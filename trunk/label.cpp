@@ -1,0 +1,69 @@
+
+/*
+   Copyright (C) 2007 by David White <dave.net>
+   Part of the Silver Tree Project
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License version 2 or later.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY.
+
+   See the COPYING file for more details.
+*/
+#include <iostream>
+
+#include "font.hpp"
+#include "label.hpp"
+#include "raster.hpp"
+#include "translate.hpp"
+
+namespace gui {
+
+label::label(const std::string& text, const SDL_Color& color, int size)
+    : text_(i18n::translate(text)), color_(color), size_(size)
+{
+	recalculate_texture();
+}
+
+void label::set_color(const SDL_Color& color)
+{
+	color_ = color;
+	recalculate_texture();
+}
+
+void label::set_text(const std::string& text)
+{
+	text_ = i18n::translate(text);
+	recalculate_texture();
+}
+
+void label::recalculate_texture()
+{
+	texture_ = graphics::font::render_text(text_, size_, color_);
+	set_dim(texture_.width(),texture_.height());
+	std::cerr << "label height: '" <<  text_ << "' -> " << texture_.height() << "\n";
+}
+
+void label::handle_draw() const
+{
+	graphics::blit_texture(texture_, x(), y());
+}
+
+label_factory::label_factory(const SDL_Color& color, int size)
+   : color_(color), size_(size)
+{}
+
+label_ptr label_factory::create(const std::string& text) const
+{
+	return label_ptr(new label(text,color_,size_));
+}
+
+label_ptr label_factory::create(const std::string& text,
+                                const std::string& tip) const
+{
+	const label_ptr res(create(text));
+	res->set_tooltip(tip);
+	return res;
+}
+
+}
