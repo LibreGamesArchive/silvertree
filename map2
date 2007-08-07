@@ -1,6 +1,6 @@
  0 d, 0 d, 0 h, 0 h, 0 h, 0 g H, 1 h, 2 h, 2 h, 3 h, 4 h
  0 h, 0 h, 0 d, 0 g H, 0 h, 0 h, 1 h, 2 h, 3 h, 4 h, 5 h
  1 h, 1 h, 1 d, 1 g H, 1 h, 1 h, 1 g H, 2 h, 3 g H, 4 h, 5 h
- 2 h, 2 g H, 2 d, 2 d, 2 h, 2 h, 2 h, 2 h f, 3 h, 3 h, 4 h
- 3 h, 3 h, 3 h, 3 h f, 3 d, 2 g H, 2 h, 3 h, 3 h, 3 h, 4 h
+ 2 h, 2 g H, 2 d, 2 d, 2 h, 2 h, 2 h, 2 f F, 3 h, 3 h, 4 h
+ 3 h, 3 h, 3 h, 3 f F, 3 d, 2 g H, 2 h, 3 h, 3 h, 3 h, 4 h
  4 h, 4 h, 4 h, 4 h, 4 h, 3 h, 3 h, 3 h, 3 h, 3 h, 3 h
