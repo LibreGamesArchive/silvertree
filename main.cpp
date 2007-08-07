@@ -63,24 +63,6 @@ extern "C" int main(int argc, char** argv)
 
 	graphics::font::manager font_manager;
 
-	std::string mapdata;
-
-	{
-	const int fd = open("map",O_RDONLY);
-	if(fd < 0) {
-		std::cerr << "could not open map\n";
-		return -1;
-	}
-
-	struct stat fileinfo;
-	fstat(fd,&fileinfo);
-
-	std::vector<char> filebuf(fileinfo.st_size);
-	read(fd,&filebuf[0],fileinfo.st_size);
-	mapdata.assign(filebuf.begin(),filebuf.end());
-	close(fd);
-	}
-
 	wml::node_ptr game_cfg;
 
 	{
