@@ -51,7 +51,7 @@ extern "C" int main(int argc, char** argv)
 	}
 
 	{
-	const std::string data = sys::read_file("translate.cfg");
+	const std::string data = sys::read_file("data/translate.cfg");
 	if(data.empty() == false) {
 		wml::node_ptr cfg(wml::parse_wml(data));
 		for(wml::node::const_attr_iterator i = cfg->begin_attr();
@@ -63,32 +63,17 @@ extern "C" int main(int argc, char** argv)
 
 	graphics::font::manager font_manager;
 
-	wml::node_ptr game_cfg;
+	wml::node_ptr rules_cfg;
 
-	{
-	const int fd = open("game.cfg",O_RDONLY);
-	if(fd < 0) {
-		std::cerr << "could not open map\n";
-		return -1;
-	}
-
-	struct stat fileinfo;
-	fstat(fd,&fileinfo);
-
-	std::vector<char> filebuf(fileinfo.st_size);
-	read(fd,&filebuf[0],fileinfo.st_size);
-	std::string doc(filebuf.begin(),filebuf.end());
 	try {
-		game_cfg = wml::parse_wml(doc);
+		rules_cfg = wml::parse_wml(sys::read_file("data/rules.cfg"));
 	} catch(...) {
-		std::cerr << "error parsing WML...\n";
+		std::cerr << "error parsing rules WML...\n";
 		return -1;
 	}
-	close(fd);
-	}
 
-	wml::node::const_all_child_iterator cfg1 = game_cfg->begin_children();
-	wml::node::const_all_child_iterator cfg2 = game_cfg->end_children();
+	wml::node::const_all_child_iterator cfg1 = rules_cfg->begin_children();
+	wml::node::const_all_child_iterator cfg2 = rules_cfg->end_children();
 	while(cfg1 != cfg2) {
 		if((*cfg1)->name() == "terrain") {
 			hex::base_terrain::add_terrain(*cfg1);
@@ -137,7 +122,15 @@ extern "C" int main(int argc, char** argv)
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
-	game_logic::world w(game_cfg);
+	wml::node_ptr scenario_cfg;
+
+	try {
+		scenario_cfg = wml::parse_wml(sys::read_file("data/scenario.cfg"));
+	} catch(...) {
+		std::cerr << "error parsing rules WML...\n";
+		return -1;
+	}
+	game_logic::world w(scenario_cfg);
 	w.play();
 
 	SDL_Quit();
