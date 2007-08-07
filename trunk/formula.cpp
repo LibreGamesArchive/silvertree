@@ -87,6 +87,47 @@ private:
 	}
 };
 
+class abs_function : public function_expression {
+public:
+	explicit abs_function(const args_list& args)
+	     : function_expression(args, 1, 1)
+	{}
+
+private:
+	int execute(const formula_callable& variables) const {
+		const int n = args()[0]->evaluate(variables);
+		return n >= 0 ? n : -n;
+	}
+};
+
+class min_function : public function_expression {
+public:
+	explicit min_function(const args_list& args)
+	     : function_expression(args, 2, 2)
+	{}
+
+private:
+	int execute(const formula_callable& variables) const {
+		const int n1 = args()[0]->evaluate(variables);
+		const int n2 = args()[1]->evaluate(variables);
+		return n1 < n2 ? n1 : n2;
+	}
+};
+
+class max_function : public function_expression {
+public:
+	explicit max_function(const args_list& args)
+	     : function_expression(args, 2, 2)
+	{}
+
+private:
+	int execute(const formula_callable& variables) const {
+		const int n1 = args()[0]->evaluate(variables);
+		const int n2 = args()[1]->evaluate(variables);
+		return n1 > n2 ? n1 : n2;
+	}
+};
+
 class rgb_function : public function_expression {
 public:
 	explicit rgb_function(const args_list& args)
@@ -187,6 +228,12 @@ expression_ptr create_function(const std::string& fn,
 {
 	if(fn == "if") {
 		return expression_ptr(new if_function(args));
+	} else if(fn == "abs") {
+		return expression_ptr(new abs_function(args));
+	} else if(fn == "min") {
+		return expression_ptr(new min_function(args));
+	} else if(fn == "max") {
+		return expression_ptr(new max_function(args));
 	} else if(fn == "rgb") {
 		return expression_ptr(new rgb_function(args));
 	} else if(fn == "transition") {
@@ -474,6 +521,12 @@ int main()
 		assert(formula("-5").execute(c) == -5);
 		assert(formula("not 5").execute(c) == 0);
 		assert(formula("not 0").execute(c) == 1);
+		assert(formula("abs(5)").execute(c) == 5);
+		assert(formula("abs(-5)").execute(c) == 5);
+		assert(formula("min(3,5)").execute(c) == 3);
+		assert(formula("min(5,2)").execute(c) == 2);
+		assert(formula("max(3,5)").execute(c) == 5);
+		assert(formula("max(5,2)").execute(c) == 5);
 	} catch(formula_error& e) {
 		std::cerr << "parse error\n";
 	}
