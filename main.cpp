@@ -72,21 +72,41 @@ extern "C" int main(int argc, char** argv)
 		return -1;
 	}
 
-	wml::node::const_all_child_iterator cfg1 = rules_cfg->begin_children();
-	wml::node::const_all_child_iterator cfg2 = rules_cfg->end_children();
+	wml::const_node_ptr skills_cfg = rules_cfg->get_child("skills");
+	if(!skills_cfg) {
+		std::cerr << "could not find skills in rules\n";
+		return -1;
+	}
+
+	for(wml::node::const_child_range range = skills_cfg->get_child_range("skill"); range.first != range.second; ++range.first) {
+		const wml::const_node_ptr& c = range.first->second;
+		game_logic::skill::add_skill(c);
+	}
+
+	wml::const_node_ptr terrain_cfg = rules_cfg->get_child("terrains");
+	if(!terrain_cfg) {
+		std::cerr << "could not find terrain in rules\n";
+		return -1;
+	}
+
+	wml::node::const_all_child_iterator cfg1 = terrain_cfg->begin_children();
+	wml::node::const_all_child_iterator cfg2 = terrain_cfg->end_children();
 	while(cfg1 != cfg2) {
 		if((*cfg1)->name() == "terrain") {
 			hex::base_terrain::add_terrain(*cfg1);
 		} else if((*cfg1)->name() == "terrain_feature") {
 			hex::terrain_feature::add_terrain(*cfg1);
-		} else if((*cfg1)->name() == "skill") {
-			game_logic::skill::add_skill(*cfg1);
-		} else if((*cfg1)->name() == "calculations") {
-			formula_registry::load(*cfg1);
 		}
-
 		++cfg1;
 	}
+
+	wml::const_node_ptr calculations_cfg = rules_cfg->get_child("calculations");
+	if(!calculations_cfg) {
+		std::cerr << "could not find calculations in rules\n";
+		return -1;
+	}
+
+	formula_registry::load(calculations_cfg);
 
 	GLfloat material_specular[] = {1.0,1.0,1.0,1.0};
 	GLfloat material_shininess[] = {1000.0};

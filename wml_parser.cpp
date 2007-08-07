@@ -21,6 +21,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "filesystem.hpp"
 #include "foreach.hpp"
 #include "formatter.hpp"
 #include "string_utils.hpp"
@@ -342,6 +343,34 @@ node_ptr parse_wml(const std::string& doc)
 			++i;
 			const std::string value = parse_value(i,doc.end());
 			nodes.top()->set_attr(name, value);
+		} else if(*i == '@') {
+			++i;
+			std::string::const_iterator begin = i;
+			while(i != doc.end() && !isspace(*i) && !util::isnewline(*i)) {
+				++i;
+			}
+
+			std::string name(begin,i);
+			if(name == "import") {
+				if(i == doc.end()) {
+					throw parse_error(formatter() << "unexpected document end while importing");
+				}
+
+				++i;
+				begin = i;
+				while(i != doc.end() && !isspace(*i) && !util::isnewline(*i)) {
+					++i;
+				}
+
+				const std::string filename(begin,i);
+				if(nodes.empty()) {
+					throw parse_error(formatter() << "@import statement at top level");
+				}
+				nodes.top()->add_child(parse_wml(sys::read_file("data/" + filename)));
+
+			} else {
+				throw parse_error(formatter() << "unrecognized @ instruction: '" << name << "'");
+			}
 		} else if(*i == '#') {
 			skip_comment(i,doc.end());
 		} else {
