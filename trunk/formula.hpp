@@ -17,6 +17,7 @@
 #include <string>
 
 #include "formula_fwd.hpp"
+#include "variant.hpp"
 
 namespace game_logic
 {
@@ -24,7 +25,7 @@ namespace game_logic
 //interface for objects that can have formulae run on them
 class formula_callable {
 public:
-	int query_value(const std::string& key) const {
+	variant query_value(const std::string& key) const {
 		return get_value(key);
 	}
 
@@ -32,16 +33,16 @@ protected:
 	~formula_callable() {}
 
 private:
-	virtual int get_value(const std::string& key) const = 0;
+	virtual variant get_value(const std::string& key) const = 0;
 };
 
 class map_formula_callable : public formula_callable {
 public:
 	explicit map_formula_callable(const formula_callable* fallback=NULL);
-	map_formula_callable& add(const std::string& key, int value);
+	map_formula_callable& add(const std::string& key, const variant& value);
 private:
-	int get_value(const std::string& key) const;
-	std::map<std::string,int> values_;
+	variant get_value(const std::string& key) const;
+	std::map<std::string,variant> values_;
 	const formula_callable* fallback_;
 };
 
@@ -50,9 +51,9 @@ typedef boost::shared_ptr<formula_expression> expression_ptr;
 
 class formula {
 public:
-	static int evaluate(const const_formula_ptr& f,
+	static variant evaluate(const const_formula_ptr& f,
 	                    const formula_callable& variables,
-						int default_res=0) {
+						variant default_res=variant(0)) {
 		if(f) {
 			return f->execute(variables);
 		} else {
@@ -60,7 +61,7 @@ public:
 		}
 	}
 	explicit formula(const std::string& str);
-	int execute(const formula_callable& variables) const;
+	variant execute(const formula_callable& variables) const;
 
 private:
 	expression_ptr expr_;

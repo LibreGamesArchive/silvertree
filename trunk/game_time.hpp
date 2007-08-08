@@ -41,7 +41,7 @@ public:
 	int alignment_adjustment() const;
 
 private:
-	int get_value(const std::string& key) const;
+	variant get_value(const std::string& key) const;
 	int minutes_since_epoch_;
 };
 

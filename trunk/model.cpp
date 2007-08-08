@@ -206,9 +206,9 @@ void yaw_matrix(GLfloat angle, GLfloat* matrix)
 void mult_matrix(const GLfloat* matrix, GLfloat* vec)
 {
 	GLfloat res[3];
-	res[0] = matrix[0 + 0*3]*vec[0] + matrix[1 + 0*3]*vec[1] + matrix[2 + 0*3]*vec[2];
-	res[1] = matrix[0 + 1*3]*vec[0]  + matrix[1 + 1*3]*vec[1] + matrix[2 + 1*3]*vec[2];
-	res[2] = matrix[0 + 2*3]*vec[0]  + matrix[1 + 2*3]*vec[1] + matrix[2 + 2*3]*vec[2];
+	res[0] = matrix[0 + 0*3]*vec[0] + matrix[0 + 1*3]*vec[1] + matrix[0 + 2*3]*vec[2];
+	res[1] = matrix[1 + 0*3]*vec[0]  + matrix[1 + 1*3]*vec[1] + matrix[1 + 2*3]*vec[2];
+	res[2] = matrix[2 + 0*3]*vec[0]  + matrix[2 + 1*3]*vec[1] + matrix[2 + 2*3]*vec[2];
 	vec[0] = res[0];
 	vec[1] = res[1];
 	vec[2] = res[2];
@@ -231,12 +231,16 @@ void model::draw_face(const face& f) const
 		int bones[64] = {v->bone_num};
 		int cur_bone = 0;
 		while(bones[cur_bone] != -1) {
-			bones[cur_bone+1] = bones_[cur_bone].parent;
+			bones[cur_bone+1] = bones_[bones[cur_bone]].parent;
 			++cur_bone;
 		}
 
-		for(int n = cur_bone-1; n != -1; --n) {
+		for(int n = 0; n != cur_bone; ++n) {
 			const bone& b = bones_[bones[n]];
+
+			vertex[0] += b.default_pos[0];
+			vertex[1] += b.default_pos[1];
+			vertex[2] += b.default_pos[2];
 
 			GLfloat matrix[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
 			roll_matrix(b.default_rot[0], matrix);
@@ -244,10 +248,6 @@ void model::draw_face(const face& f) const
 			yaw_matrix(b.default_rot[2], matrix);
 			mult_matrix(matrix, vertex);
 			mult_matrix(matrix, normal);
-
-			vertex[0] += b.default_pos[0];
-			vertex[1] += b.default_pos[1];
-			vertex[2] += b.default_pos[2];
 		}
 
 		glNormal3fv(normal);

@@ -118,12 +118,12 @@ public:
 		{}
 
 	private:
-		int get_value(const std::string& key) const {
+		variant get_value(const std::string& key) const {
 			int res = char_.stat(key);
 			if(res == 0) {
 				res = char_.get_attr(key);
 			}
-			return res;
+			return variant(res);
 		}
 		const character& char_;
 	};
@@ -131,7 +131,7 @@ public:
 private:
 	explicit character(wml::const_node_ptr node);
 
-	int get_value(const std::string& key) const;
+	variant get_value(const std::string& key) const;
 	int total_skill_points() const;
 
 	void calculate_moves();

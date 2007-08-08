@@ -122,18 +122,18 @@ game_time operator+(const game_time& t, int mins)
 	return res;
 }
 
-int game_time::get_value(const std::string& key) const
+variant game_time::get_value(const std::string& key) const
 {
 	if(key == "day") {
-		return day();
+		return variant(day());
 	} else if(key == "hour") {
-		return hour();
+		return variant(hour());
 	} else if(key == "minute") {
-		return minute();
+		return variant(minute());
 	} else if(key == "daypercent") {
-		return (100*(hour()*60 + minute()))/(24*60);
+		return variant((100*(hour()*60 + minute()))/(24*60));
 	} else {
-		return 0;
+		return variant(0);
 	}
 }
 
