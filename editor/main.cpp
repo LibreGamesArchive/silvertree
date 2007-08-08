@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 	wml::node_ptr game_cfg;
 
 	{
-	const int fd = open("game.cfg",O_RDONLY);
+	const int fd = open("data/terrain.cfg",O_RDONLY);
 	if(fd < 0) {
 		std::cerr << "could not open map\n";
 		return -1;
