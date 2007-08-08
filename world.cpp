@@ -533,14 +533,14 @@ void world::set_lighting() const
 	GLfloat diffuse[] = {1.0,1.0,1.0,1.0};
 
 	if(sun_light_) {
-		const int res = sun_light_->execute(time_);
+		const int res = sun_light_->execute(time_).as_int();
 		diffuse[0] = GLfloat((res/10000)%100)/100.0;
 		diffuse[1] = GLfloat((res/100)%100)/100.0;
 		diffuse[2] = GLfloat(res%100)/100.0;
 	}
 
 	if(ambient_light_) {
-		const int res = ambient_light_->execute(time_);
+		const int res = ambient_light_->execute(time_).as_int();
 		ambient[0] = GLfloat((res/10000)%100)/100.0;
 		ambient[1] = GLfloat((res/100)%100)/100.0;
 		ambient[2] = GLfloat(res%100)/100.0;

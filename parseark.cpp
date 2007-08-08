@@ -210,6 +210,7 @@ model_ptr parseark(const char* i1, const char* i2)
 				get_next_token(i1, i2, &token);
 				b.default_rot[2] = strtof(token.c_str(),NULL);
 				get_next_token(i1, i2, &token);
+				strip_string(&token);
 				parents.insert(std::pair<std::string,int>(token,bones.size()-1));
 			}
 

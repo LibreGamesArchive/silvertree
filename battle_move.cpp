@@ -68,7 +68,7 @@ int battle_move::get_stat(const std::string& stat,
 	         stats_.find(stat);
 	if(i != stats_.end()) {
 		const character::final_stat_callable callable(c.get_character());
-		return i->second->execute(callable);
+		return i->second->execute(callable).as_int();
 	} else {
 		return c.get_character().stat(stat);
 	}

@@ -114,7 +114,7 @@ int skill::effect_on_stat(const character& c, const std::string& stat) const
 		return 0;
 	}
 
-	return f->second->execute(c);
+	return f->second->execute(c).as_int();
 }
 
 bool skill::is_active(const character& c) const
@@ -130,7 +130,7 @@ bool skill::is_active(const character& c) const
 
 int skill::cost(const character& c) const
 {
-	return cost_.execute(c);
+	return cost_.execute(c).as_int();
 }
 
 }

@@ -27,25 +27,25 @@ map_formula_callable::map_formula_callable(
 {}
 
 map_formula_callable& map_formula_callable::add(const std::string& key,
-                                                int value)
+                                                const variant& value)
 {
 	values_[key] = value;
 	return *this;
 }
 
-int map_formula_callable::get_value(const std::string& key) const
+variant map_formula_callable::get_value(const std::string& key) const
 {
 	return map_get_value_default(values_, key,
-	        fallback_ ? fallback_->query_value(key) : 0);
+	        fallback_ ? fallback_->query_value(key) : variant(0));
 }
 
 class formula_expression {
 public:
-	int evaluate(const formula_callable& variables) const {
+	variant evaluate(const formula_callable& variables) const {
 		return execute(variables);
 	}
 private:
-	virtual int execute(const formula_callable& variables) const = 0;
+	virtual variant execute(const formula_callable& variables) const = 0;
 };
 
 namespace {
@@ -81,50 +81,9 @@ public:
 	{}
 
 private:
-	int execute(const formula_callable& variables) const {
-		const int i = args()[0]->evaluate(variables) ? 1 : 2;
+	variant execute(const formula_callable& variables) const {
+		const int i = args()[0]->evaluate(variables).as_bool() ? 1 : 2;
 		return args()[i]->evaluate(variables);
-	}
-};
-
-class abs_function : public function_expression {
-public:
-	explicit abs_function(const args_list& args)
-	     : function_expression(args, 1, 1)
-	{}
-
-private:
-	int execute(const formula_callable& variables) const {
-		const int n = args()[0]->evaluate(variables);
-		return n >= 0 ? n : -n;
-	}
-};
-
-class min_function : public function_expression {
-public:
-	explicit min_function(const args_list& args)
-	     : function_expression(args, 2, 2)
-	{}
-
-private:
-	int execute(const formula_callable& variables) const {
-		const int n1 = args()[0]->evaluate(variables);
-		const int n2 = args()[1]->evaluate(variables);
-		return n1 < n2 ? n1 : n2;
-	}
-};
-
-class max_function : public function_expression {
-public:
-	explicit max_function(const args_list& args)
-	     : function_expression(args, 2, 2)
-	{}
-
-private:
-	int execute(const formula_callable& variables) const {
-		const int n1 = args()[0]->evaluate(variables);
-		const int n2 = args()[1]->evaluate(variables);
-		return n1 > n2 ? n1 : n2;
 	}
 };
 
@@ -135,11 +94,11 @@ public:
 	{}
 
 private:
-	int execute(const formula_callable& variables) const {
-		return 10000*
-		 std::min<int>(99,std::max<int>(0,args()[0]->evaluate(variables))) +
-		 std::min<int>(99,std::max<int>(0,args()[1]->evaluate(variables)))*100+
-		 std::min<int>(99,std::max<int>(0,args()[2]->evaluate(variables)));
+	variant execute(const formula_callable& variables) const {
+		return variant(10000*
+		 std::min<int>(99,std::max<int>(0,args()[0]->evaluate(variables).as_int())) +
+		 std::min<int>(99,std::max<int>(0,args()[1]->evaluate(variables).as_int()))*100+
+		 std::min<int>(99,std::max<int>(0,args()[2]->evaluate(variables).as_int())));
 	}
 };
 
@@ -167,16 +126,16 @@ public:
 			: function_expression(args, 5, 5)
 	{}
 private:
-	int execute(const formula_callable& variables) const {
-		const int value = args()[0]->evaluate(variables);
-		const int begin = args()[1]->evaluate(variables);
-		const int end = args()[3]->evaluate(variables);
+	variant execute(const formula_callable& variables) const {
+		const int value = args()[0]->evaluate(variables).as_int();
+		const int begin = args()[1]->evaluate(variables).as_int();
+		const int end = args()[3]->evaluate(variables).as_int();
 		if(value < begin || value > end) {
-			return 0;
+			return variant(0);
 		}
-		const int val1 = args()[2]->evaluate(variables);
-		const int val2 = args()[4]->evaluate(variables);
-		return transition(begin, val1, end, val2, value);
+		const int val1 = args()[2]->evaluate(variables).as_int();
+		const int val2 = args()[4]->evaluate(variables).as_int();
+		return variant(transition(begin, val1, end, val2, value));
 	}
 };
 
@@ -186,13 +145,13 @@ public:
 			: function_expression(args, 5)
 	{}
 private:
-	int execute(const formula_callable& variables) const {
-		const int value = args()[0]->evaluate(variables);
-		int begin = args()[1]->evaluate(variables);
+	variant execute(const formula_callable& variables) const {
+		const int value = args()[0]->evaluate(variables).as_int();
+		int begin = args()[1]->evaluate(variables).as_int();
 		int end = -1;
 		int n = 3;
 		while(n < args().size()) {
-			end = args()[n]->evaluate(variables);
+			end = args()[n]->evaluate(variables).as_int();
 			if(value >= begin && value <= end) {
 				break;
 			}
@@ -202,11 +161,11 @@ private:
 		}
 
 		if(value < begin || value > end) {
-			return 0;
+			return variant(0);
 		}
-		const int val1 = args()[n-1]->evaluate(variables);
+		const int val1 = args()[n-1]->evaluate(variables).as_int();
 		const int val2 = args()[n+1 < args().size() ? n+1 : n]->
-		                                         evaluate(variables);
+		                               evaluate(variables).as_int();
 		const int r1 = (val1/10000)%100;
 		const int g1 = (val1/100)%100;
 		const int b1 = (val1)%100;
@@ -217,9 +176,52 @@ private:
 		const int r = transition(begin,r1,end,r2,value);
 		const int g = transition(begin,g1,end,g2,value);
 		const int b = transition(begin,b1,end,b2,value);
-		return std::min<int>(99,std::max<int>(0,r))*100*100 +
+		return variant(
+		       std::min<int>(99,std::max<int>(0,r))*100*100 +
 		       std::min<int>(99,std::max<int>(0,g))*100+
-		       std::min<int>(99,std::max<int>(0,b));
+		       std::min<int>(99,std::max<int>(0,b)));
+	}
+};
+
+
+class abs_function : public function_expression {
+public:
+	explicit abs_function(const args_list& args)
+	     : function_expression(args, 1, 1)
+	{}
+
+private:
+	variant execute(const formula_callable& variables) const {
+		const int n = args()[0]->evaluate(variables).as_int();
+		return variant(n >= 0 ? n : -n);
+	}
+};
+
+class min_function : public function_expression {
+public:
+	explicit min_function(const args_list& args)
+	     : function_expression(args, 2, 2)
+	{}
+
+private:
+	variant execute(const formula_callable& variables) const {
+		const variant n1 = args()[0]->evaluate(variables);
+		const variant n2 = args()[1]->evaluate(variables);
+		return n1 < n2 ? n1 : n2;
+	}
+};
+
+class max_function : public function_expression {
+public:
+	explicit max_function(const args_list& args)
+	     : function_expression(args, 2, 2)
+	{}
+
+private:
+	variant execute(const formula_callable& variables) const {
+		const variant n1 = args()[0]->evaluate(variables);
+		const variant n2 = args()[1]->evaluate(variables);
+		return n1 > n2 ? n1 : n2;
 	}
 };
 
@@ -261,10 +263,10 @@ public:
 		}
 	}
 private:
-	int execute(const formula_callable& variables) const {
-		const int res = operand_->evaluate(variables);
+	variant execute(const formula_callable& variables) const {
+		const variant res = operand_->evaluate(variables);
 		switch(op_) {
-		case NOT: return res ? 0 : 1;
+		case NOT: return res.as_bool() ? variant(0) : variant(1);
 		case SUB: return -res;
 		default: assert(false);
 		}
@@ -294,22 +296,22 @@ public:
 	}
 
 private:
-	int execute(const formula_callable& variables) const {
-		const int left = left_->evaluate(variables);
-		const int right = right_->evaluate(variables);
+	variant execute(const formula_callable& variables) const {
+		const variant left = left_->evaluate(variables);
+		const variant right = right_->evaluate(variables);
 		switch(op_) {
-		case AND: return left && right ? 1 : 0;
-		case OR:  return left || right ? 1 : 0;
+		case AND: return left.as_bool() && right.as_bool() ? variant(1) : variant(0);
+		case OR: return left.as_bool() || right.as_bool() ? variant(1) : variant(0);
 		case ADD: return left + right;
 		case SUB: return left - right;
 		case MUL: return left * right;
-		case DIV: return right == 0 ? 0 : left / right;
-		case EQ:  return left == right ? 1 : 0;
-		case NEQ: return left != right ? 1 : 0;
-		case LTE: return left <= right ? 1 : 0;
-		case GTE: return left >= right ? 1 : 0;
-		case LT:  return left < right ? 1 : 0;
-		case GT:  return left > right ? 1 : 0;
+		case DIV: return left / right;
+		case EQ:  return left == right ? variant(1) : variant(0);
+		case NEQ: return left != right ? variant(1) : variant(0);
+		case LTE: return left <= right ? variant(1) : variant(0);
+		case GTE: return left >= right ? variant(1) : variant(0);
+		case LT:  return left < right ? variant(1) : variant(0);
+		case GT:  return left > right ? variant(1) : variant(0);
 		default: assert(false);
 		}
 	}
@@ -326,7 +328,7 @@ public:
 	explicit identifier_expression(const std::string& id) : id_(id)
 	{}
 private:
-	int execute(const formula_callable& variables) const {
+	variant execute(const formula_callable& variables) const {
 		return variables.query_value(id_);
 	}
 	std::string id_;
@@ -337,8 +339,8 @@ public:
 	explicit integer_expression(int i) : i_(i)
 	{}
 private:
-	int execute(const formula_callable& variables) const {
-		return i_;
+	variant execute(const formula_callable& variables) const {
+		return variant(i_);
 	}
 
 	int i_;
@@ -483,7 +485,7 @@ formula::formula(const std::string& str)
 	expr_ = parse_expression(&tokens[0],&tokens[0] + tokens.size());
 }
 
-int formula::execute(const formula_callable& variables) const
+variant formula::execute(const formula_callable& variables) const
 { 
 	return expr_->evaluate(variables);
 }
@@ -507,26 +509,26 @@ int main()
 {
 	mock_char c;
 	try {
-		assert(formula("strength").execute(c) == 15);
-		assert(formula("17").execute(c) == 17);
-		assert(formula("strength/2 + agility").execute(c) == 19);
-		assert(formula("(strength+agility)/2").execute(c) == 13);
-		assert(formula("strength > 12").execute(c) == 1);
-		assert(formula("strength > 18").execute(c) == 0);
-		assert(formula("if(strength > 12, 7, 2)").execute(c) == 7);
-		assert(formula("if(strength > 18, 7, 2)").execute(c) == 2);
-		assert(formula("2 and 1").execute(c) == 1);
-		assert(formula("2 and 0").execute(c) == 0);
-		assert(formula("2 or 0").execute(c) == 1);
-		assert(formula("-5").execute(c) == -5);
-		assert(formula("not 5").execute(c) == 0);
-		assert(formula("not 0").execute(c) == 1);
-		assert(formula("abs(5)").execute(c) == 5);
-		assert(formula("abs(-5)").execute(c) == 5);
-		assert(formula("min(3,5)").execute(c) == 3);
-		assert(formula("min(5,2)").execute(c) == 2);
-		assert(formula("max(3,5)").execute(c) == 5);
-		assert(formula("max(5,2)").execute(c) == 5);
+		assert(formula("strength").execute(c).as_int() == 15);
+		assert(formula("17").execute(c).as_int() == 17);
+		assert(formula("strength/2 + agility").execute(c).as_int() == 19);
+		assert(formula("(strength+agility)/2").execute(c).as_int() == 13);
+		assert(formula("strength > 12").execute(c).as_int() == 1);
+		assert(formula("strength > 18").execute(c).as_int() == 0);
+		assert(formula("if(strength > 12, 7, 2)").execute(c).as_int() == 7);
+		assert(formula("if(strength > 18, 7, 2)").execute(c).as_int() == 2);
+		assert(formula("2 and 1").execute(c).as_int() == 1);
+		assert(formula("2 and 0").execute(c).as_int() == 0);
+		assert(formula("2 or 0").execute(c).as_int() == 1);
+		assert(formula("-5").execute(c).as_int() == -5);
+		assert(formula("not 5").execute(c).as_int() == 0);
+		assert(formula("not 0").execute(c).as_int() == 1);
+		assert(formula("abs(5)").execute(c).as_int() == 5);
+		assert(formula("abs(-5)").execute(c).as_int() == 5);
+		assert(formula("min(3,5)").execute(c).as_int() == 3);
+		assert(formula("min(5,2)").execute(c).as_int() == 2);
+		assert(formula("max(3,5)").execute(c).as_int() == 5);
+		assert(formula("max(5,2)").execute(c).as_int() == 5);
 	} catch(formula_error& e) {
 		std::cerr << "parse error\n";
 	}

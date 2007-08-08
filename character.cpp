@@ -36,8 +36,8 @@ const int DownHillFree = 50;
 
 class strength_penalty_callable : public formula_callable
 {
-	int val_;
-	int get_value(const std::string& key) const { return val_; }
+	variant val_;
+	variant get_value(const std::string& key) const { return val_; }
 public:
 	explicit strength_penalty_callable(int val) : val_(val) {}
 };
@@ -45,7 +45,7 @@ public:
 class fatigue_penalty_callable : public formula_callable
 {
 	const character& char_;
-	int get_value(const std::string& stat) const { return char_.stat_before_fatigue(stat); }
+	variant get_value(const std::string& stat) const { return variant(char_.stat_before_fatigue(stat)); }
 public:
 	explicit fatigue_penalty_callable(const character& c) : char_(c)
 	{}
@@ -249,19 +249,19 @@ std::vector<const_skill_ptr> character::eligible_skills() const
 	return res;
 }
 
-int character::get_value(const std::string& key) const
+variant character::get_value(const std::string& key) const
 {
 	std::map<std::string,int>::const_iterator i = attributes_.find(key);
 	if(i != attributes_.end()) {
-		return i->second;
+		return variant(i->second);
 	}
 
 	static const std::string level_str = "level";
 	if(key == level_str) {
-		return level();
+		return variant(level());
 	}
 
-	return base_stat(key);
+	return variant(base_stat(key));
 }
 
 int character::total_skill_points() const
@@ -319,7 +319,7 @@ bool character::has_skill(const std::string& name) const
 
 int character::base_stat(const std::string& str) const
 {
-	return formula::evaluate(formula_registry::get_stat_calculation(str),*this);
+	return formula::evaluate(formula_registry::get_stat_calculation(str),*this).as_int();
 }
 
 int character::stat(const std::string& str) const
@@ -327,7 +327,7 @@ int character::stat(const std::string& str) const
 	const const_formula_ptr& penalty =
 	   formula_registry::get_fatigue_penalty(str);
 	if(penalty) {
-		return penalty->execute(fatigue_penalty_callable(*this));
+		return penalty->execute(fatigue_penalty_callable(*this)).as_int();
 	} else {
 		return stat_before_fatigue(str);
 	}
@@ -356,7 +356,7 @@ int character::get_equipment_mod(const std::string& str) const
 				const int shortfall = equip->modify_stat(IdealStrength) - get_attr(StrengthAttribute);
 				if(shortfall < 0) {
 					strength_penalty_callable callable(shortfall);
-					res += strength_penalty->execute(callable);
+					res += strength_penalty->execute(callable).as_int();
 				}
 			}
 		}
@@ -378,7 +378,8 @@ int character::get_skill_mod(const std::string& str) const
 int character::stat_mod_height(const std::string& str, int height_diff) const
 {
 	return formula::evaluate(formula_registry::get_height_advantage(str),
-	            map_formula_callable(this).add("height",height_diff));
+	            map_formula_callable(this).add("height",
+						                       variant(height_diff))).as_int();
 }
 
 int character::vision_cost(hex::const_base_terrain_ptr terrain) const
