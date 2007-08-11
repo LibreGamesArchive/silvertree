@@ -18,19 +18,25 @@
 #include <QtCore/QTimer>
 #include <QtOpenGL/QGLWidget>
 
+#include "../camera.hpp"
+#include "../gamemap.hpp"
+
 class EditorGLWidget : public QGLWidget
 {
 	Q_OBJECT
 
 	public:
-		EditorGLWidget(QWidget *parent, hex::gamemap &map,
-			hex::camera &camera);
+		EditorGLWidget(QWidget *parent = 0);
+		void setMap(hex::gamemap *map);
+		void setCamera(hex::camera *camera);
 
 	protected:
 		void initializeGL();
 		//void resizeGL(int w, int h);
 		void paintGL();
-		void leaveEvent();
+
+		void enterEvent(QEvent *event);
+		void leaveEvent(QEvent *event);
 		void keyPressEvent(QKeyEvent *event);
 		void keyReleaseEvent(QKeyEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
@@ -39,8 +45,8 @@ class EditorGLWidget : public QGLWidget
 		void checkKeys();
 
 	private:
-		hex::gamemap &map_;
-		hex::camera &camera_;
+		hex::gamemap *map_;
+		hex::camera *camera_;
 		bool show_grid_;
 		int radius_;
 		int mousex_;
