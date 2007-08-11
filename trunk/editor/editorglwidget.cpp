@@ -48,6 +48,8 @@ EditorGLWidget::EditorGLWidget(QWidget *parent, hex::gamemap &map,
 	setMouseTracking(true);
 	show_grid_ = true;
 	int radius_ = 0;
+	connect(&timer_, SIGNAL(timeout()), this, SLOT(checkKeys()));
+	timer_.start(1000/50);
 }
 
 void EditorGLWidget::initializeGL() 
@@ -216,22 +218,41 @@ void EditorGLWidget::paintGL()
 
 void EditorGLWidget::keyPressEvent(QKeyEvent *event)
 {
-	if(event->type() == QEvent::KeyPress) {
-		int key = event->key();
-		if(key == Qt::Key_G) {
-			show_grid_ = true;
-			std::cerr << "Enabling grid" << std::endl;
-		} else if(key == Qt::Key_H) {
-			show_grid_ = false;
-			std::cerr << "Disabling grid" << std::endl;
-		} else if(key >= Qt::Key_0 && key <= Qt::Key_9) {
-			radius_ = key - Qt::Key_0;
-			std::cerr << "Changing radius" << std::endl;
-		} else {
-				event->ignore();
-		}
+	keys_.insert(event->key(),true);
+
+	int key = event->key();
+	if(key == Qt::Key_G) {
+		show_grid_ = true;
+		std::cerr << "Enabling grid" << std::endl;
+	} else if(key == Qt::Key_H) {
+		show_grid_ = false;
+		std::cerr << "Disabling grid" << std::endl;
+	} else if(key >= Qt::Key_0 && key <= Qt::Key_9) {
+		radius_ = key - Qt::Key_0;
+		std::cerr << "Changing radius" << std::endl;
 	} else {
 		event->ignore();
+	}
+	updateGL();
+}
+
+void EditorGLWidget::leaveEvent() {
+	keys_.clear();
+}
+
+void EditorGLWidget::keyReleaseEvent(QKeyEvent *event) {
+	keys_.remove(event->key());
+}
+
+void EditorGLWidget::checkKeys() {
+	if (keys_.contains(Qt::Key_Up)) {
+		camera_.pan_up();
+	} else if(keys_.contains(Qt::Key_Down)) {
+		camera_.pan_down();
+	} else if(keys_.contains(Qt::Key_Left)) {
+		camera_.pan_left();
+	} else if(keys_.contains(Qt::Key_Right)) {
+		camera_.pan_right();
 	}
 	updateGL();
 }
@@ -240,3 +261,5 @@ void EditorGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	setFocus(Qt::MouseFocusReason);
 }
+
+#include "editorglwidget.moc"

@@ -15,10 +15,13 @@
 #ifndef EDITORGLWIDGET_HPP_INCLUDED
 #define EDITORGLWIDGET_HPP_INCLUDED
 
+#include <QtCore/QTimer>
 #include <QtOpenGL/QGLWidget>
 
 class EditorGLWidget : public QGLWidget
 {
+	Q_OBJECT
+
 	public:
 		EditorGLWidget(QWidget *parent, hex::gamemap &map,
 			hex::camera &camera);
@@ -27,14 +30,21 @@ class EditorGLWidget : public QGLWidget
 		void initializeGL();
 		//void resizeGL(int w, int h);
 		void paintGL();
+		void leaveEvent();
 		void keyPressEvent(QKeyEvent *event);
+		void keyReleaseEvent(QKeyEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
+
+	protected slots:
+		void checkKeys();
 
 	private:
 		hex::gamemap &map_;
 		hex::camera &camera_;
 		bool show_grid_;
 		int radius_;
+		QTimer timer_;
+		QMap<int,bool> keys_;
 };
 
 #endif
