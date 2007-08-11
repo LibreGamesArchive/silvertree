@@ -146,7 +146,6 @@ int main(int argc, char** argv)
 	mainWindow->setMenuBar(menuBar);
 
 	EditorGLWidget *glWidget = new EditorGLWidget(mainWindow,map,camera);
-	//glWidget->setFocus(Qt::OtherFocusReason);
 	mainWindow->setCentralWidget(glWidget);
 
 	mainWindow->show();

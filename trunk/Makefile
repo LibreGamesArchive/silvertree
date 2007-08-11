@@ -9,7 +9,7 @@ EXECUTABLE=game
 all: $(SOURCES) $(EXECUTABLE)
 
 clean:
-	rm *.o editor/*.o editor/edit game
+	rm *.o editor/*.o edit game editor/editorglwidget.moc
 
 cleanvi:
 	rm .*swp

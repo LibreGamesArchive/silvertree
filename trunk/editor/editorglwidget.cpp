@@ -12,7 +12,6 @@
 */
 #include <gl.h>
 #include <glu.h>
-#include <SDL.h>
 
 #include <cmath>
 #include <iostream>
@@ -51,7 +50,7 @@ EditorGLWidget::EditorGLWidget(QWidget *parent, hex::gamemap &map,
 	mousex_ = 0;
 	mousey_ = 0;
 	connect(&timer_, SIGNAL(timeout()), this, SLOT(checkKeys()));
-	timer_.start(1000/50);
+	timer_.start(1000/25);
 }
 
 void EditorGLWidget::initializeGL() 
@@ -109,6 +108,7 @@ void EditorGLWidget::paintGL()
 	GLfloat yscroll = -camera_.get_pan_y();
 	const hex::tile* center = map_.closest_tile(&xscroll,&yscroll);
 	if(center) {
+		std::cout << "Selecting at " << mousex_ << "," << mousey_ << std::endl;
 		camera_.prepare_selection(mousex_,mousey_);
 		locs.clear();
 		GLuint select_name = 0;
@@ -238,6 +238,10 @@ void EditorGLWidget::keyPressEvent(QKeyEvent *event)
 	updateGL();
 }
 
+void EditorGLWidget::enterEvent() {
+	keys_.clear();
+}
+
 void EditorGLWidget::leaveEvent() {
 	keys_.clear();
 }
@@ -247,16 +251,23 @@ void EditorGLWidget::keyReleaseEvent(QKeyEvent *event) {
 }
 
 void EditorGLWidget::checkKeys() {
+	bool update = false;
 	if (keys_.contains(Qt::Key_Up)) {
+		update = true;
 		camera_.pan_up();
 	} else if(keys_.contains(Qt::Key_Down)) {
+		update = true;
 		camera_.pan_down();
 	} else if(keys_.contains(Qt::Key_Left)) {
+		update = true;
 		camera_.pan_left();
 	} else if(keys_.contains(Qt::Key_Right)) {
+		update = true;
 		camera_.pan_right();
 	}
-	updateGL();
+	if (update) {
+		updateGL();
+	}
 }
 
 void EditorGLWidget::mouseMoveEvent(QMouseEvent *event)
