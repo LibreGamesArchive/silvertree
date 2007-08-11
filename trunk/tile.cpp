@@ -95,7 +95,9 @@ void tile::draw_features(const tile** beg, const tile** end,
                          const tile::features_cache& cache)
 {
 	foreach(const graphics::const_material_ptr& mat, cache) {
-		mat->set_as_current_material();
+		if(mat) {
+			mat->set_as_current_material();
+		}
 		for(const tile** i = beg; i != end; ++i) {
 			const tile& t = **i;
 			if(t.model_) {

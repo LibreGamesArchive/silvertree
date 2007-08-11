@@ -87,7 +87,7 @@ void camera::prepare_frame()
 	glEnable(GL_LIGHT0);
 }
 
-void camera::prepare_selection()
+void camera::prepare_selection(int mousex, int mousey)
 {
 	selection_.resize(1000);
 	glSelectBuffer(selection_.size(), &selection_[0]);
@@ -101,8 +101,6 @@ void camera::prepare_selection()
 	glPushMatrix();
 	glLoadIdentity();
 
-	int mousex, mousey;
-	SDL_GetMouseState(&mousex, &mousey);
 	const double x = double(mousex);
 	const double y = 768.0 - double(mousey);
 	const double radius = 1.0;
