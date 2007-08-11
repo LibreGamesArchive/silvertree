@@ -10,6 +10,10 @@
 namespace graphics
 {
 
+namespace {
+const GLfloat ScaleFactor = 0.001;
+}
+
 void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 {
 	std::vector<GLfloat> position, normal, uv;
@@ -131,9 +135,9 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 									}
 
 									model::vertex_ptr v(new model::vertex());
-									v->point[0] = position[items[n]*3]/1000.0;
-									v->point[1] = position[items[n]*3+1]/1000.0;
-									v->point[2] = position[items[n]*3+2]/1000.0;
+									v->point[0] = position[items[n]*3]*ScaleFactor;
+									v->point[1] = position[items[n]*3+1]*ScaleFactor;
+									v->point[2] = position[items[n]*3+2]*ScaleFactor;
 									v->normal[0] = normal[items[n+1]*3];
 									v->normal[1] = normal[items[n+1]*3+1];
 									v->normal[2] = normal[items[n+1]*3+2];
