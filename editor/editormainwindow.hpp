@@ -10,6 +10,9 @@ class EditorMainWindow : public QMainWindow
 	public:
 		EditorMainWindow(QWidget *parent = 0); 
 		bool openMap(char *file);
+	
+	public slots:
+		void openRequested();
 
 	private:
 		Ui::MainWindow ui;
