@@ -11,7 +11,7 @@ namespace graphics
 {
 
 namespace {
-const GLfloat ScaleFactor = 0.001;
+const GLfloat ScaleFactor = 0.009;
 }
 
 void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
