@@ -30,6 +30,7 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QMenuBar>
 #include <QtGui/QMenu>
+#include <QtGui/QScrollArea>
 
 #include "../base_terrain.hpp"
 #include "../camera.hpp"
@@ -42,7 +43,7 @@
 #include "../tile.hpp"
 #include "../wml_parser.hpp"
 
-#include "editorglwidget.hpp"
+#include "editormainwindow.hpp"
 
 struct undo_info {
 	std::vector<hex::tile> tiles;
@@ -71,8 +72,8 @@ int main(int argc, char** argv)
 {
 	QApplication app(argc, argv);
 
-	if(argc != 2) {
-		std::cerr << "usage: " << argv[0] << " <mapname>\n";
+	if((argc != 1) && (argc != 2)) {
+		std::cerr << "usage: " << argv[0] << " [<mapname>]\n";
 		return 0;
 	}
 
@@ -112,42 +113,11 @@ int main(int argc, char** argv)
 		++cfg1;
 	}
 
-	std::string mapdata;
-
-	{
-	const int fd = open(argv[1],O_RDONLY);
-	if(fd < 0) {
-		std::cerr << "could not open map\n";
-		return -1;
+	EditorMainWindow *mainWindow = new EditorMainWindow();
+	if (argc == 2) {
+		mainWindow->openMap(argv[1]);
 	}
-
-	struct stat fileinfo;
-	fstat(fd,&fileinfo);
-
-	std::vector<char> filebuf(fileinfo.st_size);
-	read(fd,&filebuf[0],fileinfo.st_size);
-	mapdata.assign(filebuf.begin(),filebuf.end());
-	close(fd);
-	}
-
-	hex::gamemap map(mapdata);
-	hex::camera camera(map);
-	camera.allow_keyboard_panning();
-
-	QMainWindow *mainWindow = new QMainWindow();
 	mainWindow->resize(1024,768);
-
-	QMenuBar *menuBar = new QMenuBar(mainWindow);
-	QMenu *fileMenu = menuBar->addMenu("&File");
-	QAction *quitAction = fileMenu->addAction("&Quit");
-	QApplication::connect(quitAction, SIGNAL(triggered()), &app, SLOT(quit()));
-
-	menuBar->addMenu(fileMenu);
-	mainWindow->setMenuBar(menuBar);
-
-	EditorGLWidget *glWidget = new EditorGLWidget(mainWindow,map,camera);
-	mainWindow->setCentralWidget(glWidget);
-
 	mainWindow->show();
 	app.exec();
 }
