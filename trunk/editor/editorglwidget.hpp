@@ -43,6 +43,8 @@ class EditorGLWidget : public QGLWidget
 		hex::camera &camera_;
 		bool show_grid_;
 		int radius_;
+		int mousex_;
+		int mousey_;
 		QTimer timer_;
 		QMap<int,bool> keys_;
 };
