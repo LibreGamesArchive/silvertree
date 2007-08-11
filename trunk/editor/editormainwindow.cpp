@@ -3,13 +3,22 @@
 #include <sys/stat.h>
 #include <iostream>
 
+#include <QtGui/QFileDialog>
+
 #include "editormainwindow.hpp"
 
 EditorMainWindow::EditorMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
+	QApplication::connect(ui.action_Open, SIGNAL(triggered()), this, SLOT(openRequested()));
 	QApplication::connect(ui.action_Quit, SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
+}
+
+void EditorMainWindow::openRequested() {
+	//TODO: check if we have something else open and ask if we should save it, free everything and all
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Map"));
+	openMap(fileName.toAscii().data());
 }
 
 bool EditorMainWindow::openMap(char *file) {
