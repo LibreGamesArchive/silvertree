@@ -15,6 +15,7 @@
 #include "model.hpp"
 #include "parse3ds.hpp"
 #include "parseark.hpp"
+#include "parsedae.hpp"
 
 #include <map>
 #include <math.h>
@@ -24,8 +25,8 @@
 
 namespace
 {
-	std::map<std::string,graphics::const_model_ptr> model_cache;	
-	const std::string ark_header = "ArkModel";
+std::map<std::string,graphics::const_model_ptr> model_cache;	
+const std::string ark_header = "ArkModel";
 }
 
 namespace graphics
@@ -48,9 +49,11 @@ const_model_ptr model::get_model(const std::string& key)
 	
 	if(data.size() > ark_header.size() &&
 	   !memcmp(data.data(), ark_header.data(), ark_header.size())) {
-		res = parseark(data.data(),data.data()+data.size());
+		res = parseark(data.c_str(),data.c_str()+data.size());
+	} else if(data[0] == '<') {
+		res = parsedae(data.c_str(),data.c_str()+data.size());
 	} else {
-		res = parse3ds(data.data(),data.data()+data.size());
+		res = parse3ds(data.c_str(),data.c_str()+data.size());
 	}
 	model_cache.insert(std::pair<std::string,const_model_ptr>(key,res));
 	return res;
@@ -58,6 +61,7 @@ const_model_ptr model::get_model(const std::string& key)
 
 model::model(const std::vector<model::face>& faces) : faces_(faces)
 {
+	//optimize();
 	init_normals();
 }
 
@@ -65,7 +69,67 @@ model::model(const std::vector<model::face>& faces,
              const std::vector<model::bone>& bones)
   : faces_(faces), bones_(bones)
 {
+	//optimize();
 	init_normals();
+}
+
+namespace {
+bool merge_faces(model::face& a, model::face& b)
+{
+	std::vector<model::vertex_ptr>& va = a.vertices;
+	std::vector<model::vertex_ptr>& vb = b.vertices;
+	if(va.size() < 3 || vb.size() != 3) {
+		std::cerr << "bad sizes: " << va.size() << "," << vb.size() << "\n";
+		return false;
+	}
+
+	model::vertex_ptr different;
+	int unfound = 0;
+	foreach(const model::vertex_ptr& vp, vb) {
+		if(std::find(va.end()-3,va.end(),vp) == va.end()) {
+			++unfound;
+			different = vp;
+		}
+	}
+
+	std::cerr << "unfound(1): " << unfound << "\n";
+
+	if(unfound == 1) {
+		va.push_back(different);
+		return true;
+	}
+
+	unfound = 0;
+	foreach(const model::vertex_ptr& vp, vb) {
+		if(std::find(va.begin(),va.begin()+3,vp) == va.end()) {
+			++unfound;
+			different = vp;
+		}
+	}
+
+	std::cerr << "unfound(2): " << unfound << "\n";
+
+	if(unfound == 1) {
+		va.insert(va.begin(),different);
+		return true;
+	}
+
+	return false;
+}
+
+}
+
+void model::optimize()
+{
+	std::cerr << "BEFORE OPTIMIZE: " << faces_.size() << "\n";
+	for(int n = 0; n < faces_.size()-1; ) {
+		if(merge_faces(faces_[n],faces_[n+1])) {
+			faces_.erase(faces_.begin()+n+1);
+		} else {
+			++n;
+		}
+	}
+	std::cerr << "AFTER OPTIMIZE: " << faces_.size() << "\n";
 }
 
 void model::init_normals()
@@ -77,6 +141,9 @@ void model::init_normals()
 				continue;
 			}
 
+			v->normal = face_normal(f,v);
+
+			/*
 			foreach(const face& f,faces_) {
 				if(std::count(f.vertices.begin(),f.vertices.end(),v)) {
 					boost::array<GLfloat,3> normal = face_normal(f,v);
@@ -85,6 +152,7 @@ void model::init_normals()
 					}
 				}
 			}
+			*/
 
 			already_done.insert(v);
 		}
@@ -139,18 +207,28 @@ boost::array<GLfloat,3> model::face_normal(const model::face& f, int n) const
 
 void model::draw() const
 {
+	bool in_triangles = false;
 	foreach(const face& f, faces_) {
 		f.mat->set_as_current_material();
-		draw_face(f);
+		draw_face(f, in_triangles);
+	}
+
+	if(in_triangles) {
+		glEnd();
 	}
 }
 
 void model::draw_material(const const_material_ptr& mat) const
 {
+	bool in_triangles = false;
 	foreach(const face& f, faces_) {
 		if(mat == f.mat) {
-			draw_face(f);
+			draw_face(f, in_triangles);
 		}
+	}
+
+	if(in_triangles) {
+		glEnd();
 	}
 }
 
@@ -216,9 +294,19 @@ void mult_matrix(const GLfloat* matrix, GLfloat* vec)
 		
 }
 
-void model::draw_face(const face& f) const
+void model::draw_face(const face& f, bool& in_triangles) const
 {
-	glBegin(GL_TRIANGLE_STRIP);
+	if(f.vertices.size() > 3) {
+		if(in_triangles) {
+			glEnd();
+		}
+
+		glBegin(GL_TRIANGLE_STRIP);
+		in_triangles = false;
+	} else if(!in_triangles) {
+		glBegin(GL_TRIANGLES);
+		in_triangles = true;
+	}
 
 	foreach(const vertex_ptr& v,f.vertices) {
 		if(v->uvmap_valid) {
@@ -254,7 +342,9 @@ void model::draw_face(const face& f) const
 		glVertex3fv(vertex);
 	}
 
-	glEnd();
+	if(f.vertices.size() > 3) {
+		glEnd();
+	}
 }
 
 void model::get_materials(std::vector<const_material_ptr>* mats) const
