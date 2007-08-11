@@ -43,9 +43,8 @@ public:
 	typedef boost::shared_ptr<vertex> vertex_ptr;
 
 	struct face {
-		face() : strip(false) {}
+		face() {}
 		std::vector<vertex_ptr> vertices;
-		bool strip;
 		std::string material_name;
 		const_material_ptr mat;
 	};
@@ -67,10 +66,11 @@ public:
 	void get_materials(std::vector<const_material_ptr>* mats) const;
 
 private:
+	void optimize();
 	void init_normals();
 	boost::array<GLfloat,3> face_normal(const face& f, const vertex_ptr& v) const;
 	boost::array<GLfloat,3> face_normal(const face& f, int n) const;
-	void draw_face(const face& f) const;
+	void draw_face(const face& f, bool& in_triangles) const;
 	std::vector<face> faces_;
 	std::vector<bone> bones_;
 };
