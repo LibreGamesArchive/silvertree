@@ -47,7 +47,9 @@ EditorGLWidget::EditorGLWidget(QWidget *parent, hex::gamemap &map,
 {
 	setMouseTracking(true);
 	show_grid_ = true;
-	int radius_ = 0;
+	radius_ = 0;
+	mousex_ = 0;
+	mousey_ = 0;
 	connect(&timer_, SIGNAL(timeout()), this, SLOT(checkKeys()));
 	timer_.start(1000/50);
 }
@@ -107,7 +109,7 @@ void EditorGLWidget::paintGL()
 	GLfloat yscroll = -camera_.get_pan_y();
 	const hex::tile* center = map_.closest_tile(&xscroll,&yscroll);
 	if(center) {
-		camera_.prepare_selection();
+		camera_.prepare_selection(mousex_,mousey_);
 		locs.clear();
 		GLuint select_name = 0;
 		for(int x = center->loc().x()-20; x < center->loc().x()+20; ++x) {
@@ -259,6 +261,8 @@ void EditorGLWidget::checkKeys() {
 
 void EditorGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+	mousex_ = event->x();
+	mousey_ = event->x();
 	setFocus(Qt::MouseFocusReason);
 }
 
