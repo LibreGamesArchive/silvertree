@@ -18,6 +18,7 @@
 #include <queue>
 
 #include "camera.hpp"
+#include "camera_controller.hpp"
 #include "formula_fwd.hpp"
 #include "gamemap.hpp"
 #include "game_time.hpp"
@@ -86,6 +87,7 @@ private:
 	party_ptr focus_;
 	
 	hex::camera camera_;
+	hex::camera_controller camera_controller_;
 	game_time time_;
 	GLfloat subtime_;
 	tracks tracks_;

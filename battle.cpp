@@ -46,7 +46,8 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
    : chars_(chars), focus_(chars_.end()), map_(battle_map),
 	 highlight_moves_(false), highlight_attacks_(false),
 	 move_done_(false), turn_done_(false),
-	 camera_(battle_map), result_(ONGOING), keyed_selection_(0)
+	 camera_(battle_map), camera_controller_(camera_),
+	 result_(ONGOING), keyed_selection_(0)
 {
 	srand(SDL_GetTicks());
 }
@@ -135,7 +136,7 @@ void battle::player_turn(battle_character& c)
 
 		const Uint8* keys = SDL_GetKeyState(NULL);
 
-		camera_.keyboard_control();
+		camera_controller_.keyboard_control();
 
 		if(!current_move_) {
 			current_move_ = menu_->selected_move();
@@ -180,7 +181,7 @@ int battle::movement_duration()
 hex::location battle::selected_loc()
 {
 	using hex::tile;
-	camera_.prepare_selection();
+	camera_controller_.prepare_selection();
 	const std::vector<tile>& tiles = map_.tiles();
 	GLuint select_name = 0;
 	foreach(const tile& t, tiles) {
@@ -188,7 +189,7 @@ hex::location battle::selected_loc()
 		t.draw();
 	}
 
-	select_name = camera_.finish_selection();
+	select_name = camera_controller_.finish_selection();
 	if(select_name == GLuint(-1)) {
 		return hex::location();
 	}
@@ -199,14 +200,14 @@ hex::location battle::selected_loc()
 battle_character_ptr battle::selected_char()
 {
 	using hex::tile;
-	camera_.prepare_selection();
+	camera_controller_.prepare_selection();
 	GLuint select_name = 0;
 	foreach(const const_battle_character_ptr& c, chars_) {
 		glLoadName(select_name++);
 		c->draw();
 	}
 
-	select_name = camera_.finish_selection();
+	select_name = camera_controller_.finish_selection();
 	if(select_name == GLuint(-1)) {
 		if(attacks_.empty()) {
 			return battle_character_ptr();

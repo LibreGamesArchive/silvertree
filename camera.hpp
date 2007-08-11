@@ -32,7 +32,7 @@ public:
 	~camera();
 
 	void prepare_frame();
-	void prepare_selection();
+	void prepare_selection(int x, int y);
 	GLuint finish_selection();
 
 	void pan_up();

@@ -35,6 +35,7 @@ namespace game_logic
 
 world::world(wml::const_node_ptr node)
   : map_(sys::read_file((*node)["map"])), camera_(map_),
+    camera_controller_(camera_),
     time_(node), subtime_(0.0), tracks_(map_)
 {
 	const std::string& sun_light = wml::get_str(node, "sun_light");
@@ -179,7 +180,7 @@ void world::play()
 			track_info_grid = get_track_info();
 		}
 
-		camera_.prepare_selection();
+		camera_controller_.prepare_selection();
 		GLuint select_name = 0;
 		for(party_map::iterator i = parties_.begin();
 		    i != parties_.end(); ++i) {
@@ -191,7 +192,7 @@ void world::play()
 			++select_name;
 		}
 
-		select_name = camera_.finish_selection();
+		select_name = camera_controller_.finish_selection();
 		hex::location selected_loc;
 		party_map::iterator selected_party = parties_.end();
 		if(select_name != GLuint(-1)) {
@@ -430,7 +431,7 @@ void world::play()
 			game_dialogs::character_status_dialog(focus_->members().front(), focus_).show_modal();
 		}
 
-		camera_.keyboard_control();
+		camera_controller_.keyboard_control();
 	}
 }
 

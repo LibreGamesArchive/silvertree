@@ -20,6 +20,7 @@
 #include "battle_menu_fwd.hpp"
 #include "battle_move_fwd.hpp"
 #include "camera.hpp"
+#include "camera_controller.hpp"
 #include "gamemap.hpp"
 #include "texture.hpp"
 #include "widget.hpp"
@@ -84,6 +85,7 @@ private:
 	bool move_done_;
 	bool turn_done_;
 	hex::camera camera_;
+	hex::camera_controller camera_controller_;
 
 	void generate_movement_order();
 	std::vector<graphics::texture> movement_order_;
