@@ -101,7 +101,7 @@ SDL_Rect get_non_transparent_rect(surface surf)
 		++data;
 	}
 
-	const Uint32 first_row = std::min((data - lock.pixels())/surf->w,surf->h-1);
+	const Uint32 first_row = std::min<int>((data - lock.pixels())/surf->w,surf->h-1);
 	
 	const Uint32* data_rev = end_data-1;
 	while(data_rev > data) {
@@ -112,7 +112,7 @@ SDL_Rect get_non_transparent_rect(surface surf)
 		--data_rev;
 	}
 
-	const Uint32 last_row = std::min((data_rev - lock.pixels())/surf->w,surf->h-1);
+	const Uint32 last_row = std::min<int>((data_rev - lock.pixels())/surf->w,surf->h-1);
 	int left = -1;
 	int right = -1;
 
