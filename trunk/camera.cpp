@@ -44,7 +44,7 @@ camera* camera::current_camera()
 }
 		
 camera::camera(const gamemap& m)
-   : map_(m), translatex_(0.0), translatey_(0.0),
+   : map_(m), width_(1024), height_(768), translatex_(0.0), translatey_(0.0),
      rotate_(0.0), dir_(NORTH),
      tilt_(-30.0), zoom_(-30.0), debug_adjust_(false),
 	 keyboard_pan_(false)
@@ -69,7 +69,7 @@ void camera::prepare_frame()
 	glClearColor(0.0,0.0,0.0,0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glViewport(0,0,1024,768);
+	glViewport(0,0,width_,height_);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -102,7 +102,7 @@ void camera::prepare_selection(int mousex, int mousey)
 	glLoadIdentity();
 
 	const double x = double(mousex);
-	const double y = 768.0 - double(mousey);
+	const double y = GLfloat(height_) - double(mousey);
 	const double radius = 1.0;
 
 	GLint viewport[4];

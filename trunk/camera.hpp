@@ -62,12 +62,16 @@ public:
 
 	void set_debug_adjust(bool val) { debug_adjust_ = val; }
 
+	void set_dim(int width, int height) { width_ = width; height_ = height; }
+
 private:
 
 	GLfloat rotate_radians() const;
 	void enforce_limits();
 	
 	const gamemap& map_;
+
+	int width_, height_;
 
 	GLfloat translatex_, translatey_, translatez_;
 
