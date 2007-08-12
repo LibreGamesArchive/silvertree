@@ -101,6 +101,10 @@ void EditorGLWidget::initializeGL()
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 }
 
+void EditorGLWidget::resizeGL(int w, int h) {
+	camera_->set_dim(w,h);
+}
+
 void EditorGLWidget::paintGL()
 {
 	if(map_ && camera_) {
@@ -118,7 +122,6 @@ void EditorGLWidget::paintGL()
 		GLfloat yscroll = -camera_->get_pan_y();
 		const hex::tile* center = map_->closest_tile(&xscroll,&yscroll);
 		if(center) {
-			std::cout << "Selecting at " << mousex_ << "," << mousey_ << std::endl;
 			camera_->prepare_selection(mousex_,mousey_);
 			locs.clear();
 			GLuint select_name = 0;

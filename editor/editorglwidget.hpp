@@ -32,7 +32,7 @@ class EditorGLWidget : public QGLWidget
 
 	protected:
 		void initializeGL();
-		//void resizeGL(int w, int h);
+		void resizeGL(int w, int h);
 		void paintGL();
 
 		void enterEvent(QEvent *event);
