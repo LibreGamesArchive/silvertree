@@ -12,7 +12,7 @@
 */
 #include <gl.h>
 #include <glu.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include <cmath>
 #include <iostream>

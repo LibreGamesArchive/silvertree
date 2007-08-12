@@ -13,7 +13,7 @@
 #ifndef FONT_HPP_INCLUDED
 #define FONT_HPP_INCLUDED
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <string>
 #include <vector>
 
