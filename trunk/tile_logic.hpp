@@ -16,10 +16,13 @@
 #include <string>
 #include <vector>
 
+#include "formula.hpp"
+
 namespace hex
 {
-	class location {
+	class location : public game_logic::formula_callable {
 		int x_, y_;
+		variant get_value(const std::string& key) const;
 	public:
 		location() : x_(-1), y_(-1)
 		{}

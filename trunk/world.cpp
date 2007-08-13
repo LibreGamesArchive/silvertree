@@ -10,7 +10,6 @@
 
    See the COPYING file for more details.
 */
-#include "character_status_dialog.hpp"
 #include "encounter.hpp"
 #include "filesystem.hpp"
 #include "font.hpp"
@@ -19,6 +18,7 @@
 #include "grid_widget.hpp"
 #include "image_widget.hpp"
 #include "label.hpp"
+#include "party_status_dialog.hpp"
 #include "raster.hpp"
 #include "settlement.hpp"
 #include "surface.hpp"
@@ -104,6 +104,15 @@ void world::add_party(party_ptr new_party)
 	if(new_party->is_human_controlled()) {
 		std::cerr << "is human\n";
 		focus_ = new_party;
+	}
+}
+
+void world::get_matching_parties(const formula_ptr& filter, std::vector<party_ptr>& res)
+{
+	for(party_map::iterator i = parties_.begin(); i != parties_.end(); ++i) {
+		if(!filter || filter->execute(*i->second).as_bool()) {
+			res.push_back(i->second);
+		}
 	}
 }
 
@@ -428,7 +437,7 @@ void world::play()
 		}
 
 		if(keys[SDLK_s]) {
-			game_dialogs::character_status_dialog(focus_->members().front(), focus_).show_modal();
+			game_dialogs::party_status_dialog(focus_).show_modal();
 		}
 
 		camera_controller_.keyboard_control();
@@ -549,6 +558,23 @@ void world::set_lighting() const
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+}
+
+void world::fire_event(const std::string& name, const formula_callable& info)
+{
+	std::cerr << "event: '" << name << ": " << handlers_.size() << "'\n";
+	std::pair<event_map::iterator,event_map::iterator> range =
+	     handlers_.equal_range(name);
+	while(range.first != range.second) {
+		std::cerr << "calling handler...\n";
+		range.first->second.handle(info, *this);
+		++range.first;
+	}
+}
+
+void world::add_event_handler(const std::string& event, const event_handler& handler)
+{
+	handlers_.insert(std::pair<std::string,event_handler>(event,handler));
 }
 
 }

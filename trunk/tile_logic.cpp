@@ -27,6 +27,19 @@ const std::string abbrev[] = {"n","ne","se","s","sw","nw",""};
 		
 }
 
+variant location::get_value(const std::string& key) const
+{
+	if(key == "x") {
+		return variant(x_);
+	} else if(key == "y") {
+		return variant(y_);
+	} else if(key == "valid") {
+		return variant(valid());
+	} else {
+		return variant();
+	}
+}
+
 const std::string& direction_abbreviation(DIRECTION dir)
 {
 	return abbrev[dir];

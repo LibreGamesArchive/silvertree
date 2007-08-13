@@ -44,6 +44,8 @@ public:
 		return *this;
 	}
 
+	grid& finish_row();
+
 	grid& set_col_width(int col, int width);
 	grid& set_align(int col, COLUMN_ALIGN align);
 	grid& set_hpad(int pad) { hpad_ = pad; }

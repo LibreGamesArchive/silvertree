@@ -35,6 +35,7 @@
 #include "party.hpp"
 #include "skill.hpp"
 #include "terrain_feature.hpp"
+#include "texture.hpp"
 #include "translate.hpp"
 #include "world.hpp"
 

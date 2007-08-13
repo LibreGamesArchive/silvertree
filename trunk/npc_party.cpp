@@ -25,7 +25,7 @@ namespace game_logic
 {
 
 npc_party::npc_party(wml::const_node_ptr node, world& game_world)
-    : party(node,game_world)
+    : party(node,game_world), aggressive_(wml::get_bool(node,"aggressive"))
 {
 	dialog_ = node->get_child("dialog");
 	if(wml::const_node_ptr dst = node->get_child("destination")) {
@@ -96,15 +96,17 @@ void npc_party::friendly_encounter(party& p)
 
 party::TURN_RESULT npc_party::do_turn()
 {
-	std::vector<const_party_ptr> chars;
-	const std::set<hex::location>& visible = get_visible_locs();
-	foreach(const hex::location& loc, visible) {
-		game_world().get_parties_at(loc, chars);
+	const int start_ticks = SDL_GetTicks();
+	std::vector<const_party_ptr> parties;
+	if(aggressive_) {
+		get_visible_parties(parties);
 	}
+
+	std::cerr << "see " << parties.size() << " other parties\n";
 
 	hex::location target;
 	int closest = -1;
-	foreach(const const_party_ptr& party, chars) {
+	foreach(const const_party_ptr& party, parties) {
 		if(is_enemy(*party) && (closest == -1 || hex::distance_between(loc(),party->loc()) < closest)) {
 			closest = hex::distance_between(loc(),party->loc());
 			target = party->loc();
@@ -159,6 +161,8 @@ party::TURN_RESULT npc_party::do_turn()
 			pass();
 		}
 
+		const int time_taken = SDL_GetTicks() - start_ticks;
+		std::cerr << "AI took " << time_taken << "\n";
 		return TURN_COMPLETE;
 	}
 

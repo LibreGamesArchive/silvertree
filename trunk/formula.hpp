@@ -32,6 +32,8 @@ public:
 protected:
 	~formula_callable() {}
 
+	variant create_list() const;
+
 private:
 	virtual variant get_value(const std::string& key) const = 0;
 };
