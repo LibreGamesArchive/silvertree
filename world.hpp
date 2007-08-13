@@ -16,9 +16,11 @@
 #include <functional>
 #include <map>
 #include <queue>
+#include <string>
 
 #include "camera.hpp"
 #include "camera_controller.hpp"
+#include "event_handler.hpp"
 #include "formula_fwd.hpp"
 #include "gamemap.hpp"
 #include "game_time.hpp"
@@ -48,14 +50,21 @@ public:
 
 	const_settlement_ptr settlement_at(const hex::location& loc) const;
 	void add_party(party_ptr pty);
+	void get_matching_parties(const formula_ptr& filter,
+	                          std::vector<party_ptr>& res);
+	typedef std::multimap<hex::location,party_ptr> party_map;
+	party_map& parties() { return parties_; }
+	const party_map& parties() const { return parties_; }
 
 	tracks& get_tracks() { return tracks_; }
 	const tracks& get_tracks() const { return tracks_; }
 
+	void fire_event(const std::string& name, const formula_callable& info);
+	void add_event_handler(const std::string& event, const event_handler& handler);
+
 private:
 	gui::const_grid_ptr get_track_info() const;
 	hex::gamemap map_;
-	typedef std::multimap<hex::location,party_ptr> party_map;
 	typedef std::pair<party_map::iterator,party_map::iterator>
 	           party_map_range;
 	typedef std::pair<party_map::const_iterator,
@@ -95,6 +104,9 @@ private:
 	std::map<hex::location,hex::location> exits_;
 
 	const_formula_ptr sun_light_, ambient_light_;
+
+	typedef std::multimap<std::string,event_handler> event_map;
+	event_map handlers_;
 };
 		
 }

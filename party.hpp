@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "character_fwd.hpp"
+#include "formula.hpp"
 #include "gamemap.hpp"
 #include "game_time.hpp"
 #include "item_fwd.hpp"
@@ -31,7 +32,7 @@ namespace game_logic
 
 class world;
 		
-class party
+class party : public formula_callable
 {
 public:
 	party(wml::const_node_ptr node, world& gameworld);
@@ -61,6 +62,7 @@ public:
 	GLfloat get_rotation() const;
 
 	const std::set<hex::location>& get_visible_locs() const;
+	void get_visible_parties(std::vector<const_party_ptr>& parties) const;
 	
 	int vision() const;
 	int track() const;
@@ -68,6 +70,7 @@ public:
 	int trackability() const;
 
 	const std::vector<character_ptr>& members() { return members_; }
+	void destroy();
 	bool is_destroyed() const;
 
 	std::string status_text() const;
@@ -97,6 +100,8 @@ public:
 	void assign_equipment(character_ptr c,
 	                      int char_item, int party_item);
 
+	int money() const { return money_; }
+
 protected:
 	void move(hex::DIRECTION dir);
 	void pass(int minutes=1);
@@ -112,7 +117,10 @@ private:
 
 	virtual TURN_RESULT do_turn() = 0;
 
+	variant get_value(const std::string& key) const;
+
 	int id_;
+	std::string str_id_;
 
 	world* world_;
 	hex::map_avatar_ptr avatar_;
@@ -129,6 +137,7 @@ private:
 	MOVEMENT_MODE move_mode_;
 
 	std::vector<item_ptr> inventory_;
+	int money_;
 };
 
 }

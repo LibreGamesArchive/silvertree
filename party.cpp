@@ -12,6 +12,8 @@
 */
 #include "character.hpp"
 #include "foreach.hpp"
+#include "formatter.hpp"
+#include "formula.hpp"
 #include "graphics_logic.hpp"
 #include "item.hpp"
 #include "npc_party.hpp"
@@ -35,12 +37,13 @@ int current_id = 1;
 }
 
 party::party(wml::const_node_ptr node, world& gameworld)
-   : id_(current_id++), world_(&gameworld), loc_(wml::get_attr<int>(node,"x"),
+   : id_(current_id++), str_id_(wml::get_str(node,"id")),
+     world_(&gameworld), loc_(wml::get_attr<int>(node,"x"),
      wml::get_attr<int>(node,"y")),
      facing_(hex::NORTH), last_facing_(hex::NORTH),
      arrive_at_(node),
 	 allegiance_(wml::get_attr<std::string>(node,"allegiance")),
-	 move_mode_(WALK)
+	 move_mode_(WALK), money_(wml::get_int(node,"money"))
 {
 	GLfloat pos[3];
 	get_pos(pos);
@@ -56,6 +59,17 @@ party::party(wml::const_node_ptr node, world& gameworld)
 	    node->get_child_range("item");
 	    i.first != i.second; ++i.first) {
 		inventory_.push_back(item::create_item(i.first->second));
+	}
+
+	for(wml::node::const_child_range i =
+	    node->get_child_range("event");
+	    i.first != i.second; ++i.first) {
+		const wml::const_node_ptr node = i.first->second;
+		const std::string& type = wml::get_str(node,"type");
+		const formula_ptr f(new formula(formatter() << "id=" << id_));
+		event_handler handler(node);
+		handler.add_filter(f);
+		world_->add_event_handler(type, handler);
 	}
 }
 
@@ -132,6 +146,8 @@ void party::move(hex::DIRECTION dir)
 	previous_loc_ = loc_;
 	loc_ = dst;
 	visible_locs_.clear();
+
+	world_->fire_event("begin_move", *this);
 }
 
 void party::pass(int minutes)
@@ -301,6 +317,22 @@ const std::set<hex::location>& party::get_visible_locs() const
 	return visible_locs_;
 }
 
+void party::get_visible_parties(std::vector<const_party_ptr>& parties) const
+{
+	const int start_ticks = SDL_GetTicks();
+	const int range = vision();
+	world::party_map& all = world_->parties();
+	for(world::party_map::iterator i = all.begin(); i != all.end(); ++i) {
+		if(range >= hex::distance_between(loc_,i->first)) {
+			if(hex::line_of_sight(world_->map(),loc_,i->first)) {
+				parties.push_back(i->second);
+			}
+		}
+	}
+	const int taken = SDL_GetTicks() - start_ticks;
+	std::cerr << "get_visible_parties(): " << taken << "\n";
+}
+
 int party::vision() const
 {
 	static const std::string Stat = "vision";
@@ -316,6 +348,11 @@ int party::track() const
 int party::trackability() const
 {
 	return members_.size()*100;
+}
+
+void party::destroy()
+{
+	members_.clear();
 }
 
 bool party::is_destroyed() const
@@ -362,6 +399,21 @@ void party::assign_equipment(character_ptr c,
 	c->swap_equipment(char_item, inventory_[party_item]);
 	if(inventory_[party_item]->is_null()) {
 		inventory_.erase(inventory_.begin()+party_item);
+	}
+}
+
+variant party::get_value(const std::string& key) const
+{
+	if(key == "id") {
+		return variant(id_);
+	} else if(key == "loc") {
+		return variant(&loc_);
+	} else if(key == "previous") {
+		return variant(&previous_loc_);
+	} else if(key == str_id_) {
+		return variant(id_);
+	} else {
+		return variant();
 	}
 }
 

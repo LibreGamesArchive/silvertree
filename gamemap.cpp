@@ -66,26 +66,30 @@ const tile* gamemap::closest_tile(GLfloat* xloc, GLfloat* yloc) const
 	GLfloat& y = *yloc;
 	const GLfloat XRatio = 0.86602540378443427;
 	x /= XRatio;
-	if(x - std::floor(x) > 0.5) {
+
+	int xint = static_cast<int>(x);
+	if(x - xint > 0.5) {
 		x += 1.0;
+		++xint;
 	}
 
-	if((static_cast<int>(x)%2) == 1) {
+	if((xint%2) == 1) {
 		y -= 0.5;
 	}
 
-	if(y - std::floor(y) > 0.5) {
+
+	int yint = static_cast<int>(y);
+	if(y - yint > 0.5) {
 		y += 1.0;
+		++yint;
 	}
 
-	const location loc(static_cast<int>(x),static_cast<int>(y));
-	x = floor(x);
-	y = floor(y);
-	if(is_loc_on_map(loc)) {
-		return &get_tile(loc);
-	} else {
+	if(xint < 0 || yint < 0 || xint >= dim_.x() || yint >= dim_.y()) {
 		return NULL;
 	}
+
+	const unsigned int index = yint*dim_.x() + xint;
+	return &map_[index];
 }
 
 std::string gamemap::write() const
@@ -261,11 +265,7 @@ namespace {
 void draw_line_of_sight(GLfloat x1, GLfloat y1, GLfloat z1,
                         GLfloat x2, GLfloat y2, GLfloat z2,
                         GLfloat x3, GLfloat y3, GLfloat z3,
-						bool draw, bool out_of_range=false) {
-	if(!draw) {
-		return;
-	}
-
+						bool out_of_range=false) {
 	glDisable(GL_TEXTURE_2D);
 	glBegin(GL_LINES);
 	glColor4f(0.0,0.0,1.0,1.0);
@@ -332,12 +332,16 @@ bool line_of_sight(const gamemap& m,
 
 		const tile* t = m.closest_tile(&xloc,&yloc);
 		if(t == NULL || range != -1 && distance*step > range) {
-			draw_line_of_sight(x1,y1,h1,x,y,h,x2,y2,h2,draw,true);
+			if(draw) {
+				draw_line_of_sight(x1,y1,h1,x,y,h,x2,y2,h2,true);
+			}
 			return false;
 		}
 
 		if(t == &t2) {
-			draw_line_of_sight(x1,y1,h1,x2,y2,h2,x2,y2,h2,draw);
+			if(draw) {
+				draw_line_of_sight(x1,y1,h1,x2,y2,h2,x2,y2,h2);
+			}
 			return true;
 		}
 
@@ -347,13 +351,17 @@ bool line_of_sight(const gamemap& m,
 
 
 		if(t->height_at_point_vision(x,y) > h) {
-			draw_line_of_sight(x1,y1,h1,x,y,h,x2,y2,h2,draw);
+			if(draw) {
+				draw_line_of_sight(x1,y1,h1,x,y,h,x2,y2,h2);
+			}
 			return false;
 		}
 	}
 
-	draw_line_of_sight(x1,y1,h1,x2,y2,h2,x2,y2,h2,draw);
+	if(draw) {
+		draw_line_of_sight(x1,y1,h1,x2,y2,h2,x2,y2,h2,draw);
+	}
 	return true;
 }
-		
+
 }

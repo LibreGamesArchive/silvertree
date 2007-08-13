@@ -35,6 +35,7 @@ private:
 	wml::const_node_ptr dialog_;
 
 	hex::location current_destination_;
+	bool aggressive_;
 	std::vector<hex::location> wander_between_;
 };
 		

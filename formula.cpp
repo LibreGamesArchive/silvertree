@@ -22,6 +22,23 @@
 namespace game_logic
 {
 
+namespace {
+std::vector<variant_list*> memory;
+
+variant new_list()
+{
+	variant res;
+	variant_list* mem = variant::allocate_list(res);
+	memory.push_back(mem);
+	return res;
+}
+}
+
+variant formula_callable::create_list() const
+{
+	return new_list();
+}
+
 map_formula_callable::map_formula_callable(
     const formula_callable* fallback) : fallback_(fallback)
 {}
@@ -225,6 +242,53 @@ private:
 	}
 };
 
+class choose_element_function : public function_expression {
+public:
+	explicit choose_element_function(const args_list& args)
+	     : function_expression(args, 2, 2)
+	{}
+
+private:
+	variant execute(const formula_callable& variables) const {
+		const variant items = args()[0]->evaluate(variables);
+		int max_index = -1;
+		variant max_value;
+		for(int n = 0; n != items.num_elements(); ++n) {
+			const variant val = args()[1]->evaluate(*items[n].as_callable());
+			if(max_index == -1 || val > max_value) {
+				max_index = n;
+				max_value = val;
+			}
+		}
+
+		if(max_index == -1) {
+			return variant(0);
+		} else {
+			return items[max_index];
+		}
+	}
+};
+
+class filter_function : public function_expression {
+public:
+	explicit filter_function(const args_list& args)
+	    : function_expression(args, 2, 2)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		variant res = new_list();
+		const variant items = args()[0]->evaluate(variables);
+		for(int n = 0; n != items.num_elements(); ++n) {
+			const variant val = args()[1]->evaluate(*items[n].as_callable());
+			if(val.as_bool()) {
+				res.add_element(items[n]);
+			}
+		}
+
+		return res;
+	}
+};
+
 expression_ptr create_function(const std::string& fn,
                                const std::vector<expression_ptr>& args)
 {
@@ -236,6 +300,10 @@ expression_ptr create_function(const std::string& fn,
 		return expression_ptr(new min_function(args));
 	} else if(fn == "max") {
 		return expression_ptr(new max_function(args));
+	} else if(fn == "choose") {
+		return expression_ptr(new choose_element_function(args));
+	} else if(fn == "filter") {
+		return expression_ptr(new filter_function(args));
 	} else if(fn == "rgb") {
 		return expression_ptr(new rgb_function(args));
 	} else if(fn == "transition") {
@@ -274,6 +342,20 @@ private:
 	enum OP { NOT, SUB };
 	OP op_;
 	expression_ptr operand_;
+};
+
+class dot_expression : public formula_expression {
+public:
+	dot_expression(expression_ptr left, expression_ptr right)
+	   : left_(left), right_(right)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		const variant left = left_->evaluate(variables);
+		return right_->evaluate(*left.as_callable());
+	}
+
+	expression_ptr left_, right_;
 };
 
 class operator_expression : public formula_expression {
@@ -363,6 +445,7 @@ int operator_precedence(const token& t)
 		precedence_map["-"]    = 3;
 		precedence_map["*"]    = 4;
 		precedence_map["/"]    = 4;
+		precedence_map["."]    = 5;
 	}
 
 	assert(precedence_map.count(std::string(t.begin,t.end)));
@@ -457,9 +540,16 @@ expression_ptr parse_expression(const token* i1, const token* i2)
 								 parse_expression(op+1,i2)));
 	}
 
+	const std::string op_name(op->begin,op->end);
+
+	if(op_name == ".") {
+		return expression_ptr(new dot_expression(
+							     parse_expression(i1,op),
+								 parse_expression(op+1,i2)));
+	}
+
 	return expression_ptr(new operator_expression(
-							     std::string(op->begin,op->end),
-	                             parse_expression(i1,op),
+							     op_name, parse_expression(i1,op),
 								 parse_expression(op+1,i2)));
 }
 
@@ -487,7 +577,18 @@ formula::formula(const std::string& str)
 
 variant formula::execute(const formula_callable& variables) const
 { 
-	return expr_->evaluate(variables);
+	size_t n = memory.size();
+	variant res;
+	try {
+		res = expr_->evaluate(variables);
+	} catch(type_error& e) {
+		std::cerr << "formula type error!\n";
+	}
+	for(size_t m = n; m != memory.size(); ++m) {
+		variant::release_list(memory[m]);
+	}
+	memory.resize(n);
+	return res;
 }
 		
 }
@@ -495,19 +596,44 @@ variant formula::execute(const formula_callable& variables) const
 #ifdef UNIT_TEST_FORMULA
 using namespace game_logic;
 class mock_char : public formula_callable {
-	int get_value(const std::string& key) const {
+	variant get_value(const std::string& key) const {
 		if(key == "strength") {
-			return 15;
+			return variant(15);
 		} else if(key == "agility") {
-			return 12;
+			return variant(12);
 		}
 
-		return 10;
+		return variant(10);
 	}
+};
+class mock_party : public formula_callable {
+	variant get_value(const std::string& key) const {
+		if(key == "members") {
+			variant m = create_list();
+
+			i_[0].add("strength",variant(12));
+			i_[1].add("strength",variant(16));
+			i_[2].add("strength",variant(14));
+			for(int n = 0; n != 3; ++n) {
+				m.add_element(variant(&i_[n]));
+			}
+
+			return m;
+		} else if(key == "char") {
+			return variant(&c_);
+		} else {
+			return variant(0);
+		}
+	}
+
+	mock_char c_;
+	mutable map_formula_callable i_[3];
+
 };
 int main()
 {
 	mock_char c;
+	mock_party p;
 	try {
 		assert(formula("strength").execute(c).as_int() == 15);
 		assert(formula("17").execute(c).as_int() == 17);
@@ -529,6 +655,8 @@ int main()
 		assert(formula("min(5,2)").execute(c).as_int() == 2);
 		assert(formula("max(3,5)").execute(c).as_int() == 5);
 		assert(formula("max(5,2)").execute(c).as_int() == 5);
+		assert(formula("char.strength").execute(p).as_int() == 15);
+		assert(formula("choose(members,strength).strength").execute(p).as_int() == 16);
 	} catch(formula_error& e) {
 		std::cerr << "parse error\n";
 	}
