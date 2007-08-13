@@ -13,6 +13,7 @@ class EditorMainWindow : public QMainWindow
 	
 	public slots:
 		void openRequested();
+		void saveRequested();
 
 	private:
 		Ui::MainWindow ui;
