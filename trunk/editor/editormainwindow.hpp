@@ -18,6 +18,7 @@ class EditorMainWindow : public QMainWindow
 		Ui::MainWindow ui;
 		hex::camera *camera_;
 		hex::gamemap *map_;
+		bool opened_;
 };
 
 #endif

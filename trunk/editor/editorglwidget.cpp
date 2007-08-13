@@ -50,6 +50,10 @@ EditorGLWidget::EditorGLWidget(QWidget *parent)
 	mousey_ = 0;
 	map_ = 0;
 	camera_ = 0;
+
+	pick_mode_ = false;
+	new_mutation_ = true;
+
 	connect(&timer_, SIGNAL(timeout()), this, SLOT(checkKeys()));
 	timer_.start(1000/25);
 }
@@ -60,6 +64,8 @@ void EditorGLWidget::setMap(hex::gamemap *map) {
 
 void EditorGLWidget::setCamera(hex::camera *camera) {
 	camera_ = camera;
+	std::cerr << "setting camera_ to " << std::hex << (int)camera << std::endl;
+	camera_->set_dim(width(),height());
 }
 
 void EditorGLWidget::initializeGL() 
@@ -102,21 +108,16 @@ void EditorGLWidget::initializeGL()
 }
 
 void EditorGLWidget::resizeGL(int w, int h) {
-	camera_->set_dim(w,h);
+	if(camera_) {
+		camera_->set_dim(w,h);
+	}
 }
 
 void EditorGLWidget::paintGL()
 {
 	if(map_ && camera_) {
 		glEnable(GL_LIGHT0);
-		hex::location selected;
 		std::vector<hex::location> locs;
-
-		bool pick_mode = false;
-		hex::location picked_loc;
-		std::string current_terrain;
-		std::string current_feature;
-		bool new_mutation = true;
 
 		GLfloat xscroll = -camera_->get_pan_x();
 		GLfloat yscroll = -camera_->get_pan_y();
@@ -139,7 +140,7 @@ void EditorGLWidget::paintGL()
 
 			select_name = camera_->finish_selection();
 			if(select_name < locs.size()) {
-				selected = locs[select_name];
+				selected_ = locs[select_name];
 			}
 
 			camera_->prepare_frame();
@@ -183,10 +184,10 @@ void EditorGLWidget::paintGL()
 			map_->draw_grid();
 		}
 
-		if(map_->is_loc_on_map(selected)) {
+		if(map_->is_loc_on_map(selected_)) {
 			for(int n = 0; n <= radius_; ++n) {
 				std::vector<hex::location> locs;
-				hex::get_tile_ring(selected, n, locs);
+				hex::get_tile_ring(selected_, n, locs);
 				foreach(const hex::location& loc, locs) {
 					if(map_->is_loc_on_map(loc)) {
 						const hex::tile& t = map_->get_tile(loc);
@@ -198,17 +199,17 @@ void EditorGLWidget::paintGL()
 
 		{
 		std::ostringstream s;
-		s << "(" << selected.x() << "," << selected.y();
-		if(map_->is_loc_on_map(selected)) {
-			const hex::tile& t = map_->get_tile(selected);
+		s << "(" << selected_.x() << "," << selected_.y();
+		if(map_->is_loc_on_map(selected_)) {
+			const hex::tile& t = map_->get_tile(selected_);
 			s << "," << t.height();
 		}
 		s << ")";
 		renderText(20,20,s.str().c_str());
-		if(pick_mode) {
+		if(pick_mode_) {
 			std::string pick_text;
-			if(map_->is_loc_on_map(picked_loc)) {
-				const hex::tile& t = map_->get_tile(picked_loc);
+			if(map_->is_loc_on_map(picked_loc_)) {
+				const hex::tile& t = map_->get_tile(picked_loc_);
 				std::ostringstream s;
 				s << "pick: " << t.terrain()->name() << " " << t.height();
 				pick_text = s.str();
@@ -217,13 +218,13 @@ void EditorGLWidget::paintGL()
 			}
 
 			renderText(20,50,pick_text.c_str());
-		} else if(current_feature.empty() == false) {
-			hex::const_terrain_feature_ptr t = hex::terrain_feature::get(current_feature);
+		} else if(current_feature_.empty() == false) {
+			hex::const_terrain_feature_ptr t = hex::terrain_feature::get(current_feature_);
 			if(t) {
 				renderText(20,50,t->name().c_str());
 			}
 		} else {
-			hex::const_base_terrain_ptr t = hex::base_terrain::get(current_terrain);
+			hex::const_base_terrain_ptr t = hex::base_terrain::get(current_terrain_);
 			if(t) {
 				renderText(20,50,t->name().c_str());
 			}
@@ -282,6 +283,62 @@ void EditorGLWidget::checkKeys() {
 	if (update) {
 		updateGL();
 	}
+}
+
+void EditorGLWidget::mousePressEvent(QMouseEvent *event)
+{
+	int adjust = 0;
+	if(event->button() == Qt::LeftButton) {
+		adjust = 1;
+	} else if(event->button() == Qt::RightButton) {
+		adjust = -1;
+	}
+	if(adjust != 0 && map_->is_loc_on_map(selected_)) {
+		if(new_mutation_) {
+			new_mutation_ = false;
+			undo_stack_.push(undo_info());
+		}
+		assert(!undo_stack_.empty());
+		undo_info& undo = undo_stack_.top();
+
+		for(int n = 0; n <= radius_; ++n) {
+			std::vector<hex::location> locs;
+			hex::get_tile_ring(selected_, n, locs);
+			foreach(const hex::location& loc, locs) {
+				if(map_->is_loc_on_map(loc)) {
+					if(undo.locs.count(loc) == 0) {
+						undo.tiles.push_back(map_->get_tile(loc));
+						undo.locs.insert(loc);
+					}
+
+					if(pick_mode_) {
+						if(adjust == 1 && map_->is_loc_on_map(picked_loc_)) {
+							const hex::tile& src = map_->get_tile(picked_loc_);
+							const hex::tile& dst = map_->get_tile(loc);
+							map_->adjust_height(loc,src.height() - dst.height());
+							map_->set_terrain(loc,src.terrain()->id());
+							hex::const_terrain_feature_ptr f = src.feature();
+							std::string feature_id;
+							if(f) {
+								feature_id = f->id();
+							}
+
+							map_->set_feature(loc,feature_id);
+						}
+					} else if(!current_feature_.empty()) {
+						map_->set_feature(loc,current_feature_);
+					} else if(current_terrain_.empty()) {
+						map_->adjust_height(loc,adjust);
+					} else {
+						map_->set_terrain(loc,current_terrain_);
+					}
+				}
+			}
+		}
+	} else {
+		new_mutation_ = true;
+	}
+	updateGL();
 }
 
 void EditorGLWidget::mouseMoveEvent(QMouseEvent *event)

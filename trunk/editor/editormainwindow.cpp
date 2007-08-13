@@ -13,6 +13,9 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 	ui.setupUi(this);
 	QApplication::connect(ui.action_Open, SIGNAL(triggered()), this, SLOT(openRequested()));
 	QApplication::connect(ui.action_Quit, SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
+
+	opened_ = false;
+	ui.editorGLWidget->hide();
 }
 
 void EditorMainWindow::openRequested() {
@@ -25,6 +28,7 @@ bool EditorMainWindow::openMap(char *file) {
 	const int fd = open(file,O_RDONLY);
 	if(fd < 0) {
 		std::cerr << "could not open map\n";
+		opened_ = false;
 		return false;
 	}
 	struct stat fileinfo;
@@ -43,6 +47,8 @@ bool EditorMainWindow::openMap(char *file) {
 
 	ui.editorGLWidget->setMap(map_);
 	ui.editorGLWidget->setCamera(camera_);
+	ui.editorGLWidget->show();
+	opened_ = true;
 	return true;
 }
 
