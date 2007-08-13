@@ -66,6 +66,7 @@ void EditorGLWidget::setCamera(hex::camera *camera) {
 	camera_ = camera;
 	std::cerr << "setting camera_ to " << std::hex << (int)camera << std::endl;
 	camera_->set_dim(width(),height());
+	std::cerr << "setting dim to " << std::dec << width() << ", " << height() << std::endl;
 }
 
 void EditorGLWidget::initializeGL() 

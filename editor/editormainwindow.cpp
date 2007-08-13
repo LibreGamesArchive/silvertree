@@ -5,17 +5,22 @@
 
 #include <QtGui/QFileDialog>
 
+#include "../filesystem.hpp"
 #include "editormainwindow.hpp"
 
 EditorMainWindow::EditorMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
+	map_ = 0;
+	camera_ = 0;
+
 	ui.setupUi(this);
 	QApplication::connect(ui.action_Open, SIGNAL(triggered()), this, SLOT(openRequested()));
+	QApplication::connect(ui.action_Save, SIGNAL(triggered()), this, SLOT(saveRequested()));
 	QApplication::connect(ui.action_Quit, SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
 
-	opened_ = false;
-	ui.editorGLWidget->hide();
+	ui.action_Save->setEnabled(false);
+	ui.editorGLWidget->setEnabled(false);
 }
 
 void EditorMainWindow::openRequested() {
@@ -24,11 +29,17 @@ void EditorMainWindow::openRequested() {
 	openMap(fileName.toAscii().data());
 }
 
+void EditorMainWindow::saveRequested() {
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Map"));
+	if(!fileName.isNull()) {
+		sys::write_file(fileName.toAscii().data(), map_->write());
+	}
+}
+
 bool EditorMainWindow::openMap(char *file) {
 	const int fd = open(file,O_RDONLY);
 	if(fd < 0) {
 		std::cerr << "could not open map\n";
-		opened_ = false;
 		return false;
 	}
 	struct stat fileinfo;
@@ -47,8 +58,9 @@ bool EditorMainWindow::openMap(char *file) {
 
 	ui.editorGLWidget->setMap(map_);
 	ui.editorGLWidget->setCamera(camera_);
-	ui.editorGLWidget->show();
-	opened_ = true;
+	ui.editorGLWidget->setEnabled(true);
+
+	ui.action_Save->setEnabled(true);
 	return true;
 }
 
