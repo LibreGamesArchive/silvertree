@@ -18,8 +18,16 @@
 #include <QtCore/QTimer>
 #include <QtOpenGL/QGLWidget>
 
+#include <set>
+#include <stack>
+
 #include "../camera.hpp"
 #include "../gamemap.hpp"
+
+struct undo_info {
+	std::vector<hex::tile> tiles;
+	std::set<hex::location> locs;
+};
 
 class EditorGLWidget : public QGLWidget
 {
@@ -39,6 +47,7 @@ class EditorGLWidget : public QGLWidget
 		void leaveEvent(QEvent *event);
 		void keyPressEvent(QKeyEvent *event);
 		void keyReleaseEvent(QKeyEvent *event);
+		void mousePressEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
 
 	protected slots:
@@ -47,10 +56,19 @@ class EditorGLWidget : public QGLWidget
 	private:
 		hex::gamemap *map_;
 		hex::camera *camera_;
+		hex::location selected_;
 		bool show_grid_;
 		int radius_;
 		int mousex_;
 		int mousey_;
+
+		bool pick_mode_;
+		hex::location picked_loc_;
+		std::string current_terrain_;
+		std::string current_feature_;
+		bool new_mutation_;
+
+		std::stack<undo_info> undo_stack_;
 		QTimer timer_;
 		QMap<int,bool> keys_;
 };

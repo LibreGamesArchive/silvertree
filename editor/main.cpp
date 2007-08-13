@@ -45,13 +45,6 @@
 
 #include "editormainwindow.hpp"
 
-struct undo_info {
-	std::vector<hex::tile> tiles;
-	std::set<hex::location> locs;
-};
-
-std::stack<undo_info> undo_stack;
-
 namespace {
 void clone_hex(hex::gamemap& map, const hex::tile& src, const hex::location& loc)
 {
