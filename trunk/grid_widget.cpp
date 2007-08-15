@@ -34,14 +34,13 @@ void grid::add_row(const std::vector<widget_ptr>& widgets)
 	assert(widgets.size() == ncols_);
 	int index = 0;
 	foreach(const widget_ptr& widget, widgets) {
-		assert(widget);
 		cells_.push_back(widget);
 
-		if(widget->width()+hpad_ > col_widths_[index]) {
+		if(widget && widget->width()+hpad_ > col_widths_[index]) {
 			col_widths_[index] = widget->width()+hpad_;
 		}
 
-		if(widget->height() > row_height_) {
+		if(widget && widget->height() > row_height_) {
 			row_height_ = widget->height();
 		}
 
@@ -54,7 +53,7 @@ void grid::add_row(const std::vector<widget_ptr>& widgets)
 grid& grid::finish_row()
 {
 	while(!new_row_.empty()) {
-		add_col(grid_ptr(new grid(1)));
+		add_col();
 	}
 
 	return *this;
@@ -111,19 +110,22 @@ void grid::recalculate_dimensions()
 		for(int m = 0; m != ncols_; ++m) {
 			int align = 0;
 			widget_ptr widget = cells_[n*ncols_ + m];
-			switch(col_aligns_[m]) {
-			case ALIGN_LEFT:
-				align = 0;
-				break;
-			case ALIGN_CENTER:
-				align = (col_widths_[m] - widget->width())/2;
-				break;
-			case ALIGN_RIGHT:
-				align = col_widths_[m] - widget->width();
-				break;
+			if(widget) {
+				switch(col_aligns_[m]) {
+				case ALIGN_LEFT:
+					align = 0;
+					break;
+				case ALIGN_CENTER:
+					align = (col_widths_[m] - widget->width())/2;
+					break;
+				case ALIGN_RIGHT:
+					align = col_widths_[m] - widget->width();
+					break;
+				}
+
+				widget->set_loc(x+align,y+row_height_/2 - widget->height()/2);
 			}
 
-			widget->set_loc(x+align,y+row_height_/2 - widget->height()/2);
 			x += col_widths_[m];
 		}
 
@@ -147,7 +149,9 @@ void grid::handle_draw() const
 		graphics::draw_rect(rect,col,128);
 	}
 	foreach(const widget_ptr& widget, cells_) {
-		widget->draw();
+		if(widget) {
+			widget->draw();
+		}
 	}
 	glPopMatrix();
 }
@@ -190,8 +194,9 @@ void grid::handle_event(const SDL_Event& event)
 	SDL_Event ev = event;
 	normalize_event(&ev);
 	foreach(const widget_ptr& widget, cells_) {
-		assert(widget);
-		widget->process_event(ev);
+		if(widget) {
+			widget->process_event(ev);
+		}
 	}
 }
 

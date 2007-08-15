@@ -41,6 +41,8 @@ public:
 	void pan_right();
 
 	void set_pan(const GLfloat* buf);
+	void set_pan_x(GLfloat x) { translatex_ = x; }
+	void set_pan_y(GLfloat y) { translatey_ = y; }
 	GLfloat get_pan_x() const { return translatex_; }
 	GLfloat get_pan_y() const { return translatey_; }
 

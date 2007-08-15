@@ -48,7 +48,7 @@ party_status_dialog::party_status_dialog(game_logic::party_ptr p)
 	const int sz = 22;
 	label_factory lb(color, sz);
 
-	set_padding(30);
+	set_padding(10);
 
 	grid_ptr grid(new gui::grid(party_->members().size()));
 
@@ -82,7 +82,7 @@ party_status_dialog::party_status_dialog(game_logic::party_ptr p)
 	add_widget(grid);
 
 	add_widget(lb.create(formatter() << party_->money() << " " <<
-	                     i18n::translate("currency_units")));
+	                     i18n::translate("currency_units")), 20, cursor_y());
 
 	add_widget(lb.create("inventory"));
 

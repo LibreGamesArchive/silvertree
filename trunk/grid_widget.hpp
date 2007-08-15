@@ -35,7 +35,7 @@ public:
 	}
 	void add_row(const std::vector<widget_ptr>& widgets);
 
-	grid& add_col(const widget_ptr& widget) {
+	grid& add_col(const widget_ptr& widget=widget_ptr()) {
 		new_row_.push_back(widget);
 		if(new_row_.size() == ncols_) {
 			add_row(new_row_);

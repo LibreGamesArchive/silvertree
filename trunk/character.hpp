@@ -48,7 +48,7 @@ public:
 	int speed() const;
 	int climbing() const;
 	int experience() const { return xp_; }
-	int experience_required() const { return xp_required_; }
+	int experience_required() const;
 	int damage() const;
 	const std::string& damage_type() const;
 	int attack() const;
@@ -79,7 +79,7 @@ public:
 	int fatigue() const { return fatigue_; }
 	int energy() const;
 
-	void award_experience(int xp);
+	bool award_experience(int xp);
 	int level() const { return level_; }
 
 	void full_heal() { hitpoints_ = max_hitpoints(); fatigue_ = 0; }
@@ -141,7 +141,6 @@ private:
 	int fatigue_;
 	int level_;
 	int xp_;
-	int xp_required_;
 	wml::const_node_ptr level_up_;
 
 	std::map<std::string,int> move_cost_map_;

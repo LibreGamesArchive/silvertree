@@ -16,6 +16,7 @@
 #include "gl.h"
 
 #include <string>
+#include <vector>
 
 #include "model_fwd.hpp"
 #include "terrain_feature_fwd.hpp"
@@ -29,6 +30,7 @@ class terrain_feature
 {
 public:
 	static const_terrain_feature_ptr get(const std::string& id);
+	static void get_feature_ids(std::vector<std::string>& res);
 	static void add_terrain(wml::const_node_ptr node);
 
 	explicit terrain_feature(wml::const_node_ptr node);

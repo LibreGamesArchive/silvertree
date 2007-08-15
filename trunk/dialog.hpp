@@ -46,6 +46,9 @@ protected:
 	dialog(int x, int y, int w, int h);
 	virtual void handle_event(const SDL_Event& event);
 	virtual void handle_draw() const;
+
+	void prepare_draw();
+	void complete_draw();
 private:
 	std::vector<widget_ptr> widgets_;
 	bool opened_;

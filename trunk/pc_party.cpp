@@ -25,6 +25,12 @@ pc_party::pc_party(wml::const_node_ptr node, world& game_world)
 {
 }
 
+void pc_party::friendly_encounter(party& p)
+{
+	assert(dynamic_cast<pc_party*>(&p) == NULL);
+	p.friendly_encounter(*this);
+}
+
 party::TURN_RESULT pc_party::do_turn()
 {
 	const hex::DIRECTION dir = keyboard::dir(

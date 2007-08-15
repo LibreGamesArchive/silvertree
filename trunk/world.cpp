@@ -343,9 +343,9 @@ void world::play()
 			const int ticks = SDL_GetTicks();
 			const int target = last_draw + time_between_frames;
 			if(ticks >= target) {
-				SDL_Delay(1);
+				//SDL_Delay(1);
 			} else {
-				SDL_Delay(target - ticks);
+				//SDL_Delay(target - ticks);
 			}
 		}
 
@@ -368,6 +368,7 @@ void world::play()
 		party::TURN_RESULT party_result = party::TURN_COMPLETE;
 		while(active_party && party_result == party::TURN_COMPLETE) {
 			party_map::iterator itor = find_party(active_party);
+			hex::location start_loc = active_party->loc();
 			party_result = active_party->play_turn();
 			if(party_result != party::TURN_STILL_THINKING) {
 				if(itor != parties_.end()) {
@@ -376,13 +377,16 @@ void world::play()
 
 				party_map_range range = parties_.equal_range(
 				                active_party->loc());
-				while(range.first != range.second && !active_party->is_destroyed()) {
-					handle_encounter(active_party,range.first->second,
-					                 map());
-					if(range.first->second->is_destroyed()) {
-						parties_.erase(range.first++);
-					} else {
-						++range.first;
+
+				if(start_loc != active_party->loc()) {
+					while(range.first != range.second && !active_party->is_destroyed()) {
+						handle_encounter(active_party,range.first->second,
+						                 map());
+						if(range.first->second->is_destroyed()) {
+							parties_.erase(range.first++);
+						} else {
+							++range.first;
+						}
 					}
 				}
 
