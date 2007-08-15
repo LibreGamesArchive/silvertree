@@ -102,6 +102,19 @@ void EditorGLWidget::undo() {
 void EditorGLWidget::redo() {
 }
 
+void EditorGLWidget::setHeightEdit() {
+	current_terrain_.clear();
+	current_feature_.clear();
+	pick_mode_ = false;
+}
+
+void EditorGLWidget::setPicker() {
+	current_terrain_.clear();
+	current_feature_.clear();
+	pick_mode_ = true;
+	picked_loc_ = hex::location();
+}
+
 void EditorGLWidget::setCurrentTerrain(const std::string& terrain) {
 	current_terrain_ = terrain;
 	current_feature_.clear();
@@ -325,6 +338,9 @@ void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 		adjust = 1;
 	} else if(event->button() == Qt::RightButton) {
 		adjust = -1;
+		if(pick_mode_) {
+			picked_loc_ = selected_;
+		}
 	}
 	if(adjust != 0 && map_->is_loc_on_map(selected_)) {
 		if(new_mutation_) {

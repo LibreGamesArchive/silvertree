@@ -4,5 +4,5 @@
 #include "terrainhandler.moc"
 
 void TerrainHandler::terrainSelected() {
-	window_.setTerrain(id_, feature_);
+	window_.setTerrain(id_, feature_, button_);
 }
