@@ -37,6 +37,14 @@ const_terrain_feature_ptr terrain_feature::get(const std::string& id)
 	}
 }
 
+void terrain_feature::get_feature_ids(std::vector<std::string>& res)
+{
+	for(std::map<std::string,terrain_feature_ptr>::const_iterator i =
+	    terrains.begin(); i != terrains.end(); ++i) {
+		res.push_back(i->first);
+	}
+}
+
 void terrain_feature::add_terrain(wml::const_node_ptr node)
 {
 	const terrain_feature_ptr ptr(new terrain_feature(node));

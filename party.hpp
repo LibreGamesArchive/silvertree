@@ -101,6 +101,7 @@ public:
 	                      int char_item, int party_item);
 
 	int money() const { return money_; }
+	void get_money(int m) { money_ += m; }
 
 protected:
 	void move(hex::DIRECTION dir);

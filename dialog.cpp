@@ -71,14 +71,24 @@ void dialog::show_modal()
 			process_event(event);
 		}
 
-		graphics::prepare_raster();
-		glClearColor(0.0,0.0,0.0,0.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		prepare_draw();
 		draw();
 		gui::draw_tooltip();
-		SDL_GL_SwapBuffers();
-		SDL_Delay(1);
+		complete_draw();
 	}
+}
+
+void dialog::prepare_draw()
+{
+	graphics::prepare_raster();
+	glClearColor(0.0,0.0,0.0,0.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void dialog::complete_draw()
+{
+	SDL_GL_SwapBuffers();
+	SDL_Delay(1);
 }
 
 void dialog::handle_draw() const

@@ -37,6 +37,10 @@ class EditorGLWidget : public QGLWidget
 		EditorGLWidget(QWidget *parent = 0);
 		void setMap(hex::gamemap *map);
 		void setCamera(hex::camera *camera);
+		void undo();
+		void redo();
+		void setCurrentTerrain(const std::string& terrain);
+		void setCurrentFeature(const std::string& terrain);
 
 	protected:
 		void initializeGL();

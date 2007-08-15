@@ -22,7 +22,7 @@ namespace graphics
 namespace {
 	typedef std::map<texture::key,graphics::texture> texture_map;
 	texture_map texture_cache;
-	texture current_texture;
+	GLuint current_texture = 0;
 
 	const size_t num_texture_ids = 128;
 	GLuint texture_ids[num_texture_ids];
@@ -113,14 +113,17 @@ texture::texture(const key& surfs)
 
 void texture::set_as_current_texture() const
 {
-	if(current_texture == *this) {
+	if(!valid()) {
+		glBindTexture(GL_TEXTURE_2D,0);
+		current_texture = 0;
 		return;
 	}
 
-	if(!valid()) {
-		glBindTexture(GL_TEXTURE_2D,0);
+	if(current_texture == id_->id) {
 		return;
 	}
+
+	current_texture = id_->id;
 
 	glBindTexture(GL_TEXTURE_2D,id_->id);
 	width_multiplier = ratio_w_;

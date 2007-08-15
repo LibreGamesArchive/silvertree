@@ -4,9 +4,14 @@
 #include <iostream>
 
 #include <QtGui/QFileDialog>
+#include <QtGui/QScrollBar>
+#include <QtGui/QToolButton>
 
+#include "../base_terrain.hpp"
+#include "../terrain_feature.hpp"
 #include "../filesystem.hpp"
 #include "editormainwindow.hpp"
+#include "terrainhandler.hpp"
 
 EditorMainWindow::EditorMainWindow(QWidget *parent)
 	: QMainWindow(parent)
@@ -18,9 +23,37 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 	QApplication::connect(ui.action_Open, SIGNAL(triggered()), this, SLOT(openRequested()));
 	QApplication::connect(ui.action_Save, SIGNAL(triggered()), this, SLOT(saveRequested()));
 	QApplication::connect(ui.action_Quit, SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
+	QApplication::connect(ui.actionZoom_In, SIGNAL(triggered()), this, SLOT(zoominRequested()));
+	QApplication::connect(ui.actionZoom_Out, SIGNAL(triggered()), this, SLOT(zoomoutRequested()));
+	QApplication::connect(ui.horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(horzScroll(int)));
+	QApplication::connect(ui.verticalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(vertScroll(int)));
+	QApplication::connect(ui.actionRotate_Left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
+	QApplication::connect(ui.actionRotate_Right, SIGNAL(triggered()), this, SLOT(rotateRight()));
+	QApplication::connect(ui.actionUndo, SIGNAL(triggered()), this, SLOT(undo()));
+	QApplication::connect(ui.actionRedo, SIGNAL(triggered()), this, SLOT(redo()));
 
 	ui.action_Save->setEnabled(false);
 	ui.editorGLWidget->setEnabled(false);
+
+	std::vector<std::string> terrain_ids;
+	hex::base_terrain::get_terrain_ids(terrain_ids);
+	for(int n = 0; n != terrain_ids.size(); ++n) {
+		QToolButton* b = new QToolButton();
+		b->setText(hex::base_terrain::get(terrain_ids[n])->name().c_str());
+		handlers_.push_back(new TerrainHandler(*this, terrain_ids[n], false));
+		QApplication::connect(b, SIGNAL(pressed()), handlers_.back(), SLOT(terrainSelected()));
+		ui.tilesToolBar->addWidget(b);
+	}
+
+	terrain_ids.clear();
+	hex::terrain_feature::get_feature_ids(terrain_ids);
+	for(int n = 0; n != terrain_ids.size(); ++n) {
+		QToolButton* b = new QToolButton();
+		b->setText(hex::terrain_feature::get(terrain_ids[n])->name().c_str());
+		handlers_.push_back(new TerrainHandler(*this, terrain_ids[n], true));
+		QApplication::connect(b, SIGNAL(pressed()), handlers_.back(), SLOT(terrainSelected()));
+		ui.tilesToolBar->addWidget(b);
+	}
 }
 
 void EditorMainWindow::openRequested() {
@@ -34,6 +67,47 @@ void EditorMainWindow::saveRequested() {
 	if(!fileName.isNull()) {
 		sys::write_file(fileName.toAscii().data(), map_->write());
 	}
+}
+
+void EditorMainWindow::zoominRequested() {
+	std::cerr << "zoom\n";
+	for(int n = 0; n != 5; ++n) {
+		camera_->zoom_in();
+	}
+	ui.editorGLWidget->updateGL();
+}
+
+void EditorMainWindow::zoomoutRequested() {
+	for(int n = 0; n != 5; ++n) {
+		camera_->zoom_out();
+	}
+	ui.editorGLWidget->updateGL();
+}
+
+void EditorMainWindow::horzScroll(int value) {
+	camera_->set_pan_x(-value);
+	ui.editorGLWidget->updateGL();
+}
+
+void EditorMainWindow::vertScroll(int value) {
+	camera_->set_pan_y(-(ui.verticalScrollBar->maximum() - value));
+	ui.editorGLWidget->updateGL();
+}
+
+void EditorMainWindow::rotateLeft() {
+	camera_->rotate_left();
+}
+
+void EditorMainWindow::rotateRight() {
+	camera_->rotate_right();
+}
+
+void EditorMainWindow::undo() {
+	ui.editorGLWidget->undo();
+}
+
+void EditorMainWindow::redo() {
+	ui.editorGLWidget->redo();
 }
 
 bool EditorMainWindow::openMap(char *file) {
@@ -56,12 +130,26 @@ bool EditorMainWindow::openMap(char *file) {
 	camera_ = new hex::camera(*map_);
 	camera_->allow_keyboard_panning();
 
+	camera_->set_pan_y(-(map_->size().y()-1));
+	ui.horizontalScrollBar->setMaximum(map_->size().x());
+	ui.verticalScrollBar->setMaximum(map_->size().y());
+
 	ui.editorGLWidget->setMap(map_);
 	ui.editorGLWidget->setCamera(camera_);
 	ui.editorGLWidget->setEnabled(true);
 
 	ui.action_Save->setEnabled(true);
 	return true;
+}
+
+void EditorMainWindow::setTerrain(const std::string& id, bool feature)
+{
+	std::cerr << "setting terrain: '" << id << "'\n";
+	if(feature) {
+		ui.editorGLWidget->setCurrentFeature(id);
+	} else {
+		ui.editorGLWidget->setCurrentTerrain(id);
+	}
 }
 
 #include "editormainwindow.moc"

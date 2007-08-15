@@ -81,7 +81,6 @@ character::character(wml::const_node_ptr node)
 	 fatigue_(wml::get_attr<int>(node,"fatigue")),
 	 level_(wml::get_attr<int>(node,"level",1)),
 	 xp_(wml::get_attr<int>(node,"xp")),
-	 xp_required_(wml::get_attr<int>(node,"xp_required")),
 	 level_up_(node->get_child("level_up")),
 	 alignment_(character::NEUTRAL),
 	 improvement_points_(wml::get_int(node,"improvements")),
@@ -412,6 +411,11 @@ int character::vision() const
 	return stat(VisionStat);
 }
 
+int character::experience_required() const
+{
+	return stat("experience_required");
+}
+
 int character::damage() const
 {
 	return stat(DamageStat);
@@ -515,15 +519,14 @@ std::string character::alignment_description() const
 	}
 }
 
-void character::award_experience(int xp)
+bool character::award_experience(int xp)
 {
 	xp_ += xp;
-	if(xp_ >= xp_required_) {
-		xp_required_ *= 2;
-		level_++;
-		if(!level_up_) {
-			return;
-		}
+	if(xp_ >= experience_required()) {
+		++level_;
+		return true;
+	} else {
+		return false;
 	}
 }
 

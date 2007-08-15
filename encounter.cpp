@@ -17,6 +17,7 @@
 #include "dialog.hpp"
 #include "encounter.hpp"
 #include "foreach.hpp"
+#include "post_battle_dialog.hpp"
 #include "world.hpp"
 
 #include <iostream>
@@ -48,7 +49,7 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		chars.push_back(battle_character::make_battle_character(
 		                    *i,p1,loc,hex::NORTH,*battle_map,
 							p1->game_world().current_time()));
-		xp1 += (*i)->level();
+		xp1 += (*i)->level()*10;
 	}
 
 	for(std::vector<character_ptr>::const_iterator i =
@@ -57,11 +58,23 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		chars.push_back(battle_character::make_battle_character(
 		                    *i,p2,loc,hex::NORTH,*battle_map,
 							p2->game_world().current_time()));
-		xp2 += (*i)->level();
+		xp2 += (*i)->level()*10;
 	}
 
 	battle b(chars,*battle_map);
 	b.play();
+
+	if(p1->is_destroyed() || p2->is_destroyed()) {
+		if(p1->is_destroyed()) {
+			std::swap(p1,p2);
+			std::swap(xp1,xp2);
+		}
+
+		if(p1->is_human_controlled()) {
+			game_dialogs::post_battle_dialog d(p1, xp2, p2->money());
+			d.show();
+		}
+	}
 
 	if(p1->is_destroyed() == false) {
 		foreach(const character_ptr& c, p1->members()) {

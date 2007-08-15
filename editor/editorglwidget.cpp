@@ -40,6 +40,22 @@
 
 #include "editorglwidget.hpp"
 
+namespace {
+void clone_hex(hex::gamemap& map, const hex::tile& src, const hex::location& loc)
+{
+	const hex::tile& dst = map.get_tile(loc);
+	map.adjust_height(loc,src.height() - dst.height());
+	map.set_terrain(loc,src.terrain()->id());
+	hex::const_terrain_feature_ptr f = src.feature();
+	std::string feature_id;
+	if(f) {
+		feature_id = f->id();
+	}
+
+	map.set_feature(loc,feature_id);
+}
+}
+
 EditorGLWidget::EditorGLWidget(QWidget *parent)
 	: QGLWidget(parent)
 {
@@ -67,6 +83,35 @@ void EditorGLWidget::setCamera(hex::camera *camera) {
 	std::cerr << "setting camera_ to " << std::hex << (int)camera << std::endl;
 	camera_->set_dim(width(),height());
 	std::cerr << "setting dim to " << std::dec << width() << ", " << height() << std::endl;
+}
+
+void EditorGLWidget::undo() {
+	if(undo_stack_.empty()) {
+		return;
+	}
+
+	const undo_info& u = undo_stack_.top();
+	foreach(const hex::tile& t, u.tiles) {
+		clone_hex(*map_, t, t.loc());
+	}
+
+	undo_stack_.pop();
+	updateGL();
+}
+
+void EditorGLWidget::redo() {
+}
+
+void EditorGLWidget::setCurrentTerrain(const std::string& terrain) {
+	current_terrain_ = terrain;
+	current_feature_.clear();
+	pick_mode_ = false;
+}
+
+void EditorGLWidget::setCurrentFeature(const std::string& terrain) {
+	current_terrain_.clear();
+	current_feature_ = terrain;
+	pick_mode_ = false;
 }
 
 void EditorGLWidget::initializeGL() 
@@ -268,19 +313,6 @@ void EditorGLWidget::keyReleaseEvent(QKeyEvent *event) {
 
 void EditorGLWidget::checkKeys() {
 	bool update = false;
-	if (keys_.contains(Qt::Key_Up)) {
-		update = true;
-		camera_->pan_up();
-	} else if(keys_.contains(Qt::Key_Down)) {
-		update = true;
-		camera_->pan_down();
-	} else if(keys_.contains(Qt::Key_Left)) {
-		update = true;
-		camera_->pan_left();
-	} else if(keys_.contains(Qt::Key_Right)) {
-		update = true;
-		camera_->pan_right();
-	}
 	if (update) {
 		updateGL();
 	}

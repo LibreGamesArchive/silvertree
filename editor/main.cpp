@@ -73,25 +73,25 @@ int main(int argc, char** argv)
 	wml::node_ptr game_cfg;
 
 	{
-	const int fd = open("data/terrain.cfg",O_RDONLY);
-	if(fd < 0) {
-		std::cerr << "could not open map\n";
-		return -1;
-	}
+		const int fd = open("data/terrain.cfg",O_RDONLY);
+		if(fd < 0) {
+			std::cerr << "could not open map\n";
+			return -1;
+		}
 
-	struct stat fileinfo;
-	fstat(fd,&fileinfo);
+		struct stat fileinfo;
+		fstat(fd,&fileinfo);
 
-	std::vector<char> filebuf(fileinfo.st_size);
-	read(fd,&filebuf[0],fileinfo.st_size);
-	std::string doc(filebuf.begin(),filebuf.end());
-	try {
-		game_cfg = wml::parse_wml(doc);
-	} catch(...) {
-		std::cerr << "error parsing WML...\n";
-		return -1;
-	}
-	close(fd);
+		std::vector<char> filebuf(fileinfo.st_size);
+		read(fd,&filebuf[0],fileinfo.st_size);
+		std::string doc(filebuf.begin(),filebuf.end());
+		try {
+			game_cfg = wml::parse_wml(doc);
+		} catch(...) {
+			std::cerr << "error parsing WML...\n";
+			return -1;
+		}
+		close(fd);
 	}
 
 	wml::node::const_all_child_iterator cfg1 = game_cfg->begin_children();

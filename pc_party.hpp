@@ -27,6 +27,8 @@ public:
 	pc_party(wml::const_node_ptr node, world& game_world);
 
 	bool is_human_controlled() const { return true; }
+
+	void friendly_encounter(party& p);
 private:
 	TURN_RESULT do_turn();
 		

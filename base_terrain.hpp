@@ -31,6 +31,7 @@ class base_terrain
 {
 public:
 	static const_base_terrain_ptr get(const std::string& id);
+	static void get_terrain_ids(std::vector<std::string>& res);
 
 	graphics::texture generate_texture(const location& loc, int height, const const_base_terrain_ptr* adj) const;
 	graphics::texture transition_texture(hex::DIRECTION dir) const;

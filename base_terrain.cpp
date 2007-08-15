@@ -40,6 +40,14 @@ const_base_terrain_ptr base_terrain::get(const std::string& id)
 	}
 }
 
+void base_terrain::get_terrain_ids(std::vector<std::string>& res)
+{
+	for(std::map<std::string,base_terrain_ptr>::const_iterator i =
+	    terrains.begin(); i != terrains.end();  ++i) {
+		res.push_back(i->first);
+	}
+}
+
 namespace {
 
 int prandom(const location& loc, int height)
