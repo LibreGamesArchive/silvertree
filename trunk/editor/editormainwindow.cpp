@@ -35,14 +35,33 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 	ui.action_Save->setEnabled(false);
 	ui.editorGLWidget->setEnabled(false);
 
+	QToolButton* height_button = new QToolButton();
+	height_button->setText("Height");
+	height_button->setCheckable(true);
+	height_button->setChecked(true);
+	handlers_.push_back(new TerrainHandler(*this, "", false, tool_buttons_.size()));
+	QApplication::connect(height_button, SIGNAL(pressed()), handlers_.back(), SLOT(terrainSelected()));
+	ui.tilesToolBar->addWidget(height_button);
+	tool_buttons_.push_back(height_button);
+
+	QToolButton* picker_button = new QToolButton();
+	picker_button->setText("Picker");
+	picker_button->setCheckable(true);
+	handlers_.push_back(new TerrainHandler(*this, "", true, tool_buttons_.size()));
+	QApplication::connect(picker_button, SIGNAL(pressed()), handlers_.back(), SLOT(terrainSelected()));
+	ui.tilesToolBar->addWidget(picker_button);
+	tool_buttons_.push_back(picker_button);
+
 	std::vector<std::string> terrain_ids;
 	hex::base_terrain::get_terrain_ids(terrain_ids);
 	for(int n = 0; n != terrain_ids.size(); ++n) {
 		QToolButton* b = new QToolButton();
 		b->setText(hex::base_terrain::get(terrain_ids[n])->name().c_str());
-		handlers_.push_back(new TerrainHandler(*this, terrain_ids[n], false));
+		b->setCheckable(true);
+		handlers_.push_back(new TerrainHandler(*this, terrain_ids[n], false, tool_buttons_.size()));
 		QApplication::connect(b, SIGNAL(pressed()), handlers_.back(), SLOT(terrainSelected()));
 		ui.tilesToolBar->addWidget(b);
+		tool_buttons_.push_back(b);
 	}
 
 	terrain_ids.clear();
@@ -50,9 +69,11 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 	for(int n = 0; n != terrain_ids.size(); ++n) {
 		QToolButton* b = new QToolButton();
 		b->setText(hex::terrain_feature::get(terrain_ids[n])->name().c_str());
-		handlers_.push_back(new TerrainHandler(*this, terrain_ids[n], true));
+		b->setCheckable(true);
+		handlers_.push_back(new TerrainHandler(*this, terrain_ids[n], true, tool_buttons_.size()));
 		QApplication::connect(b, SIGNAL(pressed()), handlers_.back(), SLOT(terrainSelected()));
 		ui.tilesToolBar->addWidget(b);
+		tool_buttons_.push_back(b);
 	}
 }
 
@@ -142,9 +163,21 @@ bool EditorMainWindow::openMap(char *file) {
 	return true;
 }
 
-void EditorMainWindow::setTerrain(const std::string& id, bool feature)
+void EditorMainWindow::setTerrain(const std::string& id, bool feature, int button)
 {
-	std::cerr << "setting terrain: '" << id << "'\n";
+	for(int n = 0; n != tool_buttons_.size(); ++n) {
+		tool_buttons_[n]->setChecked(false);
+	}
+
+	if(id == "") {
+		if(feature) {
+			ui.editorGLWidget->setPicker();
+		} else {
+			ui.editorGLWidget->setHeightEdit();
+		}
+		return;
+	}
+
 	if(feature) {
 		ui.editorGLWidget->setCurrentFeature(id);
 	} else {

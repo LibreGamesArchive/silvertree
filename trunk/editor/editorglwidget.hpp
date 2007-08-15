@@ -39,6 +39,8 @@ class EditorGLWidget : public QGLWidget
 		void setCamera(hex::camera *camera);
 		void undo();
 		void redo();
+		void setHeightEdit();
+		void setPicker();
 		void setCurrentTerrain(const std::string& terrain);
 		void setCurrentFeature(const std::string& terrain);
 

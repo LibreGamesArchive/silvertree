@@ -1,6 +1,7 @@
 #ifndef EDITORMAINWINDOW_HPP_INCLUDED
 #define EDITORMAINWINDOW_HPP_INCLUDED
 
+#include <QtGui/QToolButton>
 #include <vector>
 
 #include "ui_mainwindow.hpp"
@@ -24,7 +25,7 @@ class EditorMainWindow : public QMainWindow
 		void rotateRight();
 		void undo();
 		void redo();
-		void setTerrain(const std::string& id, bool feature);
+		void setTerrain(const std::string& id, bool feature, int button);
 
 	private:
 		Ui::MainWindow ui;
@@ -32,6 +33,7 @@ class EditorMainWindow : public QMainWindow
 		hex::gamemap *map_;
 		bool opened_;
 		std::vector<class TerrainHandler*> handlers_;
+		std::vector<QToolButton*> tool_buttons_;
 };
 
 #endif
