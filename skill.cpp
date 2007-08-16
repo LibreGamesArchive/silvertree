@@ -84,8 +84,8 @@ const skill::skills_map& skill::all_skills()
 skill::skill(const wml::const_node_ptr& node)
   : name_(wml::get_str(node,"name")),
     description_(wml::get_str(node,"description")),
-    cost_(wml::get_str(node,"cost")),
-    prerequisite_(wml::get_str(node,"prerequisite"))
+    prerequisite_(wml::get_str(node,"prerequisite")),
+    cost_(wml::get_str(node,"cost"))
 {
 	WML_READ_VECTOR(node, requirements_, new skill_requirement, "requirement", skill_requirement_ptr);
 

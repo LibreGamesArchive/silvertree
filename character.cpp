@@ -75,13 +75,13 @@ character_ptr character::create(wml::const_node_ptr node)
 
 character::character(wml::const_node_ptr node)
    : description_(wml::get_attr<std::string>(node,"description")),
-	 image_(wml::get_str(node,"image")),
-	 portrait_(wml::get_str(node,"portrait")),
 	 hitpoints_(wml::get_attr<int>(node,"hitpoints",-1)),
 	 fatigue_(wml::get_attr<int>(node,"fatigue")),
 	 level_(wml::get_attr<int>(node,"level",1)),
 	 xp_(wml::get_attr<int>(node,"xp")),
 	 level_up_(node->get_child("level_up")),
+	 image_(wml::get_str(node,"image")),
+	 portrait_(wml::get_str(node,"portrait")),
 	 alignment_(character::NEUTRAL),
 	 improvement_points_(wml::get_int(node,"improvements")),
 	 spent_skill_points_(wml::get_int(node,"spent_skill_points"))

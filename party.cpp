@@ -231,8 +231,6 @@ void party::get_pos(GLfloat* pos) const
 
 	if(arrive_at_ > game_world().current_time() &&
 	   map().is_loc_on_map(previous_loc_)) {
-		const game_time& current_time = game_world().current_time();
-
 		const GLfloat depart =
 		       static_cast<GLfloat>(departed_at_.since_epoch());
 		const GLfloat arrive =

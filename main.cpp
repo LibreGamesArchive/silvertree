@@ -109,8 +109,6 @@ extern "C" int main(int argc, char** argv)
 
 	formula_registry::load(calculations_cfg);
 
-	GLfloat material_specular[] = {1.0,1.0,1.0,1.0};
-	GLfloat material_shininess[] = {1000.0};
 	GLfloat intensity = 1.0;
 	GLfloat ambient_light[] = {intensity,intensity,intensity,1.0};
 	GLfloat diffuse_light[] = {1.0,1.0,1.0,1.0};

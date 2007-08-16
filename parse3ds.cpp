@@ -167,9 +167,10 @@ std::vector<graphics::model::face> parse_mesh(chunk& c)
 					f.vertices[m] = vertices[index];
 				}
 
-				uint16_t face_flag = read_integer<uint16_t>(
+				/*uint16_t face_flag = read_integer<uint16_t>(
 				                      child.beg,child.end);
 				face_flag; //currently ignored
+				*/
 				res.push_back(f);
 			}
 
@@ -391,9 +392,9 @@ void parse_mesh_keyframes(chunk& c)
 		switch(child.id) {
 		case 0xB010: { //object name, parameters, father
 			const std::string name = read_string(child.beg,child.end);
-			const uint16_t flag1 = read_integer<uint16_t>(
+			/*const uint16_t flag1 =*/ read_integer<uint16_t>(
 			                                child.beg,child.end);
-			const uint16_t flag2 = read_integer<uint16_t>(
+			/*const uint16_t flag2 =*/ read_integer<uint16_t>(
 			                                child.beg,child.end);
 			const uint16_t parent = read_integer<uint16_t>(
 			                                child.beg,child.end);

@@ -41,8 +41,6 @@ void get_skills_derived_from(const std::string& skill_name,
 
 gui::grid_ptr learn_skills_dialog::get_grid_for_skill(const_skill_ptr s)
 {
-	const SDL_Color color = {0xFF,0xFF,0x0};
-	const int sz = 22;
 	using namespace gui;
 	grid_ptr g(new grid(2));
 	boost::shared_ptr<skill_dialog> child(new skill_dialog(char_, s));

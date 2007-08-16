@@ -136,7 +136,6 @@ GLuint camera::finish_selection()
 	for(GLint i = 0; i < hits && itor != selection_.end(); ++i) {
 		GLuint names = *itor++;
 		const GLuint z1 = *itor++;
-		const GLuint z2 = *itor++;
 		if(names > 0 && (closest = GLuint(-1) || z1 > closest)) {
 			res = *itor;
 			closest = z1;
@@ -246,6 +245,8 @@ DIRECTION camera::direction() const
 		case NORTH_WEST:
 			return SOUTH_WEST;
 	}
+
+	assert(false);
 }
 
 void camera::keyboard_control()

@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-O2 -c -g `sdl-config --cflags` -I/usr/include/GL -I/usr/local/include/boost-1_34 -I/System/Library/Frameworks/OpenGL.framework/Headers -I/sw/include -I/usr/include/qt4
+CFLAGS=-Wall -Werror -Wno-sign-compare -Wno-switch -Wno-switch-enum -Wno-non-virtual-dtor -O2 -c -g `sdl-config --cflags` -I/usr/include/GL -I/usr/local/include/boost-1_34 -I/System/Library/Frameworks/OpenGL.framework/Headers -I/sw/include -I/usr/include/qt4
 LDFLAGS=-O2 `sdl-config --libs` -lGL -lGLU -lSDL_image -lSDL_ttf -L/System/Library/Frameworks/OpenGL.framework/Libraries -lboost_regex
 SOURCES=$(wildcard *.cpp)
 OBJECTS=$(SOURCES:.cpp=.o) xml.o

@@ -347,7 +347,6 @@ bool battle_character::can_attack(const battle_character& c,
 
 void battle_character::end_move()
 {
-	const int cost = route_cost(move_);
 	set_time_until_next_move(route_cost(move_));
 	time_in_move_ = -1.0;
 	loc_ = move_.back();
