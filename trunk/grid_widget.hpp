@@ -41,7 +41,7 @@ public:
 
 	grid& set_col_width(int col, int width);
 	grid& set_align(int col, COLUMN_ALIGN align);
-	grid& set_hpad(int pad) { hpad_ = pad; }
+	grid& set_hpad(int pad);
 
 	void allow_selection(bool val=true) { allow_selection_ = val; }
 	void must_select(bool val=true) { must_select_ = val; selected_row_ = 0; }
