@@ -31,7 +31,6 @@ grid::grid(int ncols)
 
 void grid::add_row(const std::vector<widget_ptr>& widgets)
 {
-	std::cerr << "INFO: add row: " << widgets.size() << "\n";
 	assert(widgets.size() == ncols_);
 	int index = 0;
 	foreach(const widget_ptr& widget, widgets) {
@@ -52,7 +51,6 @@ void grid::add_row(const std::vector<widget_ptr>& widgets)
 }
 
 grid& grid::add_col(const widget_ptr& widget) {
-	std::cerr << "INFO: add col: " << new_row_.size() << "\n";
 	new_row_.push_back(widget);
 	if(new_row_.size() == ncols_) {
 		add_row(new_row_);
@@ -83,6 +81,12 @@ grid& grid::set_align(int col, grid::COLUMN_ALIGN align)
 	assert(col >= 0 && col < ncols_);
 	col_aligns_[col] = align;
 	recalculate_dimensions();
+	return *this;
+}
+
+grid& grid::set_hpad(int pad)
+{
+	hpad_ = pad;
 	return *this;
 }
 
@@ -176,7 +180,6 @@ void grid::handle_event(const SDL_Event& event)
 			if(new_row != selected_row_) {
 				selected_row_ = new_row;
 				if(on_mouseover_) {
-					std::cerr << "row: " << new_row << "\n";
 					on_mouseover_->call(new_row);
 				}
 			}
