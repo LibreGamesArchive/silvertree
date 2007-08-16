@@ -50,6 +50,15 @@ void grid::add_row(const std::vector<widget_ptr>& widgets)
 	recalculate_dimensions();
 }
 
+grid& grid::add_col(const widget_ptr& widget) {
+	new_row_.push_back(widget);
+	if(new_row_.size() == ncols_) {
+		add_row(new_row_);
+		new_row_.clear();
+	}
+	return *this;
+}
+
 grid& grid::finish_row()
 {
 	while(!new_row_.empty()) {
