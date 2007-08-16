@@ -32,6 +32,7 @@ namespace game_logic
 class character : public game_logic::formula_callable
 {
 public:
+	friend class character_generator;
 	static const std::vector<std::string>& attributes();
 
 	static character_ptr create(wml::const_node_ptr node);
@@ -141,7 +142,6 @@ private:
 	int fatigue_;
 	int level_;
 	int xp_;
-	wml::const_node_ptr level_up_;
 
 	std::map<std::string,int> move_cost_map_;
 	std::map<std::string,int> attributes_;

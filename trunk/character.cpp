@@ -13,6 +13,7 @@
 #include "base_terrain.hpp"
 #include "battle_move.hpp"
 #include "character.hpp"
+#include "character_generator.hpp"
 #include "equipment.hpp"
 #include "foreach.hpp"
 #include "formula_registry.hpp"
@@ -74,63 +75,8 @@ character_ptr character::create(wml::const_node_ptr node)
 }
 
 character::character(wml::const_node_ptr node)
-   : description_(wml::get_attr<std::string>(node,"description")),
-	 hitpoints_(wml::get_attr<int>(node,"hitpoints",-1)),
-	 fatigue_(wml::get_attr<int>(node,"fatigue")),
-	 level_(wml::get_attr<int>(node,"level",1)),
-	 xp_(wml::get_attr<int>(node,"xp")),
-	 level_up_(node->get_child("level_up")),
-	 image_(wml::get_str(node,"image")),
-	 portrait_(wml::get_str(node,"portrait")),
-	 alignment_(character::NEUTRAL),
-	 improvement_points_(wml::get_int(node,"improvements")),
-	 spent_skill_points_(wml::get_int(node,"spent_skill_points"))
 {
-	wml::const_node_ptr costs = node->get_child("movement_costs");
-	if(costs) {
-		for(wml::node::const_attr_iterator i = costs->begin_attr();
-		    i != costs->end_attr(); ++i) {
-			move_cost_map_[i->first] =
-			         wml::get_attr<int>(costs,i->first,-1);
-		}
-	}
-
-	wml::const_node_ptr attr = node->get_child("attributes");
-	if(attr) {
-		for(wml::node::const_attr_iterator i = attr->begin_attr();
-		    i != attr->end_attr(); ++i) {
-			attributes_[i->first] = wml::get_attr<int>(attr,i->first);
-		}
-	}
-
-	wml::node::const_child_range equip = node->get_child_range("equipment");
-	while(equip.first != equip.second) {
-		const wml::const_node_ptr eq = equip.first->second;
-		const item_ptr item = item::create_item(eq);
-		if(item) {
-			equipment_.push_back(item);
-		}
-
-		++equip.first;
-	}
-
-	const std::vector<std::string> skills = util::split(wml::get_str(node,"skills"));
-	foreach(const std::string& skill, skills) {
-		skills_.push_back(skill::get_skill(skill));
-	}
-
-	const std::string& align = wml::get_attr<std::string>(node,"alignment");
-	if(align == "chaotic") {
-		alignment_ = CHAOTIC;
-	} else if(align == "lawful") {
-		alignment_ = LAWFUL;
-	}
-
-	if(hitpoints_ == -1) {
-		hitpoints_ = max_hitpoints();
-	}
-
-	calculate_moves();
+	character_generator::get((*node)["generator"]).generate(*this, node);
 }
 
 int character::move_cost(hex::const_base_terrain_ptr terrain,
