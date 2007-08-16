@@ -773,6 +773,10 @@ deref(auto_any_t cur, type2type<T, C> *)
               _foreach_continue ? BOOST_FOREACH_NEXT(COL) : (void)0)                            \
         if  (boost::foreach_detail_::set_false(_foreach_continue)) {} else                      \
         for (VAR = BOOST_FOREACH_DEREF(COL); !_foreach_continue; _foreach_continue = true)
+
+#ifdef foreach
+#undef foreach
+#endif
 																		#define foreach BOOST_FOREACH
 
 #endif

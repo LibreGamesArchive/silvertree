@@ -198,8 +198,6 @@ void tile::init_corners()
 
 		std::fill(center_.normal,center_.normal+3,0.0);
 
-		GLfloat total_normal[3];
-
 		for(int n = 0; n != 6; ++n) {
 			const GLfloat* v1 = vectors[n];
 			const GLfloat* v2 = vectors[(n+1)%6];

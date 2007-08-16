@@ -175,6 +175,8 @@ int game_time::alignment_adjustment() const
 	case 4:
 		return -25;
 	}
+
+	assert(false);
 }
 
 }

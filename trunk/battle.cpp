@@ -134,8 +134,6 @@ void battle::player_turn(battle_character& c)
 			}
 		}
 
-		const Uint8* keys = SDL_GetKeyState(NULL);
-
 		camera_controller_.keyboard_control();
 
 		if(!current_move_) {
@@ -354,7 +352,6 @@ void battle::draw(gui::slider* slider)
 	}
 
 	if(highlight_attacks_ && attacks_.count(selected_hex)) {
-		SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
 		battle_character_ptr ch;
 		foreach(const battle_character_ptr& c, chars_) {
 			if(c->loc() == selected_hex) {
@@ -620,7 +617,6 @@ void battle::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
 		} else if(highlight_attacks_) {
 			battle_character_ptr target_char = selected_char();
 
-			const GLfloat hit_highlight[] = {1.0,0.0,0.0,1.0};
 			if(target_char) {
 				turn_done_ = true;
 				attack_character(**focus_, *target_char, *current_move_);
