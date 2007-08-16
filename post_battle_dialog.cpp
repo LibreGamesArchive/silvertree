@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "character.hpp"
 #include "foreach.hpp"
 #include "formatter.hpp"
@@ -24,6 +26,7 @@ post_battle_dialog::post_battle_dialog(game_logic::party_ptr p,
 	money_left_ = lb.create(formatter() << money_);
 	xp_left_ = lb.create(formatter() << xp_);
 	grid_ptr grid(new gui::grid(4));
+	std::cerr << "INFO2: " << xp_ << " " << money_ << "\n";
 	grid->set_hpad(20).
 	      add_col(lb.create("currency_units")).
 	      add_col(money_label_).
