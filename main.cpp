@@ -25,6 +25,7 @@
 
 #include "camera.hpp"
 #include "character.hpp"
+#include "character_generator.hpp"
 #include "filesystem.hpp"
 #include "font.hpp"
 #include "formula_registry.hpp"
@@ -72,6 +73,9 @@ extern "C" int main(int argc, char** argv)
 		std::cerr << "error parsing rules WML...\n";
 		return -1;
 	}
+
+	game_logic::character_generator::initialize(
+	                         rules_cfg->get_child("generators"));
 
 	wml::const_node_ptr skills_cfg = rules_cfg->get_child("skills");
 	if(!skills_cfg) {
