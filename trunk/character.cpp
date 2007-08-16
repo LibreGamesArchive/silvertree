@@ -162,24 +162,21 @@ int character::move_cost(hex::const_base_terrain_ptr terrain,
 		base_cost += feature_cost;
 	}
 
-	base_cost /= speed();
-
-	int climb_cost = (5*height_change*100)/climbing();
-	if(climb_cost < 0) {
-		climb_cost *= -1;
-		climb_cost -= DownHillFree;
-		if(climb_cost < 0) {
-			climb_cost = 0;
-		}
-	}
-
-	if(climb_cost > MaxClimb) {
+	if(abs(height_change) > MaxClimb) {
 		return -1;
 	}
 
-	const int final_cost = ((base_cost*(100+climb_cost))/100);
+	if(height_change < 0) {
+		height_change += DownHillFree;
+		if(height_change > 0) {
+			height_change = 0;
+		}
+	}
 
-	return final_cost;
+	height_change = abs(height_change);
+	const int climb_cost = 100 + (height_change*100*2)/climbing();
+
+	return (climb_cost*base_cost)/(speed()*100);
 }
 
 namespace {
