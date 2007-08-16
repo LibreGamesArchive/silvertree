@@ -31,6 +31,7 @@ grid::grid(int ncols)
 
 void grid::add_row(const std::vector<widget_ptr>& widgets)
 {
+	std::cerr << "INFO: add row: " << widgets.size() << "\n";
 	assert(widgets.size() == ncols_);
 	int index = 0;
 	foreach(const widget_ptr& widget, widgets) {
@@ -51,6 +52,7 @@ void grid::add_row(const std::vector<widget_ptr>& widgets)
 }
 
 grid& grid::add_col(const widget_ptr& widget) {
+	std::cerr << "INFO: add col: " << new_row_.size() << "\n";
 	new_row_.push_back(widget);
 	if(new_row_.size() == ncols_) {
 		add_row(new_row_);

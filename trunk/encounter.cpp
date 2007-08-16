@@ -66,11 +66,13 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 
 	if(p1->is_destroyed() || p2->is_destroyed()) {
 		if(p1->is_destroyed()) {
+			std::cerr << "SWAP!\n";
 			std::swap(p1,p2);
 			std::swap(xp1,xp2);
 		}
 
 		if(p1->is_human_controlled()) {
+			std::cerr << "INFO: " << (int)p1.get() << " " << xp2 << " " << p2->money() << "\n";
 			game_dialogs::post_battle_dialog d(p1, xp2, p2->money());
 			d.show();
 		}
