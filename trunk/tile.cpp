@@ -522,9 +522,9 @@ void tile::draw_cliffs() const
 		const int next = (n+1)%6;
 		const int prev = n == 0 ? 5 : n-1;
 
-		const point *points[4] = { &corners_[n == 0 ? 5 : n-1], &corners_[(n)%6],
+		const point *points[4] = { &cliffs_[n]->corners_[(n+3)%6],
 		                           &cliffs_[n]->corners_[(n+2)%6],
-		                           &cliffs_[n]->corners_[(n+3)%6] };
+				                   &corners_[(n)%6], &corners_[n == 0 ? 5 : n-1]};
 		const GLfloat sixth = 1.0/6.0;
 		const GLfloat left = sixth*GLfloat(loc_.x()*2 + loc_.y()*2 + n);
 		const GLfloat right = left + sixth;
@@ -547,12 +547,12 @@ void tile::draw_cliffs() const
 			glNormal3f(0.6666*next,-1.0+0.6666*next,0.0);
 			const point& corner = neighbours_[next]->corners_[prev];
 			glBegin(GL_TRIANGLES);
-			glTexCoord2f(right,points[1]->height * sixth);
-			glVertex3f(points[1]->x, points[1]->y, points[1]->height);
-			glTexCoord2f(right,points[2]->height * sixth);
-			glVertex3f(points[2]->x, points[2]->y, points[2]->height);
 			glTexCoord2f(right+sixth,corner.height * sixth);
 			glVertex3f(corner.x, corner.y, corner.height);
+			glTexCoord2f(right,points[2]->height * sixth);
+			glVertex3f(points[2]->x, points[2]->y, points[2]->height);
+			glTexCoord2f(right,points[1]->height * sixth);
+			glVertex3f(points[1]->x, points[1]->y, points[1]->height);
 			glEnd();
 		}
 
@@ -560,12 +560,12 @@ void tile::draw_cliffs() const
 			glNormal3f(0.6666*prev,-1.0+0.6666*prev,0.0);
 			const point& corner = corners_[prev == 0 ? 5 : prev-1];
 			glBegin(GL_TRIANGLES);
-			glTexCoord2f(left,points[3]->height * sixth);
-			glVertex3f(points[3]->x, points[3]->y, points[3]->height);
-			glTexCoord2f(left,points[0]->height * sixth);
-			glVertex3f(points[0]->x, points[0]->y, points[0]->height);
 			glTexCoord2f(left - sixth,corner.height * sixth);
 			glVertex3f(corner.x, corner.y, corner.height);
+			glTexCoord2f(left,points[0]->height * sixth);
+			glVertex3f(points[0]->x, points[0]->y, points[0]->height);
+			glTexCoord2f(left,points[3]->height * sixth);
+			glVertex3f(points[3]->x, points[3]->y, points[3]->height);
 			glEnd();
 		}
 
@@ -573,16 +573,16 @@ void tile::draw_cliffs() const
 		glBegin(GL_TRIANGLES);
 		GLfloat normalx = 0.0, normaly = 0.0;
 		cliff_normal(n,normalx,normaly);
-		graphics::texture::set_coord(UVCorners[5][0],UVCorners[5][1]);
-		glNormal3f(normalx,normaly,-1.0);
-		glVertex3f(points[0]->x, points[0]->y, points[0]->height);
-		graphics::texture::set_coord(UVCorners[0][0],UVCorners[0][1]);
-		glNormal3f(normalx,normaly,-1.0);
-		glVertex3f(points[1]->x, points[1]->y, points[1]->height);
 		graphics::texture::set_coord(UVCenter[0],UVCenter[1]);
 		glNormal3f(normalx,normaly,0.0);
 		glVertex3f((points[0]->x+points[1]->x)/2.0,
 		           (points[0]->y+points[1]->y)/2.0, points[1]->height-1.0);
+		graphics::texture::set_coord(UVCorners[0][0],UVCorners[0][1]);
+		glNormal3f(normalx,normaly,-1.0);
+		glVertex3f(points[1]->x, points[1]->y, points[1]->height);
+		graphics::texture::set_coord(UVCorners[5][0],UVCorners[5][1]);
+		glNormal3f(normalx,normaly,-1.0);
+		glVertex3f(points[0]->x, points[0]->y, points[0]->height);
 		glEnd();
 
 		cliff_texture_.set_as_current_texture();

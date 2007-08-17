@@ -394,12 +394,21 @@ private:
 		case GTE: return left >= right ? variant(1) : variant(0);
 		case LT:  return left < right ? variant(1) : variant(0);
 		case GT:  return left > right ? variant(1) : variant(0);
+		case DICE:return variant(dice_roll(left.as_int(), right.as_int()));
 		default: assert(false);
 		}
 	}
 
+	static int dice_roll(int num_rolls, int faces) {
+		int res = 0;
+		while(faces > 0 && num_rolls-- > 0) {
+			res += (rand()%faces)+1;
+		}
+		return res;
+	}
+
 	enum OP { AND, OR, NEQ, LTE, GTE, GT='>', LT='<', EQ='=',
-	          ADD='+', SUB='-', MUL='*', DIV='/' };
+	          ADD='+', SUB='-', MUL='*', DIV='/', DICE='d' };
 
 	OP op_;
 	expression_ptr left_, right_;
@@ -572,7 +581,12 @@ formula::formula(const std::string& str)
 		}
 	}
 
-	expr_ = parse_expression(&tokens[0],&tokens[0] + tokens.size());
+	try {
+		expr_ = parse_expression(&tokens[0],&tokens[0] + tokens.size());
+	} catch(...) {
+		std::cerr << "error parsing formula '" << str << "'\n";
+		throw;
+	}
 }
 
 variant formula::execute(const formula_callable& variables) const
@@ -589,6 +603,12 @@ variant formula::execute(const formula_callable& variables) const
 	}
 	memory.resize(n);
 	return res;
+}
+
+variant formula::execute() const
+{
+	static map_formula_callable null_callable;
+	return execute(null_callable);
 }
 		
 }
@@ -630,8 +650,12 @@ class mock_party : public formula_callable {
 	mutable map_formula_callable i_[3];
 
 };
+
+#include <time.h>
+
 int main()
 {
+	srand(time(NULL));
 	mock_char c;
 	mock_party p;
 	try {
@@ -657,6 +681,8 @@ int main()
 		assert(formula("max(5,2)").execute(c).as_int() == 5);
 		assert(formula("char.strength").execute(p).as_int() == 15);
 		assert(formula("choose(members,strength).strength").execute(p).as_int() == 16);
+		const int dice_roll = formula("3d6").execute().as_int();
+		assert(dice_roll >= 3 && dice_roll <= 18);
 	} catch(formula_error& e) {
 		std::cerr << "parse error\n";
 	}

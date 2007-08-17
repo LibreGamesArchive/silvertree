@@ -343,9 +343,9 @@ void world::play()
 			const int ticks = SDL_GetTicks();
 			const int target = last_draw + time_between_frames;
 			if(ticks >= target) {
-				//SDL_Delay(1);
+				SDL_Delay(1);
 			} else {
-				//SDL_Delay(target - ticks);
+				SDL_Delay(target - ticks);
 			}
 		}
 

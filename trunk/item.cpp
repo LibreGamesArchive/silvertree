@@ -23,6 +23,20 @@ namespace {
 const std::string type_names[] = {
 "none", "weapon", "shield", "armor", "helmet",
 };
+
+std::map<std::string,const_item_ptr> registry;
+}
+
+void item::initialize(const wml::const_node_ptr& node)
+{
+	WML_FOREACH(i, node, "item") {
+		registry[(*i)["id"]] = create_item(i);
+	}
+}
+
+const_item_ptr item::get(const std::string& id)
+{
+	return registry[id];
 }
 
 item_ptr item::create_item(const wml::const_node_ptr& node)

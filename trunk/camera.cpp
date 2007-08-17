@@ -136,6 +136,7 @@ GLuint camera::finish_selection()
 	for(GLint i = 0; i < hits && itor != selection_.end(); ++i) {
 		GLuint names = *itor++;
 		const GLuint z1 = *itor++;
+		++itor;
 		if(names > 0 && (closest = GLuint(-1) || z1 > closest)) {
 			res = *itor;
 			closest = z1;

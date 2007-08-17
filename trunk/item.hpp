@@ -26,10 +26,14 @@ class equipment;
 class item
 {
 public:
+	static void initialize(const wml::const_node_ptr& node);
+	static const_item_ptr get(const std::string& id);
+	static item_ptr create_item(const wml::const_node_ptr& node);
 	item(ITEM_TYPE type, const wml::const_node_ptr& node);
 	explicit item(ITEM_TYPE type);
 	virtual ~item() {}
-	static item_ptr create_item(const wml::const_node_ptr& node);
+
+	virtual item_ptr clone() const { return item_ptr(new item(*this)); }
 	
 	ITEM_TYPE type() const { return type_; }
 	const std::string& item_class() const { return class_; }
