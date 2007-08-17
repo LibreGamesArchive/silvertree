@@ -1,6 +1,7 @@
 #include "character.hpp"
 #include "character_generator.hpp"
 #include "foreach.hpp"
+#include "formula.hpp"
 #include "item.hpp"
 #include "skill.hpp"
 #include "string_utils.hpp"
@@ -109,7 +110,7 @@ void character_generator::generate(character& c, wml::const_node_ptr node) const
 	if(attr) {
 		for(wml::node::const_attr_iterator i = attr->begin_attr();
 		    i != attr->end_attr(); ++i) {
-			c.attributes_[i->first] = wml::get_attr<int>(attr,i->first);
+			c.attributes_[i->first] = formula(i->second).execute().as_int();
 		}
 	}
 

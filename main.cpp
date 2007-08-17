@@ -30,6 +30,7 @@
 #include "font.hpp"
 #include "formula_registry.hpp"
 #include "gamemap.hpp"
+#include "item.hpp"
 #include "wml_parser.hpp"
 #include "wml_node.hpp"
 #include "base_terrain.hpp"
@@ -74,6 +75,7 @@ extern "C" int main(int argc, char** argv)
 		return -1;
 	}
 
+	game_logic::item::initialize(rules_cfg->get_child("item_registry"));
 	game_logic::character_generator::initialize(
 	                         rules_cfg->get_child("generators"));
 
@@ -157,4 +159,5 @@ extern "C" int main(int argc, char** argv)
 	w.play();
 
 	SDL_Quit();
+	return 0;
 }

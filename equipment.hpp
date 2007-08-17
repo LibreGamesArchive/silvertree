@@ -28,6 +28,8 @@ public:
 	equipment(ITEM_TYPE type, const wml::const_node_ptr& node);
 	explicit equipment(ITEM_TYPE type);
 
+	virtual item_ptr clone() const { return item_ptr(new equipment(*this)); }
+
 	int modify_stat(const std::string& stat, bool* present=NULL) const;
 	const std::map<std::string,int>& stats() const { return stats_; }
 	const std::string& damage_type() const { return damage_type_; }

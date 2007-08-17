@@ -64,6 +64,7 @@ public:
 	}
 	explicit formula(const std::string& str);
 	variant execute(const formula_callable& variables) const;
+	variant execute() const;
 
 private:
 	expression_ptr expr_;

@@ -16,15 +16,31 @@
 #include "wml_utils.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <set>
 
 namespace game_logic
 {
+
+namespace {
+const std::set<std::string>& item_stat() {
+	static std::set<std::string> stats;
+	if(stats.empty()) {
+		stats.insert("value");
+	}
+
+	return stats;
+}
+}
 
 equipment::equipment(ITEM_TYPE type, const wml::const_node_ptr& node)
   : item(type, node), damage_type_(wml::get_str(node,"damage_type"))
 {
 	for(wml::node::const_attr_iterator i = node->begin_attr();
 	    i != node->end_attr(); ++i) {
+		if(item_stat().count(i->first)) {
+			continue;
+		}
+
 		try {
 			const int res = boost::lexical_cast<int>(i->second);
 			stats_[i->first] = res;

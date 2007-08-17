@@ -13,6 +13,7 @@
 #include "dialog.hpp"
 #include "foreach.hpp"
 #include "npc_party.hpp"
+#include "shop_dialog.hpp"
 #include "tile_logic.hpp"
 #include "wml_node.hpp"
 #include "wml_utils.hpp"
@@ -80,6 +81,12 @@ void dialog_sequence(const wml::const_node_ptr& node, party& npc, party& pc)
 	if(node->get_child("merge_party").get()) {
 		std::cerr << "merge party...\n";
 		pc.merge_party(npc);
+	}
+
+	wml::const_node_ptr shop = node->get_child("shop");
+	if(shop.get()) {
+		game_dialogs::shop_dialog(pc, wml::get_int(shop,"cost",100),
+		                          (*shop)["items"]).show_modal();
 	}
 }
 		
