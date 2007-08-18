@@ -197,9 +197,22 @@ void EditorGLWidget::paintGL()
 				}
 			}
 
-			select_name = camera_->finish_selection();
-			if(select_name < locs.size()) {
-				selected_ = locs[select_name];
+			std::vector<GLuint> selection;
+
+			camera_->finish_selection(&selection);
+
+			int high = -1;
+			foreach(GLuint n, selection) {
+				if(!map_->is_loc_on_map(locs[n])) {
+					continue;
+				}
+
+				const hex::tile& t = map_->get_tile(locs[n]);
+				
+				if(!selected_.valid() || t.height() > high) {
+					selected_ = locs[n];
+					high = t.height();
+				}
 			}
 
 			camera_->prepare_frame();
