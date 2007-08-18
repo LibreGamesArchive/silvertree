@@ -61,13 +61,6 @@
      <height>27</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>View</string>
-    </property>
-    <addaction name="actionZoom_In" />
-    <addaction name="actionZoom_Out" />
-   </widget>
    <widget class="QMenu" name="menu_File" >
     <property name="title" >
      <string>&amp;File</string>
@@ -82,6 +75,13 @@
     </property>
     <addaction name="actionUndo" />
     <addaction name="actionRedo" />
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>View</string>
+    </property>
+    <addaction name="actionZoom_In" />
+    <addaction name="actionZoom_Out" />
    </widget>
    <addaction name="menu_File" />
    <addaction name="menuEdit" />
@@ -115,6 +115,9 @@
    <addaction name="separator" />
    <addaction name="actionRotate_Left" />
    <addaction name="actionRotate_Right" />
+   <addaction name="separator" />
+   <addaction name="actionTilt_Up" />
+   <addaction name="actionTilt_Down" />
   </widget>
   <widget class="QToolBar" name="tilesToolBar" >
    <property name="orientation" >
@@ -167,6 +170,16 @@
   <action name="actionRedo" >
    <property name="text" >
     <string>Redo</string>
+   </property>
+  </action>
+  <action name="actionTilt_Up" >
+   <property name="text" >
+    <string>Tilt Up</string>
+   </property>
+  </action>
+  <action name="actionTilt_Down" >
+   <property name="text" >
+    <string>Tilt Down</string>
    </property>
   </action>
  </widget>
