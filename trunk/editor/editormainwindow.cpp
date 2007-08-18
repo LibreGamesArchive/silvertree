@@ -29,6 +29,8 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 	QApplication::connect(ui.verticalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(vertScroll(int)));
 	QApplication::connect(ui.actionRotate_Left, SIGNAL(triggered()), this, SLOT(rotateLeft()));
 	QApplication::connect(ui.actionRotate_Right, SIGNAL(triggered()), this, SLOT(rotateRight()));
+	QApplication::connect(ui.actionTilt_Up, SIGNAL(triggered()), this, SLOT(tiltUp()));
+	QApplication::connect(ui.actionTilt_Down, SIGNAL(triggered()), this, SLOT(tiltDown()));
 	QApplication::connect(ui.actionUndo, SIGNAL(triggered()), this, SLOT(undo()));
 	QApplication::connect(ui.actionRedo, SIGNAL(triggered()), this, SLOT(redo()));
 
@@ -117,10 +119,26 @@ void EditorMainWindow::vertScroll(int value) {
 
 void EditorMainWindow::rotateLeft() {
 	camera_->rotate_left();
+	ui.editorGLWidget->updateGL();
 }
 
 void EditorMainWindow::rotateRight() {
 	camera_->rotate_right();
+	ui.editorGLWidget->updateGL();
+}
+
+void EditorMainWindow::tiltUp() {
+	for(int n = 0; n != 5; ++n) {
+		camera_->tilt_up();
+	}
+	ui.editorGLWidget->updateGL();
+}
+
+void EditorMainWindow::tiltDown() {
+	for(int n = 0; n != 5; ++n) {
+		camera_->tilt_down();
+	}
+	ui.editorGLWidget->updateGL();
 }
 
 void EditorMainWindow::undo() {

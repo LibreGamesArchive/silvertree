@@ -121,7 +121,7 @@ void camera::prepare_selection(int mousex, int mousey)
 	glDisable(GL_LIGHTING);
 }
 
-GLuint camera::finish_selection()
+GLuint camera::finish_selection(std::vector<GLuint>* items)
 {
 	glEnable(GL_LIGHTING);
 	glPopName();
@@ -140,6 +140,10 @@ GLuint camera::finish_selection()
 		if(names > 0 && (closest = GLuint(-1) || z1 > closest)) {
 			res = *itor;
 			closest = z1;
+		}
+
+		if(items) {
+			items->push_back(res);
 		}
 
 		itor += names;

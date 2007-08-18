@@ -33,7 +33,7 @@ public:
 
 	void prepare_frame();
 	void prepare_selection(int x, int y);
-	GLuint finish_selection();
+	GLuint finish_selection(std::vector<GLuint>* items=NULL);
 
 	void pan_up();
 	void pan_down();
