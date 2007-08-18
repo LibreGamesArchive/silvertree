@@ -11,6 +11,7 @@
 #include "../terrain_feature.hpp"
 #include "../filesystem.hpp"
 #include "../wml_parser.hpp"
+#include "../wml_utils.hpp"
 #include "editormainwindow.hpp"
 #include "terrainhandler.hpp"
 
@@ -151,8 +152,25 @@ void EditorMainWindow::redo() {
 }
 
 bool EditorMainWindow::openScenario(const char *file) {
+	wml::node_ptr old_scenario = scenario_;
 	scenario_ = wml::parse_wml(sys::read_file(file));
-	return scenario_ && openMap((*scenario_)["map"].c_str());
+	if(!scenario_) {
+		return false;
+	}
+
+	if(!openMap((*scenario_)["map"].c_str())) {
+		scenario_ = old_scenario;
+		return false;
+	}
+
+	parties_.clear();
+	WML_MUTABLE_FOREACH(party, scenario_, "party") {
+		hex::location loc(wml::get_int(party,"x"),wml::get_int(party,"y"));
+		parties_[loc] = party;
+	}
+
+	ui.editorGLWidget->setParties(&parties_);
+	return true;
 }
 
 bool EditorMainWindow::openMap(const char *file) {

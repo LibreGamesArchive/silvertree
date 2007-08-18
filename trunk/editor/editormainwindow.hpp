@@ -2,6 +2,7 @@
 #define EDITORMAINWINDOW_HPP_INCLUDED
 
 #include <QtGui/QToolButton>
+#include <map>
 #include <vector>
 
 #include "../wml_node_fwd.hpp"
@@ -37,6 +38,7 @@ class EditorMainWindow : public QMainWindow
 		hex::gamemap *map_;
 		wml::node_ptr scenario_;
 		bool opened_;
+		std::map<hex::location,wml::node_ptr> parties_;
 		std::vector<class TerrainHandler*> handlers_;
 		std::vector<QToolButton*> tool_buttons_;
 };

@@ -21,6 +21,7 @@
 #include <set>
 #include <stack>
 
+#include "../map_avatar.hpp"
 #include "../camera.hpp"
 #include "../gamemap.hpp"
 
@@ -33,10 +34,13 @@ class EditorGLWidget : public QGLWidget
 {
 	Q_OBJECT
 
+	typedef std::map<hex::location,wml::node_ptr> party_map;
+	typedef std::map<hex::location,hex::map_avatar_ptr> avatar_map;
 	public:
 		EditorGLWidget(QWidget *parent = 0);
 		void setMap(hex::gamemap *map);
 		void setCamera(hex::camera *camera);
+		void setParties(party_map* parties);
 		void undo();
 		void redo();
 		void setHeightEdit();
@@ -79,6 +83,8 @@ class EditorGLWidget : public QGLWidget
 		std::stack<undo_info> undo_stack_;
 		QTimer timer_;
 		QMap<int,bool> keys_;
+		party_map* parties_;
+		avatar_map avatar_;
 };
 
 #endif

@@ -30,12 +30,17 @@
 #define WML_FOREACH(var,node,str) \
 	foreach(wml::const_node_ptr var, wml::child_nodes(node,str))
 
+#define WML_MUTABLE_FOREACH(var,node,str) \
+	foreach(wml::node_ptr var, wml::child_nodes(node,str))
+
 namespace wml {
 
 struct error {};
 
 std::vector<const_node_ptr> child_nodes(const const_node_ptr& ptr,
                                         const std::string& element);
+std::vector<node_ptr> child_nodes(const node_ptr& ptr,
+                                  const std::string& element);
 
 inline const std::string& get_str(const_node_ptr ptr,
                                   const std::string& key)

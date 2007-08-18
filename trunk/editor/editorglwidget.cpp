@@ -85,6 +85,24 @@ void EditorGLWidget::setCamera(hex::camera *camera) {
 	std::cerr << "setting dim to " << std::dec << width() << ", " << height() << std::endl;
 }
 
+void EditorGLWidget::setParties(party_map* parties) {
+	parties_ = parties;
+	avatar_.clear();
+	if(!parties_) {
+		return;
+	}
+
+	for(party_map::const_iterator i = parties_->begin();
+	    i != parties_->end(); ++i) {
+		GLfloat pos[3] = {hex::tile::translate_x(i->first),
+		                  hex::tile::translate_y(i->first),
+		                  hex::tile::translate_height(
+		                           map_->get_tile(i->first).height())};
+		
+		avatar_[i->first] = hex::map_avatar::create(i->second,pos);
+	}
+}
+
 void EditorGLWidget::undo() {
 	if(undo_stack_.empty()) {
 		return;
@@ -267,6 +285,11 @@ void EditorGLWidget::paintGL()
 					}
 				}
 			}
+		}
+
+		for(avatar_map::const_iterator i = avatar_.begin();
+		    i != avatar_.end(); ++i) {
+			i->second->draw();
 		}
 
 		{
