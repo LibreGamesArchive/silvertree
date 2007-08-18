@@ -346,8 +346,25 @@ void EditorGLWidget::checkKeys() {
 
 void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 {
+	modifyHex(event);
+	updateGL();
+}
+
+void EditorGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+	mousex_ = event->x();
+	mousey_ = event->y();
+	setFocus(Qt::MouseFocusReason);
+	if(event->buttons()&Qt::LeftButton) {
+		modifyHex(event);
+	}
+	updateGL();
+}
+
+void EditorGLWidget::modifyHex(QMouseEvent* event)
+{
 	int adjust = 0;
-	if(event->button() == Qt::LeftButton) {
+	if(event->buttons()&Qt::LeftButton) {
 		adjust = 1;
 	} else if(event->button() == Qt::RightButton) {
 		adjust = -1;
@@ -400,15 +417,6 @@ void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 	} else {
 		new_mutation_ = true;
 	}
-	updateGL();
-}
-
-void EditorGLWidget::mouseMoveEvent(QMouseEvent *event)
-{
-	mousex_ = event->x();
-	mousey_ = event->y();
-	setFocus(Qt::MouseFocusReason);
-	updateGL();
 }
 
 #include "editorglwidget.moc"
