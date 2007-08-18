@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 
 	EditorMainWindow *mainWindow = new EditorMainWindow();
 	if (argc == 2) {
-		mainWindow->openMap(argv[1]);
+		mainWindow->openScenario(argv[1]);
 	}
 	mainWindow->resize(1024,768);
 	mainWindow->show();
