@@ -4,6 +4,7 @@
 #include <QtGui/QToolButton>
 #include <vector>
 
+#include "../wml_node_fwd.hpp"
 #include "ui_mainwindow.hpp"
 
 class EditorMainWindow : public QMainWindow
@@ -12,7 +13,8 @@ class EditorMainWindow : public QMainWindow
 
 	public:
 		EditorMainWindow(QWidget *parent = 0); 
-		bool openMap(char *file);
+		bool openScenario(const char* file);
+		bool openMap(const char *file);
 	
 	public slots:
 		void openRequested();
@@ -23,6 +25,8 @@ class EditorMainWindow : public QMainWindow
 		void vertScroll(int value);
 		void rotateLeft();
 		void rotateRight();
+		void tiltUp();
+		void tiltDown();
 		void undo();
 		void redo();
 		void setTerrain(const std::string& id, bool feature, int button);
@@ -31,6 +35,7 @@ class EditorMainWindow : public QMainWindow
 		Ui::MainWindow ui;
 		hex::camera *camera_;
 		hex::gamemap *map_;
+		wml::node_ptr scenario_;
 		bool opened_;
 		std::vector<class TerrainHandler*> handlers_;
 		std::vector<QToolButton*> tool_buttons_;
