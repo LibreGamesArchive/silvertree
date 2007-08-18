@@ -10,6 +10,7 @@
 #include "../base_terrain.hpp"
 #include "../terrain_feature.hpp"
 #include "../filesystem.hpp"
+#include "../wml_parser.hpp"
 #include "editormainwindow.hpp"
 #include "terrainhandler.hpp"
 
@@ -149,7 +150,12 @@ void EditorMainWindow::redo() {
 	ui.editorGLWidget->redo();
 }
 
-bool EditorMainWindow::openMap(char *file) {
+bool EditorMainWindow::openScenario(const char *file) {
+	scenario_ = wml::parse_wml(sys::read_file(file));
+	return scenario_ && openMap((*scenario_)["map"].c_str());
+}
+
+bool EditorMainWindow::openMap(const char *file) {
 	const int fd = open(file,O_RDONLY);
 	if(fd < 0) {
 		std::cerr << "could not open map\n";
