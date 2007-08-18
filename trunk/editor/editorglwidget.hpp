@@ -56,6 +56,8 @@ class EditorGLWidget : public QGLWidget
 		void mousePressEvent(QMouseEvent *event);
 		void mouseMoveEvent(QMouseEvent *event);
 
+		void modifyHex(QMouseEvent* event);
+
 	protected slots:
 		void checkKeys();
 
