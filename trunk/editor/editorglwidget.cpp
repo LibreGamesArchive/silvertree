@@ -75,7 +75,7 @@ EditorGLWidget::EditorGLWidget(QWidget *parent)
 	parties_mode_ = false;
 	new_mutation_ = true;
 
-	connect(&timer_, SIGNAL(timeout()), this, SLOT(checkKeys()));
+	connect(&timer_, SIGNAL(timeout()), this, SLOT(updateIfNeeded()));
 	timer_.start(1000/25);
 }
 
@@ -417,8 +417,8 @@ void EditorGLWidget::keyReleaseEvent(QKeyEvent *event) {
 	keys_.remove(event->key());
 }
 
-void EditorGLWidget::checkKeys() {
-	bool update = false;
+void EditorGLWidget::updateIfNeeded() {
+	bool update = camera_->is_moving();
 	if (update) {
 		updateGL();
 	}
