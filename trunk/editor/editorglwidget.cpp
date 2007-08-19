@@ -39,6 +39,7 @@
 #include "../wml_parser.hpp"
 
 #include "editorglwidget.hpp"
+#include "editpartydialog.hpp"
 
 namespace {
 void clone_hex(hex::gamemap& map, const hex::tile& src, const hex::location& loc)
@@ -67,7 +68,9 @@ EditorGLWidget::EditorGLWidget(QWidget *parent)
 	map_ = 0;
 	camera_ = 0;
 
+	parties_ = NULL;
 	pick_mode_ = false;
+	parties_mode_ = false;
 	new_mutation_ = true;
 
 	connect(&timer_, SIGNAL(timeout()), this, SLOT(checkKeys()));
@@ -94,10 +97,8 @@ void EditorGLWidget::setParties(party_map* parties) {
 
 	for(party_map::const_iterator i = parties_->begin();
 	    i != parties_->end(); ++i) {
-		GLfloat pos[3] = {hex::tile::translate_x(i->first),
-		                  hex::tile::translate_y(i->first),
-		                  hex::tile::translate_height(
-		                           map_->get_tile(i->first).height())};
+		GLfloat pos[3];
+		getAvatarPos(i->first, pos);
 		
 		avatar_[i->first] = hex::map_avatar::create(i->second,pos);
 	}
@@ -107,6 +108,8 @@ void EditorGLWidget::undo() {
 	if(undo_stack_.empty()) {
 		return;
 	}
+
+	new_mutation_ = true;
 
 	const undo_info& u = undo_stack_.top();
 	foreach(const hex::tile& t, u.tiles) {
@@ -124,12 +127,14 @@ void EditorGLWidget::setHeightEdit() {
 	current_terrain_.clear();
 	current_feature_.clear();
 	pick_mode_ = false;
+	parties_mode_ = false;
 }
 
 void EditorGLWidget::setPicker() {
 	current_terrain_.clear();
 	current_feature_.clear();
 	pick_mode_ = true;
+	parties_mode_ = false;
 	picked_loc_ = hex::location();
 }
 
@@ -137,12 +142,21 @@ void EditorGLWidget::setCurrentTerrain(const std::string& terrain) {
 	current_terrain_ = terrain;
 	current_feature_.clear();
 	pick_mode_ = false;
+	parties_mode_ = false;
 }
 
 void EditorGLWidget::setCurrentFeature(const std::string& terrain) {
 	current_terrain_.clear();
 	current_feature_ = terrain;
 	pick_mode_ = false;
+	parties_mode_ = false;
+}
+
+void EditorGLWidget::setEditParties() {
+	current_terrain_.clear();
+	current_feature_.clear();
+	pick_mode_ = false;
+	parties_mode_ = true;
 }
 
 void EditorGLWidget::initializeGL() 
@@ -369,7 +383,16 @@ void EditorGLWidget::checkKeys() {
 
 void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 {
-	modifyHex(event);
+	if(parties_mode_) {
+		if(parties_ && map_->is_loc_on_map(selected_)) {
+			party_map::iterator i = parties_->find(selected_);
+			if(i != parties_->end()) {
+				EditPartyDialog(i->second).exec();
+			}
+		}
+	} else {
+		modifyHex(event);
+	}
 	updateGL();
 }
 
@@ -378,8 +401,11 @@ void EditorGLWidget::mouseMoveEvent(QMouseEvent *event)
 	mousex_ = event->x();
 	mousey_ = event->y();
 	setFocus(Qt::MouseFocusReason);
-	if(event->buttons()&Qt::LeftButton) {
-		modifyHex(event);
+	if((event->buttons()&Qt::LeftButton) ||
+	   (event->buttons()&Qt::RightButton)) {
+		if(!parties_mode_) {
+			modifyHex(event);
+		}
 	}
 	updateGL();
 }
@@ -389,7 +415,7 @@ void EditorGLWidget::modifyHex(QMouseEvent* event)
 	int adjust = 0;
 	if(event->buttons()&Qt::LeftButton) {
 		adjust = 1;
-	} else if(event->button() == Qt::RightButton) {
+	} else if(event->buttons()&Qt::RightButton) {
 		adjust = -1;
 		if(pick_mode_) {
 			picked_loc_ = selected_;
@@ -435,11 +461,25 @@ void EditorGLWidget::modifyHex(QMouseEvent* event)
 						map_->set_terrain(loc,current_terrain_);
 					}
 				}
+
+				avatar_map::iterator av = avatar_.find(loc);
+				if(av != avatar_.end()) {
+					getAvatarPos(loc,av->second->position_buffer());
+				}
 			}
 		}
 	} else {
 		new_mutation_ = true;
 	}
+}
+
+void EditorGLWidget::getAvatarPos(const hex::location& loc, GLfloat* pos) {
+	if(!map_->is_loc_on_map(loc)) {
+		return;
+	}
+	pos[0] = hex::tile::translate_x(loc);
+	pos[1] = hex::tile::translate_y(loc);
+	pos[2] = hex::tile::translate_height(map_->get_tile(loc).height());
 }
 
 #include "editorglwidget.moc"

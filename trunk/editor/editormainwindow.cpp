@@ -39,6 +39,15 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 	ui.action_Save->setEnabled(false);
 	ui.editorGLWidget->setEnabled(false);
 
+	QToolButton* party_button = new QToolButton();
+	party_button->setText("Parties");
+	party_button->setCheckable(true);
+	party_button->setChecked(false);
+	handlers_.push_back(new TerrainHandler(*this, "party", false, tool_buttons_.size()));
+	QApplication::connect(party_button, SIGNAL(pressed()), handlers_.back(), SLOT(terrainSelected()));
+	ui.tilesToolBar->addWidget(party_button);
+	tool_buttons_.push_back(party_button);
+
 	QToolButton* height_button = new QToolButton();
 	height_button->setText("Height");
 	height_button->setCheckable(true);
@@ -164,12 +173,18 @@ bool EditorMainWindow::openScenario(const char *file) {
 	}
 
 	parties_.clear();
+	std::cerr << "foreach...\n";
 	WML_MUTABLE_FOREACH(party, scenario_, "party") {
+		std::cerr << "item: " << (int)party.get() << "\n";
 		hex::location loc(wml::get_int(party,"x"),wml::get_int(party,"y"));
 		parties_[loc] = party;
+		std::cerr << "done\n";
 	}
 
+	std::cerr << "!foreach\n";
+
 	ui.editorGLWidget->setParties(&parties_);
+	std::cerr << "parties\n";
 	return true;
 }
 
@@ -218,6 +233,8 @@ void EditorMainWindow::setTerrain(const std::string& id, bool feature, int butto
 			ui.editorGLWidget->setHeightEdit();
 		}
 		return;
+	} else if(id == "party") {
+		ui.editorGLWidget->setEditParties();
 	}
 
 	if(feature) {

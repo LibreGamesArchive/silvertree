@@ -47,6 +47,7 @@ class EditorGLWidget : public QGLWidget
 		void setPicker();
 		void setCurrentTerrain(const std::string& terrain);
 		void setCurrentFeature(const std::string& terrain);
+		void setEditParties();
 
 	protected:
 		void initializeGL();
@@ -66,6 +67,7 @@ class EditorGLWidget : public QGLWidget
 		void checkKeys();
 
 	private:
+		void getAvatarPos(const hex::location& loc, GLfloat* pos);
 		hex::gamemap *map_;
 		hex::camera *camera_;
 		hex::location selected_;
@@ -74,6 +76,7 @@ class EditorGLWidget : public QGLWidget
 		int mousex_;
 		int mousey_;
 
+		bool parties_mode_;
 		bool pick_mode_;
 		hex::location picked_loc_;
 		std::string current_terrain_;
