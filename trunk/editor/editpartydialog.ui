@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>563</width>
-    <height>349</height>
+    <height>376</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -101,7 +101,7 @@
    <property name="geometry" >
     <rect>
      <x>210</x>
-     <y>310</y>
+     <y>340</y>
      <width>351</width>
      <height>33</height>
     </rect>
@@ -174,7 +174,7 @@
      <x>290</x>
      <y>10</y>
      <width>261</width>
-     <height>281</height>
+     <height>321</height>
     </rect>
    </property>
    <property name="title" >
@@ -190,6 +190,208 @@
      </rect>
     </property>
    </widget>
+   <widget class="QLabel" name="label_4" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>41</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Level</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>41</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Skills:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>110</y>
+      <width>81</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Equipment:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="equipmentLineEdit" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>110</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>78</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_7" >
+       <property name="text" >
+        <string>Strength:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_8" >
+       <property name="text" >
+        <string>Agility:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_9" >
+       <property name="text" >
+        <string>Endurance:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_10" >
+       <property name="text" >
+        <string>Intelligence:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_11" >
+       <property name="text" >
+        <string>Perception:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_12" >
+       <property name="text" >
+        <string>Persona:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLineEdit" name="enduranceLineEdit" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>200</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="intelligenceLineEdit" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>230</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="perceptionLineEdit" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>260</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="personaLineEdit" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>290</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="strengthLineEdit" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>140</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="agilityLineEdit" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>170</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="skillsLineEdit" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>80</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="levelLineEdit" >
+    <property name="geometry" >
+     <rect>
+      <x>90</x>
+      <y>50</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="editWMLButton" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>300</y>
+     <width>83</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Edit WML...</string>
+   </property>
   </widget>
  </widget>
  <pixmapfunction></pixmapfunction>

@@ -12,17 +12,22 @@ class EditPartyDialog : public QDialog
 	
 public:
 	EditPartyDialog(wml::node_ptr party, QWidget *parent = 0);
-	void writeParty();
 
 public slots:
+	void writeParty();
+	void revertParty();
 	void addMember();
 	void removeMember();
 	void memberChanged(int row);
 	void changeGenerator(int index);
+	void changeStats(const QString& text);
+	void editWml();
 
 private:
+	void loadCharacterStats();
+	void writeCharacterStats();
 	Ui::EditPartyDialog ui_;
-	wml::node_ptr party_;
+	wml::node_ptr party_, backup_;
 };
 
 

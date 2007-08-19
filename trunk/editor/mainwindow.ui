@@ -146,20 +146,32 @@
    <property name="text" >
     <string>Zoom In</string>
    </property>
+   <property name="shortcut" >
+    <string/>
+   </property>
   </action>
   <action name="actionZoom_Out" >
    <property name="text" >
     <string>Zoom Out</string>
+   </property>
+   <property name="shortcut" >
+    <string/>
    </property>
   </action>
   <action name="actionRotate_Left" >
    <property name="text" >
     <string>Rotate Left</string>
    </property>
+   <property name="shortcut" >
+    <string/>
+   </property>
   </action>
   <action name="actionRotate_Right" >
    <property name="text" >
     <string>Rotate Right</string>
+   </property>
+   <property name="shortcut" >
+    <string/>
    </property>
   </action>
   <action name="actionUndo" >
@@ -176,10 +188,16 @@
    <property name="text" >
     <string>Tilt Up</string>
    </property>
+   <property name="shortcut" >
+    <string/>
+   </property>
   </action>
   <action name="actionTilt_Down" >
    <property name="text" >
     <string>Tilt Down</string>
+   </property>
+   <property name="shortcut" >
+    <string/>
    </property>
   </action>
  </widget>
