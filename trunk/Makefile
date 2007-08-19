@@ -3,7 +3,7 @@ CFLAGS=-Wall -Werror -Wno-sign-compare -Wno-switch -Wno-switch-enum -Wno-non-vir
 LDFLAGS=-O2 `sdl-config --libs` -lGL -lGLU -lSDL_image -lSDL_ttf -L/System/Library/Frameworks/OpenGL.framework/Libraries -lboost_regex
 SOURCES=$(wildcard *.cpp)
 OBJECTS=$(SOURCES:.cpp=.o) xml.o
-EDITOR_OBJECTS=editor/main.o editor/editormainwindow.o editor/editorglwidget.o editor/terrainhandler.o gamemap.o map_avatar.o wml_node.o wml_parser.o wml_utils.o camera.o tile.o base_terrain.o model.o string_utils.o tile_logic.o parse3ds.o parseark.o parsedae.o terrain_feature.o material.o font.o texture.o filesystem.o raster.o surface_cache.o surface.o sdl_algo.o variant.o xml.o
+EDITOR_OBJECTS=editor/main.o editor/editpartydialog.o editor/editormainwindow.o editor/editorglwidget.o editor/terrainhandler.o gamemap.o map_avatar.o wml_node.o wml_parser.o wml_utils.o camera.o tile.o base_terrain.o model.o string_utils.o tile_logic.o parse3ds.o parseark.o parsedae.o terrain_feature.o material.o font.o texture.o filesystem.o raster.o surface_cache.o surface.o sdl_algo.o variant.o xml.o
 EXECUTABLE=game
 
 all: $(SOURCES) $(EXECUTABLE)
@@ -20,6 +20,9 @@ $(EXECUTABLE): $(OBJECTS)
 editor/ui_mainwindow.hpp: editor/mainwindow.ui
 	cd editor ; uic mainwindow.ui > ui_mainwindow.hpp
 
+editor/ui_editpartydialog.hpp: editor/editpartydialog.ui
+	cd editor ; uic editpartydialog.ui > ui_editpartydialog.hpp
+
 editor/editorglwidget.moc: editor/editorglwidget.hpp
 	cd editor ; moc editorglwidget.hpp > editorglwidget.moc
 
@@ -29,7 +32,10 @@ editor/editormainwindow.moc: editor/editormainwindow.hpp
 editor/terrainhandler.moc: editor/terrainhandler.hpp
 	cd editor ; moc terrainhandler.hpp > terrainhandler.moc
 
-edit: editor/ui_mainwindow.hpp editor/editorglwidget.moc editor/editormainwindow.moc editor/terrainhandler.moc $(EDITOR_OBJECTS)
+editor/editpartydialog.moc: editor/editpartydialog.hpp
+	cd editor ; moc editpartydialog.hpp > editpartydialog.moc
+
+edit: editor/ui_mainwindow.hpp editor/ui_editpartydialog.hpp editor/editorglwidget.moc editor/editormainwindow.moc editor/terrainhandler.moc editor/editpartydialog.moc $(EDITOR_OBJECTS)
 	$(CC) $(LDFLAGS) $(EDITOR_OBJECTS) -lQtCore -lQtGui -lQtOpenGL -o edit
 
 formula_test: formula.cpp formula_tokenizer.cpp variant.cpp
