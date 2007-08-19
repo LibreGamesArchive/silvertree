@@ -66,6 +66,8 @@ public:
 
 	void set_dim(int width, int height) { width_ = width; height_ = height; }
 
+	bool is_moving() const;
+
 private:
 
 	GLfloat rotate_radians() const;
