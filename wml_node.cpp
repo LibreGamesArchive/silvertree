@@ -10,6 +10,8 @@
 
    See the COPYING file for more details.
 */
+#include <algorithm>
+
 #include "wml_node.hpp"
 
 namespace {
@@ -28,6 +30,11 @@ const std::string& node::operator[](const std::string& key) const
 		}
 
 		return itor->second;
+}
+
+const std::string& node::attr(const std::string& key) const
+{
+	return (*this)[key];
 }
 
 void node::set_attr(const std::string& key, const std::string& value)
@@ -125,6 +132,53 @@ node_ptr node::get_child(const std::string& key)
 		return node_ptr();
 	} else {
 		return range.first->second;
+	}
+}
+
+void node::clear_attr()
+{
+	attr_.clear();
+}
+
+void node::clear_children()
+{
+	childmap_.clear();
+	children_.clear();
+}
+
+namespace {
+class node_name_equals {
+	std::string name_;
+public:
+	node_name_equals(const std::string& name) : name_(name)
+	{}
+
+	bool operator()(const wml::const_node_ptr& node) const {
+		return node->name() == name_;
+	}
+};
+}
+
+void node::clear_children(const std::string& name)
+{
+	childmap_.erase(name);
+	children_.erase(std::remove_if(children_.begin(),children_.end(),node_name_equals(name)), children_.end());
+}
+
+void node::erase_child(const boost::shared_ptr<node>& child_node)
+{
+	child_range range = get_child_range(child_node->name());
+	while(range.first != range.second) {
+		if(range.first->second == child_node) {
+			childmap_.erase(range.first);
+			break;
+		}
+		++range.first;
+	}
+
+	std::vector<boost::shared_ptr<node> >::iterator i = std::find(children_.begin(),children_.end(),child_node);
+	if(i != children_.end()) {
+		children_.erase(i);
 	}
 }
 

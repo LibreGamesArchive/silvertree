@@ -46,6 +46,17 @@ const character_generator& character_generator::get(const std::string& name)
 	return i->second;
 }
 
+std::vector<std::string> character_generator::generator_list()
+{
+	std::vector<std::string> res;
+	for(std::map<std::string,character_generator>::const_iterator i =
+	    gen_map.begin(); i != gen_map.end(); ++i) {
+		res.push_back(i->first);
+	}
+
+	return res;
+}
+
 character_generator::character_generator(wml::const_node_ptr node)
   : node_(node)
 {}

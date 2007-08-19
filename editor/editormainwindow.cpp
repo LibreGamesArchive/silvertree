@@ -12,6 +12,7 @@
 #include "../filesystem.hpp"
 #include "../wml_parser.hpp"
 #include "../wml_utils.hpp"
+#include "../wml_writer.hpp"
 #include "editormainwindow.hpp"
 #include "terrainhandler.hpp"
 
@@ -92,19 +93,34 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 
 void EditorMainWindow::openRequested() {
 	//TODO: check if we have something else open and ask if we should save it, free everything and all
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Map"));
-	openMap(fileName.toAscii().data());
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Scenario"));
+	openScenario(fileName.toAscii().data());
 }
 
 void EditorMainWindow::saveRequested() {
-	QString fileName = QFileDialog::getSaveFileName(this, tr("Save Map"));
-	if(!fileName.isNull()) {
-		sys::write_file(fileName.toAscii().data(), map_->write());
+	if(fname_.empty()) {
+		QString fileName = QFileDialog::getSaveFileName(this, tr("Save Scenario"));
+		if(!fileName.isNull()) {
+			fname_ = fileName.toAscii().data();
+		}
 	}
+
+	if(fname_.empty()) {
+		return;
+	}
+
+	scenario_->clear_children("party");
+	for(std::map<hex::location,wml::node_ptr>::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
+		scenario_->add_child(i->second);
+	}
+
+	std::string scenarioData;
+	wml::write(scenario_, scenarioData);
+	sys::write_file(fname_, scenarioData);
+	sys::write_file((*scenario_)["map"], map_->write());
 }
 
 void EditorMainWindow::zoominRequested() {
-	std::cerr << "zoom\n";
 	for(int n = 0; n != 5; ++n) {
 		camera_->zoom_in();
 	}
@@ -161,6 +177,7 @@ void EditorMainWindow::redo() {
 }
 
 bool EditorMainWindow::openScenario(const char *file) {
+	fname_ = file;
 	wml::node_ptr old_scenario = scenario_;
 	scenario_ = wml::parse_wml(sys::read_file(file));
 	if(!scenario_) {
@@ -173,26 +190,19 @@ bool EditorMainWindow::openScenario(const char *file) {
 	}
 
 	parties_.clear();
-	std::cerr << "foreach...\n";
 	std::vector<wml::node_ptr> parties = wml::child_nodes(scenario_, "party");
 	foreach(wml::node_ptr party, parties) {
-		std::cerr << "item: " << (int)party.get() << "\n";
 		hex::location loc(wml::get_int(party,"x"),wml::get_int(party,"y"));
 		parties_[loc] = party;
-		std::cerr << "done\n";
 	}
 
-	std::cerr << "!foreach\n";
-
 	ui.editorGLWidget->setParties(&parties_);
-	std::cerr << "parties\n";
 	return true;
 }
 
 bool EditorMainWindow::openMap(const char *file) {
 	const int fd = open(file,O_RDONLY);
 	if(fd < 0) {
-		std::cerr << "could not open map\n";
 		return false;
 	}
 	struct stat fileinfo;

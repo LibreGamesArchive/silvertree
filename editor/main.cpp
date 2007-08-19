@@ -34,6 +34,7 @@
 
 #include "../base_terrain.hpp"
 #include "../camera.hpp"
+#include "../character_generator.hpp"
 #include "../filesystem.hpp"
 #include "../font.hpp"
 #include "../foreach.hpp"
@@ -94,11 +95,9 @@ int main(int argc, char** argv)
 		close(fd);
 	}
 
-	std::cerr << "INFO 1\n";
 
 	wml::node::const_all_child_iterator cfg1 = game_cfg->begin_children();
 	wml::node::const_all_child_iterator cfg2 = game_cfg->end_children();
-	std::cerr << "INFO 2\n";
 	while(cfg1 != cfg2) {
 		if((*cfg1)->name() == "terrain") {
 			hex::base_terrain::add_terrain(*cfg1);
@@ -109,15 +108,10 @@ int main(int argc, char** argv)
 		++cfg1;
 	}
 
-	std::cerr << "INFO 3\n";
 	EditorMainWindow *mainWindow = new EditorMainWindow();
 	if (argc == 2) {
-	std::cerr << "INFO 4\n";
-	std::cerr << "INFO '" << argv[1] << "'\n";
 		mainWindow->openScenario(argv[1]);
-	std::cerr << "INFO 5\n";
 	}
-	std::cerr << "INFO 6\n";
 	mainWindow->resize(1024,768);
 	mainWindow->show();
 	app.exec();

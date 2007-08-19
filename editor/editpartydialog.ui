@@ -8,58 +8,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>425</width>
-    <height>343</height>
+    <width>563</width>
+    <height>349</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Dialog</string>
   </property>
-  <widget class="QWidget" name="layoutWidget" >
-   <property name="geometry" >
-    <rect>
-     <x>70</x>
-     <y>300</y>
-     <width>351</width>
-     <height>33</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" >
-    <property name="margin" >
-     <number>0</number>
-    </property>
-    <property name="spacing" >
-     <number>6</number>
-    </property>
-    <item>
-     <spacer>
-      <property name="orientation" >
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" >
-       <size>
-        <width>131</width>
-        <height>31</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
-     <widget class="QPushButton" name="okButton" >
-      <property name="text" >
-       <string>OK</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="cancelButton" >
-      <property name="text" >
-       <string>Cancel</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QLabel" name="label" >
    <property name="geometry" >
     <rect>
@@ -132,20 +87,62 @@
     <string>Members</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="addButton" >
+  <widget class="QListWidget" name="membersListWidget" >
    <property name="geometry" >
     <rect>
-     <x>150</x>
+     <x>10</x>
      <y>120</y>
-     <width>131</width>
-     <height>28</height>
+     <width>141</width>
+     <height>161</height>
     </rect>
    </property>
-   <property name="text" >
-    <string>Add Member...</string>
-   </property>
   </widget>
-  <widget class="QPushButton" name="pushButton" >
+  <widget class="QWidget" name="layoutWidget" >
+   <property name="geometry" >
+    <rect>
+     <x>210</x>
+     <y>310</y>
+     <width>351</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" >
+    <property name="margin" >
+     <number>0</number>
+    </property>
+    <property name="spacing" >
+     <number>6</number>
+    </property>
+    <item>
+     <spacer>
+      <property name="orientation" >
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" >
+       <size>
+        <width>131</width>
+        <height>31</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="okButton" >
+      <property name="text" >
+       <string>OK</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="cancelButton" >
+      <property name="text" >
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPushButton" name="removeButton" >
    <property name="geometry" >
     <rect>
      <x>150</x>
@@ -158,15 +155,41 @@
     <string>Remove Member</string>
    </property>
   </widget>
-  <widget class="QListWidget" name="membersListWidget" >
+  <widget class="QPushButton" name="addButton" >
    <property name="geometry" >
     <rect>
-     <x>10</x>
+     <x>150</x>
      <y>120</y>
-     <width>141</width>
-     <height>161</height>
+     <width>131</width>
+     <height>28</height>
     </rect>
    </property>
+   <property name="text" >
+    <string>Add Member</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>290</x>
+     <y>10</y>
+     <width>261</width>
+     <height>281</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Character</string>
+   </property>
+   <widget class="QComboBox" name="characterGeneratorComboBox" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
  </widget>
  <pixmapfunction></pixmapfunction>
