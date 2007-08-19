@@ -125,6 +125,16 @@ void character_generator::generate(character& c, wml::const_node_ptr node) const
 		}
 	}
 
+	std::string equip_str;
+	read_attr(&equip_str, node, node_, "equipment");
+	const std::vector<std::string> equip_items = util::split(equip_str);
+	foreach(const std::string& eq, equip_items) {
+		const_item_ptr i = item::get(eq);
+		if(i) {
+			c.equipment_.push_back(i->clone());
+		}
+	}
+
 	wml::node::const_child_range equip = node->get_child_range("equipment");
 	while(equip.first != equip.second) {
 		const wml::const_node_ptr eq = equip.first->second;

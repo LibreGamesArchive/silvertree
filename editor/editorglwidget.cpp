@@ -464,7 +464,6 @@ void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 				}
 				EditPartyDialog d(p);
 				d.exec();
-				d.writeParty();
 				if(!p->get_child("character")) {
 					parties_->erase(selected_);
 				}

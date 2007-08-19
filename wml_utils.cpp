@@ -18,6 +18,21 @@ node_ptr deep_copy(const_node_ptr ptr)
 	return res;
 }
 
+void copy_over(const_node_ptr src, node_ptr dst)
+{
+	dst->clear_attr();
+	dst->clear_children();
+	for(node::const_attr_iterator i = src->begin_attr();
+	    i != src->end_attr(); ++i) {
+		dst->set_attr(i->first,i->second);
+	}
+
+	for(node::const_all_child_iterator i = src->begin_children();
+	    i != src->end_children(); ++i) {
+		dst->add_child(deep_copy(*i));
+	}
+}
+
 std::vector<const_node_ptr> child_nodes(const const_node_ptr& ptr,
                                         const std::string& element)
 {

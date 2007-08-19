@@ -5,6 +5,7 @@
 
 #include <QtGui/QFileDialog>
 #include <QtGui/QScrollBar>
+#include <QtGui/QShortcut>
 #include <QtGui/QToolButton>
 
 #include "../base_terrain.hpp"
@@ -36,6 +37,15 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 	QApplication::connect(ui.actionTilt_Down, SIGNAL(triggered()), this, SLOT(tiltDown()));
 	QApplication::connect(ui.actionUndo, SIGNAL(triggered()), this, SLOT(undo()));
 	QApplication::connect(ui.actionRedo, SIGNAL(triggered()), this, SLOT(redo()));
+
+	QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_S),this), SIGNAL(activated()), this, SLOT(saveRequested()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_O),this), SIGNAL(activated()), this, SLOT(openRequested()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Z),this), SIGNAL(activated()), this, SLOT(zoominRequested()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_X),this), SIGNAL(activated()), this, SLOT(zoomoutRequested()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(rotateLeft()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(rotateRight()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Up),this), SIGNAL(activated()), this, SLOT(tiltUp()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Down),this), SIGNAL(activated()), this, SLOT(tiltDown()));
 
 	ui.action_Save->setEnabled(false);
 	ui.editorGLWidget->setEnabled(false);
@@ -94,7 +104,9 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 void EditorMainWindow::openRequested() {
 	//TODO: check if we have something else open and ask if we should save it, free everything and all
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open Scenario"));
-	openScenario(fileName.toAscii().data());
+	if(fileName.length()) {
+		openScenario(fileName.toAscii().data());
+	}
 }
 
 void EditorMainWindow::saveRequested() {
