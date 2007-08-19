@@ -77,6 +77,7 @@ class EditorGLWidget : public QGLWidget
 		int mousey_;
 
 		bool parties_mode_;
+		hex::location current_party_;
 		bool pick_mode_;
 		hex::location picked_loc_;
 		std::string current_terrain_;
