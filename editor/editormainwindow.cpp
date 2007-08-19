@@ -174,7 +174,8 @@ bool EditorMainWindow::openScenario(const char *file) {
 
 	parties_.clear();
 	std::cerr << "foreach...\n";
-	WML_MUTABLE_FOREACH(party, scenario_, "party") {
+	std::vector<wml::node_ptr> parties = wml::child_nodes(scenario_, "party");
+	foreach(wml::node_ptr party, parties) {
 		std::cerr << "item: " << (int)party.get() << "\n";
 		hex::location loc(wml::get_int(party,"x"),wml::get_int(party,"y"));
 		parties_[loc] = party;
@@ -235,9 +236,7 @@ void EditorMainWindow::setTerrain(const std::string& id, bool feature, int butto
 		return;
 	} else if(id == "party") {
 		ui.editorGLWidget->setEditParties();
-	}
-
-	if(feature) {
+	} else if(feature) {
 		ui.editorGLWidget->setCurrentFeature(id);
 	} else {
 		ui.editorGLWidget->setCurrentTerrain(id);
