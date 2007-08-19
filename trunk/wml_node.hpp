@@ -32,6 +32,7 @@ public:
 	const std::string& name() const { return name_; }
 		
 	const std::string& operator[](const std::string& key) const;
+	const std::string& attr(const std::string& key) const;
 	void set_attr(const std::string& key, const std::string& value);
 
 	bool has_attr(const std::string& key) const;
@@ -74,6 +75,11 @@ public:
 
 	const_node_ptr get_child(const std::string& key) const;
 	node_ptr get_child(const std::string& key);
+
+	void clear_attr();
+	void clear_children();
+	void clear_children(const std::string& name);
+	void erase_child(const boost::shared_ptr<node>& child_node);
 
 private:
 	std::string name_;

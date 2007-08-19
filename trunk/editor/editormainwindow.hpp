@@ -41,6 +41,7 @@ class EditorMainWindow : public QMainWindow
 		std::map<hex::location,wml::node_ptr> parties_;
 		std::vector<class TerrainHandler*> handlers_;
 		std::vector<QToolButton*> tool_buttons_;
+		std::string fname_;
 };
 
 #endif

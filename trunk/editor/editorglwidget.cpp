@@ -32,6 +32,7 @@
 #include "../filesystem.hpp"
 #include "../font.hpp"
 #include "../foreach.hpp"
+#include "../formatter.hpp"
 #include "../gamemap.hpp"
 #include "../raster.hpp"
 #include "../terrain_feature.hpp"
@@ -385,10 +386,19 @@ void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 {
 	if(parties_mode_) {
 		if(parties_ && map_->is_loc_on_map(selected_)) {
-			party_map::iterator i = parties_->find(selected_);
-			if(i != parties_->end()) {
-				EditPartyDialog(i->second).exec();
+			wml::node_ptr& p = (*parties_)[selected_];
+			if(!p) {
+				p.reset(new wml::node("party"));
+				p->set_attr("x",formatter() << selected_.x());
+				p->set_attr("y",formatter() << selected_.y());
 			}
+			EditPartyDialog d(p);
+			d.exec();
+			d.writeParty();
+			if(!p->get_child("character")) {
+				parties_->erase(selected_);
+			}
+			setParties(parties_);
 		}
 	} else {
 		modifyHex(event);
