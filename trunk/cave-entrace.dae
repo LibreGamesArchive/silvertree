@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+   <asset>
+      <contributor>
+         <authoring_tool>Google SketchUp 6</authoring_tool>
+      </contributor>
+      <created>2007-08-19T05:33:44Z</created>
+      <modified>2007-08-19T05:33:44Z</modified>
+      <unit name="inches" meter="0.0254"/>
+      <up_axis>Z_UP</up_axis>
+   </asset>
+   <library_images>
+      <image id="Stone_MarblenoCulling-image" name="Stone_MarblenoCulling-image">
+         <init_from>../images/Stone_MarblenoCulling.jpg</init_from>
+      </image>
+      <image id="Stone_Marble1-image" name="Stone_Marble1-image">
+         <init_from>../images/Stone_Marble1.jpg</init_from>
+      </image>
+   </library_images>
+   <library_materials>
+      <material id="Stone_MarblenoCullingID" name="Stone_MarblenoCulling">
+         <instance_effect url="#Stone_MarblenoCulling-effect"/>
+      </material>
+      <material id="FrontColorNoCullingID" name="FrontColorNoCulling">
+         <instance_effect url="#FrontColorNoCulling-effect"/>
+      </material>
+      <material id="Stone_Marble1ID" name="Stone_Marble1">
+         <instance_effect url="#Stone_Marble1-effect"/>
+      </material>
+      <material id="ForegroundColorID" name="ForegroundColor">
+         <instance_effect url="#ForegroundColor-effect"/>
+      </material>
+   </library_materials>
+   <library_effects>
+      <effect id="Stone_MarblenoCulling-effect" name="Stone_MarblenoCulling-effect">
+         <profile_COMMON>
+            <newparam sid="Stone_MarblenoCulling-image-surface">
+               <surface type="2D">
+                  <init_from>Stone_MarblenoCulling-image</init_from>
+               </surface>
+            </newparam>
+            <newparam sid="Stone_MarblenoCulling-image-sampler">
+               <sampler2D>
+                  <source>Stone_MarblenoCulling-image-surface</source>
+               </sampler2D>
+            </newparam>
+            <technique sid="COMMON">
+               <phong>
+                  <emission>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </emission>
+                  <ambient>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </ambient>
+                  <diffuse>
+                     <texture texture="Stone_MarblenoCulling-image-sampler" texcoord="UVSET0"/>
+                  </diffuse>
+                  <specular>
+                     <color>0.330000 0.330000 0.330000 1</color>
+                  </specular>
+                  <shininess>
+                     <float>20.000000</float>
+                  </shininess>
+                  <reflectivity>
+                     <float>0.100000</float>
+                  </reflectivity>
+                  <transparent>
+                     <color>1 1 1 1</color>
+                  </transparent>
+                  <transparency>
+                     <float>0.000000</float>
+                  </transparency>
+               </phong>
+            </technique>
+            <extra>
+               <technique profile="GOOGLEEARTH">
+                  <double_sided>1</double_sided>
+               </technique>
+            </extra>
+         </profile_COMMON>
+      </effect>
+      <effect id="FrontColorNoCulling-effect" name="FrontColorNoCulling-effect">
+         <profile_COMMON>
+            <technique sid="COMMON">
+               <phong>
+                  <emission>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </emission>
+                  <ambient>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </ambient>
+                  <diffuse>
+                     <color>1.000000 1.000000 1.000000 1</color>
+                  </diffuse>
+                  <specular>
+                     <color>0.330000 0.330000 0.330000 1</color>
+                  </specular>
+                  <shininess>
+                     <float>20.000000</float>
+                  </shininess>
+                  <reflectivity>
+                     <float>0.100000</float>
+                  </reflectivity>
+                  <transparent>
+                     <color>1 1 1 1</color>
+                  </transparent>
+                  <transparency>
+                     <float>0.000000</float>
+                  </transparency>
+               </phong>
+            </technique>
+            <extra>
+               <technique profile="GOOGLEEARTH">
+                  <double_sided>1</double_sided>
+               </technique>
+            </extra>
+         </profile_COMMON>
+      </effect>
+      <effect id="Stone_Marble1-effect" name="Stone_Marble1-effect">
+         <profile_COMMON>
+            <newparam sid="Stone_Marble1-image-surface">
+               <surface type="2D">
+                  <init_from>Stone_Marble1-image</init_from>
+               </surface>
+            </newparam>
+            <newparam sid="Stone_Marble1-image-sampler">
+               <sampler2D>
+                  <source>Stone_Marble1-image-surface</source>
+               </sampler2D>
+            </newparam>
+            <technique sid="COMMON">
+               <phong>
+                  <emission>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </emission>
+                  <ambient>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </ambient>
+                  <diffuse>
+                     <texture texture="Stone_Marble1-image-sampler" texcoord="UVSET0"/>
+                  </diffuse>
+                  <specular>
+                     <color>0.330000 0.330000 0.330000 1</color>
+                  </specular>
+                  <shininess>
+                     <float>20.000000</float>
+                  </shininess>
+                  <reflectivity>
+                     <float>0.100000</float>
+                  </reflectivity>
+                  <transparent>
+                     <color>1 1 1 1</color>
+                  </transparent>
+                  <transparency>
+                     <float>0.000000</float>
+                  </transparency>
+               </phong>
+            </technique>
+         </profile_COMMON>
+      </effect>
+      <effect id="ForegroundColor-effect" name="ForegroundColor-effect">
+         <profile_COMMON>
+            <technique sid="COMMON">
+               <phong>
+                  <emission>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </emission>
+                  <ambient>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </ambient>
+                  <diffuse>
+                     <color>0.000000 0.000000 0.000000 1</color>
+                  </diffuse>
+                  <specular>
+                     <color>0.330000 0.330000 0.330000 1</color>
+                  </specular>
+                  <shininess>
+                     <float>20.000000</float>
+                  </shininess>
+                  <reflectivity>
+                     <float>0.100000</float>
+                  </reflectivity>
+                  <transparent>
+                     <color>1 1 1 1</color>
+                  </transparent>
+                  <transparency>
+                     <float>0.000000</float>
+                  </transparency>
+               </phong>
+            </technique>
+            <extra>
+               <technique profile="GOOGLEEARTH">
+                  <double_sided>1</double_sided>
+               </technique>
+            </extra>
+         </profile_COMMON>
+      </effect>
+   </library_effects>
+   <library_geometries>
+      <geometry id="mesh1-geometry" name="mesh1-geometry">
+         <mesh>
+            <source id="mesh1-geometry-position">
+               <float_array id="mesh1-geometry-position-array" count="159">-10.670491 -39.544056 30.250000 39.375000 -40.956970 10.000000 7.933237 -59.794056 -21.750000 16.233318 -18.995933 39.497145 -25.670455 -28.252457 20.127199 -22.375000 -48.355773 4.250000 9.424764 -86.482110 -54.000000 44.464010 -55.142172 -54.000000 52.947607 -14.380166 -14.750000 47.000000 -0.000000 30.750000 28.568299 4.991068 37.593641 25.294903 26.522028 41.000000 50.187500 18.748364 4.250000 80.558659 0.396242 -54.000000 58.124392 43.210974 -56.750000 36.132112 35.121111 -0.000000 18.143654 42.070468 25.449457 15.468501 42.070468 10.931082 33.718161 13.359865 6.574749 2.746923 8.705101 27.180826 6.708278 -19.644995 21.248573 23.880473 -46.679532 -22.126032 31.130160 -0.326352 -2.202624 2.519458 42.070468 3.244014 18.112776 46.276110 10.465877 -0.507255 65.837897 -10.052926 23.668619 48.802181 19.552478 31.897983 67.328887 -54.000000 -3.743237 101.842021 -54.000000 -63.917098 81.662197 -54.000000 -20.643506 29.320468 16.207471 -8.898080 0.809299 6.654855 -17.782579 33.305197 21.113079 -44.634673 -38.750558 -25.578019 0.437151 -61.925479 -54.000000 11.465698 6.651065 -5.831803 0.643449 26.072063 31.932021 4.225211 28.205470 32.402624 0.052441 30.951612 33.266951 5.703500 47.705838 37.624422 0.052441 36.570468 44.250000 0.026221 26.035234 51.500000 -30.332476 5.050091 33.250000 -44.581123 -0.000000 20.000000 -47.140114 -36.833444 -4.500000 -57.092722 -48.533074 -54.000000 -66.499975 -1.237336 -26.666277 -87.821352 12.145511 -54.000000 -45.937500 26.522028 -11.250000 -39.818583 17.742689 20.608754 -13.462001 34.434581 38.820694 -8.405358 39.496990 23.740915 1.928921 28.205470 21.652624 </float_array>
+               <technique_common>
+                  <accessor source="#mesh1-geometry-position-array" count="53" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <source id="mesh1-geometry-normal">
+               <float_array id="mesh1-geometry-normal-array" count="294">0.136943 -0.905510 0.401620 0.264904 -0.662256 0.700887 -0.446305 0.190904 0.874281 -0.710663 -0.504092 0.490764 -0.058589 -0.937145 0.343985 0.255848 -0.738926 0.623321 0.559563 -0.625613 0.543597 0.319425 -0.919476 0.229196 0.929875 -0.336556 0.148535 0.936074 -0.281303 0.211266 0.191811 -0.471729 0.860628 0.322451 -0.099898 0.941300 0.774062 0.469203 0.425061 0.991920 0.010111 0.126465 0.834913 -0.219825 0.504576 0.839022 0.458455 0.293020 0.663402 0.660687 0.351270 0.676952 0.663720 0.318138 0.698686 0.640379 0.318987 0.292565 0.954725 -0.053908 -0.823578 -0.546526 0.151752 -0.563095 0.218489 -0.796986 -0.561213 0.093659 -0.822355 -0.754590 0.379534 -0.535302 -0.984380 0.088557 0.152160 -0.464643 -0.414108 0.782702 -0.471301 0.384147 0.793918 -0.811684 -0.195136 0.550538 -0.290760 -0.861068 0.417157 0.417696 -0.163767 0.893706 0.886384 0.263000 0.380991 0.669355 0.699251 0.251021 0.317303 0.910585 0.264863 0.612788 0.632818 0.473321 -0.248262 0.740289 0.624770 -0.457132 0.389199 0.799722 -0.076860 0.776064 0.625953 0.517237 -0.072634 0.852755 0.551615 0.460299 -0.695591 0.696601 0.441924 -0.565199 0.807074 0.226842 -0.545137 0.675879 -0.010107 -0.736943 0.130565 0.859658 -0.493904 0.110508 0.862506 -0.493833 0.777755 -0.346932 0.524152 -0.759822 -0.152776 0.631925 -0.327153 -0.507355 0.797221 -0.275972 -0.303401 0.912024 0.537529 -0.079344 0.839504 0.477982 -0.772468 0.418122 0.195937 -0.584544 0.787348 0.745817 -0.605375 0.277991 -0.745817 0.605375 -0.277991 0.778450 -0.436500 0.451092 -0.778450 0.436500 -0.451092 0.565519 0.280657 -0.775513 -0.028409 0.260571 -0.965037 -0.028409 0.260571 -0.965037 -0.028409 0.260571 -0.965037 -0.916320 0.356502 -0.182384 0.268145 0.388466 0.881585 0.314713 0.537564 0.782292 0.383696 -0.087113 0.919341 0.365517 -0.114660 0.923716 0.645883 -0.275640 0.711939 -0.297295 -0.344364 0.890522 -0.315526 -0.385792 0.866953 -0.558652 -0.370591 0.742004 -0.613298 -0.407462 0.676639 -0.498406 -0.586170 0.638746 -0.486392 -0.823361 0.292402 -0.906940 -0.330993 0.260584 -0.805933 -0.408138 0.428831 -0.732128 0.177026 0.657762 -0.831637 0.405062 0.379875 -0.937931 0.243281 0.247184 -0.436204 0.842552 0.315962 -0.723231 0.260156 0.639730 -0.732269 0.251801 0.632754 -0.542500 0.778399 -0.315895 -0.371595 0.500834 0.781717 -0.702357 0.164769 0.692493 -0.867248 0.463399 0.182049 -0.602412 0.199337 0.772894 -0.387593 0.523242 0.758940 0.042235 0.889466 -0.455045 0.381072 0.830365 0.406544 -0.565602 0.820214 0.085692 0.413265 -0.254847 -0.874223 0.822861 0.240511 -0.514835 -0.986786 -0.081152 -0.140243 -0.519292 0.847367 0.110925 0.529750 0.840572 -0.113159 -0.881143 -0.217912 0.419645 -0.474902 -0.832413 0.285581 0.654873 0.663345 0.362098 -0.618453 0.246674 -0.746101 0.782572 -0.508597 0.359042 </float_array>
+               <technique_common>
+                  <accessor source="#mesh1-geometry-normal-array" count="98" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <source id="mesh1-geometry-uv">
+               <float_array id="mesh1-geometry-uv-array" count="582">0.342993 0.263351 -0.683497 -0.197308 0.022857 -0.919577 -0.444743 -0.620203 0.512368 -0.028739 -0.167027 0.241352 -0.230856 0.807354 -0.844876 0.410484 -0.751489 -0.023968 -0.170668 -0.015849 -0.543340 0.226195 -0.551996 -0.395487 0.170464 0.304144 -0.242682 -0.849596 0.402379 -0.272726 0.770100 -0.429076 0.251399 -1.121775 0.403952 -1.980988 0.707282 -0.944953 0.075413 -1.745427 1.054788 -1.745427 0.494875 -0.043646 -0.252670 -0.723194 0.498045 -1.413443 0.093708 -0.473092 -0.523157 0.048317 -0.764959 -1.299973 0.281804 0.428053 -0.581084 -0.014221 0.030553 -0.541753 0.907051 0.008813 0.590504 0.288794 0.438499 -0.840092 0.289766 -0.664150 0.683742 -0.031567 0.275453 -0.241792 0.199348 0.459863 -0.507563 0.223948 -0.207967 -0.385977 -0.379913 -0.044894 0.310815 -0.443931 0.009981 0.511658 -0.643936 -0.383560 -0.435303 -1.789151 0.008855 -0.842036 -0.209345 -1.568256 0.797508 -1.508334 0.158596 -0.239080 0.216635 -1.631486 0.461059 -0.274156 0.012742 -0.368724 0.004533 -0.333967 0.453097 -0.240573 -0.025610 0.567011 -0.390729 0.224704 -0.030782 -0.334718 -0.051266 0.566531 0.104607 0.580571 0.051321 0.277665 0.505339 0.049602 0.521294 0.645395 -0.156499 0.247564 0.552110 0.339384 -0.513589 -0.358964 -0.189776 0.351788 -0.953848 0.292069 -0.390166 -0.454181 0.380682 0.083110 -0.188303 0.300322 -27.085909 -7.357813 30.971546 -41.336866 14.535887 10.014628 -16.327288 11.425974 -2.464235 2.545191 44.352078 -17.612941 -0.439903 0.786475 0.436581 0.346854 0.259594 0.640657 -0.619393 0.529168 -0.985704 -0.118787 -0.712544 -0.366237 -0.882984 -0.102848 -1.056517 -0.821843 -1.336095 -0.003986 -0.849173 0.508077 -0.873286 0.734840 0.141907 0.837853 0.049080 0.629560 0.479103 0.389649 -0.955973 -0.387628 -0.933623 0.119960 -1.035304 0.098358 0.834448 0.086331 0.487340 -0.354241 0.518587 -1.632976 0.346849 0.124347 -0.252244 -1.517869 0.489899 -1.458683 -0.131081 0.095527 -0.165972 -1.493570 0.461319 -0.544096 0.961756 -0.647398 0.498377 -1.686761 1.531982 -1.686761 -0.426096 -0.978107 -0.600672 -2.150692 0.721567 -2.150692 -0.701383 -0.381851 -1.037525 -0.843266 -0.432161 -2.368264 0.367777 -0.143705 -0.138614 -0.490013 1.157450 -2.019239 0.875251 0.094911 0.545101 0.611982 -0.009082 0.230959 -0.131715 0.008116 -0.770100 0.427377 -0.744548 0.285123 -0.784361 0.396133 -0.113543 0.031006 -0.122483 0.549367 0.159106 0.531512 -0.431819 0.384093 0.066391 0.021432 -19.542497 19.522602 -39.413599 -49.752141 0.676166 -2.067182 -0.199626 0.195433 -0.202725 -1.607498 0.798123 -0.926517 -9.150481 9.275171 -29.619139 -40.606097 -8.303441 -77.261507 -0.257992 -0.350982 0.685463 -0.838369 0.316838 0.222706 6.456396 17.538201 60.796607 -49.294597 50.471002 -8.168451 0.548739 0.247936 0.125661 0.122692 0.706798 -1.539598 0.484338 0.374592 -0.550927 0.651259 0.083467 0.190244 0.171960 -0.247410 0.874738 0.100576 -0.010390 0.231355 -7.140816 8.290627 -58.345961 -27.192857 13.249778 -5.455281 0.270522 -0.031234 -1.138251 -0.698507 -0.401384 -1.658955 0.229690 0.323363 0.995931 -1.308643 -0.403444 -0.185251 0.288627 0.249798 -0.311265 -0.297629 -0.586335 -0.092737 -0.137010 0.459780 -0.480586 0.616565 -0.786219 0.259550 0.151194 0.731463 0.072197 0.694059 0.076546 0.316426 0.151194 0.731463 0.070974 0.800162 0.072197 0.694059 0.225842 1.146501 0.070974 0.800162 0.151194 0.731463 0.969323 0.816222 0.710436 0.956610 0.601342 0.723893 0.119806 -0.261608 -0.431907 -0.118166 -0.466803 -0.410593 0.175614 -0.049235 -0.273565 0.301939 -0.383983 0.059462 0.233172 -0.204265 0.655503 -0.023902 0.529061 0.532063 -0.277356 -0.195791 0.276380 -0.092271 -0.517698 0.560492 0.462807 -0.629286 0.231242 0.245803 -0.329250 0.189332 -0.514608 0.304396 0.547085 0.018317 0.354036 0.854049 -0.512333 0.330143 0.041344 -0.479546 0.555767 0.069004 -0.194850 -0.291000 0.513421 -0.294953 0.436999 0.116807 -0.194308 -0.213052 -0.095692 -0.909856 0.513965 -0.216651 0.297444 -0.614973 -0.026158 -0.185071 -0.251114 -0.851895 0.111044 -0.238275 -0.455269 -0.428898 -0.509820 -1.507278 -0.450757 -0.877795 0.542046 -1.467625 0.384162 -0.399472 -1.052331 -1.667242 0.364664 -1.667242 -0.602916 -1.036888 0.312141 -0.873821 -0.350661 -1.300217 -0.184058 -2.056235 0.077681 -0.635561 -0.406698 0.068239 -0.629831 -0.982760 0.294560 -0.490378 0.149521 0.194601 -0.233189 0.181513 -0.566737 0.183132 -0.595852 -0.516429 -0.101085 0.086488 1.150150 -2.034653 0.429215 -0.131639 0.195990 -0.875889 1.175830 -2.017988 0.211310 -0.867833 -0.355665 -2.017988 0.092796 0.664070 -0.469221 0.652996 -0.003569 0.556354 -0.115918 -0.333851 0.445956 -0.350698 0.444805 0.071600 -0.170404 -0.307996 0.212126 -0.325576 0.041899 0.057058 0.500553 0.688669 -0.205017 0.570641 0.437381 0.313491 0.515113 0.549508 -0.098633 -0.049684 0.592964 0.133216 0.454377 0.136149 0.323294 0.368106 0.201650 -0.037557 -0.035045 1.167226 -0.314168 1.040202 -0.029493 0.910267 -0.554117 0.521400 -0.502362 0.177539 -0.267961 0.394759 0.176369 0.741538 0.088910 0.371268 0.322967 0.426216 -0.469365 0.083727 -0.608475 -0.267744 -0.396136 -0.380502 -0.838935 0.456334 -0.517594 0.655389 -0.618623 0.687830 0.642566 0.678647 0.540242 0.650559 0.582343 0.434267 -18.340365 29.779937 -16.382482 18.963184 -14.171710 29.306412 -0.342880 0.750407 -0.279303 0.506878 -0.238831 0.732284 0.222974 -0.000153 -0.509148 -0.562479 0.307579 -1.071241 0.094324 -0.231003 -0.532081 -1.497280 1.063364 -1.497280 0.013171 0.519765 0.346767 0.172210 0.613684 0.444320 -0.954138 0.333336 -0.578412 0.550894 -0.967171 0.714280 -0.189653 0.387509 0.921484 -1.553625 0.349903 -0.677497 -0.458454 -1.553625 </float_array>
+               <technique_common>
+                  <accessor source="#mesh1-geometry-uv-array" count="291" stride="2">
+                     <param name="S" type="float"/>
+                     <param name="T" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="mesh1-geometry-vertex">
+               <input semantic="POSITION" source="#mesh1-geometry-position"/>
+            </vertices>
+            <triangles material="Stone_MarblenoCulling" count="90">
+               <input semantic="VERTEX" source="#mesh1-geometry-vertex" offset="0"/>
+               <input semantic="NORMAL" source="#mesh1-geometry-normal" offset="1"/>
+               <input semantic="TEXCOORD" source="#mesh1-geometry-uv" offset="2" set="0"/>
+               <p>0 0 0 1 0 1 2 0 2 1 1 3 0 1 4 3 1 5 3 2 6 0 2 7 4 2 8 4 3 9 0 3 10 5 3 11 0 4 12 2 4 13 5 4 14 5 5 15 2 5 16 6 5 17 2 6 18 7 6 19 6 6 20 1 7 21 2 7 22 7 7 23 8 8 24 1 8 25 7 8 26 9 9 27 1 9 28 8 9 29 9 10 30 10 10 31 1 10 32 9 11 33 11 11 34 10 11 35 11 12 36 9 12 37 12 12 38 12 13 39 8 13 40 9 13 41 12 14 42 13 14 43 8 14 44 14 15 45 13 15 46 12 15 47 14 16 48 12 16 49 15 16 50 15 17 51 12 17 52 11 17 53 16 18 54 15 18 55 11 18 56 16 19 57 17 19 58 15 19 59 16 20 60 18 20 61 17 20 62 18 21 63 19 21 64 16 21 65 18 22 66 20 22 67 19 22 68 17 25 75 22 25 76 18 25 77 22 25 76 17 25 75 23 25 78 24 26 79 23 26 80 17 26 81 23 26 80 24 26 79 25 26 82 25 27 83 24 27 84 26 27 85 26 28 86 24 28 87 15 28 88 15 29 89 17 29 90 24 29 91 26 30 92 15 30 93 14 30 94 26 31 95 14 31 96 27 31 97 26 32 98 27 32 99 25 32 100 25 33 101 27 33 102 28 33 103 25 34 104 28 34 105 29 34 106 23 35 107 25 35 108 29 35 109 30 36 110 23 36 111 29 36 112 23 37 113 30 37 114 31 37 115 31 38 116 32 38 117 30 38 118 32 39 119 31 39 120 19 39 121 19 40 122 20 40 123 31 40 124 20 42 128 34 42 129 33 42 130 22 44 134 21 44 135 20 44 136 22 46 140 35 46 141 34 46 142 22 47 143 23 47 144 35 47 145 35 48 146 23 48 147 31 48 148 35 50 152 33 50 153 34 50 154 19 55 161 36 55 162 32 55 163 37 56 164 36 56 165 19 56 166 37 57 167 38 57 168 36 57 169 39 58 170 38 58 171 37 58 172 39 59 173 40 59 174 38 59 175 11 60 176 40 60 177 39 60 178 11 61 179 41 61 180 40 61 181 10 62 182 11 62 183 41 62 184 10 63 185 3 63 186 41 63 187 1 64 188 3 64 189 10 64 190 3 65 191 42 65 192 41 65 193 3 66 194 4 66 195 42 66 196 4 67 197 43 67 198 42 67 199 4 68 200 44 68 201 43 68 202 5 69 203 4 69 204 44 69 205 5 70 206 44 70 207 45 70 208 46 71 209 45 71 210 44 71 211 47 72 212 45 72 213 46 72 214 48 73 215 46 73 216 47 73 217 48 74 218 43 74 219 46 74 220 48 75 221 49 75 222 43 75 223 49 76 224 48 76 225 30 76 226 29 77 227 30 77 228 48 77 229 29 78 230 48 78 231 47 78 232 32 79 233 49 79 234 30 79 235 32 80 236 49 80 237 42 80 238 49 81 239 43 81 240 42 81 241 50 82 242 42 82 243 32 82 244 41 83 245 42 83 246 50 83 247 40 84 248 41 84 249 50 84 250 40 85 251 50 85 252 38 85 253 50 86 254 51 86 255 38 86 256 50 87 257 32 87 258 51 87 259 36 88 260 51 88 261 32 88 262 51 89 263 36 89 264 38 89 265 38 90 266 36 90 267 52 90 268 38 92 272 52 92 273 37 92 274 43 93 275 44 93 276 46 93 277 5 94 278 45 94 279 6 94 280 11 95 281 16 95 282 39 95 283 16 96 284 37 96 285 39 96 286 37 96 285 16 96 284 19 96 287 13 97 288 8 97 289 7 97 290 </p>
+            </triangles>
+            <triangles material="FrontColorNoCulling" count="7">
+               <input semantic="VERTEX" source="#mesh1-geometry-vertex" offset="0"/>
+               <input semantic="NORMAL" source="#mesh1-geometry-normal" offset="1"/>
+               <input semantic="TEXCOORD" source="#mesh1-geometry-uv" offset="2" set="0"/>
+               <p>18 23 69 21 23 70 20 23 71 18 24 72 22 24 73 21 24 74 20 41 125 33 41 126 31 41 127 20 43 131 21 43 132 34 43 133 22 45 137 34 45 138 21 45 139 31 49 149 33 49 150 35 49 151 37 91 269 52 91 270 36 91 271 </p>
+            </triangles>
+            <triangles material="Stone_Marble1" count="4">
+               <input semantic="VERTEX" source="#mesh1-geometry-vertex" offset="0"/>
+               <input semantic="NORMAL" source="#mesh1-geometry-normal" offset="1"/>
+               <input semantic="TEXCOORD" source="#mesh1-geometry-uv" offset="2" set="0"/>
+               <p>20 51 155 34 51 156 22 51 157 22 52 157 34 52 156 20 52 155 20 53 158 22 53 159 18 53 160 18 54 160 22 54 159 20 54 158 </p>
+            </triangles>
+         </mesh>
+      </geometry>
+      <geometry id="mesh2-geometry" name="mesh2-geometry">
+         <mesh>
+            <source id="mesh2-geometry-position">
+               <float_array id="mesh2-geometry-position-array" count="12">7.786102 34.693495 39.074115 8.377110 29.813946 37.739184 9.662583 31.947352 24.652624 11.958872 31.947352 38.209787 </float_array>
+               <technique_common>
+                  <accessor source="#mesh2-geometry-position-array" count="4" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <source id="mesh2-geometry-normal">
+               <float_array id="mesh2-geometry-normal-array" count="6">-0.989714 -0.089294 -0.111775 0.534337 0.840412 -0.090505 </float_array>
+               <technique_common>
+                  <accessor source="#mesh2-geometry-normal-array" count="2" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <source id="mesh2-geometry-uv">
+               <float_array id="mesh2-geometry-uv-array" count="12">0.705281 0.783626 0.602929 0.755639 0.644789 0.481283 -0.250915 0.873783 -0.187229 0.572097 -0.146858 0.855702 </float_array>
+               <technique_common>
+                  <accessor source="#mesh2-geometry-uv-array" count="6" stride="2">
+                     <param name="S" type="float"/>
+                     <param name="T" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="mesh2-geometry-vertex">
+               <input semantic="POSITION" source="#mesh2-geometry-position"/>
+            </vertices>
+            <triangles material="Stone_MarblenoCulling" count="2">
+               <input semantic="VERTEX" source="#mesh2-geometry-vertex" offset="0"/>
+               <input semantic="NORMAL" source="#mesh2-geometry-normal" offset="1"/>
+               <input semantic="TEXCOORD" source="#mesh2-geometry-uv" offset="2" set="0"/>
+               <p>0 0 0 1 0 1 2 0 2 0 1 3 2 1 4 3 1 5 </p>
+            </triangles>
+         </mesh>
+      </geometry>
+      <geometry id="mesh3-geometry" name="mesh3-geometry">
+         <mesh>
+            <source id="mesh3-geometry-position">
+               <float_array id="mesh3-geometry-position-array" count="24">-44.634673 -38.750558 -25.578019 -8.898080 0.809299 6.654855 11.465698 6.651065 -5.831803 6.708278 -19.644995 21.248573 23.880473 -46.679532 -22.126032 31.130160 -0.326352 -2.202624 0.437151 -61.925479 -54.000000 33.718161 13.359865 6.574749 </float_array>
+               <technique_common>
+                  <accessor source="#mesh3-geometry-position-array" count="8" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="mesh3-geometry-vertex">
+               <input semantic="POSITION" source="#mesh3-geometry-position"/>
+            </vertices>
+            <lines material="ForegroundColor" count="8">
+               <input semantic="VERTEX" source="#mesh3-geometry-vertex" offset="0"/>
+               <p>0 1 2 0 2 1 1 3 3 4 4 5 4 6 7 4 </p>
+            </lines>
+         </mesh>
+      </geometry>
+      <geometry id="mesh4-geometry" name="mesh4-geometry">
+         <mesh>
+            <source id="mesh4-geometry-position">
+               <float_array id="mesh4-geometry-position-array" count="6">0.643449 26.072063 31.932021 1.928921 28.205470 21.652624 </float_array>
+               <technique_common>
+                  <accessor source="#mesh4-geometry-position-array" count="2" stride="3">
+                     <param name="X" type="float"/>
+                     <param name="Y" type="float"/>
+                     <param name="Z" type="float"/>
+                  </accessor>
+               </technique_common>
+            </source>
+            <vertices id="mesh4-geometry-vertex">
+               <input semantic="POSITION" source="#mesh4-geometry-position"/>
+            </vertices>
+            <lines material="ForegroundColor" count="1">
+               <input semantic="VERTEX" source="#mesh4-geometry-vertex" offset="0"/>
+               <p>0 1 </p>
+            </lines>
+         </mesh>
+      </geometry>
+   </library_geometries>
+   <library_visual_scenes>
+      <visual_scene id="SketchUpScene" name="SketchUpScene">
+         <node id="Model" name="Model">
+            <node id="mesh1" name="mesh1">
+               <instance_geometry url="#mesh1-geometry">
+                  <bind_material>
+                     <technique_common>
+                        <instance_material symbol="Stone_MarblenoCulling" target="#Stone_MarblenoCullingID">
+                           <bind_vertex_input semantic="UVSET0" input_semantic="TEXCOORD" input_set="0"/>
+                        </instance_material>
+                        <instance_material symbol="FrontColorNoCulling" target="#FrontColorNoCullingID"/>
+                        <instance_material symbol="Stone_Marble1" target="#Stone_Marble1ID">
+                           <bind_vertex_input semantic="UVSET0" input_semantic="TEXCOORD" input_set="0"/>
+                        </instance_material>
+                     </technique_common>
+                  </bind_material>
+               </instance_geometry>
+            </node>
+            <node id="mesh2" name="mesh2">
+               <instance_geometry url="#mesh2-geometry">
+                  <bind_material>
+                     <technique_common>
+                        <instance_material symbol="Stone_MarblenoCulling" target="#Stone_MarblenoCullingID">
+                           <bind_vertex_input semantic="UVSET0" input_semantic="TEXCOORD" input_set="0"/>
+                        </instance_material>
+                     </technique_common>
+                  </bind_material>
+               </instance_geometry>
+            </node>
+            <node id="mesh3" name="mesh3">
+               <instance_geometry url="#mesh3-geometry">
+                  <bind_material>
+                     <technique_common>
+                        <instance_material symbol="ForegroundColor" target="#ForegroundColorID"/>
+                     </technique_common>
+                  </bind_material>
+               </instance_geometry>
+            </node>
+            <node id="mesh4" name="mesh4">
+               <instance_geometry url="#mesh4-geometry">
+                  <bind_material>
+                     <technique_common>
+                        <instance_material symbol="ForegroundColor" target="#ForegroundColorID"/>
+                     </technique_common>
+                  </bind_material>
+               </instance_geometry>
+            </node>
+         </node>
+      </visual_scene>
+   </library_visual_scenes>
+   <scene>
+      <instance_visual_scene url="#SketchUpScene"/>
+   </scene>
+</COLLADA>
