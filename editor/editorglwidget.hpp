@@ -64,7 +64,7 @@ class EditorGLWidget : public QGLWidget
 		void modifyHex(QMouseEvent* event);
 
 	protected slots:
-		void checkKeys();
+		void updateIfNeeded();
 
 	private:
 		void getAvatarPos(const hex::location& loc, GLfloat* pos);
