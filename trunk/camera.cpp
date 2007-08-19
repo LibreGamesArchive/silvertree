@@ -386,4 +386,9 @@ GLfloat camera::need_to_rotate() const
 	}
 }
 
+bool camera::is_moving() const
+{
+	return target_rotation() != rotate_;
+}
+
 } //end namespace hex
