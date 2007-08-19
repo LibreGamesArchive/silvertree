@@ -27,15 +27,14 @@
 		} \
 	}
 
-#define WML_FOREACH(var,node,str) \
-	foreach(wml::const_node_ptr var, wml::child_nodes(node,str))
-
-#define WML_MUTABLE_FOREACH(var,node,str) \
-	foreach(wml::node_ptr var, wml::child_nodes(node,str))
-
 namespace wml {
 
 struct error {};
+
+typedef std::vector<const_node_ptr> const_node_vector;
+typedef std::vector<node_ptr> node_vector;
+
+node_ptr deep_copy(const_node_ptr node);
 
 std::vector<const_node_ptr> child_nodes(const const_node_ptr& ptr,
                                         const std::string& element);
