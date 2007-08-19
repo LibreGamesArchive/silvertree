@@ -14,6 +14,7 @@ class character_generator
 public:
 	static void initialize(wml::const_node_ptr node);
 	static const character_generator& get(const std::string& name="");
+	static std::vector<std::string> generator_list();
 
 	character_generator() {}
 

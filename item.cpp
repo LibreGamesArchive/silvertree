@@ -29,7 +29,8 @@ std::map<std::string,const_item_ptr> registry;
 
 void item::initialize(const wml::const_node_ptr& node)
 {
-	WML_FOREACH(i, node, "item") {
+	wml::const_node_vector items = wml::child_nodes(node, "item");
+	foreach(wml::const_node_ptr i, items) {
 		registry[(*i)["id"]] = create_item(i);
 	}
 }
