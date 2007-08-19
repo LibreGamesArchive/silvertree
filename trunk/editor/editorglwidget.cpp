@@ -38,6 +38,7 @@
 #include "../terrain_feature.hpp"
 #include "../tile.hpp"
 #include "../wml_parser.hpp"
+#include "../wml_utils.hpp"
 
 #include "editorglwidget.hpp"
 #include "editpartydialog.hpp"
@@ -129,6 +130,7 @@ void EditorGLWidget::setHeightEdit() {
 	current_feature_.clear();
 	pick_mode_ = false;
 	parties_mode_ = false;
+	current_party_ = hex::location();
 }
 
 void EditorGLWidget::setPicker() {
@@ -136,6 +138,7 @@ void EditorGLWidget::setPicker() {
 	current_feature_.clear();
 	pick_mode_ = true;
 	parties_mode_ = false;
+	current_party_ = hex::location();
 	picked_loc_ = hex::location();
 }
 
@@ -144,6 +147,7 @@ void EditorGLWidget::setCurrentTerrain(const std::string& terrain) {
 	current_feature_.clear();
 	pick_mode_ = false;
 	parties_mode_ = false;
+	current_party_ = hex::location();
 }
 
 void EditorGLWidget::setCurrentFeature(const std::string& terrain) {
@@ -151,6 +155,7 @@ void EditorGLWidget::setCurrentFeature(const std::string& terrain) {
 	current_feature_ = terrain;
 	pick_mode_ = false;
 	parties_mode_ = false;
+	current_party_ = hex::location();
 }
 
 void EditorGLWidget::setEditParties() {
@@ -158,6 +163,7 @@ void EditorGLWidget::setEditParties() {
 	current_feature_.clear();
 	pick_mode_ = false;
 	parties_mode_ = true;
+	current_party_ = hex::location();
 }
 
 void EditorGLWidget::initializeGL() 
@@ -302,9 +308,45 @@ void EditorGLWidget::paintGL()
 			}
 		}
 
+		if(map_->is_loc_on_map(current_party_)) {
+			map_->get_tile(current_party_).draw_highlight();
+		}
+
 		for(avatar_map::const_iterator i = avatar_.begin();
 		    i != avatar_.end(); ++i) {
 			i->second->draw();
+		}
+
+		if(map_->is_loc_on_map(current_party_)) {
+			std::cerr << "current party...\n";
+			glDisable(GL_LIGHTING);
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_TEXTURE_2D);
+			glBegin(GL_LINES);
+			glColor4f(1.0,1.0,1.0,1.0);
+			wml::node_vector v = wml::child_nodes((*parties_)[current_party_], "wander");
+			std::cerr << "wander: " << v.size() << "\n";
+			foreach(const wml::node_ptr& ptr, v) {
+				hex::location loc(wml::get_int(ptr,"x"),wml::get_int(ptr,"y"));
+				if(!map_->is_loc_on_map(loc)) {
+					continue;
+				}
+
+				std::cerr << "drawing " << current_party_.x() << "," << current_party_.y() << " -> " << loc.x() << "," << loc.y() << "\n";
+
+				glVertex3f(hex::tile::translate_x(current_party_),
+				           hex::tile::translate_y(current_party_),
+						   hex::tile::translate_height(
+								 map_->get_tile(current_party_).height()));
+				glVertex3f(hex::tile::translate_x(loc),
+				           hex::tile::translate_y(loc),
+						   hex::tile::translate_height(
+								 map_->get_tile(loc).height()));
+			}
+			glEnd();
+			glEnable(GL_TEXTURE_2D);
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_LIGHTING);
 		}
 
 		{
@@ -385,20 +427,55 @@ void EditorGLWidget::checkKeys() {
 void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 {
 	if(parties_mode_) {
-		if(parties_ && map_->is_loc_on_map(selected_)) {
-			wml::node_ptr& p = (*parties_)[selected_];
-			if(!p) {
-				p.reset(new wml::node("party"));
-				p->set_attr("x",formatter() << selected_.x());
-				p->set_attr("y",formatter() << selected_.y());
+		if(!parties_) {
+			return;
+		}
+
+		if(event->buttons()&Qt::LeftButton) {
+			if(!map_->is_loc_on_map(selected_)) {
+				return;
 			}
-			EditPartyDialog d(p);
-			d.exec();
-			d.writeParty();
-			if(!p->get_child("character")) {
-				parties_->erase(selected_);
+
+			if(current_party_.valid() && parties_->count(current_party_)) {
+				wml::node_ptr party = (*parties_)[current_party_];
+				wml::node_vector v = wml::child_nodes(party, "wander");
+				bool found = false;
+				foreach(const wml::node_ptr& p, v) {
+					if(hex::location(wml::get_int(p,"x"),wml::get_int(p,"y")) == selected_) {
+						found = true;
+						party->erase_child(p);
+						break;
+					}
+				}
+
+				if(!found) {
+					wml::node_ptr wander(new wml::node("wander"));
+					wander->set_attr("x",formatter() << selected_.x());
+					wander->set_attr("y",formatter() << selected_.y());
+					party->add_child(wander);
+					std::cerr << "add wander...\n";
+				}
+			} else {
+				wml::node_ptr& p = (*parties_)[selected_];
+				if(!p) {
+					p.reset(new wml::node("party"));
+					p->set_attr("x",formatter() << selected_.x());
+					p->set_attr("y",formatter() << selected_.y());
+				}
+				EditPartyDialog d(p);
+				d.exec();
+				d.writeParty();
+				if(!p->get_child("character")) {
+					parties_->erase(selected_);
+				}
+				setParties(parties_);
 			}
-			setParties(parties_);
+		} else if(event->buttons()&Qt::RightButton) {
+			if(map_->is_loc_on_map(selected_) && parties_->count(selected_)) {
+				current_party_ = selected_;
+			} else {
+				current_party_ = hex::location();
+			}
 		}
 	} else {
 		modifyHex(event);
