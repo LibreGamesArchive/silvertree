@@ -33,8 +33,21 @@
 namespace game_logic
 {
 
+namespace {
+std::string get_map_data(wml::const_node_ptr node)
+{
+	const std::string& data = (*node)["map_data"];
+	if(!data.empty()) {
+		return data;
+	}
+
+	return sys::read_file((*node)["map"]);
+}
+
+}
+
 world::world(wml::const_node_ptr node)
-  : map_(sys::read_file((*node)["map"])), camera_(map_),
+  : map_(get_map_data(node)), camera_(map_),
     camera_controller_(camera_),
     time_(node), subtime_(0.0), tracks_(map_)
 {
@@ -69,8 +82,8 @@ world::world(wml::const_node_ptr node)
 	for(; e1 != e2; ++e1) {
 		hex::location loc1(wml::get_attr<int>(e1->second,"x"),
 		                   wml::get_attr<int>(e1->second,"y"));
-		hex::location loc2(wml::get_attr<int>(e1->second,"xdst"),
-		                   wml::get_attr<int>(e1->second,"ydst"));
+		hex::location loc2(wml::get_attr<int>(e1->second,"xdst",-1),
+		                   wml::get_attr<int>(e1->second,"ydst",-1));
 		exits_[loc1] = loc2;
 	}
 }

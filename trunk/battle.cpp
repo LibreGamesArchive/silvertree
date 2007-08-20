@@ -47,7 +47,8 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
 	 highlight_moves_(false), highlight_attacks_(false),
 	 move_done_(false), turn_done_(false),
 	 camera_(battle_map), camera_controller_(camera_),
-	 result_(ONGOING), keyed_selection_(0)
+	 result_(ONGOING), keyed_selection_(0),
+	 current_time_(0)
 {
 	srand(SDL_GetTicks());
 }
@@ -58,6 +59,7 @@ void battle::play()
 		std::sort(chars_.begin(),chars_.end(),battle_char_less);
 		generate_movement_order();
 		focus_ = chars_.begin();
+		current_time_ = (*focus_)->ready_to_move_at();
 		(*focus_)->play_turn(*this);
 	}
 
@@ -151,6 +153,12 @@ void battle::player_turn(battle_character& c)
 				}
 
 				if(!input) {
+					if(current_move_->mod()) {
+						if(current_move_->mod()->target() == battle_modification::TARGET_SELF) {
+							current_move_->mod()->apply(**focus_,**focus_,current_time_);
+						}
+					}
+
 					(*focus_)->set_time_until_next_move(current_move_->get_stat("initiative",**focus_));
 					turn_done_ = true;
 				}
@@ -433,7 +441,7 @@ battle::attack_stats battle::get_attack_stats(
 	attack_stats stats;
 	stats.attack = ch.stat_mod_height(AttackStat,height_diff) +
 	    move.get_stat(AttackStat,attacker);
-	stats.defense = defender.get_character().defense(
+	stats.defense = defender.defense(
 	                  attacker.get_character().damage_type());
 	stats.damage = ch.stat_mod_height(DamageStat,height_diff) +
 	                  move.get_stat(DamageStat,attacker);

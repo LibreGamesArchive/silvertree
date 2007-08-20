@@ -4,6 +4,7 @@
 #include <map>
 
 #include "battle_character_fwd.hpp"
+#include "battle_modification.hpp"
 #include "battle_move_fwd.hpp"
 #include "formula_fwd.hpp"
 #include "wml_node.hpp"
@@ -24,6 +25,8 @@ public:
 	bool can_attack() const { return can_attack_; }
 	bool must_attack() const { return must_attack_; }
 	int get_stat(const std::string& stat, const battle_character& c) const;
+
+	const battle_modification_ptr& mod() const { return mod_; }
 private:
 	battle_move() {}
 	std::string name_;
@@ -33,6 +36,7 @@ private:
 	bool can_attack_;
 	bool must_attack_;
 	std::map<std::string,const_formula_ptr> stats_;
+	battle_modification_ptr mod_;
 };
 
 }
