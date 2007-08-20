@@ -51,11 +51,15 @@ void settlement::enter(party_ptr pty)
 	}
 
 	world& w = *world_;
+	const hex::location old_loc = pty->loc();
 	pty->new_world(w,hex::location(
 	         wml::get_attr<int>(wml_,"entry_x"),
 	         wml::get_attr<int>(wml_,"entry_y")));
 	w.add_party(pty);
 	w.play();
+	if(!pty->loc().valid()) {
+		pty->set_loc(old_loc);
+	}
 }
 
 }

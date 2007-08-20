@@ -99,6 +99,7 @@ private:
 
 	const_battle_move_ptr current_move_;
 	int keyed_selection_;
+	int current_time_;
 };
 		
 }

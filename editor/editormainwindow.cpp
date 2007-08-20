@@ -56,6 +56,7 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 	party_button->setChecked(false);
 	handlers_.push_back(new TerrainHandler(*this, "party", false, tool_buttons_.size()));
 	QApplication::connect(party_button, SIGNAL(pressed()), handlers_.back(), SLOT(terrainSelected()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_P),this), SIGNAL(activated()), handlers_.back(), SLOT(terrainSelected()));
 	ui.tilesToolBar->addWidget(party_button);
 	tool_buttons_.push_back(party_button);
 
@@ -65,6 +66,7 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 	height_button->setChecked(true);
 	handlers_.push_back(new TerrainHandler(*this, "", false, tool_buttons_.size()));
 	QApplication::connect(height_button, SIGNAL(pressed()), handlers_.back(), SLOT(terrainSelected()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_H),this), SIGNAL(activated()), handlers_.back(), SLOT(terrainSelected()));
 	ui.tilesToolBar->addWidget(height_button);
 	tool_buttons_.push_back(height_button);
 

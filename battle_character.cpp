@@ -369,12 +369,35 @@ void battle_character::end_attack()
 
 int battle_character::attack() const
 {
-	return get_character().attack();
+	return get_character().attack() + mod_stat("attack");
 }
 
 int battle_character::defense() const
 {
-	return get_character().defense();
+	return get_character().defense() + mod_stat("defense");
+}
+
+int battle_character::defense(const std::string& damage_type) const
+{
+	return get_character().defense(damage_type) + mod_stat("defense");
+}
+
+int battle_character::stat(const std::string& s) const
+{
+	return get_character().stat(s) + mod_stat(s);
+}
+
+int battle_character::mod_stat(const std::string& s) const
+{
+	int res = 0;
+	typedef std::multimap<std::string,stat_mod>::const_iterator itor;
+	std::pair<itor,itor> range(mods_.equal_range(s));
+	while(range.first != range.second) {
+		res += range.first->second.mod;
+		++range.first;
+	}
+
+	return res;
 }
 
 std::string battle_character::status_text() const
@@ -451,6 +474,26 @@ int battle_character::adjust_damage(int damage) const
 	const int adjust = (time_of_day_adjustment_ < 0 ? -1 : 1) *
 	                   ((abs(time_of_day_adjustment_)*damage)/100);
 	return damage + adjust;
+}
+
+void battle_character::update_time(int time)
+{
+	std::multimap<std::string,stat_mod>::iterator i = mods_.begin();
+	while(i != mods_.end()) {
+		if(time >= i->second.expire) {
+			mods_.erase(i++);
+		} else {
+			++i;
+		}
+	}
+}
+
+void battle_character::add_modification(const std::string& stat,
+                                        int expire, int mod)
+{
+	std::multimap<std::string,stat_mod>::iterator i = mods_.insert(std::pair<std::string,stat_mod>(stat,stat_mod()));
+	i->second.expire = expire;
+	i->second.mod = mod;
 }
 
 }

@@ -59,6 +59,11 @@ battle_move::battle_move(wml::const_node_ptr node)
 			stats_[i->first] = const_formula_ptr(new formula(i->second));
 		}
 	}
+
+	wml::const_node_ptr mod = node->get_child("modification");
+	if(mod) {
+		mod_.reset(new battle_modification(mod));
+	}
 }
 
 int battle_move::get_stat(const std::string& stat,
@@ -68,9 +73,9 @@ int battle_move::get_stat(const std::string& stat,
 	         stats_.find(stat);
 	if(i != stats_.end()) {
 		const character::final_stat_callable callable(c.get_character());
-		return i->second->execute(callable).as_int();
+		return i->second->execute(callable).as_int() + c.mod_stat(stat);
 	} else {
-		return c.get_character().stat(stat);
+		return c.stat(stat);
 	}
 }
 

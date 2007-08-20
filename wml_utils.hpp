@@ -35,6 +35,7 @@ typedef std::vector<const_node_ptr> const_node_vector;
 typedef std::vector<node_ptr> node_vector;
 
 node_ptr deep_copy(const_node_ptr node);
+void merge_over(const_node_ptr src, node_ptr dst);
 void copy_over(const_node_ptr src, node_ptr dst);
 
 std::vector<const_node_ptr> child_nodes(const const_node_ptr& ptr,

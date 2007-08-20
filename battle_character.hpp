@@ -108,9 +108,15 @@ public:
 
 	int attack() const;
 	int defense() const;
+	int defense(const std::string& damage_type) const;
+	int stat(const std::string& s) const;
+	int mod_stat(const std::string& s) const;
 	std::string status_text() const;
 
 	void set_time_until_next_move(int amount) { move_at_ += amount; }
+
+	void update_time(int cur_time);
+	void add_modification(const std::string& stat, int expire, int mod);
 
 private:
 	void get_possible_moves_internal(move_map& locs, const std::vector<battle_character_ptr>& chars, route& r, int max_distance) const;
@@ -136,6 +142,13 @@ private:
 	const GLfloat* highlight_;
 
 	int time_of_day_adjustment_;
+
+	struct stat_mod {
+		int expire;
+		int mod;
+	};
+
+	std::multimap<std::string,stat_mod> mods_;
 };
 
 }
