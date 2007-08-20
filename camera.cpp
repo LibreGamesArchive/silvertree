@@ -137,7 +137,7 @@ GLuint camera::finish_selection(std::vector<GLuint>* items)
 		GLuint names = *itor++;
 		const GLuint z1 = *itor++;
 		++itor;
-		if(names > 0 && (closest = GLuint(-1) || z1 > closest)) {
+		if(names > 0 && (closest == GLuint(-1) || z1 > closest)) {
 			res = *itor;
 			closest = z1;
 		}

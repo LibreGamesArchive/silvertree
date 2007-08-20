@@ -240,6 +240,7 @@ void EditorGLWidget::paintGL()
 
 			camera_->finish_selection(&selection);
 
+			selected_ = hex::location();
 			int high = -1;
 			foreach(GLuint n, selection) {
 				if(!map_->is_loc_on_map(locs[n])) {
