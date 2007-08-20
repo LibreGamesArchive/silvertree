@@ -425,14 +425,32 @@ void EditorGLWidget::updateIfNeeded() {
 	}
 }
 
+namespace {
+// Functions to determine if a mouse event holds a left click or a right click.
+// Meta+click counts as a right-click to work nicely with OSX. Qt doesn't seem to get
+// this right for mouse move events.
+bool left_button(const QMouseEvent* event)
+{
+	return (event->buttons()&Qt::LeftButton) && !(event->modifiers()&Qt::MetaModifier);
+}
+
+bool right_button(const QMouseEvent* event)
+{
+	return (event->buttons()&Qt::RightButton) ||
+	       ((event->buttons()&Qt::LeftButton) && (event->modifiers()&Qt::MetaModifier));
+}
+}
+
 void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 {
+	std::cerr << "buttons: " << (int)event->button() << "," << (int)event->buttons() << ", " << (int)event->modifiers() << "\n";
+	std::cerr << "ctrl: " << (int)(event->modifiers()&Qt::ControlModifier) << "\n";
 	if(parties_mode_) {
 		if(!parties_) {
 			return;
 		}
 
-		if(event->buttons()&Qt::LeftButton) {
+		if(left_button(event)) {
 			if(!map_->is_loc_on_map(selected_)) {
 				return;
 			}
@@ -470,7 +488,7 @@ void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 				}
 				setParties(parties_);
 			}
-		} else if(event->buttons()&Qt::RightButton) {
+		} else if(right_button(event)) {
 			if(map_->is_loc_on_map(selected_) && parties_->count(selected_)) {
 				current_party_ = selected_;
 			} else {
@@ -485,11 +503,11 @@ void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 
 void EditorGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+	std::cerr << "move: " << (int)event->button() << "," << (int)event->buttons() << "\n";
 	mousex_ = event->x();
 	mousey_ = event->y();
 	setFocus(Qt::MouseFocusReason);
-	if((event->buttons()&Qt::LeftButton) ||
-	   (event->buttons()&Qt::RightButton)) {
+	if(left_button(event) || right_button(event)) {
 		if(!parties_mode_) {
 			modifyHex(event);
 		}
@@ -500,9 +518,9 @@ void EditorGLWidget::mouseMoveEvent(QMouseEvent *event)
 void EditorGLWidget::modifyHex(QMouseEvent* event)
 {
 	int adjust = 0;
-	if(event->buttons()&Qt::LeftButton) {
+	if(left_button(event)) {
 		adjust = 1;
-	} else if(event->buttons()&Qt::RightButton) {
+	} else if(right_button(event)) {
 		adjust = -1;
 		if(pick_mode_) {
 			picked_loc_ = selected_;
