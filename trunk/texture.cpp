@@ -24,17 +24,10 @@ namespace {
 	texture_map texture_cache;
 	GLuint current_texture = 0;
 
-	const size_t num_texture_ids = 128;
-	GLuint texture_ids[num_texture_ids];
-	size_t current_id = num_texture_ids;
-
 	GLuint get_texture_id() {
-		if(current_id == num_texture_ids) {
-			glGenTextures(num_texture_ids,texture_ids);
-			current_id = 0;
-		}
-
-		return texture_ids[current_id++];
+		GLuint res;
+		glGenTextures(1, &res);
+		return res;
 	}
 
 	bool npot_allowed = true;
@@ -109,6 +102,7 @@ texture::texture(const key& surfs)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D,0,4,s->w,s->h,0,GL_RGBA,
 	             GL_UNSIGNED_BYTE,s->pixels);
+	current_texture = 0;
 }
 
 void texture::set_as_current_texture() const
