@@ -42,10 +42,14 @@ EditorMainWindow::EditorMainWindow(QWidget *parent)
 	QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_O),this), SIGNAL(activated()), this, SLOT(openRequested()));
 	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Z),this), SIGNAL(activated()), this, SLOT(zoominRequested()));
 	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_X),this), SIGNAL(activated()), this, SLOT(zoomoutRequested()));
-	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(rotateLeft()));
-	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(rotateRight()));
-	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Up),this), SIGNAL(activated()), this, SLOT(tiltUp()));
-	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Down),this), SIGNAL(activated()), this, SLOT(tiltDown()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(rotateLeft()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(rotateRight()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Up),this), SIGNAL(activated()), this, SLOT(tiltUp()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Down),this), SIGNAL(activated()), this, SLOT(tiltDown()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Left),this), SIGNAL(activated()), this, SLOT(panLeft()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Right),this), SIGNAL(activated()), this, SLOT(panRight()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Up),this), SIGNAL(activated()), this, SLOT(panUp()));
+	QApplication::connect(new QShortcut(QKeySequence(Qt::Key_Down),this), SIGNAL(activated()), this, SLOT(panDown()));
 
 	ui.action_Save->setEnabled(false);
 	ui.editorGLWidget->setEnabled(false);
@@ -180,6 +184,22 @@ void EditorMainWindow::tiltDown() {
 		camera_->tilt_down();
 	}
 	ui.editorGLWidget->updateGL();
+}
+
+void EditorMainWindow::panUp() {
+	ui.verticalScrollBar->triggerAction(QScrollBar::SliderSingleStepSub);
+}
+
+void EditorMainWindow::panDown() {
+	ui.verticalScrollBar->triggerAction(QScrollBar::SliderSingleStepAdd);
+}
+
+void EditorMainWindow::panLeft() {
+	ui.horizontalScrollBar->triggerAction(QScrollBar::SliderSingleStepSub);
+}
+
+void EditorMainWindow::panRight() {
+	ui.horizontalScrollBar->triggerAction(QScrollBar::SliderSingleStepAdd);
 }
 
 void EditorMainWindow::undo() {

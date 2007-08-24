@@ -28,6 +28,10 @@ class EditorMainWindow : public QMainWindow
 		void rotateRight();
 		void tiltUp();
 		void tiltDown();
+		void panUp();
+		void panDown();
+		void panLeft();
+		void panRight();
 		void undo();
 		void redo();
 		void setTerrain(const std::string& id, bool feature, int button);
