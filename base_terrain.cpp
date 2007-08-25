@@ -10,6 +10,9 @@
 
    See the COPYING file for more details.
 */
+
+#include <boost/lexical_cast.hpp>
+
 #include "base_terrain.hpp"
 #include "model.hpp"
 #include "string_utils.hpp"
@@ -100,11 +103,22 @@ graphics::texture base_terrain::transition_texture(hex::DIRECTION dir) const
 	return graphics::texture::get(graphics::surface_cache::get(name));
 }
 
-graphics::texture base_terrain::cliff_texture() const
+void base_terrain::get_cliff_textures(std::vector<graphics::texture>& result) const
 {
-	graphics::texture::key surfs;
-	surfs.push_back(graphics::surface_cache::get(cliff_));
-	return graphics::texture::get(surfs);
+	foreach(const std::string& str, cliff_) {
+		int ncopies = 1;
+		std::string::const_iterator colon = std::find(str.begin(),str.end(),':');
+		const std::string image_key(str.begin(),colon);
+		if(colon != str.end()) {
+			ncopies = boost::lexical_cast<int>(std::string(colon+1,str.end()));
+		}
+		graphics::texture::key surfs;
+		surfs.push_back(graphics::surface_cache::get(image_key));
+
+		while(ncopies-- > 0) {
+			result.push_back(graphics::texture::get(surfs));
+		}
+	}
 }
 
 graphics::const_model_ptr base_terrain::generate_model(
@@ -140,7 +154,7 @@ base_terrain::base_terrain(wml::const_node_ptr node)
 {
 	id_ = (*node)["id"];
 	name_ = (*node)["name"];
-	cliff_ = (*node)["cliff_texture"];
+	cliff_ = util::split((*node)["cliff_texture"]);
 
 	textures_ = util::split((*node)["textures"]);
 	models_ = util::split((*node)["models"]);
