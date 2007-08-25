@@ -38,14 +38,16 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 					}
 					std::cerr << "'\n";
 					const std::string val(value.str,value.str+value.length);
-					if(strstr(val.c_str(),"position")) {
+					if(strcasestr(val.c_str(),"position")) {
 						std::cerr << "position...\n";
 						v = &position;
-					} else if(strstr(val.c_str(),"normal")) {
+					} else if(strcasestr(val.c_str(),"normal")) {
 						std::cerr << "normal...\n";
 						v = &normal;
-					} else if(strstr(val.c_str(),"uv")) {
+					} else if(strcasestr(val.c_str(),"uv")) {
 						v = &uv;
+					} else {
+						assert(false);
 					}
 				}
 			}
@@ -90,10 +92,31 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 				}
 			}
 
+			bool found_vertex = false, found_normal = false, found_uv = false;
+
 			while(xml_get_token(parser, &token) &&
 			      token.type != XML_TOKEN_END_ELEMENT) {
 				if(token.type == XML_TOKEN_BEGIN_ELEMENT) {
-					if(XML_TOKEN_EQUALS(token, "p")) {
+					if(XML_TOKEN_EQUALS(token, "input")) {
+						XML_TOKEN name, value;
+						while(xml_get_attr(parser, &name, &value)) {
+							if(XML_TOKEN_EQUALS(name, "semantic")) {
+								std::cerr << "found semantic\n";
+								if(XML_TOKEN_EQUALS(value, "VERTEX")) {
+									std::cerr << "VERTEX\n";
+									found_vertex = true;
+								} else if(XML_TOKEN_EQUALS(value, "NORMAL")) {
+									std::cerr << "NORMAL\n";
+									found_normal = true;
+								} else if(XML_TOKEN_EQUALS(value, "TEXCOORD")) {
+									std::cerr << "TEXCOORD\n";
+									found_uv = true;
+								}
+							}
+						}
+						xml_skip_element(parser);
+					} else if(XML_TOKEN_EQUALS(token, "p") && found_vertex &&
+						      found_normal && found_uv) {
 						std::cerr << "paragraph\n";
 						XML_TOKEN text;
 						while(xml_get_token(parser, &text) &&
@@ -159,7 +182,6 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 								}
 							}
 						}
-
 					} else {
 						xml_skip_element(parser);
 					}
@@ -169,6 +191,8 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 			xml_skip_element(parser);
 		}
 	}
+
+	std::cerr << "faces: " << faces.size() << "\n";
 }
 
 model_ptr parsedae(const char* i1, const char* i2)
