@@ -1,0 +1,2 @@
+@lines = <>;
+print (reverse @lines);
