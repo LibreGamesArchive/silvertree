@@ -35,6 +35,7 @@ unsigned int display_list_map[num_display_lists];
 GLuint start_display_list = GLuint(-1);
 int display_hit = 0;
 int display_miss = 0;
+unsigned int frame_number = 0;
 
 GLuint get_display_list(unsigned int tile_id, bool* is_new)
 {
@@ -367,6 +368,8 @@ void tile::setup_drawing()
 	glMaterialfv(GL_FRONT,GL_DIFFUSE,diffuse);
 	glMaterialfv(GL_FRONT,GL_AMBIENT,ambient);
 	glMaterialfv(GL_FRONT,GL_SPECULAR,specular);
+
+	frame_number++;
 }
 
 void tile::finish_drawing()
@@ -507,11 +510,13 @@ void tile::draw_cliffs() const
 		return;
 	}
 
-	if(cliff_texture_.valid() == false) {
-		cliff_texture_ = terrain_->cliff_texture();
+	if(cliff_textures_.empty()) {
+		terrain_->get_cliff_textures(cliff_textures_);
 	}
 
-	cliff_texture_.set_as_current_texture();
+	graphics::texture& cliff_texture = cliff_textures_[frame_number%cliff_textures_.size()];
+
+	cliff_texture.set_as_current_texture();
 	graphics::texture overlap_texture = terrain_->transition_texture(hex::NORTH);
 
 	for(int n = 0; n != 6; ++n) {
@@ -585,7 +590,7 @@ void tile::draw_cliffs() const
 		glVertex3f(points[0]->x, points[0]->y, points[0]->height);
 		glEnd();
 
-		cliff_texture_.set_as_current_texture();
+		cliff_texture.set_as_current_texture();
 	}
 }
 

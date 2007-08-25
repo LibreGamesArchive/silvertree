@@ -116,7 +116,7 @@ private:
 	mutable bool model_init_;
 
 	mutable graphics::texture texture_;
-	mutable graphics::texture cliff_texture_;
+	mutable std::vector<graphics::texture> cliff_textures_;
 
 	struct point {
 		point() : x(0), y(0), height(0),
