@@ -296,7 +296,7 @@ int character::get_equipment_mod(const std::string& str) const
 			if(strength_penalty) {
 				static const std::string IdealStrength = "ideal_strength";
 				const int shortfall = equip->modify_stat(IdealStrength) - get_attr(StrengthAttribute);
-				if(shortfall < 0) {
+				if(shortfall > 0) {
 					strength_penalty_callable callable(shortfall);
 					res += strength_penalty->execute(callable).as_int();
 				}

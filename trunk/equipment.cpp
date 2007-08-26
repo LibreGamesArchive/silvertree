@@ -50,7 +50,12 @@ equipment::equipment(ITEM_TYPE type, const wml::const_node_ptr& node)
 		}
 	}
 
-	const wml::const_node_ptr parries = node->get_child("parry_against");
+	std::vector<wml::const_node_ptr> parries = wml::child_nodes(node, "parry_against");
+	foreach(const wml::const_node_ptr& parry, parries) {
+		for(wml::node::const_attr_iterator i = parry->begin_attr(); i != parry->end_attr(); ++i) {
+			parry_against_[i->first] = boost::lexical_cast<int>(i->second);
+		}
+	}
 }
 
 equipment::equipment(ITEM_TYPE type) : item(type)

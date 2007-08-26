@@ -31,6 +31,8 @@ class learn_skills_dialog : public gui::dialog
 public:
 	explicit learn_skills_dialog(game_logic::character_ptr c);
 
+	void next_page();
+
 private:
 	void init();
 	void handle_event(const SDL_Event& event);
@@ -38,6 +40,7 @@ private:
 	game_logic::character_ptr char_;
 
 	std::vector<boost::shared_ptr<skill_dialog> > children_;
+	int page_, page_size_;
 };
 
 }
