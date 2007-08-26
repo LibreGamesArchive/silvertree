@@ -150,7 +150,7 @@ base_terrain::base_terrain(wml::const_node_ptr node)
     : cliff_particles_(node->get_child("cliff_particles")),
       overlap_priority_(wml::get_attr<int>(node,"overlap_priority")),
       vision_block_(wml::get_attr<GLfloat>(node,"vision_block")),
-	  default_cost_(wml::get_int(node,"cost",100)),
+	  default_cost_(wml::get_int(node,"cost",-1)),
 	  battle_style_(wml::get_str(node,"battle_style"))
 {
 	id_ = (*node)["id"];
