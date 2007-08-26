@@ -92,6 +92,8 @@ public:
 	void set_terrain(const std::string& name);
 	void set_feature(const std::string& name);
 
+	bool is_passable(DIRECTION dir) const;
+
 	void invalidate();
 
 	int num_neighbours() const { int res = 0; for(int n = 0; n != 6; ++n) { if(neighbours_[n]) { ++res; } } return res; }

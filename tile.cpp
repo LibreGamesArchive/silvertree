@@ -168,6 +168,19 @@ void tile::init(int height, const_base_terrain_ptr terrain,
 	center_.init = false;
 }
 
+bool tile::is_passable(DIRECTION dir) const
+{
+	if(!neighbours_[dir] || cliffs_[dir]) {
+		return false;
+	}
+
+	if(neighbours_[dir]->cliffs_[(dir+3)%6]) {
+		return false;
+	}
+
+	return true;
+}
+
 void tile::invalidate()
 {
 	invalidate_display_list(id_);
