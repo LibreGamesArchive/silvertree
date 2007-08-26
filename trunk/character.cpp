@@ -143,7 +143,7 @@ const std::string ParryStat = "parry";
 const std::string SpeedStat = "speed";
 const std::string ClimbStat = "climb";
 const std::string VisionStat = "vision";
-const std::string EnergyStat = "energy";
+const std::string StaminaStat = "stamina";
 const std::string ResistanceStat = "resistance";
 const std::string ResistancePercentStat = "resistance_percent";
 const std::string SkillPointsStat = "skill_points";
@@ -429,9 +429,9 @@ void character::get_resistance(const std::string& damage_type,
 	}
 }
 
-int character::energy() const
+int character::stamina() const
 {
-	return stat(EnergyStat);
+	return stat(StaminaStat);
 }
 
 bool character::take_damage(int amount)
@@ -467,6 +467,7 @@ bool character::award_experience(int xp)
 	xp_ += xp;
 	if(xp_ >= experience_required()) {
 		++level_;
+		improvement_points_ += formula_registry::get_stat_calculation("improvement_points")->execute(*this).as_int();
 		return true;
 	} else {
 		return false;

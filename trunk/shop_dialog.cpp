@@ -76,6 +76,11 @@ void shop_dialog::init()
 
 	grid->finish_row();
 	add_widget(grid);
+
+	widget_ptr close_label(new label("Close",color));
+	functional::callback_ptr close_callback(new gui::close_dialog_callback(this));
+	button_ptr close_button(new button(close_label,close_callback));
+	add_widget(close_button, 1024-100, 800-100);
 }
 
 int shop_dialog::price(const game_logic::const_item_ptr& i) const

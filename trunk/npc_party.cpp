@@ -10,8 +10,12 @@
 
    See the COPYING file for more details.
 */
+#include "battle.hpp"
+#include "battle_character.hpp"
+#include "battle_map_generator.hpp"
 #include "dialog.hpp"
 #include "foreach.hpp"
+#include "gamemap.hpp"
 #include "npc_party.hpp"
 #include "shop_dialog.hpp"
 #include "tile_logic.hpp"
@@ -49,6 +53,9 @@ namespace {
 
 void dialog_sequence(const wml::const_node_ptr& node, party& npc, party& pc)
 {
+	if(!node) {
+		return;
+	}
 
 	wml::node::const_child_range range = node->get_child_range("talk");
 	while(range.first != range.second) {
@@ -84,9 +91,43 @@ void dialog_sequence(const wml::const_node_ptr& node, party& npc, party& pc)
 	}
 
 	wml::const_node_ptr shop = node->get_child("shop");
-	if(shop.get()) {
+	if(shop) {
 		game_dialogs::shop_dialog(pc, wml::get_int(shop,"cost",100),
 		                          (*shop)["items"]).show_modal();
+	}
+
+	wml::const_node_ptr spar = node->get_child("spar");
+	if(spar) {
+		boost::shared_ptr<hex::gamemap> battle_map =
+		     generate_battle_map(npc.game_world().map(), npc.loc());
+		std::vector<battle_character_ptr> chars;
+
+		for(std::vector<character_ptr>::const_iterator i =
+		    pc.members().begin(); i != pc.members().end(); ++i) {
+			hex::location loc(2 + i - pc.members().begin(), 2);
+			chars.push_back(battle_character::make_battle_character(
+			      *i,pc,loc,hex::NORTH,*battle_map,
+			      npc.game_world().current_time()));
+		}
+
+		for(std::vector<character_ptr>::const_iterator i =
+		    npc.members().begin(); i != npc.members().end(); ++i) {
+			hex::location loc(8 + i - npc.members().begin(), 8);
+			chars.push_back(battle_character::make_battle_character(
+			      *i,npc,loc,hex::NORTH,*battle_map,
+			      npc.game_world().current_time()));
+		}
+
+		battle b(chars, *battle_map);
+		b.play();
+
+		const bool victory = npc.is_destroyed();
+		wml::const_node_ptr action = spar->get_child(victory ? "onvictory" : "ondefeat");
+
+		pc.full_heal();
+		npc.full_heal();
+
+		dialog_sequence(action, npc, pc);
 	}
 }
 		

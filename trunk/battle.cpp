@@ -444,7 +444,7 @@ battle::attack_stats battle::get_attack_stats(
 	static const std::string DefenseStat = "defense";
 	static const std::string DamageStat = "damage";
 	static const std::string InitiativeStat = "initiative";
-	static const std::string EnergyUsedStat = "energy_used";
+	static const std::string StaminaUsedStat = "stamina_used";
 	attack_stats stats;
 	stats.attack = ch.stat_mod_height(AttackStat,height_diff) +
 	    move.get_stat(AttackStat,attacker);
@@ -455,8 +455,8 @@ battle::attack_stats battle::get_attack_stats(
 	stats.damage_critical = stats.damage;
 	stats.time_taken = ch.stat_mod_height(InitiativeStat,height_diff) +
 	                       move.get_stat(InitiativeStat,attacker);
-	stats.energy_used = ch.stat_mod_height(EnergyUsedStat,height_diff) +
-	                       move.get_stat(EnergyUsedStat,attacker);
+	stats.stamina_used = ch.stat_mod_height(StaminaUsedStat,height_diff) +
+	                       move.get_stat(StaminaUsedStat,attacker);
 	int resist_amount, resist_percent;
 	defender.get_character().get_resistance(
 	                        attacker.get_character().damage_type(),
@@ -513,7 +513,7 @@ void battle::attack_character(battle_character& attacker,
 	                 engaged_with->loc() != attacker.loc();
 
 	attacker.set_time_until_next_move(stats.time_taken);
-	attacker.get_character().use_energy(stats.energy_used);
+	attacker.get_character().use_stamina(stats.stamina_used);
 	attacker.begin_facing_change(
 	  hex::get_adjacent_direction(attacker.loc(),defender.loc()));
 

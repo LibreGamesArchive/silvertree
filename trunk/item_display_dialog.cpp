@@ -26,7 +26,7 @@ using namespace gui;
 using game_logic::item;
 using game_logic::const_item_ptr;
 item_display_dialog::item_display_dialog(const const_item_ptr i)
-  : dialog(0,0,300,200), item_(i)
+  : dialog(0,0,300,250), item_(i)
 {
 	const SDL_Color color = {0xFF,0xFF,0,0xFF};
 	const int sz = 22;

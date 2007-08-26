@@ -123,6 +123,14 @@ void dialog::handle_event(const SDL_Event& event)
 int show_dialog(const std::string& msg,
                 const std::vector<std::string>* options)
 {
+	std::cerr << "show dialog: '" << msg << "'\n";
+	if(options == NULL) {
+		std::cerr << "no options\n";
+	} else {
+		for(std::vector<std::string>::const_iterator o = options->begin(); o != options->end(); ++o) {
+			std::cerr << "option: '" << *o << "'\n";
+		}
+	}
 	SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
 	std::vector<graphics::texture> text;
 	int width, height;
