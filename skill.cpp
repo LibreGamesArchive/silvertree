@@ -10,6 +10,7 @@
 
    See the COPYING file for more details.
 */
+#include <iostream>
 #include <map>
 
 #include "battle_move.hpp"
@@ -29,10 +30,12 @@ public:
 	bool met(const character& c) const;
 private:
 	std::string item_class_;
+	std::string not_item_class_;
 };
 
 skill_requirement::skill_requirement(const wml::const_node_ptr& node)
-  : item_class_(wml::get_str(node,"item_class"))
+  : item_class_(wml::get_str(node,"item_class")),
+    not_item_class_(wml::get_str(node,"not_item_class"))
 {
 }
 
@@ -49,6 +52,14 @@ bool skill_requirement::met(const character& c) const
 
 		if(!found) {
 			return false;
+		}
+	}
+
+	if(!not_item_class_.empty()) {
+		foreach(const item_ptr& i, c.equipment()) {
+			if(i->item_class() == not_item_class_) {
+				return false;
+			}
 		}
 	}
 

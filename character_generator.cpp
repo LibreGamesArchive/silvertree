@@ -151,6 +151,10 @@ void character_generator::generate(character& c, wml::const_node_ptr node) const
 	const std::vector<std::string> skills = util::split(skills_str);
 	foreach(const std::string& skill, skills) {
 		c.skills_.push_back(skill::get_skill(skill));
+		if(!c.skills_.back()) {
+			std::cerr << "unrecognized skill '" << skill << "'\n";
+			c.skills_.pop_back();
+		}
 	}
 	
 	READ_ATTR(hitpoints, c.max_hitpoints());

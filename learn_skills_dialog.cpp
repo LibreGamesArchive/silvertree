@@ -37,6 +37,8 @@ void get_skills_derived_from(const std::string& skill_name,
 	}
 }
 
+DEFINE_CALLBACK(next_page_callback, learn_skills_dialog, next_page);
+
 }
 
 gui::grid_ptr learn_skills_dialog::get_grid_for_skill(const_skill_ptr s)
@@ -59,7 +61,7 @@ gui::grid_ptr learn_skills_dialog::get_grid_for_skill(const_skill_ptr s)
 }
 
 learn_skills_dialog::learn_skills_dialog(game_logic::character_ptr c)
-  : gui::dialog(0,0,1024,768), char_(c)
+  : gui::dialog(0,0,1024,768), char_(c), page_(0), page_size_(0)
 {
 	init();
 }
@@ -84,11 +86,27 @@ void learn_skills_dialog::init()
 
 	set_cursor(20,160);
 
+	const int Bottom = 700;
+
 	std::vector<const_skill_ptr> base_skills;
 	get_skills_derived_from("", &base_skills);
-	foreach(const_skill_ptr s, base_skills) {
-		add_widget(get_grid_for_skill(s), MOVE_DOWN);
+	if(page_ >= base_skills.size()) {
+		page_ = 0;
 	}
+	page_size_ = 0;
+	for(int n = page_; n < base_skills.size(); ++n) {
+		grid_ptr g(get_grid_for_skill(base_skills[n]));
+		if(page_size_ && cursor_y()+g->height() > Bottom) {
+			break;
+		}
+
+		add_widget(g, MOVE_DOWN);
+		++page_size_;
+	}
+
+	functional::callback_ptr next_callback(new next_page_callback(this));
+	button_ptr next_button(new button(label::create("More >>", color), next_callback));
+	add_widget(next_button, 1024-100, 800-180);
 
 	widget_ptr close_label(new label("Close",color));
 	functional::callback_ptr close_callback(new gui::close_dialog_callback(this));
@@ -105,6 +123,12 @@ void learn_skills_dialog::handle_event(const SDL_Event& event)
 			break;
 		}
 	}
+}
+
+void learn_skills_dialog::next_page()
+{
+	page_ += page_size_;
+	init();
 }
 
 }
