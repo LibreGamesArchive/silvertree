@@ -172,6 +172,10 @@ int party::movement_cost(const hex::location& src,
 	const hex::tile& t1 = map().get_tile(src);
 	const hex::tile& t2 = map().get_tile(dst);
 
+	if(!t1.is_passable(hex::get_adjacent_direction(src, dst))) {
+		return -1;
+	}
+
 	const int gradient = t2.height() - t1.height();
 	const hex::const_base_terrain_ptr terrain = t2.terrain();
 	const hex::const_terrain_feature_ptr feature = t2.feature();

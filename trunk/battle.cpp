@@ -276,6 +276,7 @@ void battle::draw(gui::slider* slider)
 
 	camera_.prepare_frame();
 
+	tile::setup_drawing();
 	const std::vector<tile>& tiles = map_.tiles();
 	foreach(const tile& t, tiles) {
 		const bool dim = highlight_moves_ && moves_.count(t.loc()) == 0
@@ -291,6 +292,8 @@ void battle::draw(gui::slider* slider)
 			glDisable(GL_LIGHT2);
 		}
 	}
+
+	tile::finish_drawing();
 
 	foreach(const tile& t, tiles) {
 		t.draw_cliffs();
