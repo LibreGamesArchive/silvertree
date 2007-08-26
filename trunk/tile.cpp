@@ -283,6 +283,29 @@ void tile::init_normals()
 	}
 }
 
+void tile::init_particles()
+{
+	emitters_.clear();
+	if(!terrain_) {
+		return;
+	}
+
+	for(int n = 0; n != 6; ++n) {
+		if(cliffs_[n]) {
+			wml::const_node_ptr particle = terrain_->get_cliff_particles();
+			if(particle) {
+				const point& c1 = corners_[(n+5)%6];
+				const point& c2 = corners_[(n+6)%6];
+				const GLfloat pos1[3] = {c1.x, c1.y, c1.height};
+				const GLfloat pos2[3] = {c2.x, c2.y, c2.height};
+				const GLfloat dir1[3] = {c1.x - center_.x, c1.y - center_.y, 0.0};
+				const GLfloat dir2[3] = {c2.x - center_.x, c2.y - center_.y, 0.0};
+				emitters_.push_back(graphics::particle_emitter(particle, dir1, dir2,  pos1, pos2));
+			}
+		}
+	}
+}
+
 void tile::calculate_corner(int n)
 {
 	const DIRECTION neighbour_a = static_cast<DIRECTION>(n);
@@ -376,6 +399,10 @@ void tile::finish_drawing()
 {
 }
 
+void tile::set_cliff(DIRECTION dir, const tile* neighbour) {
+	cliffs_[dir] = neighbour;
+}
+
 void tile::draw() const
 {
 	do_draw();
@@ -448,6 +475,13 @@ void tile::draw_model() const
 void tile::draw_center() const
 {
 	draw_point(center_);
+}
+
+void tile::emit_particles(graphics::particle_system& system) const
+{
+	foreach(graphics::particle_emitter& emitter, emitters_) {
+		emitter.emit_particle(system);
+	}
 }
 
 void tile::adjust_height(int n)

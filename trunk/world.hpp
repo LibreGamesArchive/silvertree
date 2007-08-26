@@ -25,6 +25,7 @@
 #include "gamemap.hpp"
 #include "game_time.hpp"
 #include "grid_widget_fwd.hpp"
+#include "particle_system.hpp"
 #include "party.hpp"
 #include "settlement_fwd.hpp"
 #include "tracks.hpp"
@@ -107,6 +108,8 @@ private:
 
 	typedef std::multimap<std::string,event_handler> event_map;
 	event_map handlers_;
+
+	graphics::particle_system particle_system_;
 };
 		
 }
