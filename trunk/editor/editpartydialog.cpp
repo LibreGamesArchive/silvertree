@@ -82,11 +82,11 @@ void EditPartyDialog::writeParty()
 	}
 
 	wml::const_node_ptr c = party_->get_child("character");
-	if(c) {
+	if(c && c->has_attr("image")) {
 		party_->set_attr("image", (*c)["image"]);
 	}
 
-	party_->set_attr("money", ui_.moneyLineEdit->text().toAscii().data());
+	party_->set_or_erase_attr("money", ui_.moneyLineEdit->text().toAscii().data());
 
 	writeCharacterStats();
 }
@@ -148,7 +148,7 @@ void EditPartyDialog::changeGenerator(int index)
 		member->clear_children();
 		for(wml::node::const_attr_iterator i = generator->begin_attr();
 		    i != generator->end_attr(); ++i) {
-			member->set_attr(i->first,i->second);
+			member->set_or_erase_attr(i->first,i->second);
 		}
 
 		for(wml::node::const_all_child_iterator i = generator->begin_children();
@@ -228,13 +228,13 @@ void EditPartyDialog::writeCharacterStats()
 		ch->add_child(attr);
 	}
 
-	ch->set_attr("level", ui_.levelLineEdit->text().toAscii().data());
-	ch->set_attr("skills", ui_.skillsLineEdit->text().toAscii().data());
-	ch->set_attr("equipment", ui_.equipmentLineEdit->text().toAscii().data());
-	attr->set_attr("strength", ui_.strengthLineEdit->text().toAscii().data());
-	attr->set_attr("agility", ui_.agilityLineEdit->text().toAscii().data());
-	attr->set_attr("endurance", ui_.enduranceLineEdit->text().toAscii().data());
-	attr->set_attr("intelligence", ui_.intelligenceLineEdit->text().toAscii().data());
-	attr->set_attr("perception", ui_.perceptionLineEdit->text().toAscii().data());
-	attr->set_attr("persona", ui_.personaLineEdit->text().toAscii().data());
+	ch->set_or_erase_attr("level", ui_.levelLineEdit->text().toAscii().data());
+	ch->set_or_erase_attr("skills", ui_.skillsLineEdit->text().toAscii().data());
+	ch->set_or_erase_attr("equipment", ui_.equipmentLineEdit->text().toAscii().data());
+	attr->set_or_erase_attr("strength", ui_.strengthLineEdit->text().toAscii().data());
+	attr->set_or_erase_attr("agility", ui_.agilityLineEdit->text().toAscii().data());
+	attr->set_or_erase_attr("endurance", ui_.enduranceLineEdit->text().toAscii().data());
+	attr->set_or_erase_attr("intelligence", ui_.intelligenceLineEdit->text().toAscii().data());
+	attr->set_or_erase_attr("perception", ui_.perceptionLineEdit->text().toAscii().data());
+	attr->set_or_erase_attr("persona", ui_.personaLineEdit->text().toAscii().data());
 }
