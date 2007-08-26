@@ -35,11 +35,12 @@ public:
 	settlement(const wml::const_node_ptr& node,
 	           const hex::gamemap& map);
 
-	const hex::location& loc() const { return loc_; }
+	void entry_points(std::vector<hex::location>& result) const;
+	bool has_entry_point(const hex::location& loc) const;
 	void draw() const;
-	void enter(party_ptr pty);
+	void enter(party_ptr pty, const hex::location& loc);
 private:
-	hex::location loc_;
+	std::map<hex::location, hex::location> portals_;
 	graphics::const_model_ptr model_;
 	wml::const_node_ptr wml_;
 	boost::shared_ptr<world> world_;

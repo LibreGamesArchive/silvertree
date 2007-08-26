@@ -74,7 +74,11 @@ world::world(wml::const_node_ptr node)
 	const wml::node::const_child_iterator s2 = node->end_child("settlement");
 	for(; s1 != s2; ++s1) {
 		settlement_ptr s(new settlement(s1->second,map_));
-		settlements_[s->loc()] = s;
+		std::vector<hex::location> locs;
+		s->entry_points(locs);
+		foreach(const hex::location& loc, locs) {
+			settlements_[loc] = s;
+		}
 	}
 
 	wml::node::const_child_iterator e1 = node->begin_child("exit");
@@ -84,6 +88,15 @@ world::world(wml::const_node_ptr node)
 		                   wml::get_attr<int>(e1->second,"y"));
 		hex::location loc2(wml::get_attr<int>(e1->second,"xdst",-1),
 		                   wml::get_attr<int>(e1->second,"ydst",-1));
+		exits_[loc1] = loc2;
+	}
+
+	const std::vector<wml::const_node_ptr> portals = wml::child_nodes(node, "portal");
+	foreach(const wml::const_node_ptr& portal, portals) {
+		hex::location loc1(wml::get_attr<int>(portal,"xdst"),
+		                   wml::get_attr<int>(portal,"ydst"));
+		hex::location loc2(wml::get_attr<int>(portal,"xsrc"),
+		                   wml::get_attr<int>(portal,"ysrc"));
 		exits_[loc1] = loc2;
 	}
 }
@@ -290,10 +303,13 @@ void world::play()
 			}
 		}
 
+		std::vector<const_settlement_ptr> seen_settlements;
 		for(settlement_map::const_iterator i =
 		    settlements_.begin(); i != settlements_.end(); ++i) {
-			if(visible.count(i->second->loc())) {
+			if(visible.count(i->first) &&
+			   !std::count(seen_settlements.begin(), seen_settlements.end(), i->second)) {
 				i->second->draw();
+				seen_settlements.push_back(i->second);
 			}
 		}
 
@@ -312,9 +328,7 @@ void world::play()
 			last_fps_ticks = SDL_GetTicks();
 		}
 
-		const graphics::texture text =
-		         graphics::font::render_text(fps_msg,20,white);
-		graphics::prepare_raster();
+		const graphics::texture text = graphics::font::render_text(fps_msg,20,white); graphics::prepare_raster();
 		graphics::blit_texture(text,50,50);
 
 		if(track_info_grid) {
@@ -417,7 +431,7 @@ void world::play()
 
 					settlement_map::iterator s = settlements_.find(active_party->loc());
 					if(s != settlements_.end()) {
-						s->second->enter(active_party);
+						s->second->enter(active_party, active_party->loc());
 						active_party->new_world(*this,active_party->loc());
 					}
 
