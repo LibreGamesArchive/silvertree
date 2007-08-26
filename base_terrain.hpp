@@ -36,6 +36,7 @@ public:
 	graphics::texture generate_texture(const location& loc, int height, const const_base_terrain_ptr* adj) const;
 	graphics::texture transition_texture(hex::DIRECTION dir) const;
 	void get_cliff_textures(std::vector<graphics::texture>& result) const;
+	wml::const_node_ptr get_cliff_particles() const { return cliff_particles_; }
 	graphics::const_model_ptr generate_model(const location& loc,
 	           int height) const;
 	GLfloat get_rotation(const location& loc, int height) const;
@@ -59,6 +60,7 @@ private:
 	std::vector<std::string> textures_;
 	std::vector<std::string> models_;
 	std::vector<std::string> cliff_;
+	wml::const_node_ptr cliff_particles_;
 	int overlap_priority_;
 	GLfloat vision_block_;
 	int default_cost_;

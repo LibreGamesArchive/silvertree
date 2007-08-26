@@ -168,6 +168,11 @@ void gamemap::init_tiles()
 	    i != map_.end(); ++i) {
 		i->init_normals();
 	}
+
+	for(std::vector<tile>::iterator i = map_.begin();
+	    i != map_.end(); ++i) {
+		i->init_particles();
+	}
 }
 
 void gamemap::draw() const

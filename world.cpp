@@ -253,10 +253,12 @@ void world::play()
 
 		foreach(const hex::tile* t, visible_tiles) {
 			t->draw_cliffs();
+			t->emit_particles(particle_system_);
 		}
 
 		foreach(const hex::tile* t, dark_tiles) {
 			t->draw_cliffs();
+			t->emit_particles(particle_system_);
 		}
 
 		if(show_grid) {
@@ -294,6 +296,8 @@ void world::play()
 				i->second->draw();
 			}
 		}
+
+		particle_system_.draw();
 
 		const SDL_Color white = {0xFF,0xFF,0x0,0};
 		const GLfloat seconds = static_cast<GLfloat>(SDL_GetTicks() - last_fps_ticks)/1000.0;

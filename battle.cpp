@@ -292,6 +292,10 @@ void battle::draw(gui::slider* slider)
 		}
 	}
 
+	foreach(const tile& t, tiles) {
+		t.draw_cliffs();
+	}
+
 
 	glDisable(GL_LIGHTING);
 	map_.draw_grid();

@@ -14,11 +14,14 @@
 #define TILE_HPP_INCLUDED
 
 #include <string>
+#include <vector>
+
 #include <gl.h>
 
 #include "base_terrain_fwd.hpp"
 #include "material.hpp"
 #include "model_fwd.hpp"
+#include "particle_emitter.hpp"
 #include "terrain_feature_fwd.hpp"
 #include "texture.hpp"
 #include "tile_logic.hpp"
@@ -47,9 +50,7 @@ public:
 		neighbours_[dir] = neighbour;
 	}
 
-	void set_cliff(DIRECTION dir, const tile* neighbour) {
-		cliffs_[dir] = neighbour;
-	}
+	void set_cliff(DIRECTION dir, const tile* neighbour);
 
 	static void setup_drawing();
 	static void finish_drawing();
@@ -78,11 +79,14 @@ public:
 
 	void init_normals();
 	void init_corners();
+	void init_particles();
 
 	GLfloat height_at_point(GLfloat x, GLfloat y) const;
 	GLfloat height_at_point_vision(GLfloat x, GLfloat y) const;
 
 	void draw_center() const;
+
+	void emit_particles(graphics::particle_system& system) const;
 
 	void adjust_height(int n);
 	void set_terrain(const std::string& name);
@@ -132,6 +136,8 @@ private:
 
 	point center_;
 	point corners_[6];
+
+	mutable std::vector<graphics::particle_emitter> emitters_;
 
 	void calculate_corner(int n);
 
