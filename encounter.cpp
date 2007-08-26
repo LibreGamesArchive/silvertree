@@ -47,7 +47,7 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 	    p1->members().begin(); i != p1->members().end(); ++i) {
 		hex::location loc(2 + i - p1->members().begin(),2);
 		chars.push_back(battle_character::make_battle_character(
-		                    *i,p1,loc,hex::NORTH,*battle_map,
+		                    *i,*p1,loc,hex::NORTH,*battle_map,
 							p1->game_world().current_time()));
 		xp1 += (*i)->level()*10;
 	}
@@ -56,7 +56,7 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 	    p2->members().begin(); i != p2->members().end(); ++i) {
 		hex::location loc(2 + i - p2->members().begin(),8);
 		chars.push_back(battle_character::make_battle_character(
-		                    *i,p2,loc,hex::NORTH,*battle_map,
+		                    *i,*p2,loc,hex::NORTH,*battle_map,
 							p2->game_world().current_time()));
 		xp2 += (*i)->level()*10;
 	}

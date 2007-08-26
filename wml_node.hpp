@@ -34,6 +34,7 @@ public:
 	const std::string& operator[](const std::string& key) const;
 	const std::string& attr(const std::string& key) const;
 	void set_attr(const std::string& key, const std::string& value);
+	void set_or_erase_attr(const std::string& key, const std::string& value);
 
 	bool has_attr(const std::string& key) const;
 

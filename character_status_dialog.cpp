@@ -128,7 +128,7 @@ void character_status_dialog::init()
 		  add_col(lb.create(formatter() << c->experience_required())).
 	      add_col(lb.create("fatigue","fatigue_tip")).
 		  add_col(lb.create(formatter() << (c->fatigue()/10) << "/")).
-		  add_col(lb.create(formatter() << (c->energy()/10))).
+		  add_col(lb.create(formatter() << (c->stamina()/10))).
 	      add_col(lb.create("speed","speed_tip")).
 		  add_col(lb.create(formatter() << c->speed())).
 		  add_col(lb.create("")).

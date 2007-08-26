@@ -30,7 +30,7 @@ namespace game_logic
 {
 
 battle_character::battle_character(
-          character_ptr ch, const_party_ptr p,
+          character_ptr ch, const party& p,
           const hex::location& loc, hex::DIRECTION facing,
 		  const hex::gamemap& map, const game_time& time)
  : char_(ch), party_(p), loc_(loc),
@@ -43,11 +43,11 @@ battle_character::battle_character(
 }
 
 battle_character_ptr battle_character::make_battle_character(
-          character_ptr ch, const_party_ptr p,
+          character_ptr ch, const party& p,
           const hex::location& loc, hex::DIRECTION facing,
 		  const hex::gamemap& map, const game_time& time)
 {
-	if(p->is_human_controlled()) {
+	if(p.is_human_controlled()) {
 		return battle_character_ptr(
 		         new battle_character_pc(ch,p,loc,facing,map,time));
 	} else {

@@ -21,7 +21,7 @@ namespace game_logic
 class battle_character_npc : public battle_character
 {
 public:
-	battle_character_npc(character_ptr ch, const_party_ptr p,
+	battle_character_npc(character_ptr ch, const party& p,
 	                    const hex::location& loc, hex::DIRECTION facing,
 					    const hex::gamemap& map, const game_time& time);
 

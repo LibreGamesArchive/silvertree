@@ -42,6 +42,15 @@ void node::set_attr(const std::string& key, const std::string& value)
 	attr_[key] = value;
 }
 
+void node::set_or_erase_attr(const std::string& key, const std::string& value)
+{
+	if(value.empty() == false) {
+		set_attr(key,value);
+	} else {
+		attr_.erase(key);
+	}
+}
+
 bool node::has_attr(const std::string& key) const
 {
 	attr_map::const_iterator itor = attr_.find(key);

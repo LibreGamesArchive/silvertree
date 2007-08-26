@@ -55,7 +55,7 @@ public:
 	static int movement_duration();
 
 	struct attack_stats {
-		int attack, defense, damage, damage_critical, time_taken, energy_used;
+		int attack, defense, damage, damage_critical, time_taken, stamina_used;
 	};
 
 	attack_stats get_attack_stats(const battle_character& attacker,

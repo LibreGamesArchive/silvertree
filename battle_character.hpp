@@ -36,18 +36,18 @@ class game_time;
 class battle_character
 {
 public:
-	battle_character(character_ptr ch, const_party_ptr p,
+	battle_character(character_ptr ch, const party& p,
 	                 const hex::location& loc, hex::DIRECTION facing,
 					 const hex::gamemap& map, const game_time& time);
 	virtual ~battle_character() {}
 
 	static battle_character_ptr
-	make_battle_character(character_ptr ch, const_party_ptr p,
+	make_battle_character(character_ptr ch, const party& p,
 	                 const hex::location& loc, hex::DIRECTION facing,
 					 const hex::gamemap& map, const game_time& time);
 
 	character& get_character() const { return *char_; }
-	const party& get_party() const { return *party_; }
+	const party& get_party() const { return party_; }
 	const hex::location& loc() const { return loc_; }
 	hex::DIRECTION facing() const { return facing_; }
 
@@ -124,7 +124,7 @@ private:
 	virtual void do_turn(battle& b) = 0;
 	
 	character_ptr const char_;
-	const_party_ptr const party_;
+	const party& party_;
 	hex::location loc_;
 	hex::DIRECTION facing_;
 	hex::DIRECTION old_facing_;

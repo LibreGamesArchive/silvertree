@@ -157,7 +157,7 @@ void party::pass(int minutes)
 	departed_at_ = game_world().current_time();
 	arrive_at_ = game_world().current_time() + minutes;
 	foreach(const character_ptr& c, members_) {
-		c->use_energy(-minutes * 2);
+		c->use_stamina(-minutes * 2);
 	}
 }
 
@@ -210,7 +210,7 @@ void party::apply_fatigue(const hex::location& src,
 	foreach(const character_ptr& c, members_) {
 		const int cost = c->move_cost(terrain,feature,gradient)*move_mode_*move_mode_;
 		assert(cost != -1);
-		c->use_energy(cost);
+		c->use_stamina(cost);
 	}
 }
 
@@ -377,7 +377,7 @@ std::string party::status_text() const
 		  << "\n XP: " << c->experience() << "/"
 		  << c->experience_required()
 		  << "\n Fatigue: " << (c->fatigue()/10)
-		  << "/" << (c->energy()/10) << "\n";
+		  << "/" << (c->stamina()/10) << "\n";
 	}
 
 	return s.str();
@@ -388,7 +388,7 @@ std::string party::fatigue_status_text() const
 	std::ostringstream s;
 	foreach(const character_ptr& c, members_) {
 		s << c->description() << ": " << (c->fatigue()/10) << "/"
-		  << (c->energy()/10) << "\n";
+		  << (c->stamina()/10) << "\n";
 	}
 
 	return s.str();

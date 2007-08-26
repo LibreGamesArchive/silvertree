@@ -65,7 +65,7 @@ public:
 	bool dead() const;
 	void set_to_near_death() { hitpoints_ = 1; }
 
-	void use_energy(int amount) {
+	void use_stamina(int amount) {
 		fatigue_ += amount;
 		if(fatigue_ < 0) { fatigue_ = 0; }
 	}
@@ -78,7 +78,7 @@ public:
 	std::string alignment_description() const;
 
 	int fatigue() const { return fatigue_; }
-	int energy() const;
+	int stamina() const;
 
 	bool award_experience(int xp);
 	int level() const { return level_; }

@@ -23,6 +23,7 @@
 #include "settlement.hpp"
 #include "surface.hpp"
 #include "surface_cache.hpp"
+#include "wml_parser.hpp"
 #include "wml_utils.hpp"
 #include "world.hpp"
 
@@ -73,7 +74,12 @@ world::world(wml::const_node_ptr node)
 	wml::node::const_child_iterator s1 = node->begin_child("settlement");
 	const wml::node::const_child_iterator s2 = node->end_child("settlement");
 	for(; s1 != s2; ++s1) {
-		settlement_ptr s(new settlement(s1->second,map_));
+		wml::node_ptr node = wml::deep_copy(s1->second);
+		const std::string& file = node->attr("file");
+		if(!file.empty()) {
+			wml::merge_over(wml::parse_wml(sys::read_file(file)), node);
+		}
+		settlement_ptr s(new settlement(node,map_));
 		std::vector<hex::location> locs;
 		s->entry_points(locs);
 		foreach(const hex::location& loc, locs) {
@@ -510,6 +516,9 @@ gui::const_grid_ptr world::get_track_info() const
 		return gui::const_grid_ptr();
 	}
 
+	const int track = focus_->track();
+	std::cerr << "track ability: " << track << "\n";
+
 	const tracks::tracks_list& list = tracks_.get_tracks(focus_->loc(),time_);
 	if(list.empty()) {
 		return gui::const_grid_ptr();
@@ -519,6 +528,11 @@ gui::const_grid_ptr world::get_track_info() const
 
 	foreach(const tracks::info& info, list) {
 		if(info.party_id == focus_->id()) {
+			continue;
+		}
+
+		std::cerr << "visible: " << (info.visibility*track) << "\n";
+		if(info.visibility*track < 1000) {
 			continue;
 		}
 
