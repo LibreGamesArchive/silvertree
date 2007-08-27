@@ -380,10 +380,12 @@ void world::play()
 		if(last_draw != -1) {
 			const int ticks = SDL_GetTicks();
 			const int target = last_draw + time_between_frames;
-			if(ticks >= target) {
-				SDL_Delay(1);
-			} else {
-				SDL_Delay(target - ticks);
+			if(!preference_maxfps()) {
+				if(ticks >= target) {
+					SDL_Delay(1);
+				} else {
+					SDL_Delay(target - ticks);
+				}
 			}
 		}
 
