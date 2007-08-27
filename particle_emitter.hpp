@@ -24,6 +24,7 @@ private:
 	GLfloat pos2_[3];
 	GLfloat dir1_[3];
 	GLfloat dir2_[3];
+	game_logic::formula_ptr pos_diffs_[3];
 	game_logic::formula_ptr acceleration_[3];
 	game_logic::formula_ptr time_;
 	game_logic::formula_ptr size_;

@@ -19,6 +19,7 @@
 #include "npc_party.hpp"
 #include "party.hpp"
 #include "pc_party.hpp"
+#include "preferences.hpp"
 #include "tile.hpp"
 #include "tile_logic.hpp"
 #include "world.hpp"
@@ -104,7 +105,7 @@ party::TURN_RESULT party::play_turn()
 
 bool party::is_enemy(const party& p) const
 {
-	return allegiance() != p.allegiance();
+	return allegiance() != p.allegiance() && !preference_nocombat();
 }
 
 game_time party::ready_to_move_at() const
@@ -184,7 +185,8 @@ int party::movement_cost(const hex::location& src,
 	for(std::vector<character_ptr>::const_iterator i = members_.begin();
 	    i != members_.end(); ++i) {
 		const int cost = (*i)->move_cost(terrain,feature,gradient);
-		if(cost == -1) {
+		std::cerr << "move cost: " << cost << "\n";
+		if(cost < 0) {
 			return -1;
 		}
 

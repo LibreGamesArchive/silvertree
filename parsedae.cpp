@@ -11,7 +11,7 @@ namespace graphics
 {
 
 namespace {
-const GLfloat ScaleFactor = 0.009;
+const GLfloat ScaleFactor = 0.109;
 }
 
 void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
@@ -169,7 +169,7 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 									v->uvmap_valid = true;
 									vertices.push_back(v);
 									map[k] = v;
-									std::cerr << "VERTEX: " << v->point[0] << "," << v->point[1] << "," << v->point[2] << "\n";
+									std::cerr << "VERTEX: " << v->point[0] << "," << v->point[1] << "," << v->point[2] << " -> " << v->uvmap[0] << "," << v->uvmap[1] << "\n";
 								}
 
 								for(int n = 0; n <= vertices.size()-3; n += 3) {
