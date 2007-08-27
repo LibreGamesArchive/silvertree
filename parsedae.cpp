@@ -11,7 +11,7 @@ namespace graphics
 {
 
 namespace {
-const GLfloat ScaleFactor = 0.109;
+const GLfloat ScaleFactor = 0.009;
 }
 
 void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
@@ -32,11 +32,6 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 			while(xml_get_attr(parser, &name, &value)) {
 				std::cerr << "name '" << std::string(name.str,name.str+name.length) << "' -> '" << std::string(value.str,value.str+value.length) << "'\n";
 				if(XML_TOKEN_EQUALS(name, "id")) {
-					std::cerr << "ID: '";
-					for(int n = 0; n != value.length; ++n) {
-						std::cerr << value.str[n];
-					}
-					std::cerr << "'\n";
 					const std::string val(value.str,value.str+value.length);
 					if(strcasestr(val.c_str(),"position")) {
 						std::cerr << "position...\n";
@@ -54,7 +49,6 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 
 			while(xml_get_child(parser, &token)) {
 				if(XML_TOKEN_EQUALS(token, "float_array")) {
-					std::cerr << "float array...\n";
 					XML_TOKEN text;
 					while(xml_get_token(parser, &text) &&
 					      text.type != XML_TOKEN_END_ELEMENT) {
@@ -68,7 +62,6 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 							while(ptr != endptr) {
 								ptr = endptr;
 								v->push_back(strtod(ptr,&endptr));
-								std::cerr << "pos: " << v->back() << "\n";
 							}
 
 							v->pop_back();
@@ -101,15 +94,11 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 						XML_TOKEN name, value;
 						while(xml_get_attr(parser, &name, &value)) {
 							if(XML_TOKEN_EQUALS(name, "semantic")) {
-								std::cerr << "found semantic\n";
 								if(XML_TOKEN_EQUALS(value, "VERTEX")) {
-									std::cerr << "VERTEX\n";
 									found_vertex = true;
 								} else if(XML_TOKEN_EQUALS(value, "NORMAL")) {
-									std::cerr << "NORMAL\n";
 									found_normal = true;
 								} else if(XML_TOKEN_EQUALS(value, "TEXCOORD")) {
-									std::cerr << "TEXCOORD\n";
 									found_uv = true;
 								}
 							}
@@ -117,7 +106,6 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 						xml_skip_element(parser);
 					} else if(XML_TOKEN_EQUALS(token, "p") && found_vertex &&
 						      found_normal && found_uv) {
-						std::cerr << "paragraph\n";
 						XML_TOKEN text;
 						while(xml_get_token(parser, &text) &&
 						      text.type != XML_TOKEN_END_ELEMENT) {
@@ -152,7 +140,6 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 
 									std::map<Key,model::vertex_ptr>::const_iterator i = map.find(k);
 									if(i != map.end()) {
-										std::cerr << "mapped vertex\n";
 										vertices.push_back(i->second);
 										continue;
 									}
@@ -165,11 +152,10 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 									v->normal[1] = normal[items[n+1]*3+1];
 									v->normal[2] = normal[items[n+1]*3+2];
 									v->uvmap[0] = uv[items[n+2]*2];
-									v->uvmap[1] = uv[items[n+2]*2+1];
+									v->uvmap[1] = -uv[items[n+2]*2+1];
 									v->uvmap_valid = true;
 									vertices.push_back(v);
 									map[k] = v;
-									std::cerr << "VERTEX: " << v->point[0] << "," << v->point[1] << "," << v->point[2] << " -> " << v->uvmap[0] << "," << v->uvmap[1] << "\n";
 								}
 
 								for(int n = 0; n <= vertices.size()-3; n += 3) {
