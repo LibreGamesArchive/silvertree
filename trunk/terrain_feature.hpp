@@ -46,12 +46,15 @@ public:
 
 	int default_cost() const { return default_cost_; }
 
+	const wml::const_node_ptr particle_emitter() const { return particle_emitter_; }
+
 private:
 	std::string id_;
 	std::string name_;
 	std::vector<std::string> models_;
 	GLfloat vision_block_;
 	int default_cost_;
+	wml::const_node_ptr particle_emitter_;
 };
 
 }

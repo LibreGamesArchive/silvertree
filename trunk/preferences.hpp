@@ -4,5 +4,6 @@
 bool parse_args(int argc, char** argv);
 
 bool preference_nocombat();
+bool preference_maxfps();
 
 #endif

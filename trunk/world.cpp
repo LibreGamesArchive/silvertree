@@ -19,6 +19,7 @@
 #include "image_widget.hpp"
 #include "label.hpp"
 #include "party_status_dialog.hpp"
+#include "preferences.hpp"
 #include "raster.hpp"
 #include "settlement.hpp"
 #include "surface.hpp"

@@ -56,7 +56,8 @@ terrain_feature::terrain_feature(wml::const_node_ptr node)
   : id_(wml::get_str(node,"id")), name_(wml::get_str(node,"name")),
     models_(util::split(wml::get_str(node,"models"))),
     vision_block_(wml::get_attr<GLfloat>(node,"vision_block")),
-	default_cost_(wml::get_int(node,"cost", -1))
+	default_cost_(wml::get_int(node,"cost", -1)),
+	particle_emitter_(node->get_child("particles"))
 {}
 
 namespace {

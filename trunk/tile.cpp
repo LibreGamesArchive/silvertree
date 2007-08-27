@@ -317,6 +317,15 @@ void tile::init_particles()
 			}
 		}
 	}
+
+	if(feature_) {
+		wml::const_node_ptr particle = feature_->particle_emitter();
+		if(particle) {
+			const GLfloat center_pos[3] = {center_.x, center_.y, center_.height};
+			const GLfloat null_dir[3] = {0.0,0.0,0.0};
+			emitters_.push_back(graphics::particle_emitter(particle, null_dir, null_dir, center_pos, center_pos));
+		}
+	}
 }
 
 void tile::calculate_corner(int n)

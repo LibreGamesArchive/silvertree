@@ -454,7 +454,8 @@ int operator_precedence(const token& t)
 		precedence_map["-"]    = 3;
 		precedence_map["*"]    = 4;
 		precedence_map["/"]    = 4;
-		precedence_map["."]    = 5;
+		precedence_map["d"]    = 5;
+		precedence_map["."]    = 6;
 	}
 
 	assert(precedence_map.count(std::string(t.begin,t.end)));
