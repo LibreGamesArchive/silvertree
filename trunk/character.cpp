@@ -88,9 +88,10 @@ int character::move_cost(hex::const_base_terrain_ptr terrain,
 	        move_cost_map_.find(terrain->name());
 	if(itor != move_cost_map_.end()) {
 		base_cost = itor->second;
-		if(base_cost == -1) {
-			return -1;
-		}
+	}
+
+	if(base_cost < 0) {
+		return -1;
 	}
 
 	if(feature) {
@@ -101,7 +102,7 @@ int character::move_cost(hex::const_base_terrain_ptr terrain,
 			feature_cost = itor->second;
 		}
 
-		if(feature_cost == -1) {
+		if(feature_cost < 0) {
 			return -1;
 		}
 

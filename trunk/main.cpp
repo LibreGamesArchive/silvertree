@@ -35,6 +35,7 @@
 #include "wml_node.hpp"
 #include "base_terrain.hpp"
 #include "party.hpp"
+#include "preferences.hpp"
 #include "skill.hpp"
 #include "terrain_feature.hpp"
 #include "texture.hpp"
@@ -43,6 +44,10 @@
 
 extern "C" int main(int argc, char** argv)
 {
+	if(!parse_args(argc, argv)) {
+		return -1;
+	}
+
 	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0) {
 		std::cerr << "could not init SDL\n";
 		return -1;
