@@ -41,6 +41,9 @@ particle_emitter::particle_emitter(wml::const_node_ptr node,
 	init_formula(pos_diffs_[0], node, "pos_x");
 	init_formula(pos_diffs_[1], node, "pos_y");
 	init_formula(pos_diffs_[2], node, "pos_z");
+	init_formula(velocity_diffs_[0], node, "velocity_x");
+	init_formula(velocity_diffs_[1], node, "velocity_y");
+	init_formula(velocity_diffs_[2], node, "velocity_z");
 	init_formula(acceleration_[0], node, "accel_x");
 	init_formula(acceleration_[1], node, "accel_y");
 	init_formula(acceleration_[2], node, "accel_z");
@@ -89,6 +92,10 @@ void particle_emitter::initialize_particle(particle& p) const
 		}
 
 		p.velocity_[n] = (dir1_[n]*g + dir2_[n]*h)*speed;
+		if(velocity_diffs_[n]) {
+			p.velocity_[n] += velocity_diffs_[n]->execute().as_int()/1000.0;
+		}
+		
 		if(acceleration_[n]) {
 			p.acceleration_[n] = acceleration_[n]->execute().as_int()/10000.0;
 		} else {
