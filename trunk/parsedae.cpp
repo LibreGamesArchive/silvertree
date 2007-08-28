@@ -32,14 +32,15 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 			while(xml_get_attr(parser, &name, &value)) {
 				std::cerr << "name '" << std::string(name.str,name.str+name.length) << "' -> '" << std::string(value.str,value.str+value.length) << "'\n";
 				if(XML_TOKEN_EQUALS(name, "id")) {
-					const std::string val(value.str,value.str+value.length);
-					if(strcasestr(val.c_str(),"position")) {
+					std::string val(value.str,value.str+value.length);
+					foreach(char& c, val) { c = tolower(c); }
+					if(strstr(val.c_str(),"position")) {
 						std::cerr << "position...\n";
 						v = &position;
-					} else if(strcasestr(val.c_str(),"normal")) {
+					} else if(strstr(val.c_str(),"normal")) {
 						std::cerr << "normal...\n";
 						v = &normal;
-					} else if(strcasestr(val.c_str(),"uv")) {
+					} else if(strstr(val.c_str(),"uv")) {
 						v = &uv;
 					} else {
 						assert(false);
