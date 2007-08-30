@@ -342,7 +342,6 @@ void parse_material(
 			break;
 		}
 		default: {
-			fprintf(stderr,"0x%X\n",(int)child.id);
 			break;
 		}
 		}
@@ -456,8 +455,6 @@ model_ptr parse3ds(const char* i1, const char* i2)
 
 	while(main_chunk.beg != main_chunk.end) {
 		chunk c = read_child_chunk(main_chunk);
-		fprintf(stderr,"child chunk 0x%X: %d\n",
-		        (int)c.id,(int)(c.end - c.beg));
 		switch(c.id) {
 		case 0x3D3D: { //object block
 			std::vector<graphics::model::face> new_faces =

@@ -72,7 +72,6 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		}
 
 		if(p1->is_human_controlled()) {
-			std::cerr << "INFO: " << p1.get() << " " << xp2 << " " << p2->money() << "\n";
 			game_dialogs::post_battle_dialog d(p1, xp2, p2->money());
 			d.show();
 		}
