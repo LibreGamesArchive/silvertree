@@ -388,6 +388,7 @@ private:
 		case SUB: return left - right;
 		case MUL: return left * right;
 		case DIV: return left / right;
+		case POW: return left ^ right;
 		case EQ:  return left == right ? variant(1) : variant(0);
 		case NEQ: return left != right ? variant(1) : variant(0);
 		case LTE: return left <= right ? variant(1) : variant(0);
@@ -408,11 +409,50 @@ private:
 	}
 
 	enum OP { AND, OR, NEQ, LTE, GTE, GT='>', LT='<', EQ='=',
-	          ADD='+', SUB='-', MUL='*', DIV='/', DICE='d' };
+	          ADD='+', SUB='-', MUL='*', DIV='/', DICE='d', POW='^' };
 
 	OP op_;
 	expression_ptr left_, right_;
 };
+
+typedef std::map<std::string,expression_ptr> expr_table;
+typedef boost::shared_ptr<expr_table> expr_table_ptr;
+
+class where_variables: public formula_callable {
+public:
+	where_variables(const formula_callable &base,
+			expr_table_ptr table )
+		: base_(base), table_(table) { }
+private:
+	const formula_callable& base_;
+	expr_table_ptr table_;
+
+	variant get_value(const std::string& key) const {
+		expr_table::iterator i = table_->find(key);
+		if(i != table_->end()) {
+			return i->second->evaluate(base_);
+		} 
+		return base_.query_value(key);
+	}
+};
+
+class where_expression: public formula_expression {
+public:
+	explicit where_expression(expression_ptr body,
+				  expr_table_ptr clauses)
+		: body_(body), clauses_(clauses)
+	{}
+	
+private:
+	expression_ptr body_;
+	expr_table_ptr clauses_;
+
+	variant execute(const formula_callable& variables) const {
+		where_variables wrapped_variables(variables, clauses_);
+		return body_->evaluate(wrapped_variables);
+	}
+};
+
 
 class identifier_expression : public formula_expression {
 public:
@@ -442,20 +482,23 @@ int operator_precedence(const token& t)
 {
 	static std::map<std::string,int> precedence_map;
 	if(precedence_map.empty()) {
-		precedence_map["and"]  = 1;
-		precedence_map["or"]   = 1;
-		precedence_map["="]    = 2;
-		precedence_map["!="]   = 2;
-		precedence_map["<"]    = 2;
-		precedence_map[">"]    = 2;
-		precedence_map["<="]   = 2;
-		precedence_map[">="]   = 2;
-		precedence_map["+"]    = 3;
-		precedence_map["-"]    = 3;
-		precedence_map["*"]    = 4;
-		precedence_map["/"]    = 4;
-		precedence_map["d"]    = 5;
-		precedence_map["."]    = 6;
+		int n = 0;
+		precedence_map["where"] = ++n;
+		precedence_map["or"]    = ++n;
+		precedence_map["and"]   = ++n;
+		precedence_map["="]     = ++n;
+		precedence_map["!="]    = n;
+		precedence_map["<"]     = n;
+		precedence_map[">"]     = n;
+		precedence_map["<="]    = n;
+		precedence_map[">="]    = n;
+		precedence_map["+"]     = ++n;
+		precedence_map["-"]     = n;
+		precedence_map["*"]     = ++n;
+		precedence_map["/"]     = ++n;
+		precedence_map["^"]     = ++n;
+		precedence_map["d"]     = ++n;
+		precedence_map["."]     = ++n;
 	}
 
 	assert(precedence_map.count(std::string(t.begin,t.end)));
@@ -484,6 +527,65 @@ void parse_args(const token* i1, const token* i2,
 
 	if(beg != i1) {
 		res->push_back(parse_expression(beg,i1));
+	}
+}
+
+void parse_where_clauses(const token* i1, const token * i2,
+	 		             expr_table_ptr res) {
+	int parens = 0;
+	const token *original_i1_cached = i1;
+	const token *beg = i1;
+	std::string var_name;
+	while(i1 != i2) {
+		if(i1->type == TOKEN_LPARENS) {
+			++parens;
+		} else if(i1->type == TOKEN_RPARENS) {
+			--parens;
+		} else if(!parens) {
+			if(i1->type == TOKEN_COMMA) {
+				if(var_name.empty()) {
+					std::cerr << "There is 'where <expression>,; "
+						  << "'where name=<expression>,' was needed.\n";
+					throw formula_error();
+				}
+				(*res)[var_name] = parse_expression(beg,i1);
+				beg = i1+1;
+				var_name.clear();
+			} else if(i1->type == TOKEN_OPERATOR) {
+				std::string op_name(i1->begin, i1->end);
+				if(op_name == "=") {
+					if(beg->type != TOKEN_IDENTIFIER) {
+						if(i1 == original_i1_cached) {
+							std::cerr<< "There is 'where =<expression'; "
+								 << "'where name=<expression>' was needed.\n";
+						} else {
+							std::cerr<< "There is 'where <expression>=<expression>'; " 
+								 << "'where name=<expression>' was needed.\n";
+						}
+						throw formula_error();
+					} else if(beg+1 != i1) {
+						std::cerr<<"There is 'where name <expression>=<expression>'; "
+							 << "'where name=<expression>' was needed.\n";
+						throw formula_error();
+					} else if(!var_name.empty()) {
+						std::cerr<<"There is 'where name=name=<expression>'; "
+							 <<"'where name=<expression>' was needed.\n";
+						throw formula_error();
+					}
+					var_name.insert(var_name.end(), beg->begin, beg->end);
+					beg = i1+1;
+				}
+			}
+		}
+		++i1;
+	}
+	if(beg != i1) {
+		if(var_name.empty()) {
+			std::cerr << "There is 'where <expression>'; "
+				  << "'where name=<expression> was needed.\n";
+			throw formula_error();
+		}
+		(*res)[var_name] = parse_expression(beg,i1);
 	}
 }
 
@@ -556,6 +658,13 @@ expression_ptr parse_expression(const token* i1, const token* i2)
 		return expression_ptr(new dot_expression(
 							     parse_expression(i1,op),
 								 parse_expression(op+1,i2)));
+	}
+
+	if(op_name == "where") {
+		expr_table_ptr table(new expr_table());
+		parse_where_clauses(op+1, i2, table);
+		return expression_ptr(new where_expression(parse_expression(i1, op),
+							   table));
 	}
 
 	return expression_ptr(new operator_expression(
@@ -682,6 +791,13 @@ int main()
 		assert(formula("max(5,2)").execute(c).as_int() == 5);
 		assert(formula("char.strength").execute(p).as_int() == 15);
 		assert(formula("choose(members,strength).strength").execute(p).as_int() == 16);
+		assert(formula("4^2").execute().as_int() == 16);
+		assert(formula("2+3^3").execute().as_int() == 29);
+		assert(formula("2*3^3+2").execute().as_int() == 56);
+		assert(formula("9^3").execute().as_int() == 729);
+		assert(formula("x*5 where x=1").execute().as_int() == 5);
+		assert(formula("x*(a*b where a=2,b=1) where x=5").execute().as_int() == 10);
+		assert(formula("char.strength * ability where ability=3").execute(p).as_int() == 45);
 		const int dice_roll = formula("3d6").execute().as_int();
 		assert(dice_roll >= 3 && dice_roll <= 18);
 	} catch(formula_error& e) {
