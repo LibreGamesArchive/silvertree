@@ -101,7 +101,7 @@ variant variant::operator^(const variant& v) const
 {
 	must_be(TYPE_INT);
 	v.must_be(TYPE_INT);
-	return variant(pow(int_value_, v.int_value_));
+	return variant(static_cast<int>(pow(int_value_, v.int_value_)));
 }
 
 variant variant::operator-() const
