@@ -30,7 +30,7 @@ struct token_type {
 token get_token(iterator& i1, iterator i2) {
 	using boost::regex;
 
-	token_type types[] = { { regex("^(not\\b|and\\b|or\\b|d(?=[^a-zA-Z])|\\*|\\+|\\-|/|<=|>=|<|>|!=|=|\\.)"), TOKEN_OPERATOR },
+	token_type types[] = { { regex("^(not\\b|and\\b|or\\b|where\\b|d(?=[^a-zA-Z])|\\*|\\+|\\-|\\^|/|<=|>=|<|>|!=|=|\\.)"), TOKEN_OPERATOR },
 	                       { regex("^[a-zA-Z_]+"), TOKEN_IDENTIFIER },
 	                       { regex("^\\d+"),       TOKEN_INTEGER },
 	                       { regex("^\\("),        TOKEN_LPARENS },
@@ -61,7 +61,7 @@ token get_token(iterator& i1, iterator i2) {
 int main()
 {
 	using namespace formula_tokenizer;
-	std::string test = "(abc + 4 * (5+3))";
+	std::string test = "(abc + 4 * (5+3))^2";
 	std::string::const_iterator i1 = test.begin();
 	std::string::const_iterator i2 = test.end();
 	TOKEN_TYPE types[] = {TOKEN_LPARENS, TOKEN_IDENTIFIER,
@@ -71,7 +71,8 @@ int main()
 						  TOKEN_WHITESPACE, TOKEN_LPARENS,
 						  TOKEN_INTEGER, TOKEN_OPERATOR,
 						  TOKEN_INTEGER, TOKEN_RPARENS,
-						  TOKEN_RPARENS};
+						  TOKEN_RPARENS,
+	                      TOKEN_OPERATOR, TOKEN_INTEGER};
 	std::string tokens[] = {"(", "abc", " ", "+", " ", "4", " ",
 	                        "*", " ", "(", "5", "+", "3", ")", ")"};
 	for(int n = 0; n != sizeof(types)/sizeof(*types); ++n) {

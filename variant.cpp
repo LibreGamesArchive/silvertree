@@ -1,3 +1,4 @@
+#include <cmath>
 #include <stdlib.h>
 #include <vector>
 
@@ -94,6 +95,13 @@ variant variant::operator/(const variant& v) const
 	}
 
 	return variant(int_value_ / v.int_value_);
+}
+
+variant variant::operator^(const variant& v) const
+{
+	must_be(TYPE_INT);
+	v.must_be(TYPE_INT);
+	return variant(pow(int_value_, v.int_value_));
 }
 
 variant variant::operator-() const
