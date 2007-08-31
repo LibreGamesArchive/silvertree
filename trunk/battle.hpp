@@ -33,6 +33,8 @@ class slider;
 namespace game_logic
 {
 
+class battle_modification;
+
 class battle
 {
 public:
@@ -47,6 +49,9 @@ public:
 	void attack_character(battle_character& attacker,
 	                      battle_character& defender,
 						  const battle_move& move);
+	void target_mod(battle_character& ch,
+	                const hex::location& target,
+	                const battle_move& move);
 	bool can_make_move(const battle_character& c,
 	                   const battle_move& move) const;
 
@@ -73,15 +78,17 @@ private:
 	void handle_mouse_button_down(const SDL_MouseButtonEvent& e);
 	const_battle_character_ptr is_engaged(
 	       const battle_character& c) const;
+	void handle_dead_character(const battle_character& c);
 	std::vector<battle_character_ptr> chars_;
 	std::vector<battle_character_ptr>::iterator focus_;
 	const hex::gamemap& map_;
 	battle_character::move_map moves_;
 	bool highlight_moves_;
 	bool enter_attack_mode();
+	bool enter_target_mode();
 	bool enter_move_mode();
-	std::set<hex::location> attacks_;
-	bool highlight_attacks_;
+	std::set<hex::location> targets_;
+	bool highlight_targets_;
 	bool move_done_;
 	bool turn_done_;
 	hex::camera camera_;

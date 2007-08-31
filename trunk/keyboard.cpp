@@ -20,6 +20,10 @@ hex::DIRECTION dir(hex::DIRECTION orientation)
 {
 	const Uint8* keys = SDL_GetKeyState(NULL);
 
+	if(keys[SDLK_LCTRL] || keys[SDLK_RCTRL]) {
+		return hex::NULL_DIRECTION;
+	}
+
 	int dir = -1;
 	if(keys[SDLK_KP7] || keys[SDLK_LEFT] && keys[SDLK_UP]) {
 		dir = 1;

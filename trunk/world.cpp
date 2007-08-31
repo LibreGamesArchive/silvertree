@@ -10,6 +10,7 @@
 
    See the COPYING file for more details.
 */
+
 #include "encounter.hpp"
 #include "filesystem.hpp"
 #include "font.hpp"
@@ -165,8 +166,8 @@ void world::play()
 	bool show_grid = true;
 	int frame_num = 0;
 	hex::location current_loc;
-	std::vector<const hex::tile*> visible_tiles, dark_tiles;
-	hex::tile::features_cache visible_features_cache, dark_features_cache;
+	std::vector<const hex::tile*> tiles;
+	hex::tile::features_cache features_cache;
 	gui::const_grid_ptr track_info_grid;
 	for(bool done = false; !done; ++frame_num) {
 		if(!focus_) {
@@ -182,13 +183,11 @@ void world::play()
 			}
 		}
 
-		const std::set<hex::location>& visible =
-		     focus_->get_visible_locs();
+		const std::set<hex::location>& visible = focus_->get_visible_locs();
 
 		bool recalculate_tiles = current_loc != focus_->loc();
 		if(recalculate_tiles) {
-			visible_tiles.clear();
-			dark_tiles.clear();
+			tiles.clear();
 			current_loc = focus_->loc();
 			std::vector<hex::location> hexes;
 			for(int n = 0; n != 30; ++n) {
@@ -200,24 +199,14 @@ void world::play()
 					continue;
 				}
 
-				if(visible.count(loc)) {
-					visible_tiles.push_back(&map_.get_tile(loc));
-				} else {
-					dark_tiles.push_back(&map_.get_tile(loc));
-				}
+				tiles.push_back(&map_.get_tile(loc));
+				tiles.back()->load_texture();
 			}
 
-			std::sort(visible_tiles.begin(),visible_tiles.end(),
-			          hex::tile::compare_texture());
-			std::sort(dark_tiles.begin(),dark_tiles.end(),
-			          hex::tile::compare_texture());
+			std::sort(tiles.begin(),tiles.end(), hex::tile::compare_texture());
 
 			hex::tile::initialize_features_cache(
-			    &visible_tiles[0], &visible_tiles[0] + visible_tiles.size(),
-			    &visible_features_cache);
-			hex::tile::initialize_features_cache(
-			    &dark_tiles[0], &dark_tiles[0] + dark_tiles.size(),
-			    &dark_features_cache);
+			    &tiles[0], &tiles[0] + tiles.size(), &features_cache);
 
 			track_info_grid = get_track_info();
 		}
@@ -254,36 +243,28 @@ void world::play()
 		set_lighting();
 
 		hex::tile::setup_drawing();
-		foreach(const hex::tile* t, dark_tiles) {
+		foreach(const hex::tile* t, tiles) {
 			t->draw();
 		}
-
-		hex::tile::draw_features(&dark_tiles[0],
-		                         &dark_tiles[0] + dark_tiles.size(),
-		                         dark_features_cache);
-	
-		foreach(const hex::tile* t, visible_tiles) {
-			t->draw();
-		}
-
-		hex::tile::draw_features(&visible_tiles[0],
-		                         &visible_tiles[0] + visible_tiles.size(),
-		                         visible_features_cache);
+		hex::tile::draw_features(&tiles[0], &tiles[0] + tiles.size(),
+		                         features_cache);
 		hex::tile::finish_drawing();
 
-		foreach(const hex::tile* t, visible_tiles) {
+		foreach(const hex::tile* t, tiles) {
 			t->draw_cliffs();
-			t->emit_particles(particle_system_);
 		}
 
-		foreach(const hex::tile* t, dark_tiles) {
-			t->draw_cliffs();
+		foreach(const hex::tile* t, tiles) {
+			t->draw_cliff_transitions();
+		}
+
+		foreach(const hex::tile* t, tiles) {
 			t->emit_particles(particle_system_);
 		}
 
 		if(show_grid) {
 			glDisable(GL_LIGHTING);
-			foreach(const hex::tile* t, visible_tiles) {
+			foreach(const hex::tile* t, tiles) {
 				t->draw_grid();
 			}
 			glEnable(GL_LIGHTING);

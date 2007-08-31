@@ -118,6 +118,15 @@ void get_tile_ring(const location& a, int radius,
 	}
 }
 
+void get_tiles_in_radius(const location& center, int radius,
+                   std::vector<location>& res)
+{
+	res.push_back(center);
+	for(int n = 1; n <= radius; ++n) {
+		get_tile_ring(center, n, res);
+	}
+}
+
 DIRECTION get_adjacent_direction(const location& from, const location& to)
 {
 	location adj[6];

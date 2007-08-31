@@ -49,6 +49,8 @@ namespace hex
 
 	void get_tile_ring(const location& a, int radius,
 	                   std::vector<location>& res);
+	void get_tiles_in_radius(const location& center, int radius,
+	                   std::vector<location>& res);
 
 	DIRECTION get_adjacent_direction(const location& a, const location& b);
 	

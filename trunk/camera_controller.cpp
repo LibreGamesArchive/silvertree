@@ -9,24 +9,22 @@ namespace hex
 void camera_controller::keyboard_control()
 {
 	const Uint8* keys = SDL_GetKeyState(NULL);
-	const SDLMod mod = SDL_GetModState();
-	if(mod&KMOD_CTRL) {
-		return;
-	}
 
-	if(keys[SDLK_COMMA] || keys[SDLK_KP4]) {
+	const bool ctrl = keys[SDLK_LCTRL] || keys[SDLK_RCTRL];
+
+	if(keys[SDLK_COMMA] || keys[SDLK_KP4] || ctrl && keys[SDLK_LEFT]) {
 		cam_.rotate_left();
 	}
 
-	if(keys[SDLK_PERIOD] || keys[SDLK_KP6]) {
+	if(keys[SDLK_PERIOD] || keys[SDLK_KP6] || ctrl && keys[SDLK_RIGHT]) {
 		cam_.rotate_right();
 	}
 
-	if(keys[SDLK_p]) {
+	if(keys[SDLK_p] || ctrl && keys[SDLK_UP]) {
 		cam_.tilt_up();
 	}
 
-	if(keys[SDLK_l]) {
+	if(keys[SDLK_l] || ctrl && keys[SDLK_DOWN]) {
 		cam_.tilt_down();
 	}
 
