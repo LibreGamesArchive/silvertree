@@ -22,12 +22,26 @@ namespace graphics
 namespace {
 	typedef std::map<texture::key,graphics::texture> texture_map;
 	texture_map texture_cache;
+	const size_t TextureBufSize = 128;
+	GLuint texture_buf[TextureBufSize];
+	size_t texture_buf_pos = TextureBufSize;
+	std::vector<GLuint> avail_textures;
+
 	GLuint current_texture = 0;
 
 	GLuint get_texture_id() {
-		GLuint res;
-		glGenTextures(1, &res);
-		return res;
+		if(!avail_textures.empty()) {
+			const GLuint res = avail_textures.back();
+			avail_textures.pop_back();
+			return res;
+		}
+
+		if(texture_buf_pos == TextureBufSize) {
+			glGenTextures(TextureBufSize, texture_buf);
+			texture_buf_pos = 0;
+		}
+
+		return texture_buf[texture_buf_pos++];
 	}
 
 	bool npot_allowed = true;
@@ -45,6 +59,11 @@ namespace {
 		++n;
 		return n;
 	}
+}
+
+void texture::clear_textures()
+{
+	texture_cache.clear();
 }
 
 texture::texture(const key& surfs)
@@ -175,7 +194,7 @@ void texture::set_coord(GLfloat x, GLfloat y)
 
 texture::ID::~ID()
 {
-	glDeleteTextures(1,&id);
+	avail_textures.push_back(id);
 }
 
 }

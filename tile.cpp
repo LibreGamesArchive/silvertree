@@ -11,6 +11,7 @@
    See the COPYING file for more details.
 */
 #include "base_terrain.hpp"
+#include "camera.hpp"
 #include "foreach.hpp"
 #include "material.hpp"
 #include "model.hpp"
@@ -425,6 +426,21 @@ void tile::set_cliff(DIRECTION dir, const tile* neighbour) {
 	cliffs_[dir] = neighbour;
 }
 
+void tile::load_texture() const
+{
+	if(!texture_.valid() && terrain_) {
+		const_base_terrain_ptr adj[6];
+		for(int n = 0; n != 6; ++n) {
+			if(neighbours_[n] != NULL) {
+				adj[n] = neighbours_[n]->terrain_;
+			}
+		}
+
+		
+		texture_ = terrain_->generate_texture(loc_,height_,adj);
+	}
+}
+
 void tile::draw() const
 {
 	do_draw();
@@ -443,18 +459,7 @@ void tile::draw() const
 
 void tile::do_draw() const
 {
-	if(!texture_.valid() && terrain_) {
-		const_base_terrain_ptr adj[6];
-		for(int n = 0; n != 6; ++n) {
-			if(neighbours_[n] != NULL) {
-				adj[n] = neighbours_[n]->terrain_;
-			}
-		}
-
-		
-		texture_ = terrain_->generate_texture(loc_,height_,adj);
-	}
-
+	load_texture();
 	texture_.set_as_current_texture();
 
 	glBegin(GL_TRIANGLE_FAN);
@@ -558,7 +563,22 @@ void cliff_normal(int n, GLfloat& normalx, GLfloat& normaly)
 
 void tile::draw_cliffs() const
 {
-	if(std::count(cliffs_,cliffs_+6,static_cast<tile*>(NULL)) == 6) {
+	const hex::camera* cam = camera::current_camera();
+	if(!cam) {
+		return;
+	}
+
+	int num_visible = 3;
+	const hex::DIRECTION* visible = cam->visible_cliffs(&num_visible);
+	bool found = false;
+	for(int n = 0; n != num_visible; ++n) {
+		if(cliffs_[visible[n]]) {
+			found = true;
+			break;
+		}
+	}
+
+	if(!found) {
 		return;
 	}
 
@@ -573,9 +593,9 @@ void tile::draw_cliffs() const
 	graphics::texture& cliff_texture = cliff_textures_[frame_number%cliff_textures_.size()];
 
 	cliff_texture.set_as_current_texture();
-	graphics::texture overlap_texture = terrain_->transition_texture(hex::NORTH);
 
-	for(int n = 0; n != 6; ++n) {
+	for(int j = 0; j != num_visible; ++j) {
+		const int n = visible[j];
 		if(!cliffs_[n]) {
 			continue;
 		}
@@ -629,8 +649,45 @@ void tile::draw_cliffs() const
 			glVertex3f(points[3]->x, points[3]->y, points[3]->height);
 			glEnd();
 		}
+	}
+}
 
-		overlap_texture.set_as_current_texture();
+void tile::draw_cliff_transitions() const
+{
+	const hex::camera* cam = camera::current_camera();
+	if(!cam) {
+		return;
+	}
+
+	int num_visible = 3;
+	const hex::DIRECTION* visible = cam->visible_cliffs(&num_visible);
+	bool found = false;
+	for(int n = 0; n != num_visible; ++n) {
+		if(cliffs_[visible[n]]) {
+			found = true;
+			break;
+		}
+	}
+
+	if(!found) {
+		return;
+	}
+
+	if(!terrain_) {
+		return;
+	}
+
+	graphics::texture overlap_texture = terrain_->transition_texture(hex::NORTH);
+	overlap_texture.set_as_current_texture();
+	for(int j = 0; j != num_visible; ++j) {
+		const int n = visible[j];
+		if(!cliffs_[n]) {
+			continue;
+		}
+
+		const point *points[4] = { &cliffs_[n]->corners_[(n+3)%6],
+		                           &cliffs_[n]->corners_[(n+2)%6],
+				                   &corners_[(n)%6], &corners_[n == 0 ? 5 : n-1]};
 		glBegin(GL_TRIANGLES);
 		GLfloat normalx = 0.0, normaly = 0.0;
 		cliff_normal(n,normalx,normaly);
@@ -645,8 +702,6 @@ void tile::draw_cliffs() const
 		glNormal3f(normalx,normaly,-1.0);
 		glVertex3f(points[0]->x, points[0]->y, points[0]->height);
 		glEnd();
-
-		cliff_texture.set_as_current_texture();
 	}
 }
 

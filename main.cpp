@@ -163,6 +163,8 @@ extern "C" int main(int argc, char** argv)
 	game_logic::world w(scenario_cfg);
 	w.play();
 
+	graphics::texture::clear_textures();
+
 	SDL_Quit();
 	return 0;
 }

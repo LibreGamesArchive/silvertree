@@ -50,6 +50,7 @@ camera::camera(const gamemap& m)
      tilt_(-30.0), zoom_(-30.0), debug_adjust_(false),
 	 keyboard_pan_(false)
 {
+	update_visible_cliffs();
 }
 
 camera::~camera()
@@ -198,6 +199,7 @@ void camera::rotate_left()
 		}
 
 		dir_ = static_cast<DIRECTION>(dir);
+		update_visible_cliffs();
 	}
 }
 
@@ -211,6 +213,7 @@ void camera::rotate_right()
 		}
 
 		dir_ = static_cast<DIRECTION>(dir);
+		update_visible_cliffs();
 	}
 }
 
@@ -352,6 +355,7 @@ void camera::enforce_limits()
 	const GLfloat rotate = need_to_rotate();
 	if(std::abs(rotate) < RotateSpeed) {
 		rotate_ = target_rotation();
+		update_visible_cliffs();
 	} else if(rotate > 0.0) {
 		rotate_ += RotateSpeed;
 	} else if(rotate < 0.0) {
@@ -389,6 +393,53 @@ GLfloat camera::need_to_rotate() const
 bool camera::is_moving() const
 {
 	return target_rotation() != rotate_;
+}
+
+const hex::DIRECTION* camera::visible_cliffs(int* num) const
+{
+	if(num) {
+		*num = num_visible_cliffs_;
+	}
+	return visible_cliffs_;
+}
+
+void camera::update_visible_cliffs()
+{
+	int dir = 5;
+
+	switch(dir_) {
+	case hex::NORTH:
+		dir = 5;
+		break;
+	case hex::NORTH_WEST:
+		dir = 6;
+		break;
+	case hex::NORTH_EAST:
+		dir = 4;
+		break;
+	case hex::SOUTH:
+		dir = 2;
+		break;
+	case hex::SOUTH_WEST:
+		dir = 1;
+		break;
+	case hex::SOUTH_EAST:
+		dir = 3;
+		break;
+	}
+
+	if(rotate_ < target_rotation()) {
+		num_visible_cliffs_ = 4;
+	} else if(rotate_ > target_rotation()) {
+		--dir;
+		num_visible_cliffs_ = 4;
+	} else {
+		num_visible_cliffs_ = 3;
+	}
+
+	for(int m = 0; m != num_visible_cliffs_; ++m) {
+		visible_cliffs_[m] = static_cast<hex::DIRECTION>((dir + m)%6);
+	}
 }
 
 } //end namespace hex

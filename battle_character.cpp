@@ -214,8 +214,6 @@ void battle_character::get_possible_moves(
 		if(move.must_attack()) {
 			bool found = false;
 			foreach(const battle_character_ptr& c, chars) {
-				if(is_enemy(*c)) {
-				}
 				if(is_enemy(*c) && can_attack(*c, i->first)) {
 					found = true;
 					break;

@@ -44,7 +44,7 @@ bool battle_char_less(const const_battle_character_ptr& c1,
 battle::battle(const std::vector<battle_character_ptr>& chars,
                const hex::gamemap& battle_map)
    : chars_(chars), focus_(chars_.end()), map_(battle_map),
-	 highlight_moves_(false), highlight_attacks_(false),
+	 highlight_moves_(false), highlight_targets_(false),
 	 move_done_(false), turn_done_(false),
 	 camera_(battle_map), camera_controller_(camera_),
 	 result_(ONGOING), keyed_selection_(0),
@@ -86,7 +86,7 @@ void battle::player_turn(battle_character& c)
 	move_done_ = false;
 	turn_done_ = false;
 	highlight_moves_ = false;
-	highlight_attacks_ = false;
+	highlight_targets_ = false;
 	while(!turn_done_ && result_ == ONGOING) {
 		draw();
 
@@ -101,12 +101,21 @@ void battle::player_turn(battle_character& c)
 					turn_done_ = true;
 					break;
 				case SDL_KEYDOWN:
-					if(highlight_attacks_ &&
+					if(highlight_targets_ &&
 					   (event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE)) {
-						battle_character_ptr target_char = selected_char();
-						turn_done_ = true;
-						attack_character(**focus_, *target_char, *current_move_);
+						if(current_move_->can_attack()) {
+							turn_done_ = true;
+							battle_character_ptr target_char = selected_char();
+							attack_character(**focus_, *target_char, *current_move_);
+						} else {
+							hex::location loc = selected_loc();
+							if(map_.is_loc_on_map(loc)) {
+								turn_done_ = true;
+								assert(current_move_->mod());
+								target_mod(**focus_, loc, *current_move_);
+							}
+						}
 					} else if(current_move_ &&
 					   (event.key.keysym.sym == SDLK_ESCAPE ||
 						event.key.keysym.sym == SDLK_RETURN ||
@@ -119,7 +128,7 @@ void battle::player_turn(battle_character& c)
 							menu_.reset(new gui::battle_menu(*this,c));
 							widgets_.push_back(menu_);
 						}
-					} else if(highlight_attacks_) {
+					} else if(highlight_targets_) {
 						switch(event.key.keysym.sym) {
 							case SDLK_RIGHT:
 								++keyed_selection_;
@@ -153,6 +162,13 @@ void battle::player_turn(battle_character& c)
 				}
 
 				if(!input) {
+					const battle_modification_ptr mod = current_move_->mod();
+					if(mod && mod->target() != battle_modification::TARGET_SELF) {
+						input = enter_target_mode();
+					}
+				}
+
+				if(!input) {
 					if(current_move_->mod()) {
 						if(current_move_->mod()->target() == battle_modification::TARGET_SELF) {
 							current_move_->mod()->apply(**focus_,**focus_,current_time_);
@@ -167,8 +183,8 @@ void battle::player_turn(battle_character& c)
 	}
 
 	highlight_moves_ = false;
-	highlight_attacks_ = false;
-	attacks_.clear();
+	highlight_targets_ = false;
+	targets_.clear();
 	current_move_.reset();
 	remove_widget(menu_);
 	menu_.reset();
@@ -215,17 +231,17 @@ battle_character_ptr battle::selected_char()
 
 	select_name = camera_controller_.finish_selection();
 	if(select_name == GLuint(-1)) {
-		if(attacks_.empty()) {
+		if(targets_.empty()) {
 			return battle_character_ptr();
 		}
 
 		while(keyed_selection_ < 0) {
-			keyed_selection_ += attacks_.size();
+			keyed_selection_ += targets_.size();
 		}
 
-		keyed_selection_ = keyed_selection_%attacks_.size();
+		keyed_selection_ = keyed_selection_%targets_.size();
 
-		std::set<hex::location>::const_iterator i = attacks_.begin();
+		std::set<hex::location>::const_iterator i = targets_.begin();
 		std::advance(i,keyed_selection_);
 		foreach(const battle_character_ptr& c, chars_) {
 			if(c->loc() == *i) {
@@ -259,9 +275,9 @@ void battle::draw(gui::slider* slider)
 		if(selected_move != moves_.end()) {
 			selected_hex = selected_move->first;
 		}
-	} else if(highlight_attacks_) {
+	} else if(highlight_targets_) {
 		selected_hex = selected_loc();
-		if(attacks_.count(selected_hex) == 0) {
+		if(targets_.count(selected_hex) == 0) {
 			selected_character = selected_char();
 			if(selected_character) {
 				selected_hex = selected_character->loc();
@@ -280,7 +296,7 @@ void battle::draw(gui::slider* slider)
 	const std::vector<tile>& tiles = map_.tiles();
 	foreach(const tile& t, tiles) {
 		const bool dim = highlight_moves_ && moves_.count(t.loc()) == 0
-		        || highlight_attacks_ && attacks_.count(t.loc()) == 0;
+		        || highlight_targets_ && targets_.count(t.loc()) == 0;
 		if(dim) {
 			glEnable(GL_LIGHT2);
 			glDisable(GL_LIGHT0);
@@ -320,7 +336,18 @@ void battle::draw(gui::slider* slider)
 
 	if(map_.is_loc_on_map(selected_hex)) {
 		glDisable(GL_LIGHTING);
-		map_.get_tile(selected_hex).draw_highlight();
+		int radius = 0;
+		if(current_move_ && current_move_->mod()) {
+			radius = current_move_->mod()->radius();
+		}
+
+		std::vector<hex::location> locs;
+		hex::get_tiles_in_radius(selected_hex, radius, locs);
+		foreach(const hex::location& loc, locs) {
+			if(map_.is_loc_on_map(loc)) {
+				map_.get_tile(loc).draw_highlight();
+			}
+		}
 		glEnable(GL_LIGHTING);
 	}
 
@@ -366,7 +393,7 @@ void battle::draw(gui::slider* slider)
 		}
 	}
 
-	if(highlight_attacks_ && attacks_.count(selected_hex)) {
+	if(highlight_targets_ && targets_.count(selected_hex)) {
 		battle_character_ptr ch;
 		foreach(const battle_character_ptr& c, chars_) {
 			if(c->loc() == selected_hex) {
@@ -572,30 +599,68 @@ void battle::attack_character(battle_character& attacker,
 		graphics::floating_label::add(damage_tex,pos,move,1000);
 	}
 
-	const bool dead = defender.get_character().take_damage(damage);
+	defender.get_character().take_damage(damage);
+	handle_dead_character(defender);
+}
 
-	if(dead) {
-		for(std::vector<battle_character_ptr>::iterator i = chars_.begin(); i != chars_.end(); ++i) {
-			if(i->get() == &defender) {
-				chars_.erase(i);
-				break;
-			}
+void battle::handle_dead_character(const battle_character& c)
+{
+	if(!c.get_character().dead()) {
+		return;
+	}
+
+	for(std::vector<battle_character_ptr>::iterator i = chars_.begin();
+	    i != chars_.end(); ++i) {
+		if(i->get() == &c) {
+			chars_.erase(i);
+			break;
 		}
-		bool found_player = false;
-		bool found_enemy = false;
-		foreach(const battle_character_ptr& c, chars_) {
-			if(c->is_human()) {
-				found_player = true;
-			} else {
-				found_enemy = true;
-			}
+	}
+	bool found_player = false;
+	bool found_enemy = false;
+	foreach(const battle_character_ptr& ch, chars_) {
+		if(ch->is_human()) {
+			found_player = true;
+		} else {
+			found_enemy = true;
+		}
+	}
+
+	if(found_player && !found_enemy) {
+		result_ = PLAYER_WIN;
+	} else if(found_enemy && !found_player) {
+		result_ = PLAYER_LOSE;
+	}
+}
+
+void battle::target_mod(battle_character& caster,
+                        const hex::location& target,
+                        const battle_move& move)
+{
+	assert(move.mod());
+	const battle_modification& mod = *move.mod();
+	caster.set_time_until_next_move(move.get_stat("initiative",caster));
+	const battle_modification::TARGET_TYPE type = mod.target();
+	const int radius = mod.radius();
+	std::vector<hex::location> locs;
+	get_tiles_in_radius(target, radius, locs);
+	foreach(battle_character_ptr ch, chars_) {
+		if(std::find(locs.begin(),locs.end(),ch->loc()) == locs.end()) {
+			continue;
 		}
 
-		if(found_player && !found_enemy) {
-			result_ = PLAYER_WIN;
-		} else if(found_enemy && !found_player) {
-			result_ = PLAYER_LOSE;
+		if(type == battle_modification::TARGET_ENEMY &&
+		   !caster.is_enemy(*ch)) {
+			continue;
 		}
+
+		if(type == battle_modification::TARGET_FRIEND &&
+		   caster.is_enemy(*ch)) {
+			continue;
+		}
+
+		mod.apply(caster, *ch, current_time_);
+		handle_dead_character(*ch);
 	}
 }
 
@@ -603,9 +668,7 @@ bool battle::can_make_move(const battle_character& c,
                            const battle_move& move) const
 {
 	if(move.max_moves() > 0) {
-		battle_character::move_map moves;
-		c.get_possible_moves(moves, move, chars_);
-		return !moves.empty();
+		battle_character::move_map moves; c.get_possible_moves(moves, move, chars_); return !moves.empty();
 	} else if(move.must_attack()) {
 		foreach(const battle_character_ptr& enemy, chars_) {
 			if(c.is_enemy(*enemy) && c.can_attack(*enemy)) {
@@ -629,7 +692,7 @@ void battle::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
 				turn_done_ = !enter_attack_mode();
 				move_done_ = true;
 			}
-		} else if(highlight_attacks_) {
+		} else if(highlight_targets_ && current_move_->can_attack()) {
 			battle_character_ptr target_char = selected_char();
 
 			if(target_char) {
@@ -641,8 +704,14 @@ void battle::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
 				turn_done_ = true;
 			}
 
-			highlight_attacks_ = false;
-			attacks_.clear();
+			highlight_targets_ = false;
+			targets_.clear();
+		} else if(highlight_targets_) {
+			hex::location loc = selected_loc();
+			if(map_.is_loc_on_map(loc)) {
+				turn_done_ = true;
+				target_mod(**focus_, loc, *current_move_);
+			}
 		}
 	}
 }
@@ -660,7 +729,7 @@ bool battle::enter_move_mode()
 bool battle::enter_attack_mode()
 {
 	highlight_moves_ = false;
-	attacks_.clear();
+	targets_.clear();
 
 	if(current_move_ && current_move_->can_attack() == false) {
 		return false;
@@ -668,11 +737,30 @@ bool battle::enter_attack_mode()
 
 	foreach(const battle_character_ptr& c, chars_) {
 		if(*focus_ != c && (*focus_)->is_enemy(*c) && (*focus_)->can_attack(*c)) {
-			attacks_.insert(c->loc());
+			targets_.insert(c->loc());
 		}
 	}
-	highlight_attacks_ = attacks_.empty() == false;
-	return highlight_attacks_;
+	highlight_targets_ = targets_.empty() == false;
+	return highlight_targets_;
+}
+
+bool battle::enter_target_mode()
+{
+	highlight_moves_ = false;
+	targets_.clear();
+
+	battle_modification_ptr mod = current_move_->mod();
+	if(!mod) {
+		return false;
+	}
+
+	std::vector<hex::location> locs;
+	hex::get_tiles_in_radius((*focus_)->loc(), mod->range(), locs);
+	foreach(const hex::location& loc, locs) {
+		targets_.insert(loc);
+	}
+	highlight_targets_ = targets_.empty() == false;
+	return highlight_targets_;
 }
 
 void battle::generate_movement_order()

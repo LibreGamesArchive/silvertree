@@ -27,6 +27,8 @@ namespace graphics
 class texture
 {
 public:
+	static void clear_textures();
+
 	texture() : width_(0), height_(0) {}
 
 	typedef std::vector<surface> key;
@@ -76,7 +78,13 @@ inline bool operator!=(const texture& a, const texture& b)
 
 inline bool operator<(const texture& a, const texture& b)
 {
-	return a.id_ < b.id_;
+	if(!a.id_) {
+		return false;
+	} else if(!b.id_) {
+		return true;
+	}
+
+	return a.id_->id < b.id_->id;
 }
 
 }

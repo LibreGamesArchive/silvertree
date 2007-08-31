@@ -1,6 +1,9 @@
 #include "battle_character.hpp"
 #include "battle_modification.hpp"
 #include "character.hpp"
+#include "floating_label.hpp"
+#include "font.hpp"
+#include "formatter.hpp"
 #include "formula.hpp"
 #include "wml_node.hpp"
 
@@ -48,6 +51,10 @@ battle_modification::battle_modification(wml::const_node_ptr node)
 			}
 		} else if(i->first == "duration") {
 			duration_.reset(new formula(i->second));
+		} else if(i->first == "range") {
+			range_.reset(new formula(i->second));
+		} else if(i->first == "radius") {
+			radius_.reset(new formula(i->second));
 		} else {
 			mods_[i->first].reset(new formula(i->second));
 		}
@@ -56,7 +63,7 @@ battle_modification::battle_modification(wml::const_node_ptr node)
 
 void battle_modification::apply(battle_character& src,
                                 battle_character& target,
-								int current_time)
+								int current_time) const
 {
 	mod_callable callable(target.get_character(), src.get_character());
 	int duration = -1;
@@ -64,11 +71,34 @@ void battle_modification::apply(battle_character& src,
 		duration = duration_->execute(callable).as_int();
 	}
 
-	for(std::map<std::string,formula_ptr>::iterator i = mods_.begin();
+	const SDL_Color red = {0xFF,0x0,0x0,0xFF};
+	const SDL_Color blue = {0x0,0x0,0xFF,0xFF};
+	const GLfloat move[3] = {0.0,0.0,0.01};
+	GLfloat pos[3];
+	GLfloat rotate;
+	target.get_pos(pos,&rotate);
+
+	for(std::map<std::string,formula_ptr>::const_iterator i = mods_.begin();
 	    i != mods_.end(); ++i) {
 		const int value = i->second->execute(callable).as_int();
-		target.add_modification(i->first, current_time+duration, value);
+
+		if(i->first == "inflict_damage") {
+			target.get_character().take_damage(value);
+			graphics::floating_label::add(graphics::font::render_text(formatter() << value, 20, value <= 0 ? blue : red), pos, move, 1000);
+		} else {
+			target.add_modification(i->first, current_time+duration, value);
+		}
 	}
+}
+
+int battle_modification::range() const
+{
+	return range_ ? range_->execute().as_int() : 0;
+}
+
+int battle_modification::radius() const
+{
+	return radius_ ? radius_->execute().as_int() : 0;
 }
 
 }
