@@ -104,6 +104,7 @@ void battle::player_turn(battle_character& c)
 					if(highlight_targets_ &&
 					   (event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE)) {
+						assert(current_move_);
 						if(current_move_->can_attack()) {
 							turn_done_ = true;
 							battle_character_ptr target_char = selected_char();
@@ -127,6 +128,7 @@ void battle::player_turn(battle_character& c)
 							current_move_.reset();
 							menu_.reset(new gui::battle_menu(*this,c));
 							widgets_.push_back(menu_);
+							highlight_targets_ = false;
 						}
 					} else if(highlight_targets_) {
 						switch(event.key.keysym.sym) {
@@ -365,10 +367,10 @@ void battle::draw(gui::slider* slider)
 		c->draw();
 	}
 
-	particle_system_.draw();
-
 	graphics::floating_label::update_labels();
 	graphics::floating_label::draw_labels();
+
+	particle_system_.draw();
 
 	graphics::prepare_raster();
 
@@ -407,6 +409,7 @@ void battle::draw(gui::slider* slider)
 		if(ch) {
 			SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
 			std::string desc;
+			assert(current_move_);
 			get_attack_stats(**focus_, *ch, *current_move_, &desc);
 			graphics::texture text = graphics::font::render_text(desc, 20, color);
 			graphics::blit_texture(text,50,50);
