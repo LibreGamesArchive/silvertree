@@ -4,6 +4,7 @@
 #include <gl.h>
 
 #include "formula.hpp"
+#include "particle_emitter_fwd.hpp"
 #include "particle_system.hpp"
 #include "wml_node_fwd.hpp"
 
@@ -18,6 +19,7 @@ public:
 	                const GLfloat* dir1, const GLfloat* dir2,
 	                const GLfloat* pos1, const GLfloat* pos2=0);
 	void emit_particle(particle_system& sys);
+	void set_pos(const GLfloat* pos);
 private:
 	void initialize_particle(particle& p) const;
 	GLfloat pos1_[3];

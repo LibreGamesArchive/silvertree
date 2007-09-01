@@ -2,6 +2,7 @@
 #include "battle_move.hpp"
 #include "character.hpp"
 #include "formula.hpp"
+#include "particle_emitter.hpp"
 #include "wml_node.hpp"
 #include "wml_utils.hpp"
 
@@ -50,7 +51,8 @@ battle_move::battle_move(wml::const_node_ptr node)
     moves_(wml::get_int(node,"moves")),
     min_moves_(wml::get_int(node,"must_move")),
 	can_attack_(wml::get_bool(node,"attack")),
-	must_attack_(wml::get_bool(node,"must_attack",wml::get_bool(node,"attack")))
+	must_attack_(wml::get_bool(node,"must_attack",wml::get_bool(node,"attack"))),
+	missile_emitter_(node->get_child("missile_particles"))
 {
 	wml::const_node_ptr stats = node->get_child("stats");
 	if(stats) {
@@ -77,6 +79,16 @@ int battle_move::get_stat(const std::string& stat,
 	} else {
 		return c.stat(stat);
 	}
+}
+
+graphics::particle_emitter_ptr battle_move::create_missile_emitter() const
+{
+	if(!missile_emitter_) {
+		return graphics::particle_emitter_ptr();
+	}
+
+	const GLfloat null_pos[] = {0.0,0.0,0.0};
+	return graphics::particle_emitter_ptr(new graphics::particle_emitter(missile_emitter_, null_pos, null_pos, null_pos));
 }
 
 }
