@@ -22,6 +22,7 @@
 #include "camera.hpp"
 #include "camera_controller.hpp"
 #include "gamemap.hpp"
+#include "particle_system.hpp"
 #include "texture.hpp"
 #include "widget.hpp"
 
@@ -107,6 +108,8 @@ private:
 	const_battle_move_ptr current_move_;
 	int keyed_selection_;
 	int current_time_;
+
+	graphics::particle_system particle_system_;
 };
 		
 }

@@ -29,6 +29,7 @@ particle_emitter::particle_emitter(wml::const_node_ptr node,
 	if(pos2 == NULL) {
 		pos2 = pos1;
 	}
+
 	if(dir2 == NULL) {
 		dir2 = dir1;
 	}
@@ -76,6 +77,12 @@ void particle_emitter::emit_particle(particle_system& system)
 			break;
 		}
 	}
+}
+
+void particle_emitter::set_pos(const GLfloat* pos)
+{
+	memcpy(pos1_, pos, sizeof(pos1_));
+	memcpy(pos2_, pos, sizeof(pos2_));
 }
 
 void particle_emitter::initialize_particle(particle& p) const

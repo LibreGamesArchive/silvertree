@@ -365,6 +365,8 @@ void battle::draw(gui::slider* slider)
 		c->draw();
 	}
 
+	particle_system_.draw();
+
 	graphics::floating_label::update_labels();
 	graphics::floating_label::draw_labels();
 
@@ -637,6 +639,29 @@ void battle::target_mod(battle_character& caster,
                         const hex::location& target,
                         const battle_move& move)
 {
+	if(graphics::particle_emitter_ptr missile = move.create_missile_emitter()) {
+		using hex::tile;
+		const hex::location& src = caster.loc();
+		assert(map_.is_loc_on_map(src));
+		assert(map_.is_loc_on_map(target));
+		const hex::tile& src_tile = map_.get_tile(src);
+		const hex::tile& dst_tile = map_.get_tile(target);
+		GLfloat src_pos[] = {tile::translate_x(src), tile::translate_y(src), tile::translate_height(src_tile.height())};
+		GLfloat dst_pos[] = {tile::translate_x(target), tile::translate_y(target), tile::translate_height(dst_tile.height())};
+
+		const GLfloat nframes = 100.0;
+		for(GLfloat frame = 0.0; frame <= nframes; frame += 1.0) {
+			GLfloat pos[3];
+			for(int n = 0; n != 3; ++n) {
+				pos[n] = dst_pos[n]*(frame/nframes) + src_pos[n]*((nframes-frame)/nframes);
+			}
+
+			missile->set_pos(pos);
+			missile->emit_particle(particle_system_);
+			draw();
+		}
+	}
+
 	assert(move.mod());
 	const battle_modification& mod = *move.mod();
 	caster.set_time_until_next_move(move.get_stat("initiative",caster));

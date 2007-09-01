@@ -7,6 +7,7 @@
 #include "battle_modification.hpp"
 #include "battle_move_fwd.hpp"
 #include "formula_fwd.hpp"
+#include "particle_emitter_fwd.hpp"
 #include "wml_node.hpp"
 
 namespace game_logic
@@ -27,6 +28,8 @@ public:
 	int get_stat(const std::string& stat, const battle_character& c) const;
 
 	const battle_modification_ptr& mod() const { return mod_; }
+
+	graphics::particle_emitter_ptr create_missile_emitter() const;
 private:
 	battle_move() {}
 	std::string name_;
@@ -37,6 +40,7 @@ private:
 	bool must_attack_;
 	std::map<std::string,const_formula_ptr> stats_;
 	battle_modification_ptr mod_;
+	wml::const_node_ptr missile_emitter_;
 };
 
 }
