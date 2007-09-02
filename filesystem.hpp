@@ -20,6 +20,8 @@ namespace sys
 
 std::string read_file(const std::string& fname);
 void write_file(const std::string& fname, const std::string& data);
+
+bool file_exists(const std::string& fname);
 		
 }
 
