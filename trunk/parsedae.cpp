@@ -1,4 +1,5 @@
 #include "boost/array.hpp"
+#include "filesystem.hpp"
 #include "foreach.hpp"
 #include "model.hpp"
 #include "parsedae.hpp"
@@ -79,7 +80,14 @@ void parse_mesh(XML_PARSER* parser, std::vector<model::face>& faces)
 				if(XML_TOKEN_EQUALS(name, "material")) {
 					const GLfloat material_data[] = {1.0,1.0,1.0,1.0};
 					mat.reset(new material);
-					mat->set_texture(std::string(value.str,value.str+value.length) + ".jpg");
+
+					std::string file(value.str, value.str + value.length);
+					if(sys::file_exists("images/" + file+ ".jpg")) {
+						file += ".jpg";
+					} else if(sys::file_exists("images/" + file+ ".png")) {
+						file += ".png";
+					}
+					mat->set_texture(file);
 					mat->set_ambient(material_data);
 					mat->set_diffuse(material_data);
 					mat->set_specular(material_data);

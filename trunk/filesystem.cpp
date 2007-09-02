@@ -31,5 +31,16 @@ void write_file(const std::string& fname, const std::string& data)
 	std::ofstream file(fname.c_str(),std::ios_base::binary);
 	file << data;
 }
+
+bool file_exists(const std::string& name)
+{
+	std::ifstream file(name.c_str(), std::ios_base::binary);
+	if(file.rdstate() != 0) {
+		return false;
+	}
+
+	file.close();
+	return true;
+}
 		
 }
