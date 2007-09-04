@@ -59,6 +59,42 @@ namespace {
 		++n;
 		return n;
 	}
+	
+	bool is_npot_allowed()
+    {
+    	static bool once = false;
+    	static bool npot = true;
+    	if (once) return npot;
+    	once = true;
+
+    	const char *supported = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
+    	const char *version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+    	const char *vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+
+    	std::cerr << "OpenGL version: " << version << "\n";
+    	std::cerr << "OpenGL vendor: " << vendor << "\n";
+    	std::cerr << "OpenGL extensions: " << supported << "\n";
+
+    	// OpenGL >= 2.0 drivers must support NPOT textures
+    	bool version_2 = (version[0] >= '2');
+    	npot = version_2;
+    	// directly test for NPOT extension
+    	if (std::strstr(supported, "GL_ARB_texture_non_power_of_two")) npot = true;
+
+    	if (npot) {
+    		// Use some heuristic to make sure it is HW accelerated. Might need some
+    		// more work.
+    		if (std::strstr(vendor, "NVIDIA Corporation")) {
+    			if (!std::strstr(supported, "NV_fragment_program2") ||
+    				!std::strstr(supported, "NV_vertex_program3"))
+    					npot = false;
+    			else if (std::strstr(vendor, "ATI Technologies"))
+    				if (!std::strstr(supported, "GL_ARB_texture_non_power_of_two"))
+    					npot = false;
+    		}
+    	}
+    	return npot;
+    }
 }
 
 void texture::clear_textures()
@@ -75,13 +111,9 @@ texture::texture(const key& surfs)
 	}
 
 	if(width_multiplier < 0.0) {
-		const char* vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
-		if(strstr(vendor, "NVIDIA Corporation")) {
-			std::cerr << "NVIDIA video card: using npot textures\n";
-			npot_allowed = true;
-		} else {
-			std::cerr << "non-NVIDIA video card: using only pot textures\n";
-			npot_allowed = false;
+		npot_allowed = is_npot_allowed();
+		if (!npot_allowed) {
+		    std::cerr << "Using only pot textures\n";
 		}
 
 		width_multiplier = 1.0;
