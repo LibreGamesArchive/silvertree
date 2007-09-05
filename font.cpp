@@ -82,6 +82,25 @@ manager::~manager()
 	fonts_initialized = false;
 }
 
+int get_string_height(const std::string& text, int font_size) {
+	const font_ptr font(get_font(font_size));
+	if(!font) {
+		return -1;
+	}
+
+	std::string::const_iterator iter = text.begin();
+	int ret = 0;
+	while(iter != text.end()) {
+		int max_y;
+		TTF_GlyphMetrics(font.get(), *iter, NULL, NULL, NULL, &max_y, NULL);
+		if(max_y > ret) {
+			ret = max_y;
+		}
+		++iter;
+	}
+	return ret;
+}
+
 texture render_text(const std::string& text, int font_size,
                     const SDL_Color& color)
 {
@@ -90,41 +109,82 @@ texture render_text(const std::string& text, int font_size,
 		return texture();
 	}
 
-	if(strchr(text.c_str(),'\n') != NULL) {
-		std::vector<std::string> v = util::split(text, '\n');
-		std::vector<surface> surfs;
-		unsigned int width = 0, height = 0;
-		foreach(const std::string& s, v) {
-			surface surf(get_non_transparent_portion(
-			  TTF_RenderText_Blended(font.get(),s.c_str(),color)));
-			surfs.push_back(surf);
-			if(surf->w > width) {
-				width = surf->w;
+	int ascent = TTF_FontAscent(font.get());
+
+
+	std::vector<std::string> v = util::split(text, '\n');
+	std::vector<int> heights;
+	std::vector<surface> surfs;
+	unsigned int width = 0, height = 0;
+	const unsigned int lineskip = TTF_FontLineSkip(font.get());
+	foreach(const std::string& s, v) {
+		surface surf(get_non_transparent_portion(
+				     TTF_RenderText_Blended(font.get(),s.c_str(),color)));
+		surfs.push_back(surf);
+		if(surf->w > width) {
+			width = surf->w;
+		}
+		heights.push_back(get_string_height(s, font_size));
+		height += lineskip;
+	}
+	
+	surface res(SDL_CreateRGBSurface(SDL_SWSURFACE,width,height,
+					 32,SURFACE_MASK));
+	int y = 0;
+	std::vector<int>::iterator iter = heights.begin();
+	foreach(const surface& surf, surfs) {
+		int y_adjust = ascent - *(iter++);
+		SDL_SetAlpha(surf.get(), 0, SDL_ALPHA_OPAQUE);
+		SDL_Rect rect = {0,y + y_adjust,surf->w,surf->h};
+		SDL_BlitSurface(surf.get(), NULL, res.get(), &rect);
+		y += lineskip;
+	}
+	
+	return texture::get_no_cache(res);
+}
+
+std::string format_text(const std::string& text, int font_size, int width)
+{
+	const font_ptr font(get_font(font_size));
+	if(!font) {
+		return text;
+	}
+
+	int space_width, junk;
+	TTF_SizeText(font.get(), " ", &space_width, &junk);
+
+	std::string formatted;
+
+	std::vector<std::string> lines = util::split(text, '\n');
+	foreach(const std::string& text_line, lines) {
+		int line_words = 0;
+		int line_width = 0;
+		std::vector<std::string> words = util::split(text_line, "\n\t ");
+		foreach(const std::string& word, words) {
+			int w;
+			if(TTF_SizeText(font.get(), word.c_str(), &w, &junk) < 0) {
+				std::cerr << "Warning: error rendering text \"" <<
+					text_line << "\"\n";
+				return text;
 			}
-
-			height += surf->h;
+			if(line_words > 0) {
+				if(line_width + w > width) {
+					formatted.append(1, '\n');
+					line_width = 0;
+					line_words = 0;
+				} else {
+					formatted.append(1, ' ');
+				}
+			}
+			formatted.append(word);
+			line_width += w + space_width;
+			++line_words;
 		}
-
-		surface res(SDL_CreateRGBSurface(SDL_SWSURFACE,width,height,
-		                     32,SURFACE_MASK));
-		int y = 0;
-		foreach(const surface& surf, surfs) {
-			SDL_SetAlpha(surf.get(), 0, SDL_ALPHA_OPAQUE);
-			SDL_Rect rect = {0,y,surf->w,surf->h};
-			SDL_BlitSurface(surf.get(), NULL, res.get(), &rect);
-			y += surf->h;
+		if(!formatted.empty()) {
+		  formatted.append(1,'\n');
 		}
-
-		return texture::get_no_cache(res);
 	}
-
-	const surface res(get_non_transparent_portion(TTF_RenderText_Blended(
-	        font.get(),text.c_str(),color)));
-	if(res.get() != NULL) {
-		return texture::get_no_cache(res);
-	} else {
-		return texture();
-	}
+	return formatted;
 }
 
 void render_multiline_text(const std::string& text, int font_size,

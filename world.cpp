@@ -50,10 +50,13 @@ std::string get_map_data(wml::const_node_ptr node)
 }
 
 world::world(wml::const_node_ptr node)
-  : map_(get_map_data(node)), camera_(map_),
-    camera_controller_(camera_),
-    time_(node), subtime_(0.0), tracks_(map_)
+	: compass_(graphics::texture::get(graphics::surface_cache::get("compass-rose.png"))),
+	  map_(get_map_data(node)), camera_(map_),
+	  camera_controller_(camera_),
+	  time_(node), subtime_(0.0), tracks_(map_)
 {
+	show_grid_ = true;
+
 	const std::string& sun_light = wml::get_str(node, "sun_light");
 	if(!sun_light.empty()) {
 		sun_light_.reset(new formula(sun_light));
@@ -150,26 +153,189 @@ void world::get_matching_parties(const formula_ptr& filter, std::vector<party_pt
 	}
 }
 
+void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
+{
+
+	tiles_.clear();
+	current_loc_ = focus_->loc();
+	std::vector<hex::location> hexes;
+	for(int n = 0; n != 30; ++n) {
+		hex::get_tile_ring(focus_->loc(), n, hexes);
+	}
+	
+	foreach(const hex::location& loc, hexes) {
+		if(!map_.is_loc_on_map(loc)) {
+			continue;
+		}
+
+		tiles_.push_back(&map_.get_tile(loc));
+		tiles_.back()->load_texture();
+	}
+	
+	std::sort(tiles_.begin(),tiles_.end(), hex::tile::compare_texture());
+
+	hex::tile::initialize_features_cache(
+		&tiles_[0], &tiles_[0] + tiles_.size(), &features_cache_);
+
+	track_info_grid_ = get_track_info();
+}
+
+
+void world::draw() const
+{
+	const std::set<hex::location>& visible =
+		focus_->get_visible_locs();
+	
+	if(current_loc_ != focus_->loc()) {
+		rebuild_drawing_caches(visible);
+	}
+	
+	camera_controller_.prepare_selection();
+	GLuint select_name = 0;
+	for(party_map::const_iterator i = parties_.begin();
+	    i != parties_.end(); ++i) {
+		if(visible.count(i->second->loc())) {
+			glLoadName(select_name);
+			i->second->draw();
+		}
+		
+		++select_name;
+	}
+	
+	select_name = camera_controller_.finish_selection();
+	hex::location selected_loc;
+	party_map::const_iterator selected_party = parties_.end();
+	if(select_name != GLuint(-1)) {
+			party_map::const_iterator i = parties_.begin();
+			std::advance(i, select_name);
+			selected_loc = i->second->loc();
+			selected_party = i;
+	}
+	
+	if(focus_) {
+		GLfloat buf[3];
+		focus_->get_pos(buf);
+		camera_.set_pan(buf);
+	}
+	
+	camera_.prepare_frame();
+	set_lighting();
+	
+
+	hex::tile::setup_drawing();
+	foreach(const hex::tile* t, tiles_) {
+		t->draw();
+	}
+	
+	hex::tile::draw_features(&tiles_[0], &tiles_[0] + tiles_.size(),
+				 features_cache_);
+	hex::tile::finish_drawing();
+
+	foreach(const hex::tile* t, tiles_) {
+		t->draw_cliffs();
+	}
+	foreach(const hex::tile* t, tiles_) {
+		t->draw_cliff_transitions();
+	}
+	foreach(const hex::tile* t, tiles_) {
+		t->emit_particles(particle_system_);
+	}
+
+	if(show_grid_) {
+		glDisable(GL_LIGHTING);
+		foreach(const hex::tile* t, tiles_) {
+			t->draw_grid();
+		}
+		glEnable(GL_LIGHTING);
+	}
+
+	if(selected_party != parties_.end()) {
+		std::vector<const hex::tile*> tiles;
+		hex::line_of_sight(map_,focus_->loc(),selected_party->second->loc(),&tiles);
+		foreach(const hex::tile* t, tiles) {
+			t->draw_highlight();
+		}
+	}
+	
+	if(map_.is_loc_on_map(selected_loc)) {
+		glDisable(GL_LIGHTING);
+		map_.get_tile(selected_loc).draw_highlight();
+		glEnable(GL_LIGHTING);
+	}
+	
+	for(party_map::const_iterator i = parties_.begin();
+	    i != parties_.end(); ++i) {
+		if(visible.count(i->second->loc())) {
+			i->second->draw();
+		}
+	}
+	
+	std::vector<const_settlement_ptr> seen_settlements;
+	for(settlement_map::const_iterator i =
+		    settlements_.begin(); i != settlements_.end(); ++i) {
+		if(visible.count(i->first) &&
+		   !std::count(seen_settlements.begin(), seen_settlements.end(), i->second)) {
+			i->second->draw();
+			seen_settlements.push_back(i->second);
+		}
+	}
+
+	particle_system_.draw();
+	
+	const SDL_Color white = {0xFF,0xFF,0x0,0};
+	
+	
+	const graphics::texture text = graphics::font::render_text(fps_track_.msg(),20,white); graphics::prepare_raster();
+	graphics::blit_texture(text,50,50);
+	
+	if(track_info_grid_) {
+		track_info_grid_->draw();
+	}
+	
+	if(focus_) {
+		const hex::location& loc = focus_->loc();
+		if(map().is_loc_on_map(loc)) {
+			const hex::tile& t = map_.get_tile(loc);
+			const int height = t.height();
+			std::ostringstream stream;
+			stream << height << " elevation";
+			const graphics::texture text =
+				graphics::font::render_text(stream.str(),20,white);
+			graphics::blit_texture(text,50,80);
+			
+			graphics::texture fatigue_text = graphics::font::render_text(focus_->fatigue_status_text(), 20, white);
+			graphics::blit_texture(fatigue_text,50,140);
+		}
+	}
+	
+	{
+		const int hour = current_time().hour();
+		const int min = current_time().minute();
+		std::ostringstream stream;
+		stream << (hour < 10 ? "0" : "") << hour << ":"
+		       << (min < 10 ? "0" : "") << min;
+		const graphics::texture text = graphics::font::render_text(stream.str(),20,white);
+		graphics::blit_texture(text,50,110);
+	}
+	
+	blit_texture(compass_, 1024-compass_.height(),0,-camera_.current_rotation());
+	
+	if(selected_party != parties_.end()) {
+		graphics::texture text = graphics::font::render_text(selected_party->second->status_text(), 20, white);
+		graphics::blit_texture(text,1024 - 50 - text.width(),200);
+	}
+}
+
 void world::play()
 {
 	party_ptr active_party;
 
-	std::string fps_msg;
-	int last_fps_frames = 0;
-	int last_fps_ticks = 0;
-
-	const int time_between_frames = 20;
 	const GLfloat game_speed = 0.2;
-	int last_draw = -1;
 
-	graphics::texture compass(graphics::texture::get(graphics::surface_cache::get("compass-rose.png")));
-	bool show_grid = true;
-	int frame_num = 0;
-	hex::location current_loc;
-	std::vector<const hex::tile*> tiles;
-	hex::tile::features_cache features_cache;
-	gui::const_grid_ptr track_info_grid;
-	for(bool done = false; !done; ++frame_num) {
+	graphics::frame_skipper skippy(50, preference_maxfps());
+	fps_track_.reset();
+
+	for(bool done = false; !done; ) {
 		if(!focus_) {
 			for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
 				if(i->second->is_human_controlled()) {
@@ -183,195 +349,16 @@ void world::play()
 			}
 		}
 
-		const std::set<hex::location>& visible = focus_->get_visible_locs();
-
-		bool recalculate_tiles = current_loc != focus_->loc();
-		if(recalculate_tiles) {
-			tiles.clear();
-			current_loc = focus_->loc();
-			std::vector<hex::location> hexes;
-			for(int n = 0; n != 30; ++n) {
-				hex::get_tile_ring(focus_->loc(), n, hexes);
-			}
-
-			foreach(const hex::location& loc, hexes) {
-				if(!map_.is_loc_on_map(loc)) {
-					continue;
-				}
-
-				tiles.push_back(&map_.get_tile(loc));
-				tiles.back()->load_texture();
-			}
-
-			std::sort(tiles.begin(),tiles.end(), hex::tile::compare_texture());
-
-			hex::tile::initialize_features_cache(
-			    &tiles[0], &tiles[0] + tiles.size(), &features_cache);
-
-			track_info_grid = get_track_info();
-		}
-
-		camera_controller_.prepare_selection();
-		GLuint select_name = 0;
-		for(party_map::iterator i = parties_.begin();
-		    i != parties_.end(); ++i) {
-			if(visible.count(i->second->loc())) {
-				glLoadName(select_name);
-				i->second->draw();
-			}
-
-			++select_name;
-		}
-
-		select_name = camera_controller_.finish_selection();
-		hex::location selected_loc;
-		party_map::iterator selected_party = parties_.end();
-		if(select_name != GLuint(-1)) {
-			party_map::iterator i = parties_.begin();
-			std::advance(i, select_name);
-			selected_loc = i->second->loc();
-			selected_party = i;
-		}
-
-		if(focus_) {
-			GLfloat buf[3];
-			focus_->get_pos(buf);
-			camera_.set_pan(buf);
-		}
-	
-		camera_.prepare_frame();
-		set_lighting();
-
-		hex::tile::setup_drawing();
-		foreach(const hex::tile* t, tiles) {
-			t->draw();
-		}
-		hex::tile::draw_features(&tiles[0], &tiles[0] + tiles.size(),
-		                         features_cache);
-		hex::tile::finish_drawing();
-
-		foreach(const hex::tile* t, tiles) {
-			t->draw_cliffs();
-		}
-
-		foreach(const hex::tile* t, tiles) {
-			t->draw_cliff_transitions();
-		}
-
-		foreach(const hex::tile* t, tiles) {
-			t->emit_particles(particle_system_);
-		}
-
-		if(show_grid) {
-			glDisable(GL_LIGHTING);
-			foreach(const hex::tile* t, tiles) {
-				t->draw_grid();
-			}
-			glEnable(GL_LIGHTING);
-		}
-
-		if(selected_party != parties_.end()) {
-			std::vector<const hex::tile*> tiles;
-			hex::line_of_sight(map_,focus_->loc(),selected_party->second->loc(),&tiles);
-			foreach(const hex::tile* t, tiles) {
-				t->draw_highlight();
-			}
-		}
-
-		if(map_.is_loc_on_map(selected_loc)) {
-			glDisable(GL_LIGHTING);
-			map_.get_tile(selected_loc).draw_highlight();
-			glEnable(GL_LIGHTING);
-		}
-
-		for(party_map::iterator i = parties_.begin();
-		    i != parties_.end(); ++i) {
-			if(visible.count(i->second->loc())) {
-				i->second->draw();
-			}
-		}
-
-		std::vector<const_settlement_ptr> seen_settlements;
-		for(settlement_map::const_iterator i =
-		    settlements_.begin(); i != settlements_.end(); ++i) {
-			if(visible.count(i->first) &&
-			   !std::count(seen_settlements.begin(), seen_settlements.end(), i->second)) {
-				i->second->draw();
-				seen_settlements.push_back(i->second);
-			}
-		}
-
-		particle_system_.draw();
-
-		const SDL_Color white = {0xFF,0xFF,0x0,0};
-		const GLfloat seconds = static_cast<GLfloat>(SDL_GetTicks() - last_fps_ticks)/1000.0;
-		if(seconds > 1.0) {
-			const int frames = frame_num - last_fps_frames;
-			int fps = static_cast<int>(
-			    static_cast<GLfloat>(frames)/seconds);
-			std::ostringstream stream;
-			stream << fps << "fps";
-			fps_msg = stream.str();
-			last_fps_frames = frame_num;
-			last_fps_ticks = SDL_GetTicks();
-		}
-
-		const graphics::texture text = graphics::font::render_text(fps_msg,20,white); graphics::prepare_raster();
-		graphics::blit_texture(text,50,50);
-
-		if(track_info_grid) {
-			track_info_grid->draw();
-		}
-
-		if(focus_) {
-			const hex::location& loc = focus_->loc();
-			if(map().is_loc_on_map(loc)) {
-				const hex::tile& t = map_.get_tile(loc);
-				const int height = t.height();
-				std::ostringstream stream;
-				stream << height << " elevation";
-				const graphics::texture text =
-				   graphics::font::render_text(stream.str(),20,white);
-				graphics::blit_texture(text,50,80);
-
-				graphics::texture fatigue_text = graphics::font::render_text(focus_->fatigue_status_text(), 20, white);
-				graphics::blit_texture(fatigue_text,50,140);
-			}
-		}
-
 		{
-			const int hour = current_time().hour();
-			const int min = current_time().minute();
-			std::ostringstream stream;
-			stream << (hour < 10 ? "0" : "") << hour << ":"
-			       << (min < 10 ? "0" : "") << min;
-			const graphics::texture text = graphics::font::render_text(stream.str(),20,white);
-			graphics::blit_texture(text,50,110);
-		}
-
-		blit_texture(compass, 1024-compass.height(),0,-camera_.current_rotation());
-
-		if(selected_party != parties_.end()) {
-			graphics::texture text = graphics::font::render_text(selected_party->second->status_text(), 20, white);
-			graphics::blit_texture(text,1024 - 50 - text.width(),200);
-		}
-
-		SDL_GL_SwapBuffers();
-
-		if(last_draw != -1) {
-			const int ticks = SDL_GetTicks();
-			const int target = last_draw + time_between_frames;
-			if(!preference_maxfps()) {
-				if(ticks >= target) {
-					SDL_Delay(1);
-				} else {
-					SDL_Delay(target - ticks);
-				}
+			bool draw_this_frame = !skippy.skip_frame();
+			
+			if(draw_this_frame) {
+				draw();
+				SDL_GL_SwapBuffers();
 			}
+			fps_track_.register_frame(draw_this_frame);
 		}
-
-		last_draw = SDL_GetTicks();
-
+		
 		SDL_Event event;
 		while(SDL_PollEvent(&event)) {
 			switch(event.type) {
@@ -408,6 +395,8 @@ void world::play()
 						} else {
 							++range.first;
 						}
+						skippy.reset();
+						fps_track_.reset();
 					}
 				}
 
@@ -423,6 +412,8 @@ void world::play()
 					if(s != settlements_.end()) {
 						s->second->enter(active_party, active_party->loc());
 						active_party->new_world(*this,active_party->loc());
+						skippy.reset();
+						fps_track_.reset();
 					}
 
 					if(active_party->is_destroyed() == false) {
@@ -454,11 +445,11 @@ void world::play()
 		}
 
 		if(keys[SDLK_g]) {
-			show_grid = true;
+			show_grid_ = true;
 		}
 
 		if(keys[SDLK_h]) {
-			show_grid = false;
+			show_grid_ = false;
 		}
 
 		if(keys[SDLK_s]) {

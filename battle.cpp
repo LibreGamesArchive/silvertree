@@ -18,8 +18,10 @@
 #include "formatter.hpp"
 #include "font.hpp"
 #include "foreach.hpp"
+#include "frame_rate_utils.hpp"
 #include "keyboard.hpp"
 #include "label.hpp"
+#include "preferences.hpp"
 #include "raster.hpp"
 #include "slider.hpp"
 #include "surface_cache.hpp"
@@ -71,8 +73,11 @@ void battle::play()
 	widgets_.push_back(msg);
 
 	const int show_until = SDL_GetTicks() + 2000;
+	graphics::frame_skipper skippy(50, preference_maxfps());
 	while(SDL_GetTicks() < show_until) {
-		draw();
+		if(!skippy.skip_frame()) {
+			draw();
+		}
 		SDL_Delay(10);
 	}
 
@@ -87,8 +92,12 @@ void battle::player_turn(battle_character& c)
 	turn_done_ = false;
 	highlight_moves_ = false;
 	highlight_targets_ = false;
+	graphics::frame_skipper skippy(50, preference_maxfps());
+
 	while(!turn_done_ && result_ == ONGOING) {
-		draw();
+		if(!skippy.skip_frame()) {
+			draw();
+		}
 
 		SDL_Event event;
 		while(SDL_PollEvent(&event)) {
@@ -449,9 +458,12 @@ void battle::draw_route(const battle_character::route& r)
 void battle::move_character(battle_character& c, const battle_character::route& r)
 {
 	const GLfloat time = c.begin_move(r);
+	graphics::frame_skipper skippy(50, preference_maxfps());
 	for(GLfloat t = 0.0; t < time; t += 0.1) {
 		c.set_movement_time(t);
-		draw();
+		if(!skippy.skip_frame()) {
+			draw();
+		}
 	}
 
 	c.end_move();
@@ -565,6 +577,8 @@ void battle::attack_character(battle_character& attacker,
 	const int beg = SDL_GetTicks();
 	const int end = beg + ticks;
 	int cur_ticks;
+	graphics::frame_skipper skippy(50, preference_maxfps());
+
 	while((cur_ticks = SDL_GetTicks()) < end) {
 		const GLfloat cur_time = GLfloat(cur_ticks - beg)/1000.0;
 		attacker.set_movement_time(cur_time);
@@ -574,7 +588,9 @@ void battle::attack_character(battle_character& attacker,
 		   cur_time >= begin_hit && cur_time <= end_hit) {
 			defender.set_highlight(highlight);
 		}
-		draw();
+		if(!skippy.skip_frame()) {
+			draw();
+		}
 		defender.set_highlight(NULL);
 	}
 	attacker.end_attack();
@@ -653,6 +669,7 @@ void battle::target_mod(battle_character& caster,
 		GLfloat dst_pos[] = {tile::translate_x(target), tile::translate_y(target), tile::translate_height(dst_tile.height())};
 
 		const GLfloat nframes = 100.0;
+		graphics::frame_skipper skippy(50, preference_maxfps());
 		for(GLfloat frame = 0.0; frame <= nframes; frame += 1.0) {
 			GLfloat pos[3];
 			for(int n = 0; n != 3; ++n) {
@@ -661,7 +678,9 @@ void battle::target_mod(battle_character& caster,
 
 			missile->set_pos(pos);
 			missile->emit_particle(particle_system_);
-			draw();
+			if(!skippy.skip_frame()) {
+				draw();
+			}
 		}
 	}
 

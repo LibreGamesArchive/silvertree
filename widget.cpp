@@ -72,7 +72,9 @@ void widget::process_event(const SDL_Event& event)
 
 void widget::draw() const
 {
-	handle_draw();
+	if(visible_) {
+		handle_draw();
+	}
 }
 		
 }

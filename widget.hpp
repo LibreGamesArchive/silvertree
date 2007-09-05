@@ -26,16 +26,18 @@ public:
 	void process_event(const SDL_Event& event);
 	void draw() const;
 
-	void set_loc(int x, int y) { x_ = x; y_ = y; }
-	void set_dim(int w, int h) { w_ = w; h_ = h; }
+	virtual void set_loc(int x, int y) { x_ = x; y_ = y; }
+	virtual void set_dim(int w, int h) { w_ = w; h_ = h; }
 
 	int x() const { return x_; }
 	int y() const { return y_; }
 	int width() const { return w_; }
 	int height() const { return h_; }
 	void set_tooltip(const std::string& str);
+	bool visible() { return visible_; }
+	void set_visible(bool visible) { visible_ = visible; }
 protected:
-	widget() : x_(-1), y_(-1), w_(-1), h_(-1), tooltip_displayed_(false)
+	widget() : x_(-1), y_(-1), w_(-1), h_(-1), tooltip_displayed_(false), visible_(true)
 	{}
 	~widget();
 
@@ -43,11 +45,11 @@ protected:
 private:
 	virtual void handle_draw() const = 0;
 	virtual void handle_event(const SDL_Event& event) {}
-
 	int x_, y_;
 	int w_, h_;
 	boost::shared_ptr<std::string> tooltip_;
 	bool tooltip_displayed_;
+	bool visible_;
 };
 
 typedef boost::shared_ptr<widget> widget_ptr;

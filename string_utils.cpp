@@ -46,6 +46,31 @@ std::string &strip(std::string &str)
 	return str;
 }
 
+std::vector< std::string > split(std::string const &val, const std::string& delim)
+{
+	/* this might be slow but its very convenient so long as you
+	   aren't calling it too often */
+
+	std::vector< std::string > res;
+	std::string::const_iterator i1 = val.begin();
+	std::string::const_iterator i2 = val.begin();
+
+	while (i2 != val.end()) {
+		if(delim.find(*i2) != std::string::npos) {
+			std::string new_val(i1, i2);
+			res.push_back(new_val);
+			while(delim.find(*(++i2)) != std::string::npos) {}
+			i1 = i2;
+		}
+		++i2;
+	}
+	std::string new_val(i1,i2);
+	if(!new_val.empty()) {
+		res.push_back(new_val);
+	}
+	return res;
+}
+
 std::vector< std::string > split(std::string const &val, char c, int flags)
 {
 	std::vector< std::string > res;

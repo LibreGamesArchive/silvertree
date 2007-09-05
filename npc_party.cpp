@@ -13,7 +13,7 @@
 #include "battle.hpp"
 #include "battle_character.hpp"
 #include "battle_map_generator.hpp"
-#include "dialog.hpp"
+#include "message_dialog.hpp"
 #include "foreach.hpp"
 #include "gamemap.hpp"
 #include "npc_party.hpp"
@@ -51,13 +51,14 @@ npc_party::npc_party(wml::const_node_ptr node, world& game_world)
 
 namespace {
 
-void dialog_sequence(const wml::const_node_ptr& node, party& npc, party& pc)
+void dialog_sequence(const wml::const_node_ptr& node, party& npc, party& pc, bool nested = false)
 {
 	if(!node) {
 		return;
 	}
 
 	wml::node::const_child_range range = node->get_child_range("talk");
+
 	while(range.first != range.second) {
 		const wml::const_node_ptr& talk = range.first->second;
 		std::vector<std::string> options;
@@ -68,7 +69,11 @@ void dialog_sequence(const wml::const_node_ptr& node, party& npc, party& pc)
 		}
 
 		const std::vector<std::string>* options_ptr = options.empty() ? NULL : &options;
-		int select = gui::show_dialog((*talk)["message"],options_ptr);
+
+		gui::message_dialog dialog(pc, npc, (*talk)["message"],options_ptr, !nested);
+		dialog.show_modal();
+		int select = dialog.selected();
+		
 		if(options_ptr) {
 			op = talk->get_child_range("option");
 			while(select) {
@@ -76,7 +81,7 @@ void dialog_sequence(const wml::const_node_ptr& node, party& npc, party& pc)
 				--select;
 			}
 
-			dialog_sequence(op.first->second, npc, pc);
+			dialog_sequence(op.first->second, npc, pc, true);
 		}
 		++range.first;
 	}
