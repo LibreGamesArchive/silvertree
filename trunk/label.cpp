@@ -20,7 +20,8 @@
 namespace gui {
 
 label::label(const std::string& text, const SDL_Color& color, int size)
-    : text_(i18n::translate(text)), color_(color), size_(size)
+	: text_(i18n::translate(text)), color_(color), size_(size),
+	  fixed_width_(false)
 {
 	recalculate_texture();
 }
@@ -34,19 +35,84 @@ void label::set_color(const SDL_Color& color)
 void label::set_text(const std::string& text)
 {
 	text_ = i18n::translate(text);
+	reformat_text();
 	recalculate_texture();
+}
+
+std::string& label::current_text() {
+	if(fixed_width_) {
+		return formatted_;
+	}
+	return text_;
+}
+
+void label::set_fixed_width(bool fixed_width) 
+{ 
+	fixed_width_ = fixed_width; 
+	reformat_text();
+	recalculate_texture();
+}
+
+void label::set_dim(int w, int h) {
+	if(w != width() || h != height()) {
+		inner_set_dim(w, h);
+		reformat_text();
+		recalculate_texture();
+	}
+}
+
+void label::inner_set_dim(int w, int h) {
+	widget::set_dim(w, h);
+}
+
+void label::reformat_text() 
+{
+	if(fixed_width_) {
+		formatted_ = graphics::font::format_text(text_, size_, width());
+	}
 }
 
 void label::recalculate_texture()
 {
-	texture_ = graphics::font::render_text(text_, size_, color_);
-	set_dim(texture_.width(),texture_.height());
-	std::cerr << "label height: '" <<  text_ << "' -> " << texture_.height() << "\n";
+	texture_ = graphics::font::render_text(current_text(), size_, color_);
+	inner_set_dim(texture_.width(),texture_.height());
 }
 
 void label::handle_draw() const
 {
 	graphics::blit_texture(texture_, x(), y());
+}
+
+void label::set_texture(graphics::texture t) {
+	texture_ = t;
+}
+
+dialog_label::dialog_label(const std::string& text, const SDL_Color& color, int size)
+	: label(text, color, size), progress_(0) {
+
+	recalculate_texture();
+}
+
+void dialog_label::set_progress(int progress) 
+{
+	progress_ = progress; 
+	recalculate_texture();
+}
+
+void dialog_label::recalculate_texture() 
+{
+	label::recalculate_texture();
+	stages_ = current_text().size();
+	int prog = progress_; 
+	if(prog < 0) prog = 0;
+	if(prog > stages_) prog = stages_;
+	std::string txt = current_text().substr(0, prog);
+
+	if(prog > 0) {
+		set_texture(graphics::font::render_text(txt, size(), color()));
+	} else {
+		set_texture(graphics::texture());
+	}
 }
 
 label_factory::label_factory(const SDL_Color& color, int size)

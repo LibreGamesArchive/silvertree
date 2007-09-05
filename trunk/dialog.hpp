@@ -21,20 +21,20 @@
 
 namespace gui {
 
-int show_dialog(const std::string& msg,
-                const std::vector<std::string>* options=NULL);
-
 class dialog : public widget
 {
 public:
+	typedef std::vector<widget_ptr>::const_iterator child_iterator;
+
 	virtual ~dialog() {}
-	void show_modal();
+	virtual void show_modal();
 
 	enum MOVE_DIRECTION { MOVE_DOWN, MOVE_RIGHT };
 	dialog& add_widget(widget_ptr w, MOVE_DIRECTION dir=MOVE_DOWN);
 	dialog& add_widget(widget_ptr w, int x, int y,
 	                MOVE_DIRECTION dir=MOVE_DOWN);
 	void remove_widget(widget_ptr w);
+	void replace_widget(widget_ptr w_old, widget_ptr w_new);
 	void clear() { widgets_.clear(); }
 	void set_padding(int pad) { padding_ = pad; }
 	void close() { opened_ = false; }
@@ -42,16 +42,21 @@ public:
 	void set_cursor(int x, int y) { add_x_ = x; add_y_ = y; }
 	int cursor_x() const { return add_x_; }
 	int cursor_y() const { return add_y_; }
+	child_iterator begin_children() { return widgets_.begin(); }
+	child_iterator end_children() { return widgets_.end(); }
 protected:
 	dialog(int x, int y, int w, int h);
 	virtual void handle_event(const SDL_Event& event);
 	virtual void handle_draw() const;
-
+	virtual void handle_draw_children() const;
 	void prepare_draw();
 	void complete_draw();
+	void set_clear_bg(bool clear) { clear_bg_ = clear; };
+	bool clear_bg() const { return clear_bg_; };
 private:
 	std::vector<widget_ptr> widgets_;
 	bool opened_;
+	bool clear_bg_;
 
 	//default padding between widgets
 	int padding_;

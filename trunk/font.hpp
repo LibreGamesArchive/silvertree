@@ -34,6 +34,7 @@ struct manager
 
 texture render_text(const std::string& text, int font_size,
                     const SDL_Color& color);
+std::string format_text(const std::string& text, int font_size, int width);
 void render_multiline_text(const std::string& text, int font_size,
                     const SDL_Color& color, std::vector<texture>& res,
 					int *width=NULL, int *height=NULL);

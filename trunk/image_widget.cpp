@@ -13,6 +13,8 @@
 #include "image_widget.hpp"
 #include "raster.hpp"
 
+#include <iostream>
+
 namespace gui {
 
 image_widget::image_widget(const std::string& fname, int w, int h)

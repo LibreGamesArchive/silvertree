@@ -15,10 +15,15 @@
 
 #include "raster.hpp"
 
+#include <boost/shared_array.hpp>
 #include <iostream>
 
 namespace graphics
 {
+
+/* unavoidable global variable to store global clip
+   rectangle changes */
+std::vector<boost::shared_array<GLint> > clip_rectangles;
 
 void prepare_raster()
 {
@@ -46,9 +51,14 @@ void blit_texture(const texture& tex, int x, int y, GLfloat rotate)
 		return;
 	}
 
+	int h = tex.height();
+	int w = tex.width();
+	const int w_odd = w % 2;
+	const int h_odd = h % 2;
+	h /= 2;
+	w /= 2;
+
 	glPushMatrix();
-	const int h = tex.height()/2;
-	const int w = tex.width()/2;
 	glTranslatef(x+tex.width()/2,y+tex.height()/2,0.0);
 	glRotatef(rotate,0.0,0.0,1.0);
 	tex.set_as_current_texture();
@@ -57,11 +67,11 @@ void blit_texture(const texture& tex, int x, int y, GLfloat rotate)
 	graphics::texture::set_coord(0.0,0.0);
 	glVertex3i(-w,-h,0);
 	graphics::texture::set_coord(0.0,1.0);
-	glVertex3i(-w,h,0);
+	glVertex3i(-w,h+h_odd,0);
 	graphics::texture::set_coord(1.0,1.0);
-	glVertex3i(w,h,0);
+	glVertex3i(w+w_odd,h+h_odd,0);
 	graphics::texture::set_coord(1.0,0.0);
-	glVertex3i(w,-h,0);
+	glVertex3i(w+w_odd,-h,0);
 	glEnd();
 	glPopMatrix();
 }
@@ -72,6 +82,9 @@ void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate
 		return;
 	}
 
+	const int w_odd = w % 2;
+	const int h_odd = h % 2;
+	 
 	w /= 2;
 	h /= 2;
 	glPushMatrix();
@@ -83,11 +96,11 @@ void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate
 	graphics::texture::set_coord(0.0,0.0);
 	glVertex3i(-w,-h,0);
 	graphics::texture::set_coord(0.0,1.0);
-	glVertex3i(-w,h,0);
+	glVertex3i(-w,h+h_odd,0);
 	graphics::texture::set_coord(1.0,1.0);
-	glVertex3i(w,h,0);
+	glVertex3i(w+w_odd,h+h_odd,0);
 	graphics::texture::set_coord(1.0,0.0);
-	glVertex3i(w,-h,0);
+	glVertex3i(w+w_odd,-h,0);
 	glEnd();
 	glPopMatrix();
 }
@@ -99,6 +112,74 @@ void draw_rect(const SDL_Rect& r, const SDL_Color& color,
 	glColor4ub(color.r,color.g,color.b,alpha);
 	glRecti(r.x,r.y,r.x+r.w,r.y+r.h);
 	glEnable(GL_TEXTURE_2D);
+}
+
+void draw_hollow_rect(const SDL_Rect& r, const SDL_Color& color,
+		      unsigned char alpha) {
+	
+	glDisable(GL_TEXTURE_2D);
+	glBegin(GL_LINE_LOOP);
+	glColor4ub(color.r, color.g, color.b, alpha);
+	glVertex3f( r.x, r.y, 0);
+	glVertex3f( r.x + r.w, r.y, 0);
+	glVertex3f( r.x + r.w, r.y + r.h, 0);
+	glVertex3f( r.x, r.y + r.h, 0);
+	glEnd();
+	glEnable(GL_TEXTURE_2D);
+}
+
+void push_clip(const SDL_Rect& r) 
+{
+	const bool was_enabled_clip = glIsEnabled(GL_SCISSOR_TEST);
+	bool should_enable_clip = true;
+
+	if(r.x == 0 && r.y == 0 && r.w == screen_width() && r.h == screen_height()) {
+		should_enable_clip = false;
+	}
+
+	boost::shared_array<GLint> box(new GLint[4]);
+
+	if(was_enabled_clip) {
+		glGetIntegerv(GL_SCISSOR_BOX, box.get());
+	} else {
+		box[0] = 0;
+		box[1] = 0;
+		box[2] = screen_width();
+		box[3] = screen_height();
+	}
+	clip_rectangles.push_back(box);
+
+	if(should_enable_clip) {
+		if(!was_enabled_clip) {
+			glEnable(GL_SCISSOR_TEST);
+		}
+		glScissor(r.x, screen_height() - (r.y + r.h - 1), r.w, r.h);
+	} else if(was_enabled_clip) {
+		glDisable(GL_SCISSOR_TEST);
+	}
+}
+void pop_clip() {
+	const bool was_enabled_clip = glIsEnabled(GL_SCISSOR_TEST);
+	bool should_enable_clip = false;
+	boost::shared_array<GLint> box;
+
+	if(!clip_rectangles.empty()) {
+		box = *clip_rectangles.rbegin();
+		clip_rectangles.pop_back();
+
+		if(box[0] != 0 || box[1] != 0 || box[2] != screen_width() || box[3] != screen_height()) {
+			should_enable_clip = true;
+		}
+	}
+
+	if(should_enable_clip) {
+		if(!was_enabled_clip) {
+			glEnable(GL_SCISSOR_TEST);
+		}
+		glScissor(box[0], box[1], box[2], box[3]);
+	} else if(was_enabled_clip) {
+		glDisable(GL_SCISSOR_TEST);
+	}
 }
 
 int screen_width()

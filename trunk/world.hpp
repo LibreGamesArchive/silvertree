@@ -22,6 +22,7 @@
 #include "camera_controller.hpp"
 #include "event_handler.hpp"
 #include "formula_fwd.hpp"
+#include "frame_rate_utils.hpp"
 #include "gamemap.hpp"
 #include "game_time.hpp"
 #include "grid_widget_fwd.hpp"
@@ -62,8 +63,12 @@ public:
 
 	void fire_event(const std::string& name, const formula_callable& info);
 	void add_event_handler(const std::string& event, const event_handler& handler);
-
+	void draw() const;
 private:
+	bool show_grid_;
+	graphics::frame_rate_tracker fps_track_;
+	graphics::texture compass_;
+
 	gui::const_grid_ptr get_track_info() const;
 	hex::gamemap map_;
 	typedef std::pair<party_map::iterator,party_map::iterator>
@@ -96,8 +101,16 @@ private:
 
 	party_ptr focus_;
 	
-	hex::camera camera_;
-	hex::camera_controller camera_controller_;
+	mutable hex::camera camera_;
+	mutable hex::camera_controller camera_controller_;
+	
+	mutable hex::location current_loc_;
+	mutable std::vector<const hex::tile*> tiles_;
+	mutable hex::tile::features_cache features_cache_;
+	mutable gui::const_grid_ptr track_info_grid_;
+
+	void rebuild_drawing_caches(const std::set<hex::location>& visible) const;
+
 	game_time time_;
 	GLfloat subtime_;
 	tracks tracks_;
@@ -109,7 +122,7 @@ private:
 	typedef std::multimap<std::string,event_handler> event_map;
 	event_map handlers_;
 
-	graphics::particle_system particle_system_;
+	mutable graphics::particle_system particle_system_;
 };
 		
 }

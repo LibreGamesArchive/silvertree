@@ -26,7 +26,8 @@
 namespace gui {
 
 dialog::dialog(int x, int y, int w, int h)
-  : opened_(false), padding_(10), add_x_(0), add_y_(0)
+  : opened_(false), clear_bg_(true), padding_(10), 
+    add_x_(0), add_y_(0)
 {
 	set_loc(x,y);
 	set_dim(w,h);
@@ -62,6 +63,19 @@ void dialog::remove_widget(widget_ptr w)
 	               widgets_.end());
 }
 
+void dialog::replace_widget(widget_ptr w_old, widget_ptr w_new) 
+{
+	int x = w_old->x();
+	int y = w_old->y();
+	int w = w_old->width();
+	int h = w_old->height();
+
+	std::replace(widgets_.begin(), widgets_.end(), w_old, w_new);
+
+	w_new->set_loc(x,y);
+	w_new->set_dim(w,h);
+}
+
 void dialog::show_modal()
 {
 	opened_ = true;
@@ -81,8 +95,10 @@ void dialog::show_modal()
 void dialog::prepare_draw()
 {
 	graphics::prepare_raster();
-	glClearColor(0.0,0.0,0.0,0.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	if(clear_bg()) {
+		glClearColor(0.0,0.0,0.0,0.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
 }
 
 void dialog::complete_draw()
@@ -91,17 +107,23 @@ void dialog::complete_draw()
 	SDL_Delay(1);
 }
 
-void dialog::handle_draw() const
-{
-	SDL_Rect rect = {x(),y(),width(),height()};
-	SDL_Color col = {0,0,0,0};
-	graphics::draw_rect(rect,col);
+void dialog::handle_draw_children() const {
 	glPushMatrix();
 	glTranslatef(x(),y(),0.0);
 	foreach(const widget_ptr& w, widgets_) {
 		w->draw();
 	}
 	glPopMatrix();
+}
+
+void dialog::handle_draw() const
+{
+	if(clear_bg()) {
+		SDL_Rect rect = {x(),y(),width(),height()};
+		SDL_Color col = {0,0,0,0};
+		graphics::draw_rect(rect,col);
+	}
+	handle_draw_children();
 }
 
 void dialog::handle_event(const SDL_Event& event)
@@ -120,112 +142,5 @@ void dialog::handle_event(const SDL_Event& event)
 	}
 }
 
-int show_dialog(const std::string& msg,
-                const std::vector<std::string>* options)
-{
-	std::cerr << "show dialog: '" << msg << "'\n";
-	if(options == NULL) {
-		std::cerr << "no options\n";
-	} else {
-		for(std::vector<std::string>::const_iterator o = options->begin(); o != options->end(); ++o) {
-			std::cerr << "option: '" << *o << "'\n";
-		}
-	}
-	SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
-	std::vector<graphics::texture> text;
-	int width, height;
-	graphics::font::render_multiline_text(msg, 18, color, text, &width, &height);
-	std::vector<graphics::texture> options_text;
-	if(options) {
-		foreach(const std::string& s, *options) {
-			options_text.push_back(graphics::font::render_text(s, 18, color));
-			height += options_text.back().height();
-			if(options_text.back().width() > width) {
-				width = options_text.back().width();
-			}
-		}
-	}
-
-	const int border = 10;
-
-	int option = 0;
-	bool done = false;
-	bool redraw = true;
-	while(!done) {
-
-		if(redraw) {
-			int x = 1024/2 - width/2;
-			int y = 768/2 - height/2;
-			graphics::prepare_raster();
-			graphics::texture bg(graphics::texture::get(graphics::surface_cache::get("dialog-background.png")));
-			bg.set_as_current_texture();
-			glBegin(GL_QUADS);
-			glColor3f(1.0,1.0,1.0);
-			graphics::texture::set_coord(0.0,0.0);
-			glVertex3i(x-border,y-border,0);
-			graphics::texture::set_coord(0.0,1.0);
-			glVertex3i(x-border,y+height+border,0);
-			graphics::texture::set_coord(1.0,1.0);
-			glVertex3i(x+width+border,y+height+border,0);
-			graphics::texture::set_coord(1.0,0.0);
-			glVertex3i(x+width+border,y-border,0);
-			glEnd();
-			foreach(const graphics::texture& t, text) {
-				graphics::blit_texture(t, x, y);
-				y += t.height();
-			}
-
-			int option_num = 0;
-			foreach(const graphics::texture& t, options_text) {
-				if(option_num == option) {
-					glDisable(GL_TEXTURE_2D);
-					glColor3f(1.0,0.0,0.0);
-					glRectf(x,y,x+t.width(),y+t.height());
-					glEnable(GL_TEXTURE_2D);
-				}
-
-				graphics::blit_texture(t, x, y);
-				y += t.height();
-				++option_num;
-			}
-			SDL_GL_SwapBuffers();
-			redraw = false;
-		}
-
-		SDL_Event event;
-		while(SDL_PollEvent(&event)) {
-			switch(event.type) {
-			case SDL_KEYDOWN:
-				if(options) {
-					switch(event.key.keysym.sym) {
-					case SDLK_UP:
-						if(option > 0) {
-							--option;
-							redraw = true;
-						}
-						break;
-					case SDLK_DOWN:
-						if(option < options->size()-1) {
-							++option;
-							redraw = true;
-						}
-						break;
-					case SDLK_RETURN:
-					case SDLK_SPACE:
-						done = true;
-						break;
-					}
-				} else {
-					done = true;
-				}
-				break;
-			default:
-				break;
-			}
-		}
-	}
-
-	return option;
-}
 		
 }

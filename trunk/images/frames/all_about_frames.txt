@@ -1,0 +1,300 @@
+All About Frames
+----------------
+
+Notes for designers
+-------------------
+
+A frame is a decoration for a piece of the GUI. By writing a frame
+file, you can change how parts of the interface are drawn. Each part
+has its own file, specifying how to decorate that instance. 
+
+(i) Frame file structure
+
+A frame file is a WML file, like the other .cfg files, but it contains
+drawing instructions. There are three parts, all optional:
+
+1. Border sizing
+
+Whatever it is that is being wrapped is probably set flush against
+everything else in the display. Creating a border around an element is
+the only way a frame can manipulate the underlying object it
+decorates. If a left border of 10px is added to the frame file, then
+the object will be displaced 10px to the right of where it would have
+been. Since many dialogs also do some fitting of the layout, other
+things are likely to move too. This means you can open up gaps between
+dialog elements that are individually decorated but normally directly
+touching by setting their borders appropriately. In many respects this
+behaves like CSS borders.
+
+2. Predraw
+
+The predraw section contains a set of graphics object stanzas, which
+are rendered in the order they are given, back to front, so each new
+object is drawn on top of the previous one. There are currently three
+types of graphics object. The decorated element is drawn AFTER predraw:
+
+a. texture
+
+This takes an image file and draws it into the given rectangle. The
+image file may have alpha effects or transparency. 
+
+Parameters:
+
+x,y - the top left corner coordinates.
+w,h - the width and height of the rectangle.
+tile - if true, the texture will repeat instead of being stretched if
+       it is too small for the given area.
+file - the name of the file (under images/) that the image is in.
+
+b. rect
+
+This draws a plain coloured rectangle. The rectangle may have be
+hollow and/or be transparent.
+
+Parameters:
+
+x,y - the top left corner coordinates.
+w,h - the width and height of the rectangle
+fill - if false, the rectangle is hollow (1px wide line)
+r,g,b,a - the colour components of the rectangle
+
+c. text
+
+This draws a string of text. The text itself may not have alpha, but
+it will not have a solid background.
+
+Parameters:
+
+x,y - the top left corner of the text
+size - the font size to use
+r,g,b - the colour of the text
+
+3. Postdraw
+
+Postdraw contains exactly the same kinds of elements as predraw, but
+they are drawn AFTER the decorated element has been drawn (over the
+top of it).
+
+(ii) Frame file variables
+
+Each frame file is read by a particular part of the user
+interface. These interface parts may make available the coordinates of
+certain points of interest on the display to help the frame
+designer. Some of these are:
+
+a. self
+
+self contains the coordinates of the element which is being
+decorated. self is the only variable set guaranteed to be available in
+every frame file.
+
+Parts:
+
+x,y - the top left corner of the decorated element
+w,h - the width and height of the decorated element
+
+b. all
+
+In the dialog-option frame files (dialog-option.cfg,
+dialog-option-selected.cfg), all is a rectangle enclosing all the
+options in the set.
+
+Parts:
+
+x,y - the top left corner of the highest option
+w,h - the width and height of the smallest box enclosing all options
+
+(iii) Existing file types
+
+The following is a list of the frame files defined initially:
+
+dialog-message.cfg -         Surrounds the text spoken by an NPC in a
+                             friendly encounter.
+dialog-npc-portrait.cfg -    Surrounds the NPC portrait in a friendly
+                             encounter.
+dialog-pc-portrait.cfg -     Surrounds the PC portrait in a friendly 
+                             encounter. 
+dialog-option.cfg -          Surrounds a selectable, but unselected,
+                             PC speech option in a friendly
+                             encounter. 
+dialog-option-selected.cfg - Surrounds a selected PC speech option in
+                             a friendly encounter.
+dialog-all-options.cfg -     Surrounds the block of PC speech options
+                             in a friendly encounter.
+
+(iv) Frame file examples
+
+1. The "default frame"
+
+[frame]
+	[predraw]
+		[rect]
+		x = self.x
+		y = self.y
+		w = self.w
+		h = self.h
+		r = 0
+		g = 0
+		b = 0
+		a = 255
+		[/rect]
+	[/predraw]
+	[postdraw]
+		[rect]
+		x = self.x
+		y = self.y
+		w = self.w
+		h = self.h
+		r = 255
+		g = 255
+		b = 255
+		a = 255
+		fill = 0
+	[/postdraw]
+[/frame]
+
+2. A slightly prettier frame
+
+[frame]
+	border_left = 10
+	border_right = 10
+	border_top = 10
+	border_bottom = 10
+	[predraw]
+		[rect]
+		x = self.x - 10
+		y = self.y - 10
+		w = self.w + 20
+		h = self.h + 20
+		r = 0
+		g = 0
+		b = 0
+		a = 255
+		[/rect]
+	[/predraw]
+	[postdraw]
+		[rect]
+		x = self.x - 10
+		y = self.y - 10
+		w = self.w + 20
+		h = self.h + 20
+		r = 255
+		g = 255
+		b = 255
+		a = 255
+	[/postdraw]
+[/frame]
+
+3. A wood-look frame
+
+[frame]
+	border_left = 10
+	border_right = 10
+	border_top = 10
+	border_bottom = 10
+	[predraw]
+		[texture]
+		file = "wood.jpg"
+		x = self.x - 10
+		y = self.y - 10
+		w = self.w + 20
+		h = self.h + 20
+		[/texture]
+		[rect]
+		x = self.x
+		y = self.y
+		w = self.w
+		h = self.h
+		r = 0
+		g = 0
+		b = 0
+		a = 255
+		[/rect]
+	[/predraw]
+[/frame]
+
+
+
+Notes for developers
+--------------------
+
+Frames are a way of avoiding hard-coding decoration of the
+interface. Frames are identified by name. Every new kind of frame
+should (for most flexibility) have a new name. The frame files
+themselves are only text, textures aren't replicated, so it's fairly
+cheap to do.
+
+To enable a gui segment for frames:
+
+(i) Includes:
+
+#include "frame.hpp"
+
+(ii) Make a frame
+
+a. Basic constructor
+
+gui::frame_ptr foo = 
+      gui::frame_manager::make_frame(widget_ptr w, 
+                                     const std::string& name);
+
+This creates a new frame, wraps it in a frame_ptr and returns it. The
+new frame will decorate widget w, and be at the same location and
+dimensions. In general, the widget will now be smaller than it was,
+but you don't need to worry about this; just insert foo into the gui
+instead of w and foo will take care of the rest.
+
+b. Advanced constructor
+
+gui::frame_ptr foo = 
+      gui::frame_manager::make_frame(widget_ptr w, 
+                                     const std::string& name, 
+                                     gui::frame_manager::key_mapper_ptr keys);
+
+This provides the same functionality as the previous constructor, but
+with an additional keys parameter. The keys are the way in which you
+can pass in points of interest for use in the frame file. For example
+for a set of options, you could pass in the dimensions of a rectangle
+enclosing all options to make it easier to do alignment effects. 
+
+A key_mapper stores variables that will be available in the frame
+file. Currently these can only be rectangles. Create a new
+key_mapper_ptr with:
+
+gui::frame_manager::key_mapper_ptr keys(new gui::frame_manger::key_mapper());
+
+From there, fill it with rectangles using:
+
+void gui::frame_manager::key_mapper::add_rect(const std::string& name,
+                                              int x, int y, int w, int h);
+
+This will create a new variable "name" in the frame file, with
+subelements "x","y","w" and "h" with the given values.
+
+The key mapper is copied in the constructor, so it is safe to reuse
+for multiple calls, and to change the values in it on the fly without
+corrupting previously constructed frames.
+
+It is also possible to add keys to an existing frame by calling:
+
+void gui::frame_manager::frame::add_key_set(const std::string& name,
+                                            int x, int y, int w, int h);
+
+(iii) Set defaults (optional).
+
+The frame will be created and customised from a file under
+frames/<name>.cfg. Until there is a file there, the frame will be
+drawn by default with a 1px white border on a black background. If
+this is a problem, the default can be customised (in a very limited
+way) by calling:
+
+void gui::frame_manager::frame::set_fg(SDL_Color& color);
+void gui::frame_manager::frame::set_bg(SDL_Color& color);
+
+These change the colours but not the layout. Anything more advanced
+can be done in a frame file.
+
+(iv) See for examples:
+
+message_dialog.cpp has some fairly advanced frame usage.
+

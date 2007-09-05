@@ -51,9 +51,9 @@ battle_move::battle_move(wml::const_node_ptr node)
     moves_(wml::get_int(node,"moves")),
     min_moves_(wml::get_int(node,"must_move")),
 	can_attack_(wml::get_bool(node,"attack")),
-	must_attack_(wml::get_bool(node,"must_attack",wml::get_bool(node,"attack"))),
-	missile_emitter_(node->get_child("missile_particles"))
+	must_attack_(wml::get_bool(node,"must_attack",wml::get_bool(node,"attack")))
 {
+	missile_emitter_ = node->get_child("missile_particles");
 	wml::const_node_ptr stats = node->get_child("stats");
 	if(stats) {
 		for(wml::node::const_attr_iterator i = stats->begin_attr();
