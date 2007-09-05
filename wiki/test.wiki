@@ -8,6 +8,10 @@ did gyre and gimble in the wabe.
 All mimsy were the boregoves,
 and the momeraths outgrabe.
 
+Beware the jaberwock my son,
+The teeth that bite the claws that snatch.
+Beware teh Jubjub bird,
+and shun the frumious bandersnathc.
 
 = Details =
 
@@ -15,4 +19,3 @@ Add your content here.  Format your content with:
   * Text in *bold* or _italic_
   * Headings, paragraphs, and lists
   * Automatic links to other wiki pages
-
