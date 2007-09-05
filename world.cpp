@@ -383,18 +383,26 @@ void world::play()
 					parties_.erase(itor);
 				}
 
-				party_map_range range = parties_.equal_range(
-				                active_party->loc());
+ 				if(start_loc != active_party->loc()) {
+					party_map_range range = parties_.equal_range(
+						active_party->loc());
+					bool path_cleared = true;
+					bool were_encounters = range.first != range.second;
 
-				if(start_loc != active_party->loc()) {
 					while(range.first != range.second && !active_party->is_destroyed()) {
-						handle_encounter(active_party,range.first->second,
-						                 map());
+						handle_encounter(active_party,range.first->second, map());
+
 						if(range.first->second->is_destroyed()) {
 							parties_.erase(range.first++);
 						} else {
+							path_cleared = false;
 							++range.first;
 						}
+					}
+					if(!path_cleared) {
+						active_party->set_loc(start_loc);
+					}
+					if(were_encounters) {
 						skippy.reset();
 						fps_track_.reset();
 					}
