@@ -84,7 +84,7 @@ void message_dialog::construct_interface()
 	}
 
 	if(!npcname.empty()) {
-		widget_ptr portrait(new image_widget(npcname, 200, 200));
+		widget_ptr portrait(new image_widget(npcname, 205, 205));
 		portrait = frame_manager::make_frame(portrait,"dialog-npc-portrait"); 
 		add_widget(portrait, dialog::MOVE_RIGHT);
 	}
@@ -95,7 +95,7 @@ void message_dialog::construct_interface()
 
 		set_cursor(s_width/8, s_height*7/8 - 200);
 		if(!pcname.empty()) {
-			pc_portrait_ = widget_ptr(new image_widget(pcname, 200, 200));
+			pc_portrait_ = widget_ptr(new image_widget(pcname, 205, 205));
 			frame_ptr pc_frame = frame_manager::make_frame(pc_portrait_, "dialog-pc-portrait");
 			pc_portrait_ = pc_frame;
 			if(starts_conversation_) {
