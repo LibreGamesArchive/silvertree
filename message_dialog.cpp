@@ -166,11 +166,13 @@ void message_dialog::handle_draw() const
 
 int message_dialog::find_option(int x, int y) {
 	int opt_num = 0;
+	const int cx = x - option_box_->x();
+	const int cy = y - option_box_->y();
 	foreach(frame_ptr option, option_frames_) {
-		if(x > option->x() && 
-		   y > option->y() &&
-		   x < option->x() + option->width() &&
-		   y < option->y() + option->height()) {
+		if(cx > option->x() && 
+		   cy > option->y() &&
+		   cx < option->x() + option->width() &&
+		   cy < option->y() + option->height()) {
 			break;
 		}
 		++opt_num;
