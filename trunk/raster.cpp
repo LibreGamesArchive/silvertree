@@ -11,6 +11,7 @@
    See the COPYING file for more details.
 */
 #include <gl.h>
+#include <glu.h>
 #include <SDL.h>
 
 #include "raster.hpp"
@@ -133,7 +134,21 @@ void push_clip(const SDL_Rect& r)
 	const bool was_enabled_clip = glIsEnabled(GL_SCISSOR_TEST);
 	bool should_enable_clip = true;
 
-	if(r.x == 0 && r.y == 0 && r.w == screen_width() && r.h == screen_height()) {
+	GLdouble model[16], proj[16];
+	GLint view[4];
+
+	glGetDoublev(GL_MODELVIEW_MATRIX, model);
+	glGetDoublev(GL_PROJECTION_MATRIX, proj);
+	glGetIntegerv(GL_VIEWPORT, view);
+
+	GLdouble x, y ,z;
+	gluProject(0, graphics::screen_height(), 0, model, proj, view, &x, &y, &z);
+	
+	SDL_Rect s = r;
+	s.x += static_cast<Sint16>(x);
+	s.y -= static_cast<Sint16>(y);
+
+	if(s.x == 0 && s.y == 0 && s.w == screen_width() && s.h == screen_height()) {
 		should_enable_clip = false;
 	}
 
@@ -153,7 +168,7 @@ void push_clip(const SDL_Rect& r)
 		if(!was_enabled_clip) {
 			glEnable(GL_SCISSOR_TEST);
 		}
-		glScissor(r.x, screen_height() - (r.y + r.h - 1), r.w, r.h);
+		glScissor(s.x, screen_height() - (s.y + s.h), s.w, s.h);
 	} else if(was_enabled_clip) {
 		glDisable(GL_SCISSOR_TEST);
 	}

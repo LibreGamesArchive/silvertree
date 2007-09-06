@@ -184,10 +184,10 @@ public:
 	void set_bg(const SDL_Color& bg) { bg_ = bg; }
 	void set_fg(const SDL_Color& fg) { fg_ = fg; }
 	void set_fixed_width(bool fixed_width) { fixed_width_ = fixed_width; }
-	void set_border_left(int left) { border_l_ = left; }
-	void set_border_right(int right) { border_r_ = right; }
-	void set_border_top(int top) { border_t_ = top; }
-	void set_border_bottom(int bottom) { border_b_ = bottom; }
+	void set_border_left(int left);
+	void set_border_right(int right);
+	void set_border_top(int top);
+	void set_border_bottom(int bottom);
 	int border_left() { return border_l_; }
 	int border_right() { return border_r_; }
 	int border_width() { return border_l_ + border_r_; }
@@ -213,6 +213,7 @@ private:
 	bool fixed_width_, basic_;
 	fb_ptr builder_;
 	key_mapper_ptr keys_;
+	bool dirty_;
 };
 
 }

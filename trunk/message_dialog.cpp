@@ -91,11 +91,23 @@ void message_dialog::construct_interface()
 
 	if(options_) {		
 		const std::string pcname = pc_.members().front()->portrait();
-		int left_offset = 200;
-		if(pcname.empty()) {
-			left_offset /= 2;
+		int left_offset = 0;
+
+		set_cursor(s_width/8, s_height*7/8 - 200);
+		if(!pcname.empty()) {
+			pc_portrait_ = widget_ptr(new image_widget(pcname, 200, 200));
+			frame_ptr pc_frame = frame_manager::make_frame(pc_portrait_, "dialog-pc-portrait");
+			pc_portrait_ = pc_frame;
+			if(starts_conversation_) {
+				pc_portrait_->set_visible(false);
+			}
+			add_widget(pc_portrait_, dialog::MOVE_RIGHT);
+			left_offset = pc_portrait_->width();
+		} else {
+			left_offset = 100;
 		}
-		set_cursor(s_width/8+left_offset, s_height*7/8 - 190);
+
+		set_cursor(s_width/8 + left_offset, cursor_y()+10);
 
 		int xbox = cursor_x();
 		int ybox = cursor_y();
@@ -118,7 +130,7 @@ void message_dialog::construct_interface()
 			frame_ptr option_frame = 
 				make_option_frame(option, option_label_inner);
 			
-			option_frame->set_dim(s_width - s_width/4 - left_offset, 0);
+			option_frame->set_dim(s_width - s_width/4 - 200 + left_offset, 0);
 			option_frame->set_visible(false);
 			option_frames_.push_back(option_frame);
 			if(option_frame->width() > wbox) {
@@ -139,19 +151,6 @@ void message_dialog::construct_interface()
 		foreach(frame_ptr option_frame, option_frames_) {
 			option_frame->add_key_set("all", xbox, ybox, wbox, hbox);
 		}
-		
-		set_padding(0);
-		set_cursor(s_width/8, s_height*7/8 - 200);
-
-		if(!pcname.empty()) {
-			pc_portrait_ = widget_ptr(new image_widget(pcname, 200, 200));
-			frame_ptr pc_frame = frame_manager::make_frame(pc_portrait_, "dialog-pc-portrait");
-			pc_portrait_ = pc_frame;
-			if(starts_conversation_) {
-				pc_portrait_->set_visible(false);
-			}
-			add_widget(pc_portrait_, dialog::MOVE_RIGHT);
-		} 
 	}
 }
 	
@@ -186,8 +185,11 @@ void message_dialog::show_modal()
 {
 	fade_in();
 	if(options_ != NULL) {
-		selected_ = 0;
 		ensure_fade_over();
+		if(selected_ == -1) {
+			selected_ = 0;
+			update_option(0);
+		}
 	} 
 	dialog::show_modal();
 }
@@ -202,13 +204,8 @@ void message_dialog::ensure_fade_over() {
 	if(all_option_frame_ != NULL) {
 		all_option_frame_->set_visible(true);
 	}
-	int opt = 0;
 	foreach(frame_ptr fr, option_frames_) {
 		fr->set_visible(true);
-		if(opt == selected_) {
-			fr->set_fg(graphics::color_white());
-		}
-		++opt;
 	}
 }
 

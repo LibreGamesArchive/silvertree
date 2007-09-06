@@ -54,14 +54,20 @@ void frame::handle_draw() const
 }
 
 void frame::rebuild_frame() {
-	predraw_.clear();
-	postdraw_.clear();
-	if(builder_.get()) {
-		keys_->add_rect("self", base_->x(), base_->y(), base_->width(), base_->height());
-		builder_->initialise_frame(this);
-		basic_ = false;
-	} else {
-		basic_ = true;
+	dirty_ = true;
+	while(dirty_) {
+		dirty_ = false;
+		predraw_.clear();
+		postdraw_.clear();
+		if(builder_.get()) {
+			keys_->add_rect("self", base_->x(), base_->y(), base_->width(), base_->height());
+			builder_->initialise_frame(this);
+			basic_ = false;
+		} else {
+			basic_ = true;
+		}
+		calculate_loc();
+		calculate_dim();
 	}
 }
 
@@ -99,7 +105,6 @@ void frame::calculate_dim()
 {
 	widget::set_dim(base_->width() + border_width(), 
 			base_->height() + border_height());
-	std::cerr << "Frame has size "<<width() <<"x"<<height()<<"\n";
 }
 
 void frame::add_predraw(fdo_ptr fdo) {
@@ -112,6 +117,31 @@ void frame::add_postdraw(fdo_ptr fdo) {
 void frame::add_key_set(const std::string& name, int x, int y, int w, int h) {
 	keys_->add_rect(name, x, y, w, h);
 	rebuild_frame();
+}
+
+void frame::set_border_left(int left) {
+	if(border_l_ != left) {
+		border_l_ = left;
+		dirty_ = true;
+	}
+}
+void frame::set_border_right(int right) {
+	if(border_r_ != right) {
+		border_r_ = right;
+		dirty_ = true;
+	}
+}
+void frame::set_border_top(int top) {
+	if(border_t_ != top) {
+		border_t_ = top;
+		dirty_ = true;
+	}
+}
+void frame::set_border_bottom(int bottom) {
+	if(border_b_ != bottom) {
+		border_b_ = bottom;
+		dirty_ = true;
+	}
 }
 
 }
