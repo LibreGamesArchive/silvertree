@@ -116,7 +116,7 @@ texture render_text(const std::string& text, int font_size,
 	std::vector<int> heights;
 	std::vector<surface> surfs;
 	unsigned int width = 0, height = 0;
-	const unsigned int lineskip = TTF_FontLineSkip(font.get());
+	const unsigned int lineskip = TTF_FontLineSkip(font.get()) + 1;
 	foreach(const std::string& s, v) {
 		surface surf(get_non_transparent_portion(
 				     TTF_RenderText_Blended(font.get(),s.c_str(),color)));
