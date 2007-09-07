@@ -462,6 +462,8 @@ void world::play()
 
 		if(keys[SDLK_s]) {
 			game_dialogs::party_status_dialog(focus_).show_modal();
+			skippy.reset();
+			fps_track_.reset();
 		}
 
 		camera_controller_.keyboard_control();
