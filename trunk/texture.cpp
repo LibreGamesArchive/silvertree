@@ -13,6 +13,7 @@
 #include "surface_cache.hpp"
 #include "texture.hpp"
 #include <gl.h>
+#include <glu.h>
 #include <map>
 #include <iostream>
 
@@ -149,10 +150,10 @@ texture::texture(const key& surfs)
 	id_ = boost::shared_ptr<ID>(new ID(get_texture_id()));
 
 	glBindTexture(GL_TEXTURE_2D,id_->id);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D,0,4,s->w,s->h,0,GL_RGBA,
-	             GL_UNSIGNED_BYTE,s->pixels);
+	gluBuild2DMipmaps(GL_TEXTURE_2D,4,s->w,s->h,GL_RGBA,
+			  GL_UNSIGNED_BYTE,s->pixels);
 	current_texture = 0;
 }
 
