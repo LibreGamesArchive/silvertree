@@ -334,7 +334,7 @@ void battle::draw(gui::slider* slider)
 	if(highlight_moves_ && selected_hex.valid()) {
 		foreach(const battle_character_ptr& c, chars_) {
 			if((*focus_)->is_enemy(*c)) {
-				(*focus_)->can_attack(*c, selected_hex, true);
+				(*focus_)->can_attack(*c, chars_, selected_hex, true);
 			}
 		}
 	}
@@ -718,7 +718,7 @@ bool battle::can_make_move(const battle_character& c,
 		battle_character::move_map moves; c.get_possible_moves(moves, move, chars_); return !moves.empty();
 	} else if(move.must_attack()) {
 		foreach(const battle_character_ptr& enemy, chars_) {
-			if(c.is_enemy(*enemy) && c.can_attack(*enemy)) {
+			if(c.is_enemy(*enemy) && c.can_attack(*enemy, chars_)) {
 				return true;
 			}
 		}
@@ -783,7 +783,7 @@ bool battle::enter_attack_mode()
 	}
 
 	foreach(const battle_character_ptr& c, chars_) {
-		if(*focus_ != c && (*focus_)->is_enemy(*c) && (*focus_)->can_attack(*c)) {
+		if(*focus_ != c && (*focus_)->is_enemy(*c) && (*focus_)->can_attack(*c, chars_)) {
 			targets_.insert(c->loc());
 		}
 	}

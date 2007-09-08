@@ -214,7 +214,7 @@ void battle_character::get_possible_moves(
 		if(move.must_attack()) {
 			bool found = false;
 			foreach(const battle_character_ptr& c, chars) {
-				if(is_enemy(*c) && can_attack(*c, i->first)) {
+				if(is_enemy(*c) && can_attack(*c, chars, i->first)) {
 					found = true;
 					break;
 				}
@@ -324,6 +324,7 @@ bool battle_character::is_enemy(const battle_character& c) const
 }
 
 bool battle_character::can_attack(const battle_character& c,
+				  const std::vector<battle_character_ptr>& chars,
                                   hex::location loc, bool draw) const
 {
 	if(!loc.valid()) {
@@ -333,11 +334,18 @@ bool battle_character::can_attack(const battle_character& c,
 	const int range = char_->attack_range();
 	if(range > 1) {
 		std::vector<const hex::tile*> line;
-		if(hex::line_of_sight(map_,loc,c.loc(),&line,range,draw)) {
-			return true;
-		} else {
+		if(!hex::line_of_sight(map_,loc,c.loc(),&line,range,draw)) {
 			return false;
+		} 
+		foreach(const hex::tile* t, line) {
+			foreach(const battle_character_ptr& d, chars) {
+				if(this == d.get() || &c == d.get()) continue;
+				if(t->loc() == d->loc()) {
+					return false;
+				}
+			}
 		}
+		return true;
 	} else {
 		return tiles_adjacent(loc,c.loc());
 	}
