@@ -82,6 +82,7 @@ public:
 
 	bool is_enemy(const battle_character& c) const;
 	bool can_attack(const battle_character& c,
+			const std::vector<battle_character_ptr>& chars,
 	                hex::location loc=hex::location(),
 					bool draw=false) const;
 

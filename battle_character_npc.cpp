@@ -64,7 +64,7 @@ void battle_character_npc::do_turn(battle& b)
 		foreach(const move_pair& movement, movements) {
 			const hex::location& dst = movement.first;
 			foreach(const battle_character_ptr& c, b.participants()) {
-				if(!is_enemy(*c) || !can_attack(*c,dst)) {
+				if(!is_enemy(*c) || !can_attack(*c,b.participants(),dst)) {
 					continue;
 				}
 
