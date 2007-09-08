@@ -468,10 +468,10 @@ int main(int argc, char **argv) {
 		max_len = atoi(argv[4]);
 	}
 	if(argc > 5) {
-		 num_vowels = atoi(argv[3]);
+		 num_vowels = atoi(argv[5]);
 	}
 	if(argc > 6) {
-		num_consonants = atoi(argv[4]);
+		num_consonants = atoi(argv[6]);
 	}
 	
 	namegen::typo_ptr t;
