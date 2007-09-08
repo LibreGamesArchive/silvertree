@@ -1,0 +1,57 @@
+namegen
+-------
+
+namegen is a simple utility to generate words from "languages" that
+look reasonable. At its heart it has a set of phonemes represented by
+letter combinations. For simplicity, some are flagged as vowels, some
+as consonants (some could be both if you wanted, but none by default
+are).
+
+There are 2 major parts to namegen. Firstly, namegen can generate a
+"language" and store it in a file for later use. This means that you
+can generate more names with the same look later. The "language" is
+generated like this:
+
+A cluster file is read which tells namegen what combinations of
+phonemes will look "reasonable" (more later). From here a small set of
+vowels and consonants are selected to form the basic sounds of our new
+language. You can pick how many these are on the command line (the
+default is 5 vowels, 10 consonants). Then, a random process runs which
+assigns a probability to each phoneme following another, so for
+example how likely "th" is to be followed by "ea". These parameters
+are then written into a language file.
+
+The second part of namegen is to generate words (names, whatever) from
+a language. You can specify how long (in phonemes) the names should
+be. The default is for names to be between 2 and 6 phonemes
+long. Namegen then traverses the language, honouring the rules it was
+given about whether a cluster can appear medially, initially or
+finally, creating words. It will then dump 150 words to the terminal.
+
+Cluster file format
+-------------------
+
+The cluster file is the biggest factor affecting how well namegen
+works. Each line is a cluster of letters representing a sound followed
+by markers. For example, a line might be:
+
+a	vif
+
+The markers have the following meanings:
+
+v - vowel: the cluster can be used as a vowel sound.
+c - consonant: the cluster can be used as a consonant.
+i - not-initial: the cluster cannot be used to start a word
+m - not-medial: the cluster cannot be used in the middle of a word
+f - not-final: the cluster cannot be used to end a word
+
+There must be no spaces between the marker letters. There must be at
+least one of [vc] so that the cluster can be used. The markers can be
+separated from the cluster by any combination of whitespace. There is
+only one cluster per line.
+
+Invoking namegen
+----------------
+
+Invoke namegen without arguments to get a list of the available
+command line arguments.
