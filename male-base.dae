@@ -8,11 +8,541 @@
 			<copyright></copyright>
 			<source_data>file:///home/spiderworm/Documents/silverTree/model-sources/blender/male-base.blend</source_data>
 		</contributor>
-		<created>2007-09-05T21:06:46.943519</created>
-		<modified>2007-09-05T21:06:46.943568</modified>
+		<created>2007-09-08T17:11:13.028376</created>
+		<modified>2007-09-08T17:11:13.028405</modified>
 		<unit meter="0.01" name="centimeter"/>
 		<up_axis>Z_UP</up_axis>
 	</asset>
+	<library_animations>
+		<animation id="hip_IK-rotateX" name="hip_IK-rotateX">
+			<source id="hip_IK-rotateX-input">
+				<float_array count="4" id="hip_IK-rotateX-input-array">0.04000 0.68000 0.96000 1.28000</float_array>
+				<technique_common>
+					<accessor count="4" source="#hip_IK-rotateX-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="hip_IK-rotateX-output">
+				<float_array count="4" id="hip_IK-rotateX-output-array">6.31091 1.31181 -1.78167 1.74518</float_array>
+				<technique_common>
+					<accessor count="4" source="#hip_IK-rotateX-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="hip_IK-rotateX-interpolation">
+				<Name_array count="4" id="hip_IK-rotateX-interpolation-array">BEZIER BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="4" source="#hip_IK-rotateX-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="hip_IK-rotateX-sampler">
+				<input semantic="INPUT" source="#hip_IK-rotateX-input"/>
+				<input semantic="OUTPUT" source="#hip_IK-rotateX-output"/>
+				<input semantic="INTERPOLATION" source="#hip_IK-rotateX-interpolation"/>
+			</sampler>
+			<channel source="#hip_IK-rotateX-sampler" target="hip_IK/rotateX.ANGLE"/>
+		</animation>
+		<animation id="hip_IK-rotateY" name="hip_IK-rotateY">
+			<source id="hip_IK-rotateY-input">
+				<float_array count="4" id="hip_IK-rotateY-input-array">0.04000 0.68000 0.96000 1.28000</float_array>
+				<technique_common>
+					<accessor count="4" source="#hip_IK-rotateY-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="hip_IK-rotateY-output">
+				<float_array count="4" id="hip_IK-rotateY-output-array">-0.00000 -0.00000 -0.00000 -0.00000</float_array>
+				<technique_common>
+					<accessor count="4" source="#hip_IK-rotateY-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="hip_IK-rotateY-interpolation">
+				<Name_array count="4" id="hip_IK-rotateY-interpolation-array">BEZIER BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="4" source="#hip_IK-rotateY-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="hip_IK-rotateY-sampler">
+				<input semantic="INPUT" source="#hip_IK-rotateY-input"/>
+				<input semantic="OUTPUT" source="#hip_IK-rotateY-output"/>
+				<input semantic="INTERPOLATION" source="#hip_IK-rotateY-interpolation"/>
+			</sampler>
+			<channel source="#hip_IK-rotateY-sampler" target="hip_IK/rotateY.ANGLE"/>
+		</animation>
+		<animation id="hip_IK-rotateZ" name="hip_IK-rotateZ">
+			<source id="hip_IK-rotateZ-input">
+				<float_array count="4" id="hip_IK-rotateZ-input-array">0.04000 0.68000 0.96000 1.28000</float_array>
+				<technique_common>
+					<accessor count="4" source="#hip_IK-rotateZ-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="hip_IK-rotateZ-output">
+				<float_array count="4" id="hip_IK-rotateZ-output-array">0.00001 0.00000 -0.00000 0.00000</float_array>
+				<technique_common>
+					<accessor count="4" source="#hip_IK-rotateZ-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="hip_IK-rotateZ-interpolation">
+				<Name_array count="4" id="hip_IK-rotateZ-interpolation-array">BEZIER BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="4" source="#hip_IK-rotateZ-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="hip_IK-rotateZ-sampler">
+				<input semantic="INPUT" source="#hip_IK-rotateZ-input"/>
+				<input semantic="OUTPUT" source="#hip_IK-rotateZ-output"/>
+				<input semantic="INTERPOLATION" source="#hip_IK-rotateZ-interpolation"/>
+			</sampler>
+			<channel source="#hip_IK-rotateZ-sampler" target="hip_IK/rotateZ.ANGLE"/>
+		</animation>
+		<animation id="hip_IK-translate" name="hip_IK-translate">
+			<source id="hip_IK-translate-input">
+				<float_array count="32" id="hip_IK-translate-input-array">0.04000 0.08000 0.12000 0.16000 0.20000 0.24000 0.28000 0.32000 0.36000 0.40000 0.44000 0.48000 0.52000 0.56000 0.60000 0.64000 0.68000 0.72000 0.76000 0.80000 0.84000 0.88000 0.92000 0.96000 1.00000 1.04000 1.08000 1.12000 1.16000 1.20000 1.24000 1.28000</float_array>
+				<technique_common>
+					<accessor count="32" source="#hip_IK-translate-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="hip_IK-translate-output">
+				<float_array count="96" id="hip_IK-translate-output-array">0.00000 -0.30882 6.95589 0.00000 -0.30941 6.95470 0.00000 -0.31120 6.95112 0.00000 -0.31418 6.94516 0.00000 -0.31831 6.93690 0.00000 -0.32347 6.92657 0.00000 -0.32950 6.91452 0.00000 -0.33616 6.90121 0.00000 -0.34314 6.88725 0.00000 -0.35012 6.87329 0.00000 -0.35677 6.85998 0.00000 -0.36280 6.84792 0.00000 -0.36797 6.83759 0.00000 -0.37210 6.82933 0.00000 -0.37508 6.82336 0.00000 -0.37687 6.81978 0.00000 -0.37746 6.81860 0.00000 -0.36968 6.83572 0.00000 -0.34666 6.88639 0.00000 -0.31158 6.96356 -0.00000 -0.27179 7.05109 -0.00000 -0.23672 7.12825 -0.00000 -0.21369 7.17890 -0.00000 -0.20591 7.19602 -0.00000 -0.20710 7.18888 -0.00000 -0.21066 7.16754 -0.00000 -0.21625 7.13397 -0.00000 -0.22307 7.09307 -0.00000 -0.22989 7.05216 0.00000 -0.23549 7.01858 0.00000 -0.23904 6.99724 0.00000 -0.24023 6.99009</float_array>
+				<technique_common>
+					<accessor count="32" source="#hip_IK-translate-output-array" stride="3">
+						<param type="float" name="X"></param>
+						<param type="float" name="Y"></param>
+						<param type="float" name="Z"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="hip_IK-translate-interpolation">
+				<Name_array count="96" id="hip_IK-translate-interpolation-array">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="32" source="#hip_IK-translate-interpolation-array" stride="3">
+						<param type="Name" name="X"></param>
+						<param type="Name" name="Y"></param>
+						<param type="Name" name="Z"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="hip_IK-translate-sampler">
+				<input semantic="INPUT" source="#hip_IK-translate-input"/>
+				<input semantic="OUTPUT" source="#hip_IK-translate-output"/>
+				<input semantic="INTERPOLATION" source="#hip_IK-translate-interpolation"/>
+			</sampler>
+			<channel source="#hip_IK-translate-sampler" target="hip_IK/translate"/>
+		</animation>
+		<animation id="r_arm_IK-rotateX" name="r_arm_IK-rotateX">
+			<source id="r_arm_IK-rotateX-input">
+				<float_array count="3" id="r_arm_IK-rotateX-input-array">0.04000 0.20000 0.32000</float_array>
+				<technique_common>
+					<accessor count="3" source="#r_arm_IK-rotateX-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="r_arm_IK-rotateX-output">
+				<float_array count="3" id="r_arm_IK-rotateX-output-array">-104.08366 -34.48190 -29.58592</float_array>
+				<technique_common>
+					<accessor count="3" source="#r_arm_IK-rotateX-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="r_arm_IK-rotateX-interpolation">
+				<Name_array count="3" id="r_arm_IK-rotateX-interpolation-array">BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="3" source="#r_arm_IK-rotateX-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="r_arm_IK-rotateX-sampler">
+				<input semantic="INPUT" source="#r_arm_IK-rotateX-input"/>
+				<input semantic="OUTPUT" source="#r_arm_IK-rotateX-output"/>
+				<input semantic="INTERPOLATION" source="#r_arm_IK-rotateX-interpolation"/>
+			</sampler>
+			<channel source="#r_arm_IK-rotateX-sampler" target="r_arm_IK/rotateX.ANGLE"/>
+		</animation>
+		<animation id="r_arm_IK-rotateY" name="r_arm_IK-rotateY">
+			<source id="r_arm_IK-rotateY-input">
+				<float_array count="3" id="r_arm_IK-rotateY-input-array">0.04000 0.20000 0.32000</float_array>
+				<technique_common>
+					<accessor count="3" source="#r_arm_IK-rotateY-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="r_arm_IK-rotateY-output">
+				<float_array count="3" id="r_arm_IK-rotateY-output-array">46.46134 12.80648 10.44678</float_array>
+				<technique_common>
+					<accessor count="3" source="#r_arm_IK-rotateY-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="r_arm_IK-rotateY-interpolation">
+				<Name_array count="3" id="r_arm_IK-rotateY-interpolation-array">BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="3" source="#r_arm_IK-rotateY-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="r_arm_IK-rotateY-sampler">
+				<input semantic="INPUT" source="#r_arm_IK-rotateY-input"/>
+				<input semantic="OUTPUT" source="#r_arm_IK-rotateY-output"/>
+				<input semantic="INTERPOLATION" source="#r_arm_IK-rotateY-interpolation"/>
+			</sampler>
+			<channel source="#r_arm_IK-rotateY-sampler" target="r_arm_IK/rotateY.ANGLE"/>
+		</animation>
+		<animation id="r_arm_IK-rotateZ" name="r_arm_IK-rotateZ">
+			<source id="r_arm_IK-rotateZ-input">
+				<float_array count="3" id="r_arm_IK-rotateZ-input-array">0.04000 0.20000 0.32000</float_array>
+				<technique_common>
+					<accessor count="3" source="#r_arm_IK-rotateZ-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="r_arm_IK-rotateZ-output">
+				<float_array count="3" id="r_arm_IK-rotateZ-output-array">11.44340 14.17974 12.60663</float_array>
+				<technique_common>
+					<accessor count="3" source="#r_arm_IK-rotateZ-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="r_arm_IK-rotateZ-interpolation">
+				<Name_array count="3" id="r_arm_IK-rotateZ-interpolation-array">BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="3" source="#r_arm_IK-rotateZ-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="r_arm_IK-rotateZ-sampler">
+				<input semantic="INPUT" source="#r_arm_IK-rotateZ-input"/>
+				<input semantic="OUTPUT" source="#r_arm_IK-rotateZ-output"/>
+				<input semantic="INTERPOLATION" source="#r_arm_IK-rotateZ-interpolation"/>
+			</sampler>
+			<channel source="#r_arm_IK-rotateZ-sampler" target="r_arm_IK/rotateZ.ANGLE"/>
+		</animation>
+		<animation id="r_arm_IK-translate" name="r_arm_IK-translate">
+			<source id="r_arm_IK-translate-input">
+				<float_array count="8" id="r_arm_IK-translate-input-array">0.04000 0.08000 0.12000 0.16000 0.20000 0.24000 0.28000 0.32000</float_array>
+				<technique_common>
+					<accessor count="8" source="#r_arm_IK-translate-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="r_arm_IK-translate-output">
+				<float_array count="24" id="r_arm_IK-translate-output-array">-4.51900 -0.50657 4.76040 -4.63613 -0.44130 4.55381 -4.93540 -0.27287 4.02513 -5.23189 -0.10000 3.38399 -5.34641 -0.03042 2.85480 -5.03355 -0.54853 2.38442 -4.35859 -1.63484 1.95461 -4.00839 -2.27226 1.78697</float_array>
+				<technique_common>
+					<accessor count="8" source="#r_arm_IK-translate-output-array" stride="3">
+						<param type="float" name="X"></param>
+						<param type="float" name="Y"></param>
+						<param type="float" name="Z"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="r_arm_IK-translate-interpolation">
+				<Name_array count="24" id="r_arm_IK-translate-interpolation-array">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="8" source="#r_arm_IK-translate-interpolation-array" stride="3">
+						<param type="Name" name="X"></param>
+						<param type="Name" name="Y"></param>
+						<param type="Name" name="Z"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="r_arm_IK-translate-sampler">
+				<input semantic="INPUT" source="#r_arm_IK-translate-input"/>
+				<input semantic="OUTPUT" source="#r_arm_IK-translate-output"/>
+				<input semantic="INTERPOLATION" source="#r_arm_IK-translate-interpolation"/>
+			</sampler>
+			<channel source="#r_arm_IK-translate-sampler" target="r_arm_IK/translate"/>
+		</animation>
+		<animation id="l_arm_IK-rotateX" name="l_arm_IK-rotateX">
+			<source id="l_arm_IK-rotateX-input">
+				<float_array count="3" id="l_arm_IK-rotateX-input-array">0.04000 0.24000 0.36000</float_array>
+				<technique_common>
+					<accessor count="3" source="#l_arm_IK-rotateX-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="l_arm_IK-rotateX-output">
+				<float_array count="3" id="l_arm_IK-rotateX-output-array">-152.30983 -36.93330 -16.63384</float_array>
+				<technique_common>
+					<accessor count="3" source="#l_arm_IK-rotateX-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="l_arm_IK-rotateX-interpolation">
+				<Name_array count="3" id="l_arm_IK-rotateX-interpolation-array">BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="3" source="#l_arm_IK-rotateX-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="l_arm_IK-rotateX-sampler">
+				<input semantic="INPUT" source="#l_arm_IK-rotateX-input"/>
+				<input semantic="OUTPUT" source="#l_arm_IK-rotateX-output"/>
+				<input semantic="INTERPOLATION" source="#l_arm_IK-rotateX-interpolation"/>
+			</sampler>
+			<channel source="#l_arm_IK-rotateX-sampler" target="l_arm_IK/rotateX.ANGLE"/>
+		</animation>
+		<animation id="l_arm_IK-rotateY" name="l_arm_IK-rotateY">
+			<source id="l_arm_IK-rotateY-input">
+				<float_array count="3" id="l_arm_IK-rotateY-input-array">0.04000 0.24000 0.36000</float_array>
+				<technique_common>
+					<accessor count="3" source="#l_arm_IK-rotateY-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="l_arm_IK-rotateY-output">
+				<float_array count="3" id="l_arm_IK-rotateY-output-array">-23.24450 -11.25734 2.08960</float_array>
+				<technique_common>
+					<accessor count="3" source="#l_arm_IK-rotateY-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="l_arm_IK-rotateY-interpolation">
+				<Name_array count="3" id="l_arm_IK-rotateY-interpolation-array">BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="3" source="#l_arm_IK-rotateY-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="l_arm_IK-rotateY-sampler">
+				<input semantic="INPUT" source="#l_arm_IK-rotateY-input"/>
+				<input semantic="OUTPUT" source="#l_arm_IK-rotateY-output"/>
+				<input semantic="INTERPOLATION" source="#l_arm_IK-rotateY-interpolation"/>
+			</sampler>
+			<channel source="#l_arm_IK-rotateY-sampler" target="l_arm_IK/rotateY.ANGLE"/>
+		</animation>
+		<animation id="l_arm_IK-rotateZ" name="l_arm_IK-rotateZ">
+			<source id="l_arm_IK-rotateZ-input">
+				<float_array count="3" id="l_arm_IK-rotateZ-input-array">0.04000 0.24000 0.36000</float_array>
+				<technique_common>
+					<accessor count="3" source="#l_arm_IK-rotateZ-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="l_arm_IK-rotateZ-output">
+				<float_array count="3" id="l_arm_IK-rotateZ-output-array">38.60316 -25.34743 -15.21628</float_array>
+				<technique_common>
+					<accessor count="3" source="#l_arm_IK-rotateZ-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="l_arm_IK-rotateZ-interpolation">
+				<Name_array count="3" id="l_arm_IK-rotateZ-interpolation-array">BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="3" source="#l_arm_IK-rotateZ-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="l_arm_IK-rotateZ-sampler">
+				<input semantic="INPUT" source="#l_arm_IK-rotateZ-input"/>
+				<input semantic="OUTPUT" source="#l_arm_IK-rotateZ-output"/>
+				<input semantic="INTERPOLATION" source="#l_arm_IK-rotateZ-interpolation"/>
+			</sampler>
+			<channel source="#l_arm_IK-rotateZ-sampler" target="l_arm_IK/rotateZ.ANGLE"/>
+		</animation>
+		<animation id="l_arm_IK-translate" name="l_arm_IK-translate">
+			<source id="l_arm_IK-translate-input">
+				<float_array count="9" id="l_arm_IK-translate-input-array">0.04000 0.08000 0.12000 0.16000 0.20000 0.24000 0.28000 0.32000 0.36000</float_array>
+				<technique_common>
+					<accessor count="9" source="#l_arm_IK-translate-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="l_arm_IK-translate-output">
+				<float_array count="27" id="l_arm_IK-translate-output-array">4.83831 -0.58177 4.96571 4.72661 -0.59253 4.55646 4.42028 -0.64196 3.60722 4.03530 -0.75778 2.53414 3.73626 -0.95485 1.70045 3.62886 -1.22489 1.37853 3.65030 -1.71495 1.42868 3.69587 -2.34677 1.52974 3.71716 -2.63895 1.57662</float_array>
+				<technique_common>
+					<accessor count="9" source="#l_arm_IK-translate-output-array" stride="3">
+						<param type="float" name="X"></param>
+						<param type="float" name="Y"></param>
+						<param type="float" name="Z"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="l_arm_IK-translate-interpolation">
+				<Name_array count="27" id="l_arm_IK-translate-interpolation-array">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="9" source="#l_arm_IK-translate-interpolation-array" stride="3">
+						<param type="Name" name="X"></param>
+						<param type="Name" name="Y"></param>
+						<param type="Name" name="Z"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="l_arm_IK-translate-sampler">
+				<input semantic="INPUT" source="#l_arm_IK-translate-input"/>
+				<input semantic="OUTPUT" source="#l_arm_IK-translate-output"/>
+				<input semantic="INTERPOLATION" source="#l_arm_IK-translate-interpolation"/>
+			</sampler>
+			<channel source="#l_arm_IK-translate-sampler" target="l_arm_IK/translate"/>
+		</animation>
+		<animation id="head_IK-rotateX" name="head_IK-rotateX">
+			<source id="head_IK-rotateX-input">
+				<float_array count="4" id="head_IK-rotateX-input-array">0.15514 0.48798 0.82083 1.15367</float_array>
+				<technique_common>
+					<accessor count="4" source="#head_IK-rotateX-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="head_IK-rotateX-output">
+				<float_array count="4" id="head_IK-rotateX-output-array">0.00000 0.00001 0.00000 0.00001</float_array>
+				<technique_common>
+					<accessor count="4" source="#head_IK-rotateX-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="head_IK-rotateX-interpolation">
+				<Name_array count="4" id="head_IK-rotateX-interpolation-array">BEZIER BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="4" source="#head_IK-rotateX-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="head_IK-rotateX-sampler">
+				<input semantic="INPUT" source="#head_IK-rotateX-input"/>
+				<input semantic="OUTPUT" source="#head_IK-rotateX-output"/>
+				<input semantic="INTERPOLATION" source="#head_IK-rotateX-interpolation"/>
+			</sampler>
+			<channel source="#head_IK-rotateX-sampler" target="head_IK/rotateX.ANGLE"/>
+		</animation>
+		<animation id="head_IK-rotateY" name="head_IK-rotateY">
+			<source id="head_IK-rotateY-input">
+				<float_array count="4" id="head_IK-rotateY-input-array">0.15514 0.48798 0.82083 1.15367</float_array>
+				<technique_common>
+					<accessor count="4" source="#head_IK-rotateY-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="head_IK-rotateY-output">
+				<float_array count="4" id="head_IK-rotateY-output-array">5.75130 29.15600 8.08770 22.88872</float_array>
+				<technique_common>
+					<accessor count="4" source="#head_IK-rotateY-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="head_IK-rotateY-interpolation">
+				<Name_array count="4" id="head_IK-rotateY-interpolation-array">BEZIER BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="4" source="#head_IK-rotateY-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="head_IK-rotateY-sampler">
+				<input semantic="INPUT" source="#head_IK-rotateY-input"/>
+				<input semantic="OUTPUT" source="#head_IK-rotateY-output"/>
+				<input semantic="INTERPOLATION" source="#head_IK-rotateY-interpolation"/>
+			</sampler>
+			<channel source="#head_IK-rotateY-sampler" target="head_IK/rotateY.ANGLE"/>
+		</animation>
+		<animation id="head_IK-rotateZ" name="head_IK-rotateZ">
+			<source id="head_IK-rotateZ-input">
+				<float_array count="4" id="head_IK-rotateZ-input-array">0.15514 0.48798 0.82083 1.15367</float_array>
+				<technique_common>
+					<accessor count="4" source="#head_IK-rotateZ-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="head_IK-rotateZ-output">
+				<float_array count="4" id="head_IK-rotateZ-output-array">0.00000 0.00001 0.00000 0.00001</float_array>
+				<technique_common>
+					<accessor count="4" source="#head_IK-rotateZ-output-array" stride="1">
+						<param type="float" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="head_IK-rotateZ-interpolation">
+				<Name_array count="4" id="head_IK-rotateZ-interpolation-array">BEZIER BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="4" source="#head_IK-rotateZ-interpolation-array" stride="1">
+						<param type="Name" name="ANGLE"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="head_IK-rotateZ-sampler">
+				<input semantic="INPUT" source="#head_IK-rotateZ-input"/>
+				<input semantic="OUTPUT" source="#head_IK-rotateZ-output"/>
+				<input semantic="INTERPOLATION" source="#head_IK-rotateZ-interpolation"/>
+			</sampler>
+			<channel source="#head_IK-rotateZ-sampler" target="head_IK/rotateZ.ANGLE"/>
+		</animation>
+		<animation id="head_IK-translate" name="head_IK-translate">
+			<source id="head_IK-translate-input">
+				<float_array count="26" id="head_IK-translate-input-array">0.12000 0.16000 0.20000 0.24000 0.28000 0.32000 0.36000 0.40000 0.44000 0.48000 0.52000 0.56000 0.60000 0.64000 0.68000 0.72000 0.76000 0.80000 0.84000 0.88000 0.92000 0.96000 1.00000 1.04000 1.08000 1.12000</float_array>
+				<technique_common>
+					<accessor count="26" source="#head_IK-translate-input-array" stride="1">
+						<param type="float" name="TIME"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="head_IK-translate-output">
+				<float_array count="78" id="head_IK-translate-output-array">-1.30294 -2.23569 6.74477 -1.30157 -2.23569 6.74451 -1.18684 -2.23569 6.72217 -0.89740 -2.23569 6.66435 -0.46838 -2.23569 6.57619 0.03669 -2.23569 6.46976 0.53669 -2.23569 6.36269 0.95465 -2.23569 6.27278 1.23620 -2.23569 6.21253 1.35455 -2.23569 6.18746 1.31685 -2.23569 6.19702 1.14992 -2.23569 6.23878 0.86591 -2.23569 6.30987 0.49963 -2.23569 6.40160 0.10913 -2.23569 6.49938 -0.23946 -2.23569 6.58661 -0.49352 -2.23569 6.65012 -0.62510 -2.23569 6.68297 -0.63536 -2.23569 6.68636 -0.57447 -2.23569 6.67830 -0.45436 -2.23569 6.66236 -0.28795 -2.23569 6.64024 -0.09992 -2.23569 6.61527 0.07821 -2.23569 6.59166 0.21803 -2.23569 6.57320 0.30181 -2.23569 6.56219</float_array>
+				<technique_common>
+					<accessor count="26" source="#head_IK-translate-output-array" stride="3">
+						<param type="float" name="X"></param>
+						<param type="float" name="Y"></param>
+						<param type="float" name="Z"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<source id="head_IK-translate-interpolation">
+				<Name_array count="78" id="head_IK-translate-interpolation-array">BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER BEZIER</Name_array>
+				<technique_common>
+					<accessor count="26" source="#head_IK-translate-interpolation-array" stride="3">
+						<param type="Name" name="X"></param>
+						<param type="Name" name="Y"></param>
+						<param type="Name" name="Z"></param>
+					</accessor>
+				</technique_common>
+			</source>
+			<sampler id="head_IK-translate-sampler">
+				<input semantic="INPUT" source="#head_IK-translate-input"/>
+				<input semantic="OUTPUT" source="#head_IK-translate-output"/>
+				<input semantic="INTERPOLATION" source="#head_IK-translate-interpolation"/>
+			</sampler>
+			<channel source="#head_IK-translate-sampler" target="head_IK/translate"/>
+		</animation>
+	</library_animations>
 	<library_controllers>
 		<controller id="human-skin">
 			<skin source="#human-Geometry">
@@ -39,7 +569,7 @@
 					</technique_common>
 				</source>
 				<source id="human-skin-poses">
-					<float_array count="288" id="human-skin-poses-array">1.00000 -0.00000 0.00000 -3.73488 -0.00000 0.00000 1.00000 -9.04747 0.00000 -1.00000 0.00000 0.02677 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -1.76352 -0.00000 0.00000 1.00000 -11.03459 0.00000 -1.00000 0.00000 -0.07026 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 -0.00000 0.00000 -0.00000 0.00000 1.00000 -7.02740 0.00000 -1.00000 0.00000 -0.33265 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -4.53262 -0.00000 0.00000 1.00000 -7.26481 0.00000 -1.00000 0.00000 -0.46674 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 -0.00000 4.53262 -0.00000 0.00000 1.00000 -7.26481 0.00000 -1.00000 0.00000 -0.46674 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 -0.00000 3.73488 -0.00000 0.00000 1.00000 -9.04747 0.00000 -1.00000 0.00000 0.02677 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 -0.00000 1.76352 -0.00000 0.00000 1.00000 -11.03459 0.00000 -1.00000 0.00000 -0.07026 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.00000 -0.00000 0.00000 1.00000 -13.58791 0.00000 -1.00000 0.00000 -1.48836 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.00000 -0.00000 0.00000 1.00000 -11.45335 0.00000 -1.00000 0.00000 -0.33265 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.00000 -0.00000 0.00000 1.00000 -11.45335 0.00000 -1.00000 0.00000 -0.33265 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.81264 -0.00000 0.00000 1.00000 -6.48976 0.00000 -1.00000 0.00000 -0.33265 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.69414 -0.00000 0.00000 1.00000 -3.67589 0.00000 -1.00000 0.00000 -0.44762 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.69411 -0.00000 0.00000 1.00000 -0.21710 0.00000 -1.00000 0.00000 -0.87234 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 -0.00000 0.69411 -0.00000 0.00000 1.00000 -0.21710 0.00000 -1.00000 0.00000 -0.87234 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 -0.00000 0.69413 -0.00000 0.00000 1.00000 -3.67589 0.00000 -1.00000 0.00000 -0.44763 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 -0.00000 0.81264 -0.00000 0.00000 1.00000 -6.48976 0.00000 -1.00000 0.00000 -0.33265 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.00000 -0.00000 0.00000 1.00000 -6.97957 0.00000 -1.00000 0.00000 -0.33265 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.00000 -0.00000 0.00000 1.00000 -6.97957 0.00000 -1.00000 0.00000 -0.33265 -0.00000 0.00000 -0.00000 1.00000</float_array>
+					<float_array count="288" id="human-skin-poses-array">1.00000 -0.00000 0.00000 -3.73488 -0.00000 1.00000 -0.00000 -0.02677 0.00000 -0.00000 1.00000 -9.04748 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -1.76352 -0.00000 1.00000 -0.00000 0.07026 0.00000 -0.00000 1.00000 -11.03459 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 0.00000 -0.00000 1.00000 -0.00000 0.33265 0.00000 -0.00000 1.00000 -7.02740 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -4.53262 -0.00000 1.00000 -0.00000 0.46675 0.00000 -0.00000 1.00000 -7.26481 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 4.53262 -0.00000 1.00000 -0.00000 0.46675 0.00000 -0.00000 1.00000 -7.26481 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 3.73488 -0.00000 1.00000 -0.00000 -0.02677 0.00000 -0.00000 1.00000 -9.04748 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 1.76352 -0.00000 1.00000 -0.00000 0.07026 0.00000 -0.00000 1.00000 -11.03459 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 0.00000 -0.00000 1.00000 -0.00000 1.48836 0.00000 -0.00000 1.00000 -13.58791 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 0.00000 -0.00000 1.00000 -0.00000 0.33265 0.00000 -0.00000 1.00000 -11.45335 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 0.00000 -0.00000 1.00000 -0.00000 0.33265 0.00000 -0.00000 1.00000 -11.45335 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.81264 -0.00000 1.00000 -0.00000 0.33265 0.00000 -0.00000 1.00000 -6.48976 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.69414 -0.00000 1.00000 -0.00000 0.44762 0.00000 -0.00000 1.00000 -3.67589 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.69411 -0.00000 1.00000 -0.00000 0.87234 0.00000 -0.00000 1.00000 -0.21710 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 0.69411 -0.00000 1.00000 -0.00000 0.87234 0.00000 -0.00000 1.00000 -0.21710 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 0.69413 -0.00000 1.00000 -0.00000 0.44763 0.00000 -0.00000 1.00000 -3.67589 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 0.81264 -0.00000 1.00000 -0.00000 0.33265 0.00000 -0.00000 1.00000 -6.48976 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 0.00000 -0.00000 1.00000 -0.00000 0.33265 0.00000 -0.00000 1.00000 -6.97957 -0.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 0.00000 -0.00000 1.00000 -0.00000 0.33265 0.00000 -0.00000 1.00000 -6.97957 -0.00000 0.00000 -0.00000 1.00000</float_array>
 					<technique_common>
 						<accessor count="0" source="#human-skin-poses" stride="1">
 							<param type="float4x4"></param>
@@ -145,7 +675,7 @@
 				<translate sid="translate">0.00000 -0.33265 7.02740</translate>
 				<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 				<rotate sid="rotateY">0 1 0 -0.00000</rotate>
-				<rotate sid="rotateX">1 0 0 90.00000</rotate>
+				<rotate sid="rotateX">1 0 0 0.00000</rotate>
 				<scale sid="scale">1.00000 1.00000 1.00000</scale>
 				<node sid="spine" type="JOINT" id="spine" name="spine">
 					<translate sid="translate">-0.00000 0.00000 0.00000</translate>
@@ -154,25 +684,25 @@
 					<rotate sid="rotateX">1 0 0 0.00000</rotate>
 					<scale sid="scale">1.00000 1.00000 1.00000</scale>
 					<node sid="l.shoulder" type="JOINT" id="l_shoulder" name="l_shoulder">
-						<translate sid="translate">0.00000 4.42595 0.00000</translate>
+						<translate sid="translate">0.00000 0.00000 4.42595</translate>
 						<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 						<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 						<rotate sid="rotateX">1 0 0 0.00000</rotate>
 						<scale sid="scale">1.00000 1.00000 1.00000</scale>
 						<node sid="l.upperArm" type="JOINT" id="l_upperArm" name="l_upperArm">
-							<translate sid="translate">1.76352 -0.41876 -0.26239</translate>
+							<translate sid="translate">1.76352 0.26239 -0.41876</translate>
 							<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 							<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 							<rotate sid="rotateX">1 0 0 0.00000</rotate>
 							<scale sid="scale">1.00000 1.00000 1.00000</scale>
 							<node sid="l.lowerArm" type="JOINT" id="l_lowerArm" name="l_lowerArm">
-								<translate sid="translate">1.97136 -1.98712 -0.09703</translate>
+								<translate sid="translate">1.97136 0.09703 -1.98712</translate>
 								<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 								<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 								<rotate sid="rotateX">1 0 0 0.00000</rotate>
 								<scale sid="scale">1.00000 1.00000 1.00000</scale>
 								<node sid="l.hand" type="JOINT" id="l_hand" name="l_hand">
-									<translate sid="translate">0.79775 -1.78266 0.49351</translate>
+									<translate sid="translate">0.79775 -0.49351 -1.78266</translate>
 									<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 									<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 									<rotate sid="rotateX">1 0 0 0.00000</rotate>
@@ -182,25 +712,25 @@
 						</node>
 					</node>
 					<node sid="r.shoulder" type="JOINT" id="r_shoulder" name="r_shoulder">
-						<translate sid="translate">0.00000 4.42595 0.00000</translate>
+						<translate sid="translate">0.00000 0.00000 4.42595</translate>
 						<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 						<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 						<rotate sid="rotateX">1 0 0 0.00000</rotate>
 						<scale sid="scale">1.00000 1.00000 1.00000</scale>
 						<node sid="r.upperArm" type="JOINT" id="r_upperArm" name="r_upperArm">
-							<translate sid="translate">-1.76352 -0.41876 -0.26239</translate>
+							<translate sid="translate">-1.76352 0.26239 -0.41876</translate>
 							<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 							<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 							<rotate sid="rotateX">1 0 0 0.00000</rotate>
 							<scale sid="scale">1.00000 1.00000 1.00000</scale>
 							<node sid="r.lowerArm" type="JOINT" id="r_lowerArm" name="r_lowerArm">
-								<translate sid="translate">-1.97136 -1.98712 -0.09703</translate>
+								<translate sid="translate">-1.97136 0.09703 -1.98712</translate>
 								<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 								<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 								<rotate sid="rotateX">1 0 0 0.00000</rotate>
 								<scale sid="scale">1.00000 1.00000 1.00000</scale>
 								<node sid="r.hand" type="JOINT" id="r_hand" name="r_hand">
-									<translate sid="translate">-0.79775 -1.78266 0.49351</translate>
+									<translate sid="translate">-0.79775 -0.49351 -1.78266</translate>
 									<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 									<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 									<rotate sid="rotateX">1 0 0 0.00000</rotate>
@@ -210,31 +740,31 @@
 						</node>
 					</node>
 					<node sid="neck" type="JOINT" id="neck" name="neck">
-						<translate sid="translate">0.00000 4.42595 0.00000</translate>
+						<translate sid="translate">0.00000 0.00000 4.42595</translate>
 						<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 						<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 						<rotate sid="rotateX">1 0 0 0.00000</rotate>
 						<scale sid="scale">1.00000 1.00000 1.00000</scale>
 						<node sid="head" type="JOINT" id="head" name="head">
-							<translate sid="translate">0.00000 1.13276 -0.00000</translate>
+							<translate sid="translate">0.00000 0.00000 1.13276</translate>
 							<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 							<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 							<rotate sid="rotateX">1 0 0 0.00000</rotate>
 							<scale sid="scale">1.00000 1.00000 1.00000</scale>
 							<node sid="head.001" type="JOINT" id="head_001" name="head_001">
-								<translate sid="translate">0.00000 0.00180 1.15571</translate>
+								<translate sid="translate">0.00000 -1.15571 0.00180</translate>
 								<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 								<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 								<rotate sid="rotateX">1 0 0 0.00000</rotate>
 								<scale sid="scale">1.00000 1.00000 1.00000</scale>
 								<node sid="head.002" type="JOINT" id="head_002" name="head_002">
-									<translate sid="translate">0.00000 1.00000 0.00000</translate>
+									<translate sid="translate">0.00000 0.00000 1.00000</translate>
 									<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 									<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 									<rotate sid="rotateX">1 0 0 0.00000</rotate>
 									<scale sid="scale">1.00000 1.00000 1.00000</scale>
 									<node sid="head.003" type="JOINT" id="head_003" name="head_003">
-										<translate sid="translate">0.00000 0.00000 0.70000</translate>
+										<translate sid="translate">-0.00000 -0.70000 0.00000</translate>
 										<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 										<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 										<rotate sid="rotateX">1 0 0 0.00000</rotate>
@@ -246,19 +776,19 @@
 					</node>
 				</node>
 				<node sid="l.hip" type="JOINT" id="l_hip" name="l_hip">
-					<translate sid="translate">0.00000 -0.04783 0.00000</translate>
+					<translate sid="translate">-0.00000 0.00000 -0.04783</translate>
 					<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 					<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 					<rotate sid="rotateX">1 0 0 0.00000</rotate>
 					<scale sid="scale">1.00000 1.00000 1.00000</scale>
 					<node sid="l.upperLeg" type="JOINT" id="l_upperLeg" name="l_upperLeg">
-						<translate sid="translate">0.81264 -0.48981 0.00000</translate>
+						<translate sid="translate">0.81264 0.00000 -0.48981</translate>
 						<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 						<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 						<rotate sid="rotateX">1 0 0 0.00000</rotate>
 						<scale sid="scale">1.00000 1.00000 1.00000</scale>
 						<node sid="l.lowerLeg" type="JOINT" id="l_lowerLeg" name="l_lowerLeg">
-							<translate sid="translate">-0.11850 -2.81388 0.11497</translate>
+							<translate sid="translate">-0.11850 -0.11497 -2.81388</translate>
 							<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 							<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 							<rotate sid="rotateX">1 0 0 0.00000</rotate>
@@ -267,20 +797,20 @@
 					</node>
 				</node>
 				<node sid="spine.IK" type="JOINT" id="spine_IK" name="spine_IK">
-					<translate sid="translate">-0.00000 4.42593 0.00001</translate>
+					<translate sid="translate">-0.00000 -0.00001 4.42593</translate>
 					<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 					<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 					<rotate sid="rotateX">1 0 0 0.00000</rotate>
 					<scale sid="scale">1.00000 1.00000 1.00000</scale>
 				</node>
 				<node sid="r.arm.IK" type="JOINT" id="r_arm_IK" name="r_arm_IK">
-					<translate sid="translate">-4.51695 0.20527 0.14589</translate>
+					<translate sid="translate">-4.51695 -0.14589 0.20527</translate>
 					<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 					<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 					<rotate sid="rotateX">1 0 0 0.00000</rotate>
 					<scale sid="scale">1.00000 1.00000 1.00000</scale>
 					<node sid="r.hand.IK" type="JOINT" id="r_hand_IK" name="r_hand_IK">
-						<translate sid="translate">-0.59828 -1.15881 0.31385</translate>
+						<translate sid="translate">-0.59828 -0.31385 -1.15881</translate>
 						<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 						<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 						<rotate sid="rotateX">1 0 0 0.00000</rotate>
@@ -288,13 +818,13 @@
 					</node>
 				</node>
 				<node sid="l.arm.IK" type="JOINT" id="l_arm_IK" name="l_arm_IK">
-					<translate sid="translate">4.51693 0.20522 0.14588</translate>
+					<translate sid="translate">4.51693 -0.14588 0.20522</translate>
 					<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 					<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 					<rotate sid="rotateX">1 0 0 0.00000</rotate>
 					<scale sid="scale">1.00000 1.00000 1.00000</scale>
 					<node sid="l.hand.IK" type="JOINT" id="l_hand_IK" name="l_hand_IK">
-						<translate sid="translate">0.59834 -1.15877 0.31387</translate>
+						<translate sid="translate">0.59834 -0.31387 -1.15877</translate>
 						<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 						<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 						<rotate sid="rotateX">1 0 0 0.00000</rotate>
@@ -302,26 +832,26 @@
 					</node>
 				</node>
 				<node sid="head.IK" type="JOINT" id="head_IK" name="head_IK">
-					<translate sid="translate">-0.00000 6.55756 2.63572</translate>
+					<translate sid="translate">-0.00000 -2.63572 6.55756</translate>
 					<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 					<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 					<rotate sid="rotateX">1 0 0 0.00000</rotate>
 					<scale sid="scale">1.00000 1.00000 1.00000</scale>
 				</node>
 				<node sid="r.hip" type="JOINT" id="r_hip" name="r_hip">
-					<translate sid="translate">0.00000 -0.04783 0.00000</translate>
+					<translate sid="translate">-0.00000 0.00000 -0.04783</translate>
 					<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 					<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 					<rotate sid="rotateX">1 0 0 0.00000</rotate>
 					<scale sid="scale">1.00000 1.00000 1.00000</scale>
 					<node sid="r.upperLeg" type="JOINT" id="r_upperLeg" name="r_upperLeg">
-						<translate sid="translate">-0.81264 -0.48981 -0.00000</translate>
+						<translate sid="translate">-0.81264 0.00000 -0.48981</translate>
 						<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 						<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 						<rotate sid="rotateX">1 0 0 0.00000</rotate>
 						<scale sid="scale">1.00000 1.00000 1.00000</scale>
 						<node sid="r.lowerLeg" type="JOINT" id="r_lowerLeg" name="r_lowerLeg">
-							<translate sid="translate">0.11851 -2.81388 0.11497</translate>
+							<translate sid="translate">0.11851 -0.11497 -2.81388</translate>
 							<rotate sid="rotateZ">0 0 1 0.00000</rotate>
 							<rotate sid="rotateY">0 1 0 -0.00000</rotate>
 							<rotate sid="rotateX">1 0 0 0.00000</rotate>
