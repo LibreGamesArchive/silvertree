@@ -16,19 +16,23 @@ class framed_dialog: public dialog {
 public:
 	void set_frame(frame_ptr frame) { frame_ = frame; }
 	const frame_ptr get_frame() { return frame_; }
-	void set_dim(int w, int h) {}
+	void set_loc(int x, int y);
+	void set_dim(int w, int h);
 protected:
 	framed_dialog(int x, int y, int w, int h) 
-		: dialog(x,y,w,h), nested_(false) {}
+		: dialog(x,y,w,h), 
+		  nested_draw_(false), nested_set_dim_(false), nested_set_loc_(false) {}
 	virtual ~framed_dialog() {}
 private:
 	void handle_draw() const;
+	virtual void inner_set_dim(int w, int h);
+	virtual void inner_set_loc(int x, int y);
 	virtual void prepare_draw() const =0;
 	virtual void inner_draw() const =0;
 	virtual void finish_draw() const =0;
 
 	frame_ptr frame_;
-	mutable bool nested_;
+	mutable bool nested_draw_, nested_set_dim_, nested_set_loc_;
 };
 }
 

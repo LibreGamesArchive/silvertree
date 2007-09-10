@@ -99,6 +99,7 @@ public:
 
 	GLfloat begin_move(const route& move) { return route_cost(move_ = move); }
 	void set_movement_time(GLfloat time) { time_in_move_ = time; }
+	GLfloat get_movement_time() { return time_in_move_; }
 	void end_move();
 
 	void begin_attack(const battle_character& enemy);

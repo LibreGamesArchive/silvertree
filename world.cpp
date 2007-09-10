@@ -55,7 +55,7 @@ world::world(wml::const_node_ptr node)
 	  camera_controller_(camera_),
 	  time_(node), subtime_(0.0), tracks_(map_)
 {
-	show_grid_ = true;
+	show_grid_ = false;
 
 	const std::string& sun_light = wml::get_str(node, "sun_light");
 	if(!sun_light.empty()) {
