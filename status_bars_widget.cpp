@@ -82,6 +82,9 @@ void status_bars_widget::handle_draw() const {
 		time_to_move +=  move_time;
 	}
 	if(time_to_move == fastest) {
+		if(second_fastest == HUGE_VALF) {
+			time_to_move = 0;
+		}
 		time_to_move -= second_fastest;
 	} else {
 		time_to_move -= fastest;
