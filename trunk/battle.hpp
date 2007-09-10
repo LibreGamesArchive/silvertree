@@ -22,6 +22,7 @@
 #include "camera.hpp"
 #include "camera_controller.hpp"
 #include "gamemap.hpp"
+#include "mini_stats_dialog.hpp"
 #include "particle_system.hpp"
 #include "texture.hpp"
 #include "widget.hpp"
@@ -77,6 +78,7 @@ private:
 	hex::location selected_loc();
 	battle_character_ptr selected_char();
 	void handle_mouse_button_down(const SDL_MouseButtonEvent& e);
+	void handle_mouse_motion(const SDL_Event& e);
 	const_battle_character_ptr is_engaged(
 	       const battle_character& c) const;
 	void handle_dead_character(const battle_character& c);
@@ -102,6 +104,7 @@ private:
 	BATTLE_RESULT result_;
 
 	std::vector<gui::widget_ptr> widgets_;
+	std::map<battle_character_ptr, game_dialogs::mini_stats_dialog_ptr> stats_dialogs_;
 
 	gui::battle_menu_ptr menu_;
 

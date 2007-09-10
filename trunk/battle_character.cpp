@@ -40,6 +40,11 @@ battle_character::battle_character(
    time_of_day_adjustment_(ch->alignment()*time.alignment_adjustment())
 {
 	assert(old_facing_ >= hex::NORTH && old_facing_ <= hex::NULL_DIRECTION);
+
+	loc_tracker_.add_vertex(0.5, 0, 0.0);
+	loc_tracker_.add_vertex(-0.5, 0, 0.0);
+	loc_tracker_.add_vertex(0.5, 0, 1.0);
+	loc_tracker_.add_vertex(-0.5, 0, 1.0);
 }
 
 battle_character_ptr battle_character::make_battle_character(
@@ -104,6 +109,8 @@ void battle_character::draw() const
 		glEnable(GL_LIGHT0);
 		glDisable(GL_LIGHT3);
 	}
+
+	loc_tracker_.update();
 
 	glPopMatrix();
 }

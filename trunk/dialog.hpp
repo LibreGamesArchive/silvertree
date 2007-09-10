@@ -28,6 +28,7 @@ public:
 
 	virtual ~dialog() {}
 	virtual void show_modal();
+	void show();
 
 	enum MOVE_DIRECTION { MOVE_DOWN, MOVE_RIGHT };
 	dialog& add_widget(widget_ptr w, MOVE_DIRECTION dir=MOVE_DOWN);
@@ -39,6 +40,7 @@ public:
 	void set_padding(int pad) { padding_ = pad; }
 	void close() { opened_ = false; }
 
+	bool closed() { return !opened_; }
 	void set_cursor(int x, int y) { add_x_ = x; add_y_ = y; }
 	int cursor_x() const { return add_x_; }
 	int cursor_y() const { return add_y_; }

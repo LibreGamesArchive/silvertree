@@ -60,9 +60,12 @@ void blit_texture(const texture& tex, int x, int y, GLfloat rotate)
 	w /= 2;
 
 	glPushMatrix();
-	glTranslatef(x+tex.width()/2,y+tex.height()/2,0.0);
+	
+	glTranslatef(x+w,y+h,0.0);
 	glRotatef(rotate,0.0,0.0,1.0);
+
 	tex.set_as_current_texture();
+
 	glBegin(GL_QUADS);
 	glColor3f(1.0,1.0,1.0);
 	graphics::texture::set_coord(0.0,0.0);
@@ -74,6 +77,7 @@ void blit_texture(const texture& tex, int x, int y, GLfloat rotate)
 	graphics::texture::set_coord(1.0,0.0);
 	glVertex3i(w+w_odd,-h,0);
 	glEnd();
+
 	glPopMatrix();
 }
 
@@ -129,11 +133,8 @@ void draw_hollow_rect(const SDL_Rect& r, const SDL_Color& color,
 	glEnable(GL_TEXTURE_2D);
 }
 
-void push_clip(const SDL_Rect& r) 
-{
-	const bool was_enabled_clip = glIsEnabled(GL_SCISSOR_TEST);
-	bool should_enable_clip = true;
-
+void coords_to_screen(GLdouble sx, GLdouble sy, GLdouble sz, 
+		      GLdouble* dx, GLdouble* dy, GLdouble* dz) {
 	GLdouble model[16], proj[16];
 	GLint view[4];
 
@@ -141,8 +142,16 @@ void push_clip(const SDL_Rect& r)
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
 	glGetIntegerv(GL_VIEWPORT, view);
 
+	gluProject(sx, sy, sz, model, proj, view, dx, dy, dz);
+}
+  
+void push_clip(const SDL_Rect& r) 
+{
+	const bool was_enabled_clip = glIsEnabled(GL_SCISSOR_TEST);
+	bool should_enable_clip = true;
+
 	GLdouble x, y ,z;
-	gluProject(0, graphics::screen_height(), 0, model, proj, view, &x, &y, &z);
+	coords_to_screen(0, graphics::screen_height(), 0, &x, &y, &z);
 	
 	SDL_Rect s = r;
 	s.x += static_cast<Sint16>(x);
@@ -152,6 +161,7 @@ void push_clip(const SDL_Rect& r)
 		should_enable_clip = false;
 	}
 
+	
 	boost::shared_array<GLint> box(new GLint[4]);
 
 	if(was_enabled_clip) {
