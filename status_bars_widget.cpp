@@ -26,7 +26,7 @@ void status_bars_widget::smooth_transition(GLfloat& x, GLfloat& prev, GLfloat cu
 
 void status_bars_widget::handle_draw() const {
 	const game_logic::character& rch = ch_->get_character();
-	if(rch.dead()) {
+	if(rch.dead() && hitpoints_ == 0) {
 		return;
 	}
 
@@ -46,7 +46,12 @@ void status_bars_widget::handle_draw() const {
 		health_max_angle = 20;
 	}
 
-	GLfloat r_hitpoints = static_cast<GLfloat>(rch.hitpoints());
+	GLfloat r_hitpoints;
+	if(!rch.dead()) {
+		r_hitpoints = static_cast<GLfloat>(rch.hitpoints());
+	} else {
+		r_hitpoints = 0;
+	}
 
 	if(hitpoints_ >= 0) {
 		smooth_transition(hitpoints_, old_hitpoints_, r_hitpoints);
@@ -55,19 +60,21 @@ void status_bars_widget::handle_draw() const {
 	}
 
 	GLfloat health_angle = health_max_angle*hitpoints_ / max_hitpoints_;
-	if(health_angle < 20) {
-		health_angle = 20;
-	} else if(health_angle > 100) {
+	if(health_angle > 100) {
 		health_angle = 100;
 	}
 
+	int num_moving_chars = 0;
 	GLfloat fastest = HUGE_VALF;
 	GLfloat second_fastest = HUGE_VALF;
 	for(std::vector<game_logic::battle_character_ptr>::const_iterator i = b_.participants().begin();
 	    i != b_.participants().end(); ++i) {
 		GLfloat ready = (*i)->ready_to_move_at();
 		GLfloat move_time = (*i)->get_movement_time();
-		if(move_time > 0.0) ready += move_time;
+		if(move_time > 0.0) { 
+			ready += move_time;
+			++num_moving_chars;
+		}
 		if(ready < fastest) {
 			second_fastest = fastest;
 			fastest = ready;
@@ -84,10 +91,17 @@ void status_bars_widget::handle_draw() const {
 	if(time_to_move == fastest) {
 		if(second_fastest == HUGE_VALF) {
 			time_to_move = 0;
+		} else if(num_moving_chars != 1) {
+			time_to_move = b_.current_time() + b_.animation_time() - second_fastest ;
+		} else {
+			time_to_move -= second_fastest;
 		}
-		time_to_move -= second_fastest;
 	} else {
-		time_to_move -= fastest;
+		if(num_moving_chars != 1) {
+			time_to_move -= b_.current_time() + b_.animation_time();
+		} else {
+			time_to_move -= fastest;
+		}
 	}
 
 	SDL_Color time_color;

@@ -21,6 +21,7 @@
 #include "battle_move_fwd.hpp"
 #include "camera.hpp"
 #include "camera_controller.hpp"
+#include "frame_rate_utils.hpp"
 #include "gamemap.hpp"
 #include "mini_stats_dialog.hpp"
 #include "particle_system.hpp"
@@ -47,6 +48,7 @@ public:
 	void player_turn(battle_character& c);
 	const hex::gamemap& map() const { return map_; }
 
+	void elapse_time(GLfloat time_to_elapse);
 	void move_character(battle_character& c, const battle_character::route& r);
 	void attack_character(battle_character& attacker,
 	                      battle_character& defender,
@@ -70,7 +72,8 @@ public:
 						   const battle_move& move,
 						   std::string* description=NULL,
 						   hex::location from_loc=hex::location()) const;
-	
+	int current_time() const { return current_time_; }
+	GLfloat animation_time() const { return sub_time_; }
 private:
 	void remove_widget(gui::const_widget_ptr w);
 	void draw(gui::slider* slider=NULL);
@@ -79,6 +82,9 @@ private:
 	battle_character_ptr selected_char();
 	void handle_mouse_button_down(const SDL_MouseButtonEvent& e);
 	void handle_mouse_motion(const SDL_Event& e);
+	void begin_animation();
+	void end_animation();
+	void animation_frame(GLfloat t);
 	const_battle_character_ptr is_engaged(
 	       const battle_character& c) const;
 	void handle_dead_character(const battle_character& c);
@@ -111,7 +117,9 @@ private:
 	const_battle_move_ptr current_move_;
 	int keyed_selection_;
 	int current_time_;
+	GLfloat sub_time_;
 
+	graphics::frame_skipper skippy_;
 	graphics::particle_system particle_system_;
 };
 		
