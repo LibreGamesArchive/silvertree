@@ -26,6 +26,7 @@
 #include "map_avatar.hpp"
 #include "party.hpp"
 #include "tile_logic.hpp"
+#include "location_tracker.hpp"
 
 namespace game_logic
 {
@@ -118,7 +119,7 @@ public:
 
 	void update_time(int cur_time);
 	void add_modification(const std::string& stat, int expire, int mod);
-
+	const graphics::location_tracker& loc_tracker() { return loc_tracker_; }
 private:
 	void get_possible_moves_internal(move_map& locs, const std::vector<battle_character_ptr>& chars, route& r, int max_distance) const;
 
@@ -143,6 +144,8 @@ private:
 	const GLfloat* highlight_;
 
 	int time_of_day_adjustment_;
+
+	mutable graphics::location_tracker loc_tracker_;
 
 	struct stat_mod {
 		int expire;

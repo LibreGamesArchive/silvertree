@@ -153,6 +153,9 @@ void battle::player_turn(battle_character& c)
 				case SDL_MOUSEBUTTONDOWN:
 					handle_mouse_button_down(event.button);
 					break;
+			        case SDL_MOUSEMOTION:
+					handle_mouse_motion(event);
+					break;
 			}
 		}
 
@@ -428,6 +431,17 @@ void battle::draw(gui::slider* slider)
 	foreach(const gui::widget_ptr& w, widgets_) {
 		w->draw();
 	}
+
+	for(std::map<battle_character_ptr, game_dialogs::mini_stats_dialog_ptr>::iterator i = 
+		    stats_dialogs_.begin();
+	    i != stats_dialogs_.end(); ++i) {
+		if(i->second->closed()) {
+			stats_dialogs_.erase(i);
+		} else {
+			i->second->draw();
+		}
+	}
+
 
 	SDL_GL_SwapBuffers();
 	SDL_Delay(1);
@@ -760,6 +774,28 @@ void battle::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
 				target_mod(**focus_, loc, *current_move_);
 			}
 		}
+	}
+}
+
+void battle::handle_mouse_motion(const SDL_Event& e) {
+	battle_character_ptr target_char = selected_char();
+	
+	game_dialogs::mini_stats_dialog_ptr ptr;
+
+	if(target_char) {
+		std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
+			stats_dialogs_.find(target_char);
+		if(i == stats_dialogs_.end()) {
+			ptr.reset(new game_dialogs::mini_stats_dialog(target_char, -1, 100, 100));
+			stats_dialogs_[target_char] = ptr;
+			ptr->show();
+			ptr->set_frame(gui::frame_manager::make_frame(ptr, "mini-char-battle-stats"));
+		}
+	}
+	for(std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
+	      stats_dialogs_.begin(); i != stats_dialogs_.end(); ++i) {
+		if(ptr && (ptr == i->second)) continue;
+		i->second->process_event(e);
 	}
 }
 

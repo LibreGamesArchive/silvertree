@@ -76,6 +76,11 @@ void dialog::replace_widget(widget_ptr w_old, widget_ptr w_new)
 	w_new->set_dim(w,h);
 }
 
+void dialog::show() {
+	opened_ = true;
+	set_visible(true);
+}
+
 void dialog::show_modal()
 {
 	opened_ = true;
