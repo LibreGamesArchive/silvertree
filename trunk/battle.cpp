@@ -24,6 +24,7 @@
 #include "preferences.hpp"
 #include "raster.hpp"
 #include "slider.hpp"
+#include "status_bars_widget.hpp"
 #include "surface_cache.hpp"
 
 #include <boost/lexical_cast.hpp>
@@ -53,6 +54,13 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
 	 current_time_(0)
 {
 	srand(SDL_GetTicks());
+
+	for(std::vector<battle_character_ptr>::const_iterator i = chars_.begin();
+	    i != chars_.end(); ++i) {
+		gui::widget_ptr w(new game_dialogs::status_bars_widget(*this, *i));
+		widgets_.push_back(w);
+	}
+
 }
 
 void battle::play()
@@ -331,7 +339,7 @@ void battle::draw(gui::slider* slider)
 
 
 	glDisable(GL_LIGHTING);
-	map_.draw_grid();
+	//map_.draw_grid();
 
 	//draw possible attacks
 	if(highlight_moves_ && selected_hex.valid()) {
@@ -472,11 +480,24 @@ void battle::draw_route(const battle_character::route& r)
 void battle::move_character(battle_character& c, const battle_character::route& r)
 {
 	const GLfloat time = c.begin_move(r);
+	SDL_Event ev;
 	graphics::frame_skipper skippy(50, preference_maxfps());
+
+	stats_dialogs_.clear();
+
 	for(GLfloat t = 0.0; t < time; t += 0.1) {
 		c.set_movement_time(t);
 		if(!skippy.skip_frame()) {
 			draw();
+		}
+		while(SDL_PollEvent(&ev)) {
+			switch(ev.type) {
+			case SDL_MOUSEMOTION:
+				handle_mouse_motion(ev);
+				break;
+			default:
+				break;
+			}
 		}
 	}
 
@@ -592,6 +613,7 @@ void battle::attack_character(battle_character& attacker,
 	const int end = beg + ticks;
 	int cur_ticks;
 	graphics::frame_skipper skippy(50, preference_maxfps());
+	stats_dialogs_.clear();
 
 	while((cur_ticks = SDL_GetTicks()) < end) {
 		const GLfloat cur_time = GLfloat(cur_ticks - beg)/1000.0;
@@ -786,7 +808,7 @@ void battle::handle_mouse_motion(const SDL_Event& e) {
 		std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
 			stats_dialogs_.find(target_char);
 		if(i == stats_dialogs_.end()) {
-			ptr.reset(new game_dialogs::mini_stats_dialog(target_char, -1, 100, 100));
+			ptr.reset(new game_dialogs::mini_stats_dialog(target_char, -1, 200, 100));
 			stats_dialogs_[target_char] = ptr;
 			ptr->show();
 			ptr->set_frame(gui::frame_manager::make_frame(ptr, "mini-char-battle-stats"));

@@ -16,20 +16,68 @@ void framed_dialog::handle_draw() const
 		finish_draw();
 		return;
 	}
-	if(nested_) {
+	if(nested_draw_) {
 		inner_draw();
 	} else {
 		prepare_draw();
-		nested_ = true;
+		nested_draw_ = true;
 		try {
 			frame_->draw();
 		} catch(...) {
-			nested_ = false;
+			nested_draw_ = false;
 			throw;
 		}
-		nested_ = false;
+		nested_draw_ = false;
 		finish_draw();
 	}
+}
+
+void framed_dialog::set_dim(int w, int h) 
+{
+	if(!frame_) {
+		inner_set_dim(w,h);
+		return;
+	} 
+	if(nested_set_dim_) {
+		inner_set_dim(w,h);
+	} else {
+		nested_set_dim_ = true;
+		try {
+			frame_->set_dim(w,h);
+		} catch(...) {
+			nested_set_dim_ = false;
+			throw;
+		}
+		nested_set_dim_ = false;
+	}
+}
+
+void framed_dialog::inner_set_dim(int w, int h) {
+	dialog::set_dim(w,h);
+}
+
+void framed_dialog::set_loc(int x, int y) 
+{
+	if(!frame_) {
+		inner_set_loc(x,y);
+		return;
+	} 
+	if(nested_set_loc_) {
+		inner_set_loc(x,y);
+	} else {
+		nested_set_loc_ = true;
+		try {
+			frame_->set_loc(x,y);
+		} catch(...) {
+			nested_set_loc_ = false;
+			throw;
+		}
+		nested_set_loc_ = false;
+	}
+}
+
+void framed_dialog::inner_set_loc(int x, int y) {
+	dialog::set_loc(x,y);
 }
 
 }
@@ -150,18 +198,18 @@ void mini_stats_dialog::inner_draw() const {
 
 void mini_stats_dialog::construct_interface() 
 {
-	/*
 	game_logic::character& rch = ch_->get_character();
 	
-	{
-		std::string portrait_file = rch.portrait();
-		if(!portrait_file.empty()) {
-			gui::widget_ptr portrait = 
-				gui::widget_ptr(new gui::image_widget(portrait_file, width()/4, height()/4));
-			add_widget(portrait, dialog::MOVE_RIGHT);
-		}
+	std::string portrait_file = rch.portrait();
+	if(!portrait_file.empty()) {
+		gui::widget_ptr portrait = 
+			gui::widget_ptr(new gui::image_widget(portrait_file, width()/2, height()));
+		add_widget(portrait, dialog::MOVE_RIGHT);
+	} else {
+		set_dim(width()/2, height());
 	}
-	
+
+	/*
 	{
 		gui::label_ptr name_label(new gui::label(rch.description(), graphics::color_yellow()));
 		name_label->set_fixed_width(true);
@@ -173,7 +221,6 @@ void mini_stats_dialog::construct_interface()
 		//set_cursor(0, height()/4);
 		
 		gui::label_ptr stats_label(new gui::label(ch_->status_text(), graphics::color_white()));
-
 		add_widget(stats_label);
 	}
 }
