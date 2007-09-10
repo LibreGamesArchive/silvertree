@@ -18,7 +18,6 @@
 #include "formatter.hpp"
 #include "font.hpp"
 #include "foreach.hpp"
-#include "frame_rate_utils.hpp"
 #include "keyboard.hpp"
 #include "label.hpp"
 #include "preferences.hpp"
@@ -51,7 +50,8 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
 	 move_done_(false), turn_done_(false),
 	 camera_(battle_map), camera_controller_(camera_),
 	 result_(ONGOING), keyed_selection_(0),
-	 current_time_(0)
+         current_time_(0), sub_time_(0.0), 
+         skippy_(50, preference_maxfps())
 {
 	srand(SDL_GetTicks());
 
@@ -80,15 +80,16 @@ void battle::play()
 	             (graphics::screen_height()-msg->height())/2);
 	widgets_.push_back(msg);
 
-	const int show_until = SDL_GetTicks() + 2000;
-	graphics::frame_skipper skippy(50, preference_maxfps());
-	while(SDL_GetTicks() < show_until) {
-		if(!skippy.skip_frame()) {
-			draw();
-		}
-		SDL_Delay(10);
-	}
-
+	begin_animation();
+	const int start = SDL_GetTicks();
+	const GLfloat time = 2.0;
+	GLfloat t;
+	do {
+		t = (SDL_GetTicks()-start)/(1000.0);
+		animation_frame(t);
+	} while(t < time);
+	end_animation();
+		
 	graphics::floating_label::clear();
 }
 
@@ -100,10 +101,9 @@ void battle::player_turn(battle_character& c)
 	turn_done_ = false;
 	highlight_moves_ = false;
 	highlight_targets_ = false;
-	graphics::frame_skipper skippy(50, preference_maxfps());
 
 	while(!turn_done_ && result_ == ONGOING) {
-		if(!skippy.skip_frame()) {
+		if(!skippy_.skip_frame()) {
 			draw();
 		}
 
@@ -477,31 +477,58 @@ void battle::draw_route(const battle_character::route& r)
 	glEnable(GL_LIGHTING);
 }
 
+void battle::begin_animation() {
+	sub_time_ = 0.0;
+	stats_dialogs_.clear();
+}
+
+void battle::animation_frame(float t) {
+	SDL_Event ev;
+
+	sub_time_ = t;
+
+	if(!skippy_.skip_frame()) {
+		draw();
+	}
+	while(SDL_PollEvent(&ev)) {
+		switch(ev.type) {
+		case SDL_MOUSEMOTION:
+			handle_mouse_motion(ev);
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void battle::end_animation() {
+	sub_time_ = 0.0;
+}
+
+void battle::elapse_time(const GLfloat elapse) {
+	if(elapse <= 0) {
+		return;
+	}
+	begin_animation();
+	for(GLfloat t = 0.0; t < elapse; t +=0.1) {
+		animation_frame(t);
+	}
+	end_animation();
+}
+
 void battle::move_character(battle_character& c, const battle_character::route& r)
 {
-	const GLfloat time = c.begin_move(r);
-	SDL_Event ev;
-	graphics::frame_skipper skippy(50, preference_maxfps());
+	begin_animation();
 
-	stats_dialogs_.clear();
+	const GLfloat time = c.begin_move(r);
 
 	for(GLfloat t = 0.0; t < time; t += 0.1) {
 		c.set_movement_time(t);
-		if(!skippy.skip_frame()) {
-			draw();
-		}
-		while(SDL_PollEvent(&ev)) {
-			switch(ev.type) {
-			case SDL_MOUSEMOTION:
-				handle_mouse_motion(ev);
-				break;
-			default:
-				break;
-			}
-		}
+		animation_frame(t);
 	}
 
 	c.end_move();
+	end_animation();
 }
 
 battle::attack_stats battle::get_attack_stats(
@@ -591,7 +618,6 @@ void battle::attack_character(battle_character& attacker,
 	const bool otherwise_engaged = engaged_with &&
 	                 engaged_with->loc() != attacker.loc();
 
-	attacker.set_time_until_next_move(stats.time_taken);
 	attacker.get_character().use_stamina(stats.stamina_used);
 	attacker.begin_facing_change(
 	  hex::get_adjacent_direction(attacker.loc(),defender.loc()));
@@ -604,19 +630,15 @@ void battle::attack_character(battle_character& attacker,
 	const int random = rand()%(stats.attack+stats.defense);
 
 	GLfloat highlight[] = {1.0,0.0,0.0,0.5};
-	const GLfloat time = 1.0;
+	const GLfloat elapsed_time = stats.time_taken;
+	const GLfloat anim_time = elapsed_time/5.0;
 	const GLfloat begin_hit = 0.4;
-	const GLfloat end_hit = 0.4;
+	const GLfloat end_hit = 0.8;
 	attacker.begin_attack(defender);
-	const int ticks = int(time*1000.0);
-	const int beg = SDL_GetTicks();
-	const int end = beg + ticks;
-	int cur_ticks;
-	graphics::frame_skipper skippy(50, preference_maxfps());
-	stats_dialogs_.clear();
 
-	while((cur_ticks = SDL_GetTicks()) < end) {
-		const GLfloat cur_time = GLfloat(cur_ticks - beg)/1000.0;
+	begin_animation();
+	for(GLfloat t = 0.0; t < anim_time; t += 0.1) {
+		const GLfloat cur_time = t / anim_time;
 		attacker.set_movement_time(cur_time);
 		defender.set_movement_time(cur_time);
 		attacker.set_attack_time(cur_time);
@@ -624,14 +646,16 @@ void battle::attack_character(battle_character& attacker,
 		   cur_time >= begin_hit && cur_time <= end_hit) {
 			defender.set_highlight(highlight);
 		}
-		if(!skippy.skip_frame()) {
-			draw();
-		}
+		animation_frame(t * elapsed_time/anim_time);
 		defender.set_highlight(NULL);
-	}
+	} 
+	end_animation();
+
 	attacker.end_attack();
 	attacker.end_facing_change();
 	defender.end_facing_change();
+
+	attacker.set_time_until_next_move(stats.time_taken);
 
 	int damage = stats.damage;
 	if(random <= stats.defense) {
@@ -666,6 +690,8 @@ void battle::handle_dead_character(const battle_character& c)
 		return;
 	}
 
+	elapse_time(5.0);
+
 	for(std::vector<battle_character_ptr>::iterator i = chars_.begin();
 	    i != chars_.end(); ++i) {
 		if(i->get() == &c) {
@@ -694,6 +720,8 @@ void battle::target_mod(battle_character& caster,
                         const hex::location& target,
                         const battle_move& move)
 {
+
+	const int time_to_perform = move.get_stat("initiative",caster);
 	if(graphics::particle_emitter_ptr missile = move.create_missile_emitter()) {
 		using hex::tile;
 		const hex::location& src = caster.loc();
@@ -705,7 +733,8 @@ void battle::target_mod(battle_character& caster,
 		GLfloat dst_pos[] = {tile::translate_x(target), tile::translate_y(target), tile::translate_height(dst_tile.height())};
 
 		const GLfloat nframes = 100.0;
-		graphics::frame_skipper skippy(50, preference_maxfps());
+
+		begin_animation();
 		for(GLfloat frame = 0.0; frame <= nframes; frame += 1.0) {
 			GLfloat pos[3];
 			for(int n = 0; n != 3; ++n) {
@@ -714,15 +743,14 @@ void battle::target_mod(battle_character& caster,
 
 			missile->set_pos(pos);
 			missile->emit_particle(particle_system_);
-			if(!skippy.skip_frame()) {
-				draw();
-			}
+			animation_frame(frame*time_to_perform/static_cast<GLfloat>(nframes));
 		}
+		end_animation();
 	}
 
 	assert(move.mod());
 	const battle_modification& mod = *move.mod();
-	caster.set_time_until_next_move(move.get_stat("initiative",caster));
+	caster.set_time_until_next_move(time_to_perform);
 	const battle_modification::TARGET_TYPE type = mod.target();
 	const int radius = mod.radius();
 	std::vector<hex::location> locs;
