@@ -106,25 +106,19 @@ void status_bars_widget::handle_draw() const {
 		time_color.b = 255;
 	}
 
-	SDL_Color health_color;
+	SDL_Color bar_color;
 	if(old_hitpoints_ >= 0 && old_hitpoints_ != r_hitpoints) {
-		health_color.r = 255;
-		health_color.g = 255;
-		health_color.b = 255;
-	} else if(health_angle < health_max_angle/4 || health_angle == 20) {
-		health_color.r = 255;
-		health_color.g = 10;
-		health_color.b = 10;
-	} else if(health_angle < health_max_angle*3/4) {
-		health_color.r = 200;
-		health_color.g = 200;
-		health_color.b = 50;
+		bar_color.r = 255;
+		bar_color.g = 255;
+		bar_color.b = 255;
 	} else {
-		health_color.r = 10;
-		health_color.g = 150;
-		health_color.b = 10;
-	}
-	
+		bar_color.r = 10;
+		bar_color.g = 150;
+		bar_color.b = 10;
+	} 
+
+	SDL_Color damage_color = { 255, 10, 10 };
+
 
 	GLfloat center_x = (pos[0] + pos[2])/2;
 	GLfloat center_y = (pos[1] + pos[3])/2;
@@ -149,9 +143,12 @@ void status_bars_widget::handle_draw() const {
 		glTranslatef(center_x, center_y, 0);
 		
 		if(health_angle > 0) {
-			glColor4ub(health_color.r, health_color.g, health_color.b, 180);
+			glColor4ub(damage_color.r, damage_color.g, damage_color.b, 180);
 			gluPartialDisk(quad, radius*9/10, radius*11/10, 16, 1, 
-				       -90+health_max_angle/2, -health_angle);
+				       -90-health_max_angle/2 + health_angle, +(health_max_angle-health_angle));
+			glColor4ub(bar_color.r, bar_color.g, bar_color.b, 180);
+			gluPartialDisk(quad, radius*9/10, radius*11/10, 16, 1, 
+				       -90-health_max_angle/2, +health_angle);
 		}
 		if(time_to_move > 0) {
 			GLfloat big_units = time_to_move/10;
@@ -160,20 +157,23 @@ void status_bars_widget::handle_draw() const {
 			int small_segments = static_cast<int>(small_units);
 			glColor4ub(time_color.r, time_color.g, time_color.b, 180);
 			
+			GLfloat small_units_angle = small_units * 14 + (small_units - small_segments);
+
 			for(int i =0;i<small_segments;++i) {
-				gluPartialDisk(quad, radius*9/10, radius*11/10, 16, 1, 
-					       90 - (small_units)*14/2 + i*14, 10); 
+				gluPartialDisk(quad, radius*12/10, radius*14/10, 16, 1, 
+					       -90 + (small_units_angle/2) - i*14, -10); 
 			}
-			gluPartialDisk(quad, radius*9/10, radius*11/10, 16, 1, 
-				       90 - (small_units)*14/2 + (small_segments)*14, 
-				       10*(small_units - small_segments));
+			gluPartialDisk(quad, radius*12/10, radius*14/10, 16, 1, 
+				       -90 + (small_units_angle/2) - small_segments*14, 
+				       -10*(small_units - small_segments));
+
 			if(big_segments > 0) {
 				if(big_units  > 10) big_units = 10;
 				if(big_segments > 10) big_segments = 10;
 				for(int i=0;i<big_segments;++i) {
-					gluPartialDisk(quad, radius*12/10, radius*13/10, 16, 1, 
-						       20.0 + (20.0/big_segments) + i*140.0/(big_segments), 
-						       100.0/(big_segments)); 
+					gluPartialDisk(quad, radius*15/10, radius*16/10, 16, 1, 
+						       -40.0 - (10.0/big_segments) - i*100.0/big_segments, 
+						       -90.0/(big_segments)); 
 				}
 			}
 		}
