@@ -10,6 +10,9 @@ void status_bars_widget::smooth_transition(GLfloat& x, GLfloat& prev, GLfloat cu
 		GLfloat step;
 		if(prev >= 0) {
 			step = (cur - prev)/50;
+			if ((cur - x - step) * (cur - prev) < 0) {
+				step = (cur - x);
+			}
 		} else {
 			step = (cur - x);
 			if(step < -0.1) step = -0.1;
