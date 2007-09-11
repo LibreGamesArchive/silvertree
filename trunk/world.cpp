@@ -387,11 +387,14 @@ void world::play()
 					party_map_range range = parties_.equal_range(
 						active_party->loc());
 					bool path_cleared = true;
-					bool were_encounters = range.first != range.second;
+					bool were_encounters = false;
 
 					while(range.first != range.second && !active_party->is_destroyed()) {
+						if(active_party->is_human_controlled() || 
+						   range.first->second->is_human_controlled()) {
+							were_encounters = true;
+						}
 						handle_encounter(active_party,range.first->second, map());
-
 						if(range.first->second->is_destroyed()) {
 							parties_.erase(range.first++);
 						} else {
@@ -402,7 +405,7 @@ void world::play()
 					if(!path_cleared) {
 						active_party->set_loc(start_loc);
 					}
-					if(active_party->is_human_controlled() && were_encounters) {
+					if(were_encounters) {
 						skippy.reset();
 						fps_track_.reset();
 					}
