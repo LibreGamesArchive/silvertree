@@ -402,7 +402,7 @@ void world::play()
 					if(!path_cleared) {
 						active_party->set_loc(start_loc);
 					}
-					if(were_encounters) {
+					if(active_party->is_human_controlled() && were_encounters) {
 						skippy.reset();
 						fps_track_.reset();
 					}
