@@ -121,6 +121,7 @@ public:
 	void update_time(int cur_time);
 	void add_modification(const std::string& stat, int expire, int mod);
 	const graphics::location_tracker& loc_tracker() { return loc_tracker_; }
+	int route_cost(const route& r) const;
 private:
 	void get_possible_moves_internal(move_map& locs, const std::vector<battle_character_ptr>& chars, route& r, int max_distance) const;
 
@@ -134,7 +135,6 @@ private:
 	int move_at_;
 
 	int planned_move_cost() const;
-	int route_cost(const route& r) const;
 	int move_cost(const hex::location& a, const hex::location& b) const;
 	int adjust_damage(int damage) const;
 	route move_;

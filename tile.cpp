@@ -114,7 +114,8 @@ void tile::draw_features(const tile** beg, const tile** end,
 }
 
 tile::tile(const location& loc, const std::string& data)
-    : id_(current_id++), loc_(loc), height_(0), model_init_(false)
+	: id_(current_id++), loc_(loc), height_(0), model_init_(false),
+	  active_tracker_(NULL)
 {
 
 	std::vector<std::string> items = util::split(data,' ');
@@ -131,7 +132,7 @@ tile::tile(const location& loc, const std::string& data)
 tile::tile(const location& loc, int height,
            const_base_terrain_ptr terrain,
 		   const_terrain_feature_ptr feature)
-    : loc_(loc), height_(height)
+	: loc_(loc), height_(height), active_tracker_(NULL)
 {
 	init(height,terrain,feature);
 }
@@ -475,6 +476,10 @@ void tile::do_draw() const
 	}
 	
 	glEnd();
+
+	if(active_tracker_) {
+		active_tracker_->update();
+	}
 }
 
 void tile::draw_model() const
@@ -734,6 +739,19 @@ void tile::draw_highlight() const
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
+}
+
+void tile::attach_tracker(graphics::location_tracker* tracker) const {
+	active_tracker_ = tracker;
+	active_tracker_->clear_vertices();
+	active_tracker_->add_vertex(center_.x, center_.y, center_.height);
+	for(int i=0; i<6;i++) {
+		active_tracker_->add_vertex(corners_[i].x, corners_[i].y, corners_[i].height);
+	}
+}
+
+void tile::clear_tracker() const {
+	active_tracker_ = NULL;
 }
 
 }

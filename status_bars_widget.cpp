@@ -5,6 +5,115 @@
 
 namespace game_dialogs {
 
+namespace {
+
+inline void draw_centered_expanding_time_bar(GLfloat time, int units, GLfloat range_center_angle, GLfloat range_length, 
+					    GLfloat proportion_ticks, GLfloat inner_radius, GLfloat thickness, 
+					    const SDL_Color& color, Uint8 alpha, GLUquadric *quad) 
+{
+	if(time <= 0) {
+		return;
+	}
+	if(time > 10.0) {
+		time = 10.0;
+	}
+	
+	const int segments = static_cast<int>(time);
+
+	const GLfloat angle_per_tick = range_length / units;
+	const GLfloat drawn_tick_angle = angle_per_tick * proportion_ticks;
+	const GLfloat skip_angle = (angle_per_tick - drawn_tick_angle)/2;
+	const GLfloat outer_radius = inner_radius + thickness;
+	const GLfloat total_angle = segments * angle_per_tick + (time - segments)*angle_per_tick;
+
+	glColor4ub(color.r, color.g, color.b, alpha);
+			
+	
+	if(segments > 0) {
+		for(int i =0;i<segments;++i) {
+			gluPartialDisk(quad, inner_radius, outer_radius, 16, 1, 
+				       range_center_angle - (total_angle/2) + i*angle_per_tick + skip_angle, 
+				       drawn_tick_angle); 
+		}
+	}
+	if(time != static_cast<GLfloat>(segments)) {
+		gluPartialDisk(quad, inner_radius, outer_radius, 16, 1, 
+			       range_center_angle - (total_angle/2) + segments*angle_per_tick + skip_angle, 
+			       drawn_tick_angle*(time - segments));
+	}		
+}
+
+inline void draw_centered_scaling_time_bar(GLfloat time, int units, GLfloat range_center_angle, GLfloat range_length, 
+					   GLfloat proportion_ticks, GLfloat inner_radius, GLfloat thickness, 
+					   const SDL_Color& color, Uint8 alpha, GLUquadric *quad) 
+{
+	int segments = static_cast<int>(time);
+	if(segments < 1) {
+		return;
+	}
+	if(segments > 10) {
+		segments = 10;
+	}
+	
+	const GLfloat angle_per_tick = range_length / segments;
+	const GLfloat drawn_tick_angle = angle_per_tick * proportion_ticks;
+	const GLfloat skip_angle = (angle_per_tick - drawn_tick_angle)/2;
+	const GLfloat outer_radius = inner_radius + thickness;
+
+	glColor4ub(color.r, color.g, color.b, alpha);
+			
+	if(segments > 0) {
+		for(int i=0;i<segments;++i) {
+			gluPartialDisk(quad, inner_radius, outer_radius, 16, 1, 
+				       range_center_angle - (range_length/2) + i*angle_per_tick + skip_angle, 
+				       drawn_tick_angle); 
+		}
+	}
+}
+
+inline void draw_time_bars(GLfloat time, GLfloat start, GLfloat thickness, GLfloat start_ang, GLfloat range,
+			   int units, const SDL_Color& color, Uint8 alpha, GLUquadric *quad) 
+{
+	int cur_bar = 1;
+	GLfloat divisor = 1.0;
+	while(time / divisor > units) {
+		divisor *= units;
+		++cur_bar;
+	}
+	GLfloat cur_time = time;
+	while(divisor > 1.0) {
+		GLfloat bar_time = cur_time/divisor;
+		const GLfloat bar_inner = start + (1 + 2*(cur_bar-1))*thickness;
+		const GLfloat bar_thickness = thickness/2;
+		draw_centered_scaling_time_bar(bar_time, units, start_ang, range, 10.0/14.0, bar_inner,
+					       bar_thickness, color, alpha, quad);
+		--cur_bar;
+		cur_time -= static_cast<int>(bar_time)*divisor;
+		divisor /= units;
+	}
+
+	draw_centered_expanding_time_bar(cur_time, units, start_ang, range, 10.0/14.0, start, 
+					 thickness, color, alpha, quad);
+}
+
+inline void get_bcircle(const GLfloat* bbox, GLfloat* bcircle) {
+	bcircle[0] = (bbox[0] + bbox[2])/2;
+	bcircle[1] = (bbox[1] + bbox[3])/2;
+	bcircle[2] = 0;
+
+	for(int i=0;i<2;++i) {
+		GLfloat dist_x = (bbox[i*2] - bcircle[0]);
+		GLfloat dist_y = (bbox[i*2+1] - bcircle[1]);
+		GLfloat dist = dist_x*dist_x + dist_y*dist_y;
+		if(dist > bcircle[2]) {
+			bcircle[2] = dist;
+		}
+	}
+	bcircle[2] = sqrt(bcircle[2]);
+}
+}
+
+
 void status_bars_widget::smooth_transition(GLfloat& x, GLfloat& prev, GLfloat cur) const {
 	if(cur != x) {
 		GLfloat step;
@@ -30,8 +139,8 @@ void status_bars_widget::handle_draw() const {
 		return;
 	}
 
-	GLfloat pos[4];
-	ch_->loc_tracker().get_bbox(pos);
+	GLfloat bbox[4];
+	ch_->loc_tracker().get_bbox(bbox);
 	
 	GLfloat r_max_hitpoints = static_cast<GLfloat>(rch.max_hitpoints());
 
@@ -118,69 +227,25 @@ void status_bars_widget::handle_draw() const {
 
 	SDL_Color damage_color = { 255, 10, 10 };
 
-
-	GLfloat center_x = (pos[0] + pos[2])/2;
-	GLfloat center_y = (pos[1] + pos[3])/2;
-
-	GLfloat radius = 0;
-
-	for(int i=0;i<2;++i) {
-		GLfloat dist_x = (pos[i*2] - center_x);
-		GLfloat dist_y = (pos[i*2+1] - center_y);
-		GLfloat dist = dist_x*dist_x + dist_y*dist_y;
-		if(dist > radius) {
-			radius = dist;
-		}
-	}
-	radius = sqrt(radius);
+	GLfloat bcircle[3];
+	get_bcircle(bbox, bcircle);
 
 	GLUquadric* quad =  gluNewQuadric();
 
 	try {
 		glDisable(GL_TEXTURE_2D);
 		glPushMatrix();
-		glTranslatef(center_x, center_y, 0);
+		glTranslatef(bcircle[0], bcircle[1], 0);
 		
 		if(health_angle > 0) {
 			glColor4ub(damage_color.r, damage_color.g, damage_color.b, 180);
-			gluPartialDisk(quad, radius*9/10, radius*11/10, 16, 1, 
+			gluPartialDisk(quad, bcircle[2]*9/10, bcircle[2]*11/10, 16, 1, 
 				       -90-health_max_angle/2 + health_angle, +(health_max_angle-health_angle));
 			glColor4ub(bar_color.r, bar_color.g, bar_color.b, 180);
-			gluPartialDisk(quad, radius*9/10, radius*11/10, 16, 1, 
+			gluPartialDisk(quad, bcircle[2]*9/10, bcircle[2]*11/10, 16, 1, 
 				       -90-health_max_angle/2, +health_angle);
 		}
-		if(time_to_move > 0) {
-			GLfloat big_units = time_to_move/10;
-			int big_segments = static_cast<int>(big_units);
-			GLfloat small_units = time_to_move - big_segments*10;
-			int small_segments = static_cast<int>(small_units);
-			glColor4ub(time_color.r, time_color.g, time_color.b, 180);
-			
-			GLfloat small_units_angle = small_units * 14 + (small_units - small_segments);
-
-
-			if(small_segments > 0) {
-				for(int i =0;i<small_segments;++i) {
-					gluPartialDisk(quad, radius*12/10, radius*14/10, 16, 1, 
-						       -90 + (small_units_angle/2) - i*14, -10); 
-				}
-			}
-			if(small_units > 0 && small_units != static_cast<GLfloat>(small_segments)) {
-				gluPartialDisk(quad, radius*12/10, radius*14/10, 16, 1, 
-					       -90 + (small_units_angle/2) - small_segments*14, 
-					       -10*(small_units - small_segments));
-			}
-
-			if(big_segments > 0) {
-				if(big_units  > 10) big_units = 10;
-				if(big_segments > 10) big_segments = 10;
-				for(int i=0;i<big_segments;++i) {
-					gluPartialDisk(quad, radius*15/10, radius*16/10, 16, 1, 
-						       -40.0 - (10.0/big_segments) - i*100.0/big_segments, 
-						       -90.0/(big_segments)); 
-				}
-			}
-		}
+		draw_time_bars(time_to_move, bcircle[2]*12/10, bcircle[2]*2/10, -90, 140, 10, time_color, 180, quad);
 
 		glPopMatrix();
 		glEnable(GL_TEXTURE_2D);
@@ -188,6 +253,36 @@ void status_bars_widget::handle_draw() const {
 	} catch(...) {
 		gluDeleteQuadric(quad);
 		throw;
+	}
+	gluDeleteQuadric(quad);
+}
+
+void time_cost_widget::handle_draw() const {
+	if(!tracker_) {
+		return;
+	}
+
+	GLfloat bbox[4];
+	tracker_->get_bbox(bbox);
+	GLfloat bcircle[3];
+	get_bcircle(bbox, bcircle);
+	
+	const SDL_Color cost_color = { 255, 200, 255 };
+
+	GLUquadric *quad = gluNewQuadric();
+	try {
+		glDisable(GL_TEXTURE_2D);
+		glPushMatrix();
+		glTranslatef(bcircle[0], bcircle[1], 0);
+		
+		draw_time_bars(time_cost_, bcircle[2]/3, bcircle[2]/10, 180, 360, 10, cost_color, 180, quad);
+
+		glPopMatrix();
+		glEnable(GL_TEXTURE_2D);
+
+		
+	} catch(...) {
+		gluDeleteQuadric(quad);
 	}
 	gluDeleteQuadric(quad);
 }

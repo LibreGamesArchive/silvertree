@@ -51,7 +51,8 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
 	 camera_(battle_map), camera_controller_(camera_),
 	 result_(ONGOING), keyed_selection_(0),
          current_time_(0), sub_time_(0.0), 
-         skippy_(50, preference_maxfps())
+         skippy_(50, preference_maxfps()),
+         tracked_tile_(NULL)
 {
 	srand(SDL_GetTicks());
 
@@ -60,7 +61,8 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
 		gui::widget_ptr w(new game_dialogs::status_bars_widget(*this, *i));
 		widgets_.push_back(w);
 	}
-
+	time_cost_widget_.reset(new game_dialogs::time_cost_widget());
+	widgets_.push_back(time_cost_widget_);
 }
 
 void battle::play()
@@ -87,16 +89,8 @@ void battle::play()
 	             (graphics::screen_height()-msg->height())/2);
 	widgets_.push_back(msg);
 
-	begin_animation();
-	const int start = SDL_GetTicks();
-	const GLfloat time = 2.0;
-	GLfloat t;
-	do {
-		t = (SDL_GetTicks()-start)/(1000.0);
-		animation_frame(t);
-	} while(t < time);
-	end_animation();
-		
+	elapse_time(0.0, 100);
+
 	graphics::floating_label::clear();
 }
 
@@ -171,6 +165,7 @@ void battle::player_turn(battle_character& c)
 					break;
 			        case SDL_MOUSEMOTION:
 					handle_mouse_motion(event);
+					handle_time_cost_popup();
 					break;
 			}
 		}
@@ -232,6 +227,10 @@ int battle::movement_duration()
 
 hex::location battle::selected_loc()
 {
+	if(tracked_tile_) {
+		tracked_tile_->clear_tracker();
+	}
+
 	using hex::tile;
 	camera_controller_.prepare_selection();
 	const std::vector<tile>& tiles = map_.tiles();
@@ -245,6 +244,9 @@ hex::location battle::selected_loc()
 	if(select_name == GLuint(-1)) {
 		return hex::location();
 	}
+
+	tracked_tile_ = &(tiles[select_name]);
+	tracked_tile_->attach_tracker(&hex_tracker_);
 
 	return tiles[select_name].loc();
 }
@@ -488,6 +490,8 @@ void battle::draw_route(const battle_character::route& r)
 void battle::begin_animation() {
 	sub_time_ = 0.0;
 	stats_dialogs_.clear();
+	time_cost_widget_->set_visible(false);
+	time_cost_widget_->clear_tracker();
 }
 
 void battle::animation_frame(float t) {
@@ -507,19 +511,23 @@ void battle::animation_frame(float t) {
 			break;
 		}
 	}
+	camera_controller_.keyboard_control();
 }
 
 void battle::end_animation() {
 	sub_time_ = 0.0;
 }
 
-void battle::elapse_time(const GLfloat elapse) {
-	if(elapse <= 0) {
+void battle::elapse_time(GLfloat anim_elapse, int frames) {
+	if(frames <= 0) {
 		return;
 	}
+	const GLfloat step = anim_elapse/frames;
+	GLfloat t = 0.0; 
 	begin_animation();
-	for(GLfloat t = 0.0; t < elapse; t +=0.1) {
+	for(int frame = 0; frame<frames;++frame) {
 		animation_frame(t);
+		t += step;
 	}
 	end_animation();
 }
@@ -698,7 +706,7 @@ void battle::handle_dead_character(const battle_character& c)
 		return;
 	}
 
-	elapse_time(5.0);
+	elapse_time(0.0, 50);
 
 	for(std::vector<battle_character_ptr>::iterator i = chars_.begin();
 	    i != chars_.end(); ++i) {
@@ -855,6 +863,50 @@ void battle::handle_mouse_motion(const SDL_Event& e) {
 		if(ptr && (ptr == i->second)) continue;
 		i->second->process_event(e);
 	}
+}
+
+void battle::handle_time_cost_popup() 
+{
+	std::cout<< "handling time cost popup\n";
+
+	battle_character_ptr attacker = *focus_;
+	battle_character_ptr defender = selected_char();
+		
+	if(highlight_moves_ ) {
+		std::cout << "in move mode\n";
+		const battle_character::move_map::const_iterator move = moves_.find(selected_loc());
+		if(move != moves_.end()) {
+			int cost = attacker->route_cost(move->second);
+			time_cost_widget_->set_tracker(&hex_tracker_);
+			time_cost_widget_->set_time_cost(cost);
+			time_cost_widget_->set_visible(true);	
+			return;
+		}			
+	} else if(highlight_targets_) {
+		std::cout << "in attack mode\n";
+		assert(current_move_);
+		if(current_move_->can_attack()) {
+			/* attack cost */
+			attack_stats stats = get_attack_stats(*attacker, *defender, *current_move_);
+			time_cost_widget_->set_tracker(&(defender->loc_tracker()));
+			time_cost_widget_->set_time_cost(stats.time_taken);
+			time_cost_widget_->set_visible(true);
+			return;
+		} else {
+			/* SPELL cost */
+			hex::location loc = selected_loc();
+			if(map_.is_loc_on_map(loc)) {
+				/* move cost */
+				time_cost_widget_->set_tracker(&hex_tracker_);
+				time_cost_widget_->set_time_cost(current_move_->get_stat("initiative",*attacker));
+				time_cost_widget_->set_visible(true);
+				return;
+			}
+		}
+	}
+	
+	time_cost_widget_->clear_tracker();
+	time_cost_widget_->set_visible(false);
 }
 
 bool battle::enter_move_mode()
