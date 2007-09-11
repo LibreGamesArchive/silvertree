@@ -64,17 +64,11 @@ void status_bars_widget::handle_draw() const {
 		health_angle = 100;
 	}
 
-	int num_moving_chars = 0;
 	GLfloat fastest = HUGE_VALF;
 	GLfloat second_fastest = HUGE_VALF;
 	for(std::vector<game_logic::battle_character_ptr>::const_iterator i = b_.participants().begin();
 	    i != b_.participants().end(); ++i) {
 		GLfloat ready = (*i)->ready_to_move_at();
-		GLfloat move_time = (*i)->get_movement_time();
-		if(move_time > 0.0) { 
-			ready += move_time;
-			++num_moving_chars;
-		}
 		if(ready < fastest) {
 			second_fastest = fastest;
 			fastest = ready;
@@ -83,25 +77,16 @@ void status_bars_widget::handle_draw() const {
 		}
 	}
 
-	GLfloat time_to_move = ch_->ready_to_move_at();
-	GLfloat move_time = ch_->get_movement_time();
-	if(move_time > 0) {
-		time_to_move +=  move_time;
-	}
+ 	GLfloat time_to_move = ch_->ready_to_move_at();
+
 	if(time_to_move == fastest) {
 		if(second_fastest == HUGE_VALF) {
 			time_to_move = 0;
-		} else if(num_moving_chars != 1) {
+		} else {
 			time_to_move = b_.current_time() + b_.animation_time() - second_fastest ;
-		} else {
-			time_to_move -= second_fastest;
-		}
+		} 
 	} else {
-		if(num_moving_chars != 1) {
-			time_to_move -= b_.current_time() + b_.animation_time();
-		} else {
-			time_to_move -= fastest;
-		}
+		time_to_move -= b_.current_time() + b_.animation_time();
 	}
 
 	SDL_Color time_color;
@@ -173,13 +158,18 @@ void status_bars_widget::handle_draw() const {
 			
 			GLfloat small_units_angle = small_units * 14 + (small_units - small_segments);
 
-			for(int i =0;i<small_segments;++i) {
-				gluPartialDisk(quad, radius*12/10, radius*14/10, 16, 1, 
-					       -90 + (small_units_angle/2) - i*14, -10); 
+
+			if(small_segments > 0) {
+				for(int i =0;i<small_segments;++i) {
+					gluPartialDisk(quad, radius*12/10, radius*14/10, 16, 1, 
+						       -90 + (small_units_angle/2) - i*14, -10); 
+				}
 			}
-			gluPartialDisk(quad, radius*12/10, radius*14/10, 16, 1, 
-				       -90 + (small_units_angle/2) - small_segments*14, 
-				       -10*(small_units - small_segments));
+			if(small_units > 0 && small_units != static_cast<GLfloat>(small_segments)) {
+				gluPartialDisk(quad, radius*12/10, radius*14/10, 16, 1, 
+					       -90 + (small_units_angle/2) - small_segments*14, 
+					       -10*(small_units - small_segments));
+			}
 
 			if(big_segments > 0) {
 				if(big_units  > 10) big_units = 10;
