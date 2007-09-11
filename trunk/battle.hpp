@@ -23,8 +23,10 @@
 #include "camera_controller.hpp"
 #include "frame_rate_utils.hpp"
 #include "gamemap.hpp"
+#include "location_tracker.hpp"
 #include "mini_stats_dialog.hpp"
 #include "particle_system.hpp"
+#include "time_cost_widget.hpp"
 #include "texture.hpp"
 #include "widget.hpp"
 
@@ -48,7 +50,7 @@ public:
 	void player_turn(battle_character& c);
 	const hex::gamemap& map() const { return map_; }
 
-	void elapse_time(GLfloat time_to_elapse);
+	void elapse_time(GLfloat anim_elapse, int frames);
 	void move_character(battle_character& c, const battle_character::route& r);
 	void attack_character(battle_character& attacker,
 	                      battle_character& defender,
@@ -82,6 +84,7 @@ private:
 	battle_character_ptr selected_char();
 	void handle_mouse_button_down(const SDL_MouseButtonEvent& e);
 	void handle_mouse_motion(const SDL_Event& e);
+	void handle_time_cost_popup();
 	void begin_animation();
 	void end_animation();
 	void animation_frame(GLfloat t);
@@ -120,6 +123,9 @@ private:
 	GLfloat sub_time_;
 
 	graphics::frame_skipper skippy_;
+	graphics::location_tracker hex_tracker_;
+	const hex::tile* tracked_tile_;
+	game_dialogs::time_cost_widget_ptr time_cost_widget_;
 	graphics::particle_system particle_system_;
 };
 		

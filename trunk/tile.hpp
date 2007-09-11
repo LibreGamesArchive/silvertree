@@ -19,6 +19,7 @@
 #include <gl.h>
 
 #include "base_terrain_fwd.hpp"
+#include "location_tracker.hpp"
 #include "material.hpp"
 #include "model_fwd.hpp"
 #include "particle_emitter.hpp"
@@ -100,6 +101,10 @@ public:
 
 	int num_neighbours() const { int res = 0; for(int n = 0; n != 6; ++n) { if(neighbours_[n]) { ++res; } } return res; }
 
+	void attach_tracker(graphics::location_tracker* tracker) const;
+	void clear_tracker() const;
+	const graphics::location_tracker* get_tracker() { return active_tracker_; }
+
 	struct compare_texture
 	{
 		bool operator()(const tile* a, const tile* b) const {
@@ -125,6 +130,8 @@ private:
 
 	mutable graphics::texture texture_;
 	mutable std::vector<graphics::texture> cliff_textures_;
+
+	mutable graphics::location_tracker* active_tracker_;
 
 	struct point {
 		point() : x(0), y(0), height(0),
