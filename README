@@ -10,17 +10,24 @@ Notable dependencies are Boost, SDL, and OpenGL. The editor depends on Qt 4.
 
 RUNNING
 
-Type './game' to run the game. Type './edit data/scenario.cfg' to run the editor (on the main scenario file).
+To play the game type './game'. 
+
+To run the editor (on the main scenario file) type './edit data/scenario.cfg' .
 
 CONTROLS
 
-You move a party of characters around a hexagonally tiled map. Moving north and south is accomplished by pressing the up and down arrow. Moving in a diagonal direction involves pressing the left or right arrow key, and holding it while you also press the up or down arrow.
+You move a party of characters around a hexagonally tiled map. Assuming north is toward the top of the screen, moving north and south is accomplished by pressing the up and down arrow. Moving in a diagonal direction involves pressing the left or right arrow key, and holding it while you also press the up or down arrow.
 
 For instance, press left and down to move south-west.
 
-You move your party one hex at a time. Once your party begins moving from one hex to another, you've committed to that move and won't have control over your party again until the move is complete.
+You move your party one hex at a time. Once your party begins moving from one hex to another, you've committed to that move and won't have control over your party again until the move is complete.  Other parties will only move while you are moving or resting.  Whenever your party isn't carrying out your commands, the game automatically pauses until you issue a new command.
 
-You can also control the camera. Press 'z' to zoom in, and 'x' to zoom out. Hold control and press the arrow keys to rotate and tilt the camera.
+You can also control the camera. Press 'z' to zoom in, and 'x' to zoom out. Hold control and press the arrow keys to rotate and tilt the camera.  As alternate keys, 'p' and 'l' will tilt the camera, while '<' and '>' will rotate the camera.
+
+GETTING STARTED
+
+We suggest that you first visit the small town of Felson (the house visible from your starting position).
+See also "Character Status" below.
 
 CHARACTER STATUS
 
@@ -40,11 +47,17 @@ Hold shift while moving to make your party run. The party moves at double speed 
 
 COMBAT
 
-When you encounter a hostile party, combat will be initiated on a combat map. During combat, you will be able to move your character's around and attack enemies. Each character gets their turn in order based on their initiative.
+When you encounter a hostile party, combat will be initiated on a combat map.
+* In combat, every action has an "action cost." 
+* The unit performs the action, and then is "unready" until the "action cost" can be paid off.
+* "Unready" units can only stand and defend themselves.
+* The "action cost" is paid off at the rate of 1 action point per second of "battle time".
+* When a unit pays off it's previous "action cost," it becomes "ready" and can act again.
+* If more than one unit is "ready" during the same second of "battle time" the unit with the highest initiative goes first.
 
 MORE INFO
 
-Stop by http://groups.google.com/group/silver-tree-development/ to check out the latest in Silver Tree development.
+Visit http://www.silvertreerpg.org/ to check out the latest in Silver Tree development.
 
 We are currently looking for assistance in many areas of development.
 
