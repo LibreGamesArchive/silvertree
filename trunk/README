@@ -1,0 +1,52 @@
+Welcome to Silver Tree 0.1!
+
+Silver Tree is a project which aims to create an Open Source single player RPG.
+
+BUILDING
+
+Type 'make' to build the game. Type 'make edit' to build the editor. The Makefile is kinda hacky so you might have to modify it to get it working on your system.
+
+Notable dependencies are Boost, SDL, and OpenGL. The editor depends on Qt 4.
+
+RUNNING
+
+Type './game' to run the game. Type './edit data/scenario.cfg' to run the editor (on the main scenario file).
+
+CONTROLS
+
+You move a party of characters around a hexagonally tiled map. Moving north and south is accomplished by pressing the up and down arrow. Moving in a diagonal direction involves pressing the left or right arrow key, and holding it while you also press the up or down arrow.
+
+For instance, press left and down to move south-west.
+
+You move your party one hex at a time. Once your party begins moving from one hex to another, you've committed to that move and won't have control over your party again until the move is complete.
+
+You can also control the camera. Press 'z' to zoom in, and 'x' to zoom out. Hold control and press the arrow keys to rotate and tilt the camera.
+
+CHARACTER STATUS
+
+Press 's' to enter the party's status screen. The characters in your party are displayed at the top. You can click on a party member to go to that character's status screen. From here you can upgrade their attributes, learn skills, and change their equipment.
+
+At the start of the game, your main character has many unassigned attribute points. It is recommended that you immediately build your character by going to the status screen.
+
+FATIGUE
+
+In the top-left of the screen on the main display are two numbers listed for each character. For instance, 0/85. The '0' in this example indicates the character's fatigue, and the '85' their stamina. As the party performs actions, fatigue increases. Once fatigue is greater than stamina, the character begins to tire and becomes slower, and suffers penalties in combat.
+
+RESTING AND RUNNING
+
+Hold space to make your party rest. Fatigue will be removed as the party rests.
+
+Hold shift while moving to make your party run. The party moves at double speed when running, however fatigue accumulates at four times the normal rate.
+
+COMBAT
+
+When you encounter a hostile party, combat will be initiated on a combat map. During combat, you will be able to move your character's around and attack enemies. Each character gets their turn in order based on their initiative.
+
+MORE INFO
+
+Stop by http://groups.google.com/group/silver-tree-development/ to check out the latest in Silver Tree development.
+
+We are currently looking for assistance in many areas of development.
+
+David White
+dave@whitevine.net
