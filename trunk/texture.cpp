@@ -10,6 +10,7 @@
 
    See the COPYING file for more details.
 */
+#include "preferences.hpp"
 #include "surface_cache.hpp"
 #include "texture.hpp"
 #include <gl.h>
@@ -27,6 +28,7 @@ namespace {
 	GLuint texture_buf[TextureBufSize];
 	size_t texture_buf_pos = TextureBufSize;
 	std::vector<GLuint> avail_textures;
+	bool graphics_initialised = false;
 
 	GLuint current_texture = 0;
 
@@ -96,6 +98,25 @@ namespace {
     	}
     	return npot;
     }
+
+	std::string mipmap_type_to_string(GLenum type) {
+		switch(type) {
+		case GL_NEAREST:
+			return "N";
+		case GL_LINEAR:
+			return "L";
+		case GL_NEAREST_MIPMAP_NEAREST:
+			return "NN";
+		case GL_NEAREST_MIPMAP_LINEAR:
+			return "NL";
+		case GL_LINEAR_MIPMAP_NEAREST:
+			return "LN";
+		case GL_LINEAR_MIPMAP_LINEAR:
+			return "LL";
+		default:
+			return "??";
+		}
+	}
 }
 
 void texture::clear_textures()
@@ -111,7 +132,7 @@ texture::texture(const key& surfs)
 		return;
 	}
 
-	if(width_multiplier < 0.0) {
+	if(!graphics_initialised) {
 		npot_allowed = is_npot_allowed();
 		if (!npot_allowed) {
 		    std::cerr << "Using only pot textures\n";
@@ -150,11 +171,29 @@ texture::texture(const key& surfs)
 	id_ = boost::shared_ptr<ID>(new ID(get_texture_id()));
 
 	glBindTexture(GL_TEXTURE_2D,id_->id);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	gluBuild2DMipmaps(GL_TEXTURE_2D,4,s->w,s->h,GL_RGBA,
-			  GL_UNSIGNED_BYTE,s->pixels);
+	if(preference_mipmapping()) {
+		if(!graphics_initialised) {
+			std::cout << "Mipmapping enabled: MIN "
+				  << mipmap_type_to_string(preference_mipmap_min())
+				  << " MAX " 
+				  << mipmap_type_to_string(preference_mipmap_max())
+				  << "\n";
+		}
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, preference_mipmap_min());
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, preference_mipmap_max());
+		gluBuild2DMipmaps(GL_TEXTURE_2D,4,s->w,s->h,GL_RGBA,
+				  GL_UNSIGNED_BYTE,s->pixels);
+	} else {
+		if(!graphics_initialised) {
+			std::cout << "Mipmapping disabled.\n";
+		}
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D,0,4,s->w,s->h,0,GL_RGBA,
+			     GL_UNSIGNED_BYTE,s->pixels);
+	}
 	current_texture = 0;
+	graphics_initialised = true;
 }
 
 void texture::set_as_current_texture() const
