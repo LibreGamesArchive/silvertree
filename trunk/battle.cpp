@@ -126,11 +126,6 @@ void battle::player_turn(battle_character& c)
 					result_ = QUIT;
 					break;
 				case SDL_KEYDOWN:
-					if(event.key.keysym.sym == SDLK_ESCAPE) {
-						turn_done_ = true;
-						result_ = QUIT;
-						break;
-					}
 					if(highlight_targets_ &&
 					   (event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE)) {
