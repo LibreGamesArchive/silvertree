@@ -106,7 +106,7 @@ private:
 	void generate_movement_order();
 	std::vector<graphics::texture> movement_order_;
 
-	enum BATTLE_RESULT { ONGOING, PLAYER_WIN, PLAYER_LOSE };
+	enum BATTLE_RESULT { ONGOING, PLAYER_WIN, PLAYER_LOSE, QUIT };
 	BATTLE_RESULT result_;
 
 	std::vector<gui::widget_ptr> widgets_;
