@@ -867,13 +867,10 @@ void battle::handle_mouse_motion(const SDL_Event& e) {
 
 void battle::handle_time_cost_popup() 
 {
-	std::cout<< "handling time cost popup\n";
-
 	battle_character_ptr attacker = *focus_;
 	battle_character_ptr defender = selected_char();
 		
 	if(highlight_moves_ ) {
-		std::cout << "in move mode\n";
 		const battle_character::move_map::const_iterator move = moves_.find(selected_loc());
 		if(move != moves_.end()) {
 			int cost = attacker->route_cost(move->second);
@@ -883,7 +880,6 @@ void battle::handle_time_cost_popup()
 			return;
 		}			
 	} else if(highlight_targets_) {
-		std::cout << "in attack mode\n";
 		assert(current_move_);
 		if(current_move_->can_attack()) {
 			/* attack cost */
