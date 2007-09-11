@@ -73,6 +73,13 @@ void battle::play()
 		(*focus_)->play_turn(*this);
 	}
 
+	if(result_ == QUIT) {
+		SDL_Event e;
+		e.type = SDL_QUIT;
+		SDL_PushEvent(&e);
+		return;
+	}
+
 	const std::string message = result_ == PLAYER_WIN ?
 	     "Victory!" : "Defeat!";
 	gui::widget_ptr msg = gui::label::create(message, result_ == PLAYER_WIN ? graphics::color_blue() : graphics::color_red(), 60);
@@ -116,8 +123,14 @@ void battle::player_turn(battle_character& c)
 			switch(event.type) {
 				case SDL_QUIT:
 					turn_done_ = true;
+					result_ = QUIT;
 					break;
 				case SDL_KEYDOWN:
+					if(event.key.keysym.sym == SDLK_ESCAPE) {
+						turn_done_ = true;
+						result_ = QUIT;
+						break;
+					}
 					if(highlight_targets_ &&
 					   (event.key.keysym.sym == SDLK_RETURN ||
 						event.key.keysym.sym == SDLK_SPACE)) {
