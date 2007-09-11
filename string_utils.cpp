@@ -105,5 +105,20 @@ std::vector< std::string > split(std::string const &val, char c, int flags)
 
 	return res;
 }
-		
+
+bool string_starts_with(const std::string& target, const std::string& prefix) {
+	if(target.length() < prefix.length()) {
+		return false;
+	}
+	std::string target_pfx =  target.substr(0,prefix.length());
+	return target_pfx == prefix;
+}
+
+std::string strip_string_prefix(const std::string& target, const std::string& prefix) {
+	if(target.length() < prefix.length()) {
+		return "";
+	}
+	return target.substr(prefix.length());
+}
+
 }
