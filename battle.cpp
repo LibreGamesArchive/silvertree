@@ -111,6 +111,10 @@ void battle::player_turn(battle_character& c)
 
 		SDL_Event event;
 		while(SDL_PollEvent(&event)) {
+			if(stats_dialogs_process_event(event)) {
+				continue;
+			}
+
 			foreach(const gui::widget_ptr& w, widgets_) {
 				w->process_event(event);
 			}
@@ -165,7 +169,6 @@ void battle::player_turn(battle_character& c)
 					handle_mouse_button_down(event.button);
 					break;
 			        case SDL_MOUSEMOTION:
-					handle_mouse_motion(event);
 					handle_time_cost_popup();
 					break;
 			}
@@ -252,9 +255,7 @@ hex::location battle::selected_loc()
 	return tiles[select_name].loc();
 }
 
-battle_character_ptr battle::selected_char()
-{
-	using hex::tile;
+battle_character_ptr battle::mouse_selected_char() {
 	camera_controller_.prepare_selection();
 	GLuint select_name = 0;
 	foreach(const const_battle_character_ptr& c, chars_) {
@@ -264,28 +265,40 @@ battle_character_ptr battle::selected_char()
 
 	select_name = camera_controller_.finish_selection();
 	if(select_name == GLuint(-1)) {
-		if(targets_.empty()) {
-			return battle_character_ptr();
-		}
-
-		while(keyed_selection_ < 0) {
-			keyed_selection_ += targets_.size();
-		}
-
-		keyed_selection_ = keyed_selection_%targets_.size();
-
-		std::set<hex::location>::const_iterator i = targets_.begin();
-		std::advance(i,keyed_selection_);
-		foreach(const battle_character_ptr& c, chars_) {
-			if(c->loc() == *i) {
-				return c;
-			}
-		}
-
 		return battle_character_ptr();
-	} else {
-		return chars_[select_name];
 	}
+	return chars_[select_name];
+}
+
+battle_character_ptr battle::selected_char()
+{
+	using hex::tile;
+	battle_character_ptr ret;
+	
+	ret = mouse_selected_char();
+	if(ret) {
+		return ret;
+	}
+
+	if(targets_.empty()) {
+		return battle_character_ptr();
+	}
+
+	while(keyed_selection_ < 0) {
+		keyed_selection_ += targets_.size();
+	}
+	
+	keyed_selection_ = keyed_selection_%targets_.size();
+	
+	std::set<hex::location>::const_iterator i = targets_.begin();
+	std::advance(i,keyed_selection_);
+	foreach(const battle_character_ptr& c, chars_) {
+		if(c->loc() == *i) {
+			return c;
+		}
+	}
+	
+	return battle_character_ptr();
 }
 
 void battle::draw(gui::slider* slider)
@@ -454,11 +467,7 @@ void battle::draw(gui::slider* slider)
 	for(std::map<battle_character_ptr, game_dialogs::mini_stats_dialog_ptr>::iterator i = 
 		    stats_dialogs_.begin();
 	    i != stats_dialogs_.end(); ++i) {
-		if(i->second->closed()) {
-			stats_dialogs_.erase(i);
-		} else {
-			i->second->draw();
-		}
+		i->second->draw();
 	}
 
 
@@ -495,21 +504,10 @@ void battle::begin_animation() {
 }
 
 void battle::animation_frame(float t) {
-	SDL_Event ev;
-
 	sub_time_ += t;
 
 	if(!skippy_.skip_frame()) {
 		draw();
-	}
-	while(SDL_PollEvent(&ev)) {
-		switch(ev.type) {
-		case SDL_MOUSEMOTION:
-			handle_mouse_motion(ev);
-			break;
-		default:
-			break;
-		}
 	}
 	camera_controller_.keyboard_control();
 }
@@ -841,29 +839,74 @@ void battle::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
 				target_mod(**focus_, loc, *current_move_);
 			}
 		}
-	}
+	} 
 }
 
-void battle::handle_mouse_motion(const SDL_Event& e) {
-	battle_character_ptr target_char = selected_char();
-	
-	game_dialogs::mini_stats_dialog_ptr ptr;
+bool battle::stats_dialogs_process_event(const SDL_Event& e) {
+	const bool has_dialogs = !stats_dialogs_.empty();
 
-	if(target_char) {
-		std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
-			stats_dialogs_.find(target_char);
-		if(i == stats_dialogs_.end()) {
-			ptr.reset(new game_dialogs::mini_stats_dialog(target_char, -1, 200, 100));
-			stats_dialogs_[target_char] = ptr;
-			ptr->show();
-			ptr->set_frame(gui::frame_manager::make_frame(ptr, "mini-char-battle-stats"));
+	bool clear, grabbed;
+	switch(e.type) {
+	case SDL_KEYDOWN:
+		if(has_dialogs) {
+			clear = true;
+			grabbed = true;
+		} else {
+			clear = false;
+			grabbed = false;
 		}
+		break;
+	case SDL_MOUSEBUTTONDOWN:
+		if(e.button.button != SDL_BUTTON_RIGHT) {
+			if(has_dialogs) {
+				clear = true;
+				grabbed = true;
+			} else {
+				clear = false;
+				grabbed = false;
+			}
+			break;
+		}
+		{
+			battle_character_ptr target_char = mouse_selected_char();
+			if(target_char) {
+				grabbed = true;
+				clear = false;
+				
+				game_dialogs::mini_stats_dialog_ptr ptr;
+				
+				std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
+					stats_dialogs_.find(target_char);
+				if(i == stats_dialogs_.end()) {
+					ptr.reset(new game_dialogs::mini_stats_dialog(target_char, 200, 100));
+					stats_dialogs_[target_char] = ptr;
+					ptr->show();
+					ptr->set_frame(gui::frame_manager::make_frame(ptr, "mini-char-battle-stats"));
+				} else {
+					stats_dialogs_.erase(i);
+				}
+			} else {
+				if(has_dialogs) {
+					grabbed = true;
+					clear = true;
+				} else {
+					grabbed = false;
+					clear = false;
+				}
+			}
+		}
+		break;
+	default:
+		clear = false;
+		grabbed = false;
+		break;
 	}
-	for(std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
-	      stats_dialogs_.begin(); i != stats_dialogs_.end(); ++i) {
-		if(ptr && (ptr == i->second)) continue;
-		i->second->process_event(e);
+
+	if(clear) {
+		stats_dialogs_.clear();
 	}
+
+	return grabbed;
 }
 
 void battle::handle_time_cost_popup() 
