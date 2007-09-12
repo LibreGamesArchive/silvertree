@@ -40,26 +40,17 @@ namespace game_dialogs {
 
 class mini_stats_dialog : public gui::framed_dialog {
 public:
-	mini_stats_dialog(game_logic::battle_character_ptr ch, 
-			  int ttl=-1, int w=100, int h=100);
+	mini_stats_dialog(game_logic::battle_character_ptr ch, int w=100, int h=100);
 	void set_loc(int x, int y) {}
-	void refresh();
 protected:
 	void construct_interface();		
 private:
-	bool hits_me(const SDL_Event& e);
-	void check_death() const;
 	void prepare_draw() const;
 	void inner_draw() const;
 	void finish_draw() const;
-	void handle_event(const SDL_Event& e);
 	void update_location();
-	void hide_and_close();
 
 	game_logic::battle_character_ptr ch_;
-	gui::label_ptr health_label_;
-	int ttl_, death_time_;
-	mutable bool dead_;
 };
 
 typedef boost::shared_ptr<mini_stats_dialog> mini_stats_dialog_ptr;

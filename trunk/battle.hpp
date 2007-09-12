@@ -83,8 +83,9 @@ private:
 	void draw_route(const battle_character::route& r);
 	hex::location selected_loc();
 	battle_character_ptr selected_char();
+	battle_character_ptr mouse_selected_char();
 	void handle_mouse_button_down(const SDL_MouseButtonEvent& e);
-	void handle_mouse_motion(const SDL_Event& e);
+	bool stats_dialogs_process_event(const SDL_Event& e);
 	void handle_time_cost_popup();
 	void begin_animation();
 	void end_animation();
