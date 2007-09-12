@@ -8,6 +8,17 @@
 # need to find a better way to sort this out if anyone else is going to
 # use it for regular cross compilation.
 
+# Note: You need to first build with the makefile, to do all the Qt4 magic.
+
+# Pathes to use:
+BUILD_PATH = "../build"
+EXTRA_INCLUDE_PATHS = ["../win-deps/include",
+    "/usr/i586-mingw32msvc/include/GL",
+    "/usr/i586-mingw32msvc/include/SDL"] 
+EXTRA_EDIT_INCLUDE_PATHS = ["/home/elias/.wine/drive_c/Qt/4.3.1/include"]
+EXTRA_LIB_PATHS = ["../win-deps/lib"]
+EXTRA_EDIT_LIB_PATHS = ["/home/elias/.wine/drive_c/Qt/4.3.1/lib"]
+
 import glob
 
 sources = glob.glob("*.cpp")
@@ -16,15 +27,27 @@ sources += ["xml/xml.c"]
 crosscompile = ARGUMENTS.get("crosscompile", "")
 editor = ARGUMENTS.get("editor", "")
 
-name = "st"
+name = "game"
 if editor:
     sources.remove("main.cpp")
     editor_sources = glob.glob("editor/*.cpp")
     editor_sources.remove("editor/oldmain.cpp")
+    
     sources.extend(editor_sources)
     name = "edit"
 
 env = Environment()
+
+def buildpath():
+    name = BUILD_PATH
+    if editor: name += "/st-edit"
+    else: name += "st-game"
+    if crosscompile: name += "-mingw"
+    else: name += "-posix"
+    return name + "/"
+
+bdir = buildpath()
+realsources = [bdir + x for x in sources] 
 
 if crosscompile:
     # The cross compiler to use
@@ -32,18 +55,15 @@ if crosscompile:
     env["CXX"] = "i586-mingw32msvc-g++"
 
     # Dependencies are here for me (same folder as for Wesnoth).
-    env.Append(CPPPATH = ["../win-deps/include"])
-    
-    env.Append(CPPPATH = ["/usr/i586-mingw32msvc/include/GL"])
-    env.Append(CPPPATH = ["/usr/i586-mingw32msvc/include/SDL"])
+    env.Append(CPPPATH = EXTRA_INCLUDE_PATHS)
 
     # This is where I put the dependency libs
-    env.Append(LIBPATH = ["../win-deps/lib"])
+    env.Append(LIBPATH = EXTRA_LIB_PATHS)
     
     # This is where I placed the Qt stuff for mingw
     if editor:
-        env.Append(CPPPATH = ["/home/elias/.wine/drive_c/Qt/4.3.1/include"])
-        env.Append(LIBPATH = ["/home/elias/.wine/drive_c/Qt/4.3.1/lib"])
+        env.Append(CPPPATH = EXTRA_EDIT_INCLUDE_PATHS)
+        env.Append(LIBPATH = EXTRA_EDIT_LIB_PATHS)
         env.Append(LIBS = ["QtCore4", "QtGui4", "QtOpenGL4"])
 
     # Compilation settings
@@ -53,15 +73,7 @@ if crosscompile:
     env.Append(LIBS = ["mingw32", "SDLmain", "SDL", "SDL_net", "SDL_mixer", "SDL_image",
         "SDL_ttf", "opengl32", "glu32", "boost_regex"])
 
-    # Scons stuff
-    env.BuildDir("../build/st-mingw", ".")
-    env.SConsignFile("sconsign")
-
-    # Windows stuff
     env["PROGSUFFIX"] = ".exe"
-
-    # Compile it!
-    env.Program(name, ["../build/st-mingw/" + x for x in sources])
 
 else:
     # assume Linux
@@ -69,12 +81,9 @@ else:
     env.ParseConfig("sdl-config --libs")
     env.Append(CPPPATH = ["/usr/include/GL"])
     env.Append(LIBS = ["GL", "GLU", "SDL_image", "SDL_ttf", "boost_regex-mt"])
-    
-    if editor:
-        env.ParseConfig("pkg-config --cflags --libs QtCore QtGui QtOpenGL")
-    
-    env.BuildDir("../build/st-posix", ".")
-    env.SConsignFile("sconsign")
-   
-    env.Program(name, ["../build/st-posix/" + x for x in sources])
+    env.ParseConfig("pkg-config --cflags --libs QtCore QtGui QtOpenGL")
+            
+env.BuildDir(bdir, ".")
+env.SConsignFile("sconsign")
+env.Program(name, realsources)
 
