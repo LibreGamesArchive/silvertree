@@ -61,7 +61,7 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
 		gui::widget_ptr w(new game_dialogs::status_bars_widget(*this, *i));
 		widgets_.push_back(w);
 	}
-	time_cost_widget_.reset(new game_dialogs::time_cost_widget());
+	time_cost_widget_.reset(new game_dialogs::time_cost_widget(*this));
 	widgets_.push_back(time_cost_widget_);
 }
 
@@ -72,6 +72,7 @@ void battle::play()
 		generate_movement_order();
 		focus_ = chars_.begin();
 		current_time_ = (*focus_)->ready_to_move_at();
+		sub_time_ = 0.0;
 		(*focus_)->play_turn(*this);
 	}
 
@@ -488,7 +489,6 @@ void battle::draw_route(const battle_character::route& r)
 }
 
 void battle::begin_animation() {
-	sub_time_ = 0.0;
 	stats_dialogs_.clear();
 	time_cost_widget_->set_visible(false);
 	time_cost_widget_->clear_tracker();
@@ -497,7 +497,7 @@ void battle::begin_animation() {
 void battle::animation_frame(float t) {
 	SDL_Event ev;
 
-	sub_time_ = t;
+	sub_time_ += t;
 
 	if(!skippy_.skip_frame()) {
 		draw();
@@ -515,21 +515,23 @@ void battle::animation_frame(float t) {
 }
 
 void battle::end_animation() {
-	sub_time_ = 0.0;
+	elapse_time(0.0, 25, true);
 }
 
-void battle::elapse_time(GLfloat anim_elapse, int frames) {
+void battle::elapse_time(GLfloat anim_elapse, int frames, bool in_anim) {
 	if(frames <= 0) {
 		return;
 	}
 	const GLfloat step = anim_elapse/frames;
-	GLfloat t = 0.0; 
-	begin_animation();
-	for(int frame = 0; frame<frames;++frame) {
-		animation_frame(t);
-		t += step;
+	if(!in_anim) {
+		begin_animation();
 	}
-	end_animation();
+	for(int frame = 0; frame<frames;++frame) {
+		animation_frame(step);
+	}
+	if(!in_anim) {
+		end_animation();
+	}
 }
 
 void battle::move_character(battle_character& c, const battle_character::route& r)
@@ -538,9 +540,9 @@ void battle::move_character(battle_character& c, const battle_character::route& 
 
 	const GLfloat time = c.begin_move(r);
 
-	for(GLfloat t = 0.0; t < time; t += 0.1) {
+	for(GLfloat t = 0; t < time; t += 0.1) {
 		c.set_movement_time(t);
-		animation_frame(t);
+		animation_frame(0.1);
 	}
 
 	c.end_move();
@@ -627,7 +629,7 @@ battle::attack_stats battle::get_attack_stats(
 
 void battle::attack_character(battle_character& attacker,
                               battle_character& defender,
-							  const battle_move& attack_move)
+			      const battle_move& attack_move)
 {
 	attack_stats stats = get_attack_stats(attacker,defender,attack_move);
 	const_battle_character_ptr engaged_with = is_engaged(defender);
@@ -662,7 +664,7 @@ void battle::attack_character(battle_character& attacker,
 		   cur_time >= begin_hit && cur_time <= end_hit) {
 			defender.set_highlight(highlight);
 		}
-		animation_frame(t * elapsed_time/anim_time);
+		animation_frame(0.1 * elapsed_time/anim_time);
 		defender.set_highlight(NULL);
 	} 
 	end_animation();
@@ -736,7 +738,6 @@ void battle::target_mod(battle_character& caster,
                         const hex::location& target,
                         const battle_move& move)
 {
-
 	const int time_to_perform = move.get_stat("initiative",caster);
 	if(graphics::particle_emitter_ptr missile = move.create_missile_emitter()) {
 		using hex::tile;
@@ -759,7 +760,7 @@ void battle::target_mod(battle_character& caster,
 
 			missile->set_pos(pos);
 			missile->emit_particle(particle_system_);
-			animation_frame(frame*time_to_perform/static_cast<GLfloat>(nframes));
+			animation_frame(time_to_perform/static_cast<GLfloat>(nframes));
 		}
 		end_animation();
 	}
