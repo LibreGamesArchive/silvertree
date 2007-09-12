@@ -130,26 +130,22 @@ void smooth_transition(GLfloat& x, GLfloat& prev, GLfloat cur) {
 
 inline GLfloat calc_time_to_move(const game_logic::battle_character_ptr ch, const game_logic::battle& b) {
 	GLfloat fastest = HUGE_VALF;
-	GLfloat second_fastest = HUGE_VALF;
 	for(std::vector<game_logic::battle_character_ptr>::const_iterator i = b.participants().begin();
 	    i != b.participants().end(); ++i) {
+		if((*i) == ch) continue;
 		GLfloat ready = (*i)->ready_to_move_at();
 		if(ready < fastest) {
-			second_fastest = fastest;
 			fastest = ready;
-		}  else if(ready < second_fastest) {
-			second_fastest = ready;
-		}
+		}  
 	}
-
  	GLfloat ret = ch->ready_to_move_at();
 
 	if(ch == b.active_character()) {
 		/* i am the char moving */
-		if(second_fastest == HUGE_VALF) {
+		if(fastest == HUGE_VALF) {
 			ret = 0;
 		} else {
-			ret = b.current_time() + b.animation_time() - second_fastest ;
+			ret = b.current_time() + b.animation_time() - fastest ;
 		} 
 	} else {
 		ret -= b.current_time() + b.animation_time();
