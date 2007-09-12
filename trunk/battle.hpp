@@ -50,11 +50,11 @@ public:
 	void player_turn(battle_character& c);
 	const hex::gamemap& map() const { return map_; }
 
-	void elapse_time(GLfloat anim_elapse, int frames);
+	void elapse_time(GLfloat anim_elapse, int frames, bool in_anim = false);
 	void move_character(battle_character& c, const battle_character::route& r);
 	void attack_character(battle_character& attacker,
 	                      battle_character& defender,
-						  const battle_move& move);
+			      const battle_move& move);
 	void target_mod(battle_character& ch,
 	                const hex::location& target,
 	                const battle_move& move);
@@ -76,6 +76,7 @@ public:
 						   hex::location from_loc=hex::location()) const;
 	int current_time() const { return current_time_; }
 	GLfloat animation_time() const { return sub_time_; }
+	const battle_character_ptr active_character() const { return *focus_; }
 private:
 	void remove_widget(gui::const_widget_ptr w);
 	void draw(gui::slider* slider=NULL);

@@ -8,8 +8,8 @@ namespace game_dialogs {
 
 class time_cost_widget: public gui::widget {
 public:
-	time_cost_widget() :
-		tracker_(NULL), time_cost_(0)
+	time_cost_widget(const game_logic::battle& b) :
+		tracker_(NULL), b_(b), time_cost_(0)
 	{
 		set_visible(false);
 	}
@@ -19,6 +19,7 @@ public:
 private:
 	void handle_draw() const;
 	const graphics::location_tracker* tracker_;
+	const game_logic::battle& b_;
 	int time_cost_;
 };
 
