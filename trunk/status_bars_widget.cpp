@@ -240,7 +240,7 @@ void status_bars_widget::handle_draw() const {
 	SDL_Color time_waited_color = {1,195,255};
 	SDL_Color time_to_go_color = {13,20,108};
 	SDL_Color healthy_color = { 15, 87, 5 };
-	SDL_Color damaged_color = { 133, 8, 14 };
+	SDL_Color damaged_color = { 255, 0, 0 };
 
 	GLfloat bcircle[3];
 	get_bcircle(bbox, bcircle);
