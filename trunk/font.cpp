@@ -140,7 +140,7 @@ texture render_text(const std::string& text, int font_size,
 		y += lineskip;
 	}
 	
-	return texture::get_no_cache(res);
+	return texture::get_no_cache(res, 1 << texture::NO_MIPMAP);
 }
 
 std::string format_text(const std::string& text, int font_size, int width)

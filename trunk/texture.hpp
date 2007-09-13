@@ -13,6 +13,7 @@
 #ifndef TEXTURE_HPP_INCLUDED
 #define TEXTURE_HPP_INCLUDED
 
+#include <bitset>
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <vector>
@@ -27,6 +28,8 @@ namespace graphics
 class texture
 {
 public:
+	enum OPTION { NO_MIPMAP, NUM_OPTIONS };
+	typedef std::bitset<NUM_OPTIONS> options_type;
 	static void clear_textures();
 
 	texture() : width_(0), height_(0) {}
@@ -36,11 +39,11 @@ public:
 	void set_as_current_texture() const;
 	bool valid() const { return id_; }
 
-	static texture get(const std::string& str);
-	static texture get(const key& k);
-	static texture get(const surface& surf);
-	static texture get_no_cache(const key& k);
-	static texture get_no_cache(const surface& surf);
+	static texture get(const std::string& str, options_type options=options_type());
+	static texture get(const key& k, options_type options=options_type());
+	static texture get(const surface& surf, options_type options=options_type());
+	static texture get_no_cache(const key& k, options_type options=options_type());
+	static texture get_no_cache(const surface& surf, options_type options=options_type());
 	static void set_current_texture(const key& k);
 	static void set_coord(GLfloat x, GLfloat y);
 
@@ -51,7 +54,7 @@ public:
 	friend bool operator<(const texture&, const texture&);
 
 private:
-	explicit texture(const key& surfs);
+	explicit texture(const key& surfs, options_type options=options_type());
 
 	struct ID {
 		explicit ID(GLuint id) : id(id) {
