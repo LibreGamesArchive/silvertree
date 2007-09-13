@@ -92,7 +92,9 @@ namespace {
     				!std::strstr(supported, "NV_vertex_program3"))
     					npot = false;
     			else if (std::strstr(vendor, "ATI Technologies"))
-    				if (!std::strstr(supported, "GL_ARB_texture_non_power_of_two"))
+					// TODO: Investigation note: my ATI card works fine for npot textures as long
+					// as mipmapping is enabled. otherwise it runs slowly. Work out why. --David
+    				if (true) //!std::strstr(supported, "GL_ARB_texture_non_power_of_two"))
     					npot = false;
     		}
     	}
@@ -124,7 +126,7 @@ void texture::clear_textures()
 	texture_cache.clear();
 }
 
-texture::texture(const key& surfs)
+texture::texture(const key& surfs, options_type options)
    : width_(0), height_(0), ratio_w_(1.0), ratio_h_(1.0)
 {
 	if(surfs.empty() ||
@@ -171,7 +173,7 @@ texture::texture(const key& surfs)
 	id_ = boost::shared_ptr<ID>(new ID(get_texture_id()));
 
 	glBindTexture(GL_TEXTURE_2D,id_->id);
-	if(preference_mipmapping()) {
+	if(preference_mipmapping() && !options[NO_MIPMAP]) {
 		if(!graphics_initialised) {
 			std::cout << "Mipmapping enabled: MIN "
 				  << mipmap_type_to_string(preference_mipmap_min())
@@ -215,38 +217,38 @@ void texture::set_as_current_texture() const
 	height_multiplier = ratio_h_;
 }
 
-texture texture::get(const std::string& str)
+texture texture::get(const std::string& str, options_type options)
 {
-	return get(surface_cache::get(str));
+	return get(surface_cache::get(str), options);
 }
 
-texture texture::get(const key& surfs)
+texture texture::get(const key& surfs, options_type options)
 {
 	texture_map::iterator i = texture_cache.find(surfs);
 	if(i != texture_cache.end()) {
 		return i->second;
 	} else {
 
-		texture t(surfs);
+		texture t(surfs, options);
 
 		texture_cache.insert(std::pair<key,texture>(surfs,t));
 		return t;
 	}
 }
 
-texture texture::get(const surface& surf)
+texture texture::get(const surface& surf, options_type options)
 {
-	return get(key(1,surf));
+	return get(key(1,surf), options);
 }
 
-texture texture::get_no_cache(const key& surfs)
+texture texture::get_no_cache(const key& surfs, options_type options)
 {
-	return texture(surfs);
+	return texture(surfs, options);
 }
 
-texture texture::get_no_cache(const surface& surf)
+texture texture::get_no_cache(const surface& surf, options_type options)
 {
-	return texture(key(1,surf));
+	return texture(key(1,surf), options);
 }
 
 void texture::set_current_texture(const key& k)
