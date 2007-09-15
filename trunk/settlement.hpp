@@ -38,7 +38,8 @@ public:
 	void entry_points(std::vector<hex::location>& result) const;
 	bool has_entry_point(const hex::location& loc) const;
 	void draw() const;
-	void enter(party_ptr pty, const hex::location& loc);
+	game_time enter(party_ptr pty, const hex::location& loc,
+					const game_time& t);
 private:
 	std::map<hex::location, hex::location> portals_;
 	graphics::const_model_ptr model_;

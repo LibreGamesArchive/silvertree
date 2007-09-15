@@ -44,6 +44,7 @@ public:
 
 	const hex::gamemap& map() const { return map_; }
 	const game_time& current_time() const { return time_; }
+	void advance_time_until(const game_time& t) { time_ = t; }
 	const GLfloat& subtime() const { return subtime_; }
 
 	const hex::camera& camera() const { return camera_; }
