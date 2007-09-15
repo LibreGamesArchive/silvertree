@@ -28,7 +28,7 @@ namespace {
 	GLuint texture_buf[TextureBufSize];
 	size_t texture_buf_pos = TextureBufSize;
 	std::vector<GLuint> avail_textures;
-	bool graphics_initialised = false;
+	bool graphics_initialized = false;
 
 	GLuint current_texture = 0;
 
@@ -123,6 +123,32 @@ namespace {
 	}
 }
 
+texture::manager::manager() {
+	assert(!graphics_initialized);
+	npot_allowed = is_npot_allowed();
+	if(!npot_allowed) {
+		std::cerr << "Using only pot textures\n";
+	}
+
+	width_multiplier = 1.0;
+	height_multiplier = 1.0;
+
+	if(preference_mipmapping()) {
+		std::cerr << "Mipmapping enabled: MIN "
+			  << mipmap_type_to_string(preference_mipmap_min())
+			  << " MAX " 
+			  << mipmap_type_to_string(preference_mipmap_max())
+			  << "\n";
+	} else {
+		std::cerr << "no mipmapping\n";
+	}
+	graphics_initialized = true;
+}
+
+texture::manager::~manager() {
+	graphics_initialized = false;
+}
+
 void texture::clear_textures()
 {
 	texture_cache.clear();
@@ -131,19 +157,10 @@ void texture::clear_textures()
 texture::texture(const key& surfs, options_type options)
    : width_(0), height_(0), ratio_w_(1.0), ratio_h_(1.0)
 {
+	assert(graphics_initialized);
 	if(surfs.empty() ||
 	   std::find(surfs.begin(),surfs.end(),surface()) != surfs.end()) {
 		return;
-	}
-
-	if(!graphics_initialised) {
-		npot_allowed = is_npot_allowed();
-		if (!npot_allowed) {
-		    std::cerr << "Using only pot textures\n";
-		}
-
-		width_multiplier = 1.0;
-		height_multiplier = 1.0;
 	}
 
 	width_ = surfs.front()->w;
@@ -176,28 +193,18 @@ texture::texture(const key& surfs, options_type options)
 
 	glBindTexture(GL_TEXTURE_2D,id_->id);
 	if(preference_mipmapping() && !options[NO_MIPMAP]) {
-		if(!graphics_initialised) {
-			std::cout << "Mipmapping enabled: MIN "
-				  << mipmap_type_to_string(preference_mipmap_min())
-				  << " MAX " 
-				  << mipmap_type_to_string(preference_mipmap_max())
-				  << "\n";
-		}
+
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, preference_mipmap_min());
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, preference_mipmap_max());
 		gluBuild2DMipmaps(GL_TEXTURE_2D,4,s->w,s->h,GL_RGBA,
 				  GL_UNSIGNED_BYTE,s->pixels);
 	} else {
-		if(!graphics_initialised) {
-			std::cout << "Mipmapping disabled.\n";
-		}
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D,0,4,s->w,s->h,0,GL_RGBA,
 			     GL_UNSIGNED_BYTE,s->pixels);
 	}
 	current_texture = 0;
-	graphics_initialised = true;
 }
 
 void texture::set_as_current_texture() const
@@ -270,7 +277,9 @@ void texture::set_coord(GLfloat x, GLfloat y)
 
 texture::ID::~ID()
 {
-	avail_textures.push_back(id);
+	if(graphics_initialized) {
+		avail_textures.push_back(id);
+	}
 }
 
 }
