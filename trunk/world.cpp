@@ -593,6 +593,8 @@ void world::set_lighting() const
 		ambient[2] = GLfloat(res%100)/100.0;
 	}
 
+	camera_.set_background_color(ambient);
+
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 }
