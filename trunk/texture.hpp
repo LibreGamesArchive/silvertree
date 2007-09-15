@@ -28,6 +28,13 @@ namespace graphics
 class texture
 {
 public:
+	//create an instance of this object before using the first texture,
+	//and destroy it before the program exits
+	struct manager {
+		manager();
+		~manager();
+	};
+
 	enum OPTION { NO_MIPMAP, NUM_OPTIONS };
 	typedef std::bitset<NUM_OPTIONS> options_type;
 	static void clear_textures();

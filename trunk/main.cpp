@@ -70,6 +70,7 @@ extern "C" int main(int argc, char** argv)
 	}
 
 	graphics::font::manager font_manager;
+	graphics::texture::manager texture_manager;
 
 	wml::node_ptr rules_cfg;
 
