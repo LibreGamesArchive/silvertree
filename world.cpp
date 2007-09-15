@@ -421,7 +421,10 @@ void world::play()
 
 					settlement_map::iterator s = settlements_.find(active_party->loc());
 					if(s != settlements_.end()) {
-						s->second->enter(active_party, active_party->loc());
+						//enter the new world
+						time_ = s->second->enter(active_party, active_party->loc(), time_);
+
+						//player has left the settlement, return to this world
 						active_party->new_world(*this,active_party->loc());
 						skippy.reset();
 						fps_track_.reset();

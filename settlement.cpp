@@ -69,7 +69,8 @@ void settlement::draw() const
 	}
 }
 
-void settlement::enter(party_ptr pty, const hex::location& loc)
+game_time settlement::enter(party_ptr pty, const hex::location& loc,
+				            const game_time& t)
 {
 	if(!world_) {
 		world_.reset(new world(wml_));
@@ -78,6 +79,7 @@ void settlement::enter(party_ptr pty, const hex::location& loc)
 	assert(portals_.count(loc));
 
 	world& w = *world_;
+	w.advance_time_until(t);
 	const hex::location old_loc = pty->loc();
 	pty->new_world(w,portals_[loc]);
 	w.add_party(pty);
@@ -85,6 +87,8 @@ void settlement::enter(party_ptr pty, const hex::location& loc)
 	if(!pty->loc().valid()) {
 		pty->set_loc(old_loc);
 	}
+
+	return w.current_time();
 }
 
 }
