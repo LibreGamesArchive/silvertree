@@ -18,6 +18,7 @@
 #include "character.hpp"
 #include "foreach.hpp"
 #include "graphics_logic.hpp"
+#include "model.hpp"
 #include "surface.hpp"
 #include "surface_cache.hpp"
 #include "tile.hpp"
@@ -67,12 +68,6 @@ void battle_character::draw() const
 	GLfloat rotate;
 	get_pos(pos, &rotate);
 
-	graphics::surface surf = graphics::surface_cache::get(
-	                                            char_->image());
-	if(surf.get() == NULL) {
-		return;
-	}
-
 	glPushMatrix();
 	glTranslatef(pos[0],pos[1],pos[2]);
 	glRotatef(rotate,0.0,0.0,1.0);
@@ -84,26 +79,35 @@ void battle_character::draw() const
 		glLightfv(GL_LIGHT3,GL_DIFFUSE,highlight_);
 	}
 
-	std::vector<graphics::surface> surfs;
-	surfs.push_back(surf);
+	graphics::const_model_ptr model = graphics::model::get_model(char_->model());
+	if(model) {
+		model->draw();
+	}
 
-	graphics::texture::set_current_texture(surfs);
+	graphics::surface surf = graphics::surface_cache::get(
+	                                            char_->image());
+	if(surf.get()) {
+		std::vector<graphics::surface> surfs;
+		surfs.push_back(surf);
 
-	glBegin(GL_QUADS);
+		graphics::texture::set_current_texture(surfs);
 
-	graphics::texture::set_coord(0.0,0.0);
-	glVertex3f(-0.5,0.0,1.0);
+		glBegin(GL_QUADS);
 
-	graphics::texture::set_coord(1.0,0.0);
-	glVertex3f(0.5,0.0,1.0);
+		graphics::texture::set_coord(0.0,0.0);
+		glVertex3f(-0.5,0.0,1.0);
 
-	graphics::texture::set_coord(1.0,1.0);
-	glVertex3f(0.5,0.0,0.0);
+		graphics::texture::set_coord(1.0,0.0);
+		glVertex3f(0.5,0.0,1.0);
 
-	graphics::texture::set_coord(0.0,1.0);
-	glVertex3f(-0.5,0.0,0.0);
+		graphics::texture::set_coord(1.0,1.0);
+		glVertex3f(0.5,0.0,0.0);
 
-	glEnd();
+		graphics::texture::set_coord(0.0,1.0);
+		glVertex3f(-0.5,0.0,0.0);
+
+		glEnd();
+	}
 
 	if(highlight_) {
 		glEnable(GL_LIGHT0);
