@@ -111,7 +111,6 @@ texture render_text(const std::string& text, int font_size,
 
 	int ascent = TTF_FontAscent(font.get());
 
-
 	std::vector<std::string> v = util::split(text, '\n');
 	std::vector<int> heights;
 	std::vector<surface> surfs;
@@ -124,7 +123,7 @@ texture render_text(const std::string& text, int font_size,
 		if(surf->w > width) {
 			width = surf->w;
 		}
-		heights.push_back(get_string_height(s, font_size));
+		heights.push_back(std::max(surf->h, get_string_height(s, font_size)));
 		height += lineskip;
 	}
 	
