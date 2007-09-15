@@ -70,6 +70,7 @@ public:
 		if(fatigue_ < 0) { fatigue_ = 0; }
 	}
 
+	const std::string& model() const { return model_; }
 	const std::string& image() const { return image_; }
 	const std::string& portrait() const { return portrait_; }
 
@@ -147,6 +148,7 @@ private:
 	std::map<std::string,int> attributes_;
 
 	std::string image_;
+	std::string model_;
 	std::string portrait_;
 	ALIGNMENT alignment_;
 
