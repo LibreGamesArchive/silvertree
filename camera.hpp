@@ -70,6 +70,8 @@ public:
 
 	const hex::DIRECTION* visible_cliffs(int* num) const;
 
+	void set_background_color(const GLfloat* col);
+
 private:
 
 	GLfloat rotate_radians() const;
@@ -97,6 +99,8 @@ private:
 	bool keyboard_pan_;
 
 	std::vector<GLuint> selection_;
+
+	GLfloat background_[3];
 };
 		
 }

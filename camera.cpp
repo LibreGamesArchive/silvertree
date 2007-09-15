@@ -50,6 +50,7 @@ camera::camera(const gamemap& m)
      tilt_(-30.0), zoom_(-30.0), debug_adjust_(false),
 	 keyboard_pan_(false)
 {
+	std::fill(background_,background_+sizeof(background_)/sizeof(*background_),0.0);
 	update_visible_cliffs();
 }
 
@@ -68,7 +69,7 @@ void camera::prepare_frame()
 	//glEnable(GL_LINE_SMOOTH);
 
 	glShadeModel(GL_SMOOTH);
-	glClearColor(0.0,0.0,0.0,0.0);
+	glClearColor(background_[0],background_[1],background_[2],0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glViewport(0,0,width_,height_);
@@ -439,6 +440,12 @@ void camera::update_visible_cliffs()
 
 	for(int m = 0; m != num_visible_cliffs_; ++m) {
 		visible_cliffs_[m] = static_cast<hex::DIRECTION>((dir + m)%6);
+	}
+}
+
+void camera::set_background_color(const GLfloat* col) {
+	for(int n = 0; n != 3; ++n) {
+		background_[n] = col[n];
 	}
 }
 
