@@ -96,6 +96,7 @@ void character_generator::generate(character& c, wml::const_node_ptr node) const
 	READ_ATTR(level, 1);
 	READ_ATTR(xp, 0);
 	READ_ATTR(image, "");
+	READ_ATTR(model, "");
 	READ_ATTR(portrait, "");
 	READ_ATTR(improvement_points, 0);
 	READ_ATTR(spent_skill_points, 0);
