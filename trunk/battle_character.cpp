@@ -127,21 +127,25 @@ void battle_character::get_pos(GLfloat* pos, GLfloat* rotate) const
 	}
 
 	using hex::tile;
-	pos[0] = tile::translate_x(loc_);
-	pos[1] = tile::translate_y(loc_);
-	if(map_.is_loc_on_map(loc_)) {
-		pos[2] = tile::translate_height(
-		                  map_.get_tile(loc_).height());
+	if(pos) {
+		pos[0] = tile::translate_x(loc_);
+		pos[1] = tile::translate_y(loc_);
+		if(map_.is_loc_on_map(loc_)) {
+			pos[2] = tile::translate_height(
+			                  map_.get_tile(loc_).height());
+		}
 	}
 
-	*rotate = facing_*60.0;
+	if(rotate) {
+		*rotate = facing_*60.0;
 
-	//if the unit is rotating
-	if(time_in_move_ >= 0.0) {
-		const GLfloat rotate_time = 1.0;
-		if(time_in_move_ < rotate_time) {
-			*rotate = graphics::calculate_rotation(
-			  old_facing_*60.0,facing_*60.0,time_in_move_/rotate_time);
+		//if the unit is rotating
+		if(time_in_move_ >= 0.0) {
+			const GLfloat rotate_time = 1.0;
+			if(time_in_move_ < rotate_time) {
+				*rotate = graphics::calculate_rotation(
+				  old_facing_*60.0,facing_*60.0,time_in_move_/rotate_time);
+			}
 		}
 	}
 }

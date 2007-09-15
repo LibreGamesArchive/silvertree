@@ -33,7 +33,8 @@ const std::set<std::string>& item_stat() {
 }
 
 equipment::equipment(ITEM_TYPE type, const wml::const_node_ptr& node)
-  : item(type, node), damage_type_(wml::get_str(node,"damage_type"))
+  : item(type, node), damage_type_(wml::get_str(node,"damage_type")),
+		              missile_(wml::get_str(node,"missile"))
 {
 	for(wml::node::const_attr_iterator i = node->begin_attr();
 	    i != node->end_attr(); ++i) {

@@ -32,12 +32,14 @@ public:
 
 	int modify_stat(const std::string& stat, bool* present=NULL) const;
 	const std::map<std::string,int>& stats() const { return stats_; }
+	const std::string& missile() const { return missile_; }
 	const std::string& damage_type() const { return damage_type_; }
 	int parry_against(const std::string& damage_type) const;
 private:
 	std::map<std::string,int> stats_;
 	std::map<std::string,int> parry_against_;
 	std::string damage_type_;
+	std::string missile_;
 };
 
 }
