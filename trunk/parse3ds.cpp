@@ -167,10 +167,9 @@ std::vector<graphics::model::face> parse_mesh(chunk& c)
 					f.vertices[m] = vertices[index];
 				}
 
-				/*uint16_t face_flag = read_integer<uint16_t>(
+				/*uint16_t face_flag = */ read_integer<uint16_t>(
 				                      child.beg,child.end);
-				face_flag; //currently ignored
-				*/
+				//face_flag; //currently ignored
 				res.push_back(f);
 			}
 
