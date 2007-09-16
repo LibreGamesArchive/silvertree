@@ -796,6 +796,7 @@ void battle::target_mod(battle_character& caster,
 	const battle_modification::TARGET_TYPE type = mod.target();
 	const int radius = mod.radius();
 	std::vector<hex::location> locs;
+	std::vector<battle_character_ptr> affected_chars;
 	get_tiles_in_radius(target, radius, locs);
 	foreach(battle_character_ptr ch, chars_) {
 		if(std::find(locs.begin(),locs.end(),ch->loc()) == locs.end()) {
@@ -811,10 +812,13 @@ void battle::target_mod(battle_character& caster,
 		   caster.is_enemy(*ch)) {
 			continue;
 		}
-
+		affected_chars.push_back(ch);
+	}
+	foreach(battle_character_ptr ch, affected_chars) {
 		mod.apply(caster, *ch, current_time_);
 		handle_dead_character(*ch);
 	}
+
 }
 
 bool battle::can_make_move(const battle_character& c,
