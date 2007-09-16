@@ -54,6 +54,7 @@ public:
 	const std::string& damage_type() const;
 	int attack() const;
 	int defense(const std::string& damage_type="") const;
+	int defense_behind() const;
 	int parry(const std::string& damage_type="") const;
 	int dodge() const;
 	

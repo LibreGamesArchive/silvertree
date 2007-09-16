@@ -113,6 +113,7 @@ public:
 	int attack() const;
 	int defense() const;
 	int defense(const std::string& damage_type) const;
+	int defense_behind() const;
 	int stat(const std::string& s) const;
 	int mod_stat(const std::string& s) const;
 	std::string status_text() const;
