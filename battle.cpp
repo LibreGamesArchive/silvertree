@@ -207,6 +207,7 @@ void battle::player_turn(battle_character& c)
 						}
 					}
 
+					(*focus_)->use_energy(current_move_->energy_required());
 					(*focus_)->set_time_until_next_move(current_move_->get_stat("initiative",**focus_));
 					turn_done_ = true;
 				}
@@ -821,8 +822,15 @@ void battle::target_mod(battle_character& caster,
 bool battle::can_make_move(const battle_character& c,
                            const battle_move& move) const
 {
+	if(move.energy_required() > c.energy()) {
+		std::cerr << "CANNOT MAKE MOVE: " << move.energy_required() << " > " << c.energy() << "\n";
+		return false;
+	}
+
 	if(move.max_moves() > 0) {
-		battle_character::move_map moves; c.get_possible_moves(moves, move, chars_); return !moves.empty();
+		battle_character::move_map moves;
+		c.get_possible_moves(moves, move, chars_);
+		return !moves.empty();
 	} else if(move.must_attack()) {
 		foreach(const battle_character_ptr& enemy, chars_) {
 			if(c.is_enemy(*enemy) && c.can_attack(*enemy, chars_)) {

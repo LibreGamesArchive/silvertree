@@ -26,12 +26,13 @@ public:
 	bool can_attack() const { return can_attack_; }
 	bool must_attack() const { return must_attack_; }
 	int get_stat(const std::string& stat, const battle_character& c) const;
+	int energy_required() const { return energy_required_; }
 
 	const battle_modification_ptr& mod() const { return mod_; }
 
 	graphics::particle_emitter_ptr create_missile_emitter() const;
 private:
-	battle_move() {}
+	battle_move() : energy_required_(0) {}
 	std::string name_;
 	std::string category_;
 	int moves_;
@@ -41,6 +42,7 @@ private:
 	std::map<std::string,const_formula_ptr> stats_;
 	battle_modification_ptr mod_;
 	wml::const_node_ptr missile_emitter_;
+	int energy_required_;
 };
 
 }

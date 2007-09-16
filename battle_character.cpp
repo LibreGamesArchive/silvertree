@@ -38,7 +38,8 @@ battle_character::battle_character(
    facing_(facing), old_facing_(facing),
    move_at_(ch->initiative()), time_in_move_(-1.0), map_(map),
    highlight_(NULL),
-   time_of_day_adjustment_(ch->alignment()*time.alignment_adjustment())
+   time_of_day_adjustment_(ch->alignment()*time.alignment_adjustment()),
+   energy_(0)
 {
 	assert(old_facing_ >= hex::NORTH && old_facing_ <= hex::NULL_DIRECTION);
 
@@ -517,6 +518,11 @@ void battle_character::update_time(int time)
 void battle_character::add_modification(const std::string& stat,
                                         int expire, int mod)
 {
+	if(stat == "energy") {
+		energy_ += mod;
+		return;
+	}
+
 	std::multimap<std::string,stat_mod>::iterator i = mods_.insert(std::pair<std::string,stat_mod>(stat,stat_mod()));
 	i->second.expire = expire;
 	i->second.mod = mod;
