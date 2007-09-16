@@ -33,6 +33,7 @@ protected:
 	~formula_callable() {}
 
 	variant create_list() const;
+	variant create_string() const;
 
 private:
 	virtual variant get_value(const std::string& key) const = 0;

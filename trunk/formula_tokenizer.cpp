@@ -31,6 +31,7 @@ token get_token(iterator& i1, iterator i2) {
 	using boost::regex;
 
 	token_type types[] = { { regex("^(not\\b|and\\b|or\\b|where\\b|d(?=[^a-zA-Z])|\\*|\\+|\\-|\\^|/|<=|>=|<|>|!=|=|\\.)"), TOKEN_OPERATOR },
+	                       { regex("^'[^']*'"),    TOKEN_STRING_LITERAL },
 	                       { regex("^[a-zA-Z_]+"), TOKEN_IDENTIFIER },
 	                       { regex("^\\d+"),       TOKEN_INTEGER },
 	                       { regex("^\\("),        TOKEN_LPARENS },

@@ -208,8 +208,16 @@ variant character::get_value(const std::string& key) const
 	}
 
 	static const std::string level_str = "level";
+	static const std::string weapon_str = "weapon";
 	if(key == level_str) {
 		return variant(level());
+	} else if(key == weapon_str) {
+		if(const game_logic::equipment* equip = weapon()) {
+			return variant(equip);
+		} else {
+			static game_logic::equipment empty_weapon(EQUIPMENT_WEAPON);
+			return variant(&empty_weapon);
+		}
 	}
 
 	return variant(base_stat(key));
