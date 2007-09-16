@@ -619,7 +619,7 @@ void world::set_lighting() const
 
 void world::fire_event(const std::string& name, const formula_callable& info)
 {
-	std::cerr << "event: '" << name << ": " << handlers_.size() << "'\n";
+	//std::cerr << "event: '" << name << ": " << handlers_.size() << "'\n";
 	std::pair<event_map::iterator,event_map::iterator> range =
 	     handlers_.equal_range(name);
 	while(range.first != range.second) {

@@ -516,6 +516,10 @@ void battle::animation_frame(float t) {
 	if(!skippy_.skip_frame()) {
 		draw();
 	}
+	/* do this to ensure key tables are updated */
+	SDL_Event e;
+	SDL_PollEvent(&e);
+	SDL_PushEvent(&e);
 	camera_controller_.keyboard_control();
 }
 
