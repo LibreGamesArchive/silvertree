@@ -124,6 +124,9 @@ public:
 	void add_modification(const std::string& stat, int expire, int mod);
 	const graphics::location_tracker& loc_tracker() { return loc_tracker_; }
 	int route_cost(const route& r) const;
+
+	int energy() const { return energy_; }
+	void use_energy(int amount) { energy_ -= amount; if(energy_ < 0) { energy_ = 0; } }
 private:
 	void get_possible_moves_internal(move_map& locs, const std::vector<battle_character_ptr>& chars, route& r, int max_distance) const;
 
@@ -147,6 +150,7 @@ private:
 	const GLfloat* highlight_;
 
 	int time_of_day_adjustment_;
+	int energy_;
 
 	mutable graphics::location_tracker loc_tracker_;
 
