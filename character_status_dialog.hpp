@@ -26,14 +26,11 @@ public:
 	character_status_dialog(game_logic::character_ptr c,
 	                        game_logic::party_ptr p);
 
-	void change_equipment(int index);
-	void preview_equipment(int index);
-	void implement_equipment_change(int index);
 	void change_character(int index);
 	void improve_attribute(int index);
 	void learn_skill();
 private:
-	void handle_event(const SDL_Event& event);
+	bool handle_event(const SDL_Event& event);
 	void init();
 	game_logic::character_ptr char_;
 	game_logic::party_ptr party_;

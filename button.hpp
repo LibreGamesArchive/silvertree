@@ -27,7 +27,7 @@ public:
 private:
 	bool in_button(int x, int y) const;
 	void handle_draw() const;
-	void handle_event(const SDL_Event& event);
+	bool handle_event(const SDL_Event& event);
 
 	widget_ptr label_;
 	functional::callback_ptr onclick_;

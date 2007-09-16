@@ -22,7 +22,7 @@ public:
 	game_logic::const_battle_move_ptr selected_move() const;
 private:
 	void handle_draw() const;
-	void handle_event(const SDL_Event& event);
+	bool handle_event(const SDL_Event& event);
 	void select(int num);
 
 	const game_logic::battle& battle_;

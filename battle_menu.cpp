@@ -81,22 +81,32 @@ void battle_menu::handle_draw() const
 	}
 }
 
-void battle_menu::handle_event(const SDL_Event& event)
+bool battle_menu::handle_event(const SDL_Event& event)
 {
+	bool claimed = false;
+
 	if(grid_) {
-		grid_->process_event(event);
+		claimed = grid_->process_event(event);
+	}
+
+	if(claimed) {
+		return claimed;
 	}
 
 	if(event.type == SDL_KEYDOWN) {
 		if(event.key.keysym.sym == SDLK_LEFT) {
 			select(selected_-1);
+			claimed = true;
 		} else if(event.key.keysym.sym == SDLK_RIGHT) {
 			select(selected_+1);
+			claimed = true;
 		} else if(event.key.keysym.sym == SDLK_RETURN ||
 		          event.key.keysym.sym == SDLK_SPACE) {
 			selection_made_ = true;
+			claimed = true;
 		}
 	}
+	return claimed;
 }
 
 void battle_menu::select(int num)

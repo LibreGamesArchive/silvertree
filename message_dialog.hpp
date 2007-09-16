@@ -15,27 +15,15 @@
 #include <string>
 #include <vector>
 
-#include "party.hpp"
 #include "dialog.hpp"
-#include "world.hpp"
-#include "widget.hpp"
 #include "frame.hpp"
+#include "gui_core.hpp"
 #include "label.hpp"
+#include "party.hpp"
+#include "widget.hpp"
+#include "world.hpp"
 
 namespace gui {
-
-class phantom_dialog: public dialog {
-public:
-	phantom_dialog() : dialog(0, 0, 0, 0) { set_clear_bg(false); }
-	virtual dialog& add_widget(widget_ptr w, MOVE_DIRECTION dir=MOVE_DOWN);
-	virtual dialog& add_widget(widget_ptr w, int x, int y,
-	                MOVE_DIRECTION dir=MOVE_DOWN);
-	virtual void remove_widget(widget_ptr w);
-	virtual void replace_widget(widget_ptr w_old, widget_ptr w_new);
-	virtual void clear();
-private:
-	void adapt_size();
-};
 
 class message_dialog: public dialog {
 public:
@@ -50,7 +38,7 @@ public:
 	void show_modal();
 protected:
 	void handle_draw() const;
-	void handle_event(const SDL_Event &event);
+	bool handle_event(const SDL_Event &event);
 	void construct_interface();
 	int find_option(int x, int y);
 	frame_ptr make_option_frame(int opt, widget_ptr base, 

@@ -50,7 +50,7 @@ void widget::set_tooltip(const std::string& str)
 	tooltip_.reset(new std::string(str));
 }
 
-void widget::process_event(const SDL_Event& event)
+bool widget::process_event(const SDL_Event& event)
 {
 	if(tooltip_ && event.type == SDL_MOUSEMOTION) {
 		if(event.motion.x >= x() && event.motion.x <= x()+width() &&
@@ -67,7 +67,7 @@ void widget::process_event(const SDL_Event& event)
 		}
 	}
 
-	handle_event(event);
+	return handle_event(event);
 }
 
 void widget::draw() const

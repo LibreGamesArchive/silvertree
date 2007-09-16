@@ -151,6 +151,9 @@ void frame_builder::initialise_frame(frame* frame) const
 
 void texture_fdo::draw() const
 {
+	if(!texture_.valid()) {
+		return;
+	}
   	graphics::push_clip(r_);
 	if(!tile_) {
 		graphics::blit_texture(texture_, r_.x,r_.y,r_.w,r_.h);
@@ -181,6 +184,9 @@ void rect_fdo::draw() const
 
 void text_fdo::draw() const
 {
+	if(!texture_.valid()) {
+		return;
+	}
 	graphics::blit_texture(texture_, x_, y_);
 }
 

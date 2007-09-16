@@ -29,16 +29,18 @@ inline void draw_anchored_expanding_time_bar(GLfloat time, GLfloat accounted_tim
 
 	glColor4ub(main_color.r, main_color.g, main_color.b, 255);
 			
-	GLfloat px_radius = (inner_radius + thickness/2) * 0.5 * M_PI/180.0;
+	GLfloat px_radial = 180.0/(M_PI * (inner_radius + thickness/2));
+	GLfloat px_axial = 1.5;
+
 	if(drawn_tick_angle < 0) {
-		px_radius = -px_radius;
+		px_radial = -px_radial;
 	}
 	if(segments > 0) {
 		for(int i =0;i<segments;++i) {
 			glColor4ub(0, 0, 0, 255);
-			gluPartialDisk(quad, inner_radius-2, outer_radius+1, 16, 2, 
-				       range_start_angle + i*angle_per_tick + skip_angle - px_radius, 
-				       drawn_tick_angle + 2*px_radius); 
+			gluPartialDisk(quad, inner_radius-px_axial, outer_radius+px_axial, 16, 2, 
+				       range_start_angle + i*angle_per_tick + skip_angle - px_radial, 
+				       drawn_tick_angle + 2*px_radial); 
 			
 
 			GLfloat acc = 0.0;

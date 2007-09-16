@@ -44,11 +44,12 @@ public:
 	void set_cursor(int x, int y) { add_x_ = x; add_y_ = y; }
 	int cursor_x() const { return add_x_; }
 	int cursor_y() const { return add_y_; }
-	child_iterator begin_children() { return widgets_.begin(); }
-	child_iterator end_children() { return widgets_.end(); }
+	child_iterator begin_children() const { return widgets_.begin(); }
+	child_iterator end_children() const { return widgets_.end(); }
 protected:
 	dialog(int x, int y, int w, int h);
-	virtual void handle_event(const SDL_Event& event);
+	virtual bool handle_event(const SDL_Event& event);
+	virtual bool handle_event_children(const SDL_Event& event);
 	virtual void handle_draw() const;
 	virtual void handle_draw_children() const;
 	void prepare_draw();
@@ -66,6 +67,8 @@ private:
 	//where the next widget will be placed by default
 	int add_x_, add_y_;
 };
+
+typedef boost::shared_ptr<dialog> dialog_ptr;
 
 DEFINE_CALLBACK(close_dialog_callback, dialog, close);
 

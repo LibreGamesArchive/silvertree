@@ -32,15 +32,6 @@ namespace game_dialogs {
 
 namespace {
 
-class change_equipment_callback : public functional::callback<character_status_dialog>
-{
-	int index_;
-	void execute(character_status_dialog* ptr) { ptr->change_equipment(index_); }
-public:
-	change_equipment_callback(character_status_dialog* ptr, int index) : functional::callback<character_status_dialog>(ptr), index_(index)
-	{}
-};
-
 class change_character_callback : public functional::callback<character_status_dialog>
 {
 	int index_;
@@ -56,22 +47,6 @@ class improve_attribute_callback : public functional::callback<character_status_
 	void execute(character_status_dialog* ptr) { ptr->improve_attribute(index_); }
 public:
 	improve_attribute_callback(character_status_dialog* ptr, int index) : functional::callback<character_status_dialog>(ptr), index_(index)
-	{}
-};
-
-class preview_equipment_callback : public functional::callback_arg1<character_status_dialog,int>
-{
-	void execute(character_status_dialog* ptr, const int& index) { std::cerr << "preview cb: " << index << "\n"; ptr->preview_equipment(index); }
-public:
-	explicit preview_equipment_callback(character_status_dialog* ptr) : functional::callback_arg1<character_status_dialog,int>(ptr)
-	{}
-};
-
-class implement_equipment_callback : public functional::callback_arg1<character_status_dialog,int>
-{
-	void execute(character_status_dialog* ptr, const int& index) { ptr->implement_equipment_change(index); }
-public:
-	explicit implement_equipment_callback(character_status_dialog* ptr) : functional::callback_arg1<character_status_dialog,int>(ptr)
 	{}
 };
 
@@ -234,20 +209,8 @@ void character_status_dialog::init()
 	button_ptr add_skill_button(new button(ptr(new label("Learn Skill", color)), skill_callback));
 	add_widget(add_skill_button);
 
-	const std::vector<game_logic::item_ptr>& equip = c->equipment();
-	grid.reset(new gui::grid(equip.size()));
-	index = 0;
-	foreach(const game_logic::item_ptr& item, equip) {
-		dialog* d = new item_display_dialog(item);
-		functional::callback_ptr callback(
-		             new change_equipment_callback(this,index++));
-		button_ptr b(new button(ptr(new label("Change", color)),
-		                        callback));
-		d->add_widget(b);
-		grid->add_col(widget_ptr(d));
-	}
+	// came from here
 
-	add_widget(grid,20,500);
 
 	widget_ptr close_label(new label("Close",color));
 	callback_ptr close_callback(new gui::close_dialog_callback(this));
@@ -268,7 +231,7 @@ void character_status_dialog::init()
 	}
 }
 
-void character_status_dialog::handle_event(const SDL_Event& event)
+bool character_status_dialog::handle_event(const SDL_Event& event)
 {
 	if(modify_char_widget_) {
 
@@ -277,97 +240,9 @@ void character_status_dialog::handle_event(const SDL_Event& event)
 		gui::widget_ptr ptr = modify_char_widget_;
 		SDL_Event ev = event;
 		normalize_event(&ev);
-		ptr->process_event(ev);
-		return;
+		return ptr->process_event(ev);
 	}
-	dialog::handle_event(event);
-}
-
-void character_status_dialog::change_equipment(int index)
-{
-	if(!party_) {
-		return;
-	}
-
-	remove_widget(modify_char_widget_);
-
-	SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
-
-	using namespace gui;
-	typedef gui::widget_ptr ptr;
-	gui::grid* grid = new gui::grid(2);
-	modify_char_widget_.reset(grid);
-	grid->add_col(ptr(new label("", color)));
-	grid->add_col(ptr(new label("None", color)));
-	equipment_change_ = index;
-	foreach(const game_logic::item_ptr& i, party_->inventory()) {
-		if(i->type() == char_->equipment()[index]->type()) {
-			grid->add_col(ptr(new image_widget(i->image(), 50, 50)));
-			grid->add_col(ptr(new label(i->description(), color)));
-		}
-	}
-
-	grid->allow_selection();
-	grid->register_mouseover_callback(gui::grid::select_callback_ptr(
-	                        new preview_equipment_callback(this)));
-	grid->register_selection_callback(gui::grid::select_callback_ptr(
-							new implement_equipment_callback(this)));
-
-	int mousex, mousey;
-	SDL_GetMouseState(&mousex,&mousey);
-
-	if(mousex+grid->width() > 1024) {
-		mousey = 1024 - grid->width();
-	}
-
-	if(mousey+grid->height() > 768) {
-		mousey = 768 - grid->height();
-	}
-
-	add_widget(modify_char_widget_, mousex, mousey);
-}
-
-void character_status_dialog::preview_equipment(int index)
-{
-}
-
-void character_status_dialog::implement_equipment_change(int index)
-{
-	remove_widget(modify_char_widget_);
-	modify_char_widget_.reset();
-	
-	if(index == -1) {
-		equipment_change_ = -1;
-		return;
-	}
-
-	if(index == 0) {
-		game_logic::item_ptr it(new game_logic::equipment(
-		      char_->equipment()[equipment_change_]->type()));
-		char_->swap_equipment(equipment_change_,it);
-		if(!it->is_null()) {
-			party_->acquire_item(it);
-		}
-
-		assert(char_->equipment()[equipment_change_]);
-	} else {
-		int item_num = 0;
-		foreach(game_logic::item_ptr i, party_->inventory()) {
-			if(i->type() == char_->equipment()[equipment_change_]->type()) {
-				if(--index == 0) {
-					break;
-				}
-			}
-			++item_num;
-		}
-
-		assert(index == 0);
-		party_->assign_equipment(char_,equipment_change_,item_num);
-	}
-
-	equipment_change_ = -1;
-	clear();
-	init();
+	return dialog::handle_event(event);
 }
 
 void character_status_dialog::change_character(int index)

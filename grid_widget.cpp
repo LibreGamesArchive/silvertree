@@ -171,8 +171,10 @@ void grid::handle_draw() const
 	glPopMatrix();
 }
 
-void grid::handle_event(const SDL_Event& event)
+bool grid::handle_event(const SDL_Event& event)
 {
+	bool claimed = false;
+
 	if(allow_selection_) {
 		if(event.type == SDL_MOUSEMOTION) {
 			const SDL_MouseMotionEvent& e = event.motion;
@@ -197,21 +199,29 @@ void grid::handle_event(const SDL_Event& event)
 				if(selected_row_-- == 0) {
 					selected_row_ = nrows()-1;
 				}
+				claimed = true;
 			} else if(event.key.keysym.sym == SDLK_DOWN) {
 				if(++selected_row_ == nrows()) {
 					selected_row_ = 0;
 				}
+				claimed = true;
 			}
 		}
+	}
+
+	if(claimed) {
+		return claimed;
 	}
 
 	SDL_Event ev = event;
 	normalize_event(&ev);
 	foreach(const widget_ptr& widget, cells_) {
 		if(widget) {
-			widget->process_event(ev);
+			claimed = widget->process_event(ev);
 		}
+		if(claimed) break;
 	}
+	return claimed;
 }
 
 }

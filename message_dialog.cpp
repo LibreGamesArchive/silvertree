@@ -279,8 +279,9 @@ void message_dialog::update_option(int option) {
 	}
 }
 
-void message_dialog::handle_event(const SDL_Event& event) {
+bool message_dialog::handle_event(const SDL_Event& event) {
 	int old_selected = selected_;
+	bool claimed = false;
 	switch(event.type) {
 	case SDL_KEYDOWN:
 		if(options_) {
@@ -323,6 +324,7 @@ void message_dialog::handle_event(const SDL_Event& event) {
 		} else {
 			close();
 		}
+		claimed = true;
 		break;
 	case SDL_MOUSEMOTION:
 		if(options_) {
@@ -338,6 +340,7 @@ void message_dialog::handle_event(const SDL_Event& event) {
 		} else {
 			close();
 		}
+		claimed = true;
 		break;
 	default:
 		break;
@@ -346,60 +349,8 @@ void message_dialog::handle_event(const SDL_Event& event) {
 		update_option(old_selected);
 		update_option(selected_);
 	}
+	return claimed;
 }
 
-void phantom_dialog::adapt_size() 
-{
-	int dlg_w = width();
-	int dlg_h = height();
-
-	for(child_iterator i = begin_children(); i != end_children(); ++i) {
-		const widget_ptr w = *i;
-		const int wid_brx = w->x() + w->width();
-		const int wid_bry = w->y() + w->height();
-
-		if(wid_brx > dlg_w) {
-			dlg_w = wid_brx;
-		}
-		if(wid_bry > dlg_h) {
-			dlg_h = wid_bry;
-		}
-	}
-
-	if(dlg_w != width() || dlg_h != height()) {
-		set_dim(dlg_w, dlg_h);
-	}
-}
-
-dialog& phantom_dialog::add_widget(widget_ptr w, MOVE_DIRECTION dir) 
-{
-	dialog& ret = dialog::add_widget(w, dir);
-	adapt_size();
-	return ret;
-}
-
-dialog& phantom_dialog::add_widget(widget_ptr w, int x, int y, MOVE_DIRECTION dir) 
-{
-	dialog& ret = dialog::add_widget(w, x, y, dir);
-	adapt_size();
-	return ret;
-}
-
-void phantom_dialog::remove_widget(widget_ptr w) 
-{
-	dialog::remove_widget(w);
-	adapt_size();
-}
-
-void phantom_dialog::replace_widget(widget_ptr w_old, widget_ptr w_new) 
-{
-	dialog::replace_widget(w_old, w_new);
-	adapt_size();
-}
-
-void phantom_dialog::clear() {
-	dialog::clear();
-	adapt_size();
-}
 
 } // namespace gui

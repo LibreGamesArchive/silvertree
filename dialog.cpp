@@ -131,20 +131,33 @@ void dialog::handle_draw() const
 	handle_draw_children();
 }
 
-void dialog::handle_event(const SDL_Event& event)
+bool dialog::handle_event_children(const SDL_Event &event) {
+	SDL_Event ev = event;
+	normalize_event(&ev);
+	std::vector<widget_ptr> widgets = widgets_;
+	bool claimed = false;
+	foreach(const widget_ptr& w, widgets) {
+		if(w->process_event(ev)) {
+			claimed = true;
+			break;
+		}
+	}
+	return claimed;
+}
+
+bool dialog::handle_event(const SDL_Event& event)
 {
+	bool claimed = false;
 	if(event.type == SDL_KEYDOWN &&
 	   (event.key.keysym.sym == SDLK_SPACE ||
 	    event.key.keysym.sym == SDLK_RETURN)) {
 		close();
+		claimed = true;
 	}
-
-	SDL_Event ev = event;
-	normalize_event(&ev);
-	std::vector<widget_ptr> widgets = widgets_;
-	foreach(const widget_ptr& w, widgets) {
-		w->process_event(ev);
+	if(!claimed) {
+		claimed = handle_event_children(event);
 	}
+	return claimed;
 }
 
 		

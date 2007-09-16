@@ -12,7 +12,9 @@
 */
 #include "battle.hpp"
 #include "battle_menu.hpp"
-#include "battle_missile.hpp"
+/* FIXME_MISSILE
+   #include "battle_missile.hpp"
+*/
 #include "battle_move.hpp"
 #include "character.hpp"
 #include "equipment.hpp"
@@ -413,9 +415,11 @@ void battle::draw(gui::slider* slider)
 		c->draw();
 	}
 
+	/* FIXME_MISSILE
 	if(missile_) {
 		missile_->draw();
 	}
+	*/
 
 	graphics::floating_label::update_labels();
 	graphics::floating_label::draw_labels();
@@ -658,7 +662,7 @@ void battle::attack_character(battle_character& attacker,
 	const GLfloat end_hit = 0.8;
 	attacker.begin_attack(defender);
 
-
+	/* FIXME_MISSILE
 	graphics::const_model_ptr missile;
 	if(const equipment* weapon = attacker.get_character().weapon()) {
 		const std::string& name = weapon->missile();
@@ -670,12 +674,15 @@ void battle::attack_character(battle_character& attacker,
 			missile_.reset(new battle_missile(model, src, dst));
 		}
 	}
+	*/
 
 	begin_animation();
 	for(GLfloat t = 0.0; t < anim_time; t += 0.1) {
+		/* FIXME_MISSILE
 		if(missile_.get()) {
 			missile_->update();
 		}
+		*/
 		const GLfloat cur_time = t / anim_time;
 		attacker.set_movement_time(cur_time);
 		defender.set_movement_time(cur_time);
@@ -688,9 +695,10 @@ void battle::attack_character(battle_character& attacker,
 		defender.set_highlight(NULL);
 	} 
 	end_animation();
-
+	
+	/* FIXME_MISSILE
 	missile_.reset();
-
+	*/
 	attacker.end_attack();
 	attacker.end_facing_change();
 	defender.end_facing_change();
