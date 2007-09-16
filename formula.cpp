@@ -24,6 +24,7 @@ namespace game_logic
 
 namespace {
 std::vector<variant_list*> memory;
+std::vector<variant_string*> memory_strings;
 
 variant new_list()
 {
@@ -32,11 +33,25 @@ variant new_list()
 	memory.push_back(mem);
 	return res;
 }
+
+variant new_string()
+{
+	variant res;
+	variant_string* mem = variant::allocate_string(res);
+	memory_strings.push_back(mem);
+	return res;
+}
+
 }
 
 variant formula_callable::create_list() const
 {
 	return new_list();
+}
+
+variant formula_callable::create_string() const
+{
+	return new_string();
 }
 
 map_formula_callable::map_formula_callable(
@@ -477,6 +492,17 @@ private:
 	int i_;
 };
 
+class string_expression : public formula_expression {
+public:
+	explicit string_expression(const std::string& str) : str_(str)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		return new_string().set_string(str_);
+	}
+	std::string str_;
+};
+
 using namespace formula_tokenizer;
 int operator_precedence(const token& t)
 {
@@ -621,6 +647,8 @@ expression_ptr parse_expression(const token* i1, const token* i2)
 			} else if(i1->type == TOKEN_INTEGER) {
 				int n = boost::lexical_cast<int>(std::string(i1->begin,i1->end));
 				return expression_ptr(new integer_expression(n));
+			} else if(i1->type == TOKEN_STRING_LITERAL) {
+				return expression_ptr(new string_expression(std::string(i1->begin+1,i1->end-1)));
 			}
 		} else if(i1->type == TOKEN_IDENTIFIER &&
 		          (i1+1)->type == TOKEN_LPARENS &&
@@ -702,6 +730,7 @@ formula::formula(const std::string& str)
 variant formula::execute(const formula_callable& variables) const
 { 
 	size_t n = memory.size();
+	size_t str_size = memory_strings.size();
 	variant res;
 	try {
 		res = expr_->evaluate(variables);
@@ -712,6 +741,12 @@ variant formula::execute(const formula_callable& variables) const
 		variant::release_list(memory[m]);
 	}
 	memory.resize(n);
+
+	for(size_t m = str_size; m != memory_strings.size(); ++m) {
+		variant::release_string(memory_strings[m]);
+	}
+	memory_strings.resize(str_size);
+
 	return res;
 }
 
@@ -798,6 +833,8 @@ int main()
 		assert(formula("x*5 where x=1").execute().as_int() == 5);
 		assert(formula("x*(a*b where a=2,b=1) where x=5").execute().as_int() == 10);
 		assert(formula("char.strength * ability where ability=3").execute(p).as_int() == 45);
+		assert(formula("'abcd' = 'abcd'").execute(p).as_bool() == true);
+		assert(formula("'abcd' = 'acd'").execute(p).as_bool() == false);
 		const int dice_roll = formula("3d6").execute().as_int();
 		assert(dice_roll >= 3 && dice_roll <= 18);
 	} catch(formula_error& e) {

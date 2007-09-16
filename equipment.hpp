@@ -16,13 +16,14 @@
 #include <map>
 #include <vector>
 
+#include "formula.hpp"
 #include "item.hpp"
 #include "wml_node_fwd.hpp"
 
 namespace game_logic
 {
 
-class equipment : public item
+class equipment : public item, public formula_callable
 {
 public:
 	equipment(ITEM_TYPE type, const wml::const_node_ptr& node);
@@ -36,6 +37,7 @@ public:
 	const std::string& damage_type() const { return damage_type_; }
 	int parry_against(const std::string& damage_type) const;
 private:
+	variant get_value(const std::string& key) const;
 	std::map<std::string,int> stats_;
 	std::map<std::string,int> parry_against_;
 	std::string damage_type_;

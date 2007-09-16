@@ -83,4 +83,13 @@ int equipment::parry_against(const std::string& damage_type) const
 	return map_get_value_default(parry_against_,damage_type,100);
 }
 
+variant equipment::get_value(const std::string& key) const
+{
+	if(key == "damage_type") {
+		return create_string().set_string(damage_type());
+	} else {
+		return variant(modify_stat(key));
+	}
+}
+
 }

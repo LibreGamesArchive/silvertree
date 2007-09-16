@@ -9,11 +9,15 @@ class formula_callable;
 }
 
 struct variant_list;
+struct variant_string;
 
 class variant {
 public:
 	static variant_list* allocate_list(variant& v);
 	static void release_list(variant_list* l);
+
+	static variant_string* allocate_string(variant& v);
+	static void release_string(variant_string* s);
 
 	explicit variant(int n=0);
 	explicit variant(const game_logic::formula_callable* callable);
@@ -26,6 +30,8 @@ public:
 	bool is_int() const { return type_ == TYPE_INT; }
 	int as_int() const { must_be(TYPE_INT); return int_value_; }
 	bool as_bool() const { return int_value_ != 0; }
+
+	const variant& set_string(const std::string& str);
 
 	bool is_callable() const { return type_ == TYPE_CALLABLE; }
 	const game_logic::formula_callable* as_callable() const {
@@ -47,13 +53,14 @@ public:
 
 private:
 
-	enum TYPE { TYPE_INT, TYPE_CALLABLE, TYPE_LIST };
+	enum TYPE { TYPE_INT, TYPE_CALLABLE, TYPE_LIST, TYPE_STRING };
 	void must_be(TYPE t) const;
 	TYPE type_;
 	union {
 		int int_value_;
 		const game_logic::formula_callable* callable_;
 		variant_list* list_;
+		variant_string* string_;
 	};
 };
 
