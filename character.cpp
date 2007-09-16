@@ -394,6 +394,11 @@ int character::defense(const std::string& damage_type) const
 	return std::max(dodge(),parry(damage_type));
 }
 
+int character::defense_behind() const
+{
+	return dodge();
+}
+
 int character::dodge() const
 {
 	return stat(DodgeStat);

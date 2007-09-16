@@ -602,13 +602,10 @@ battle::attack_stats battle::get_attack_stats(
 	if(engaged) {
 		switch(abs(hex::get_adjacent_direction(defender.loc(),
 		                 from_loc) - defender.facing())) {
-		case 3:
-			stats.defense /= 3;
-			behind = true;
-			break;
 		case 2:
+		case 3:
 		case 4:
-			stats.defense /= 2;
+			stats.defense = defender.defense_behind();
 			behind = true;
 			break;
 		}
