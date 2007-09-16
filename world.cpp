@@ -165,7 +165,8 @@ void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 	std::cerr << "ZOOM: " << camera_.zoom() << "\n";
 	std::cerr << "TILT: " << camera_.tilt() << "\n";
 	const GLfloat vert = std::abs(camera_.zoom()/4.0) + (camera_.tilt()*camera_.tilt())/100.0;
-	hex::get_tile_strip(focus_->loc(), camera_.direction(), vert, vert, std::abs(camera_.zoom()/3.0), hexes);
+	hex::get_tile_strip(focus_->loc(), camera_.direction(), static_cast<int>(vert), 
+			    static_cast<int>(vert), static_cast<int>(std::abs(camera_.zoom()/3.0)), hexes);
 //	for(int n = 0; n != 30; ++n) {
 //		hex::get_tile_ring(focus_->loc(), n, hexes);
 //	}
