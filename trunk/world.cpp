@@ -162,9 +162,13 @@ void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 	tiles_.clear();
 	current_loc_ = focus_->loc();
 	std::vector<hex::location> hexes;
-	for(int n = 0; n != 30; ++n) {
-		hex::get_tile_ring(focus_->loc(), n, hexes);
-	}
+	std::cerr << "ZOOM: " << camera_.zoom() << "\n";
+	std::cerr << "TILT: " << camera_.tilt() << "\n";
+	const GLfloat vert = std::abs(camera_.zoom()/4.0) + (camera_.tilt()*camera_.tilt())/100.0;
+	hex::get_tile_strip(focus_->loc(), camera_.direction(), vert, vert, std::abs(camera_.zoom()/3.0), hexes);
+//	for(int n = 0; n != 30; ++n) {
+//		hex::get_tile_ring(focus_->loc(), n, hexes);
+//	}
 	
 	foreach(const hex::location& loc, hexes) {
 		if(!map_.is_loc_on_map(loc)) {
@@ -189,7 +193,7 @@ void world::draw() const
 	const std::set<hex::location>& visible =
 		focus_->get_visible_locs();
 	
-	if(current_loc_ != focus_->loc()) {
+	if(current_loc_ != focus_->loc() || camera_.moved_since_last_check()) {
 		rebuild_drawing_caches(visible);
 	}
 	
@@ -288,7 +292,7 @@ void world::draw() const
 	const SDL_Color white = {0xFF,0xFF,0x0,0};
 	
 	
-	const graphics::texture text = graphics::font::render_text(fps_track_.msg(),20,white); graphics::prepare_raster();
+	const graphics::texture text = graphics::font::render_text(fps_track_.msg() + (formatter() << " " << tiles_.size()).str(),20,white); graphics::prepare_raster();
 	graphics::blit_texture(text,50,50);
 	
 	if(track_info_grid_) {

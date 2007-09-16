@@ -24,6 +24,7 @@
 #include "character_fwd.hpp"
 #include "gamemap.hpp"
 #include "map_avatar.hpp"
+#include "model.hpp"
 #include "party.hpp"
 #include "tile_logic.hpp"
 #include "location_tracker.hpp"

@@ -48,7 +48,8 @@ camera::camera(const gamemap& m)
      translatez_(0.0),
      rotate_(0.0), dir_(NORTH),
      tilt_(-30.0), zoom_(-30.0), debug_adjust_(false),
-	 keyboard_pan_(false)
+	 keyboard_pan_(false),
+     moved_since_last_check_(true)
 {
 	std::fill(background_,background_+sizeof(background_)/sizeof(*background_),0.0);
 	update_visible_cliffs();
@@ -192,6 +193,7 @@ GLfloat camera::rotate_radians() const
 
 void camera::rotate_left()
 {
+	moved_since_last_check_ = true;
 	if(std::abs(need_to_rotate()) < RotateSpeed) {
 		int dir = static_cast<int>(dir_);
 		--dir;
@@ -206,6 +208,7 @@ void camera::rotate_left()
 
 void camera::rotate_right()
 {
+	moved_since_last_check_ = true;
 	if(std::abs(need_to_rotate()) < RotateSpeed) {
 		int dir = static_cast<int>(dir_);
 		++dir;
@@ -221,21 +224,25 @@ void camera::rotate_right()
 void camera::tilt_up()
 {
 	tilt_ += TiltSpeed;
+	moved_since_last_check_ = true;
 }
 
 void camera::tilt_down()
 {
 	tilt_ -= TiltSpeed;
+	moved_since_last_check_ = true;
 }
 
 void camera::zoom_in()
 {
 	zoom_ += ZoomSpeed;
+	moved_since_last_check_ = true;
 }
 
 void camera::zoom_out()
 {
 	zoom_ -= ZoomSpeed;
+	moved_since_last_check_ = true;
 }
 
 DIRECTION camera::direction() const

@@ -51,9 +51,11 @@ public:
 
 	void tilt_up();
 	void tilt_down();
+	GLfloat tilt() const { return tilt_; }
 
 	void zoom_in();
 	void zoom_out();
+	GLfloat zoom() const { return zoom_; }
 
 	DIRECTION direction() const;
 
@@ -71,6 +73,12 @@ public:
 	const hex::DIRECTION* visible_cliffs(int* num) const;
 
 	void set_background_color(const GLfloat* col);
+
+	bool moved_since_last_check() const {
+		const bool res = moved_since_last_check_;
+		moved_since_last_check_ = false;
+		return res;
+	}
 
 private:
 
@@ -101,6 +109,8 @@ private:
 	std::vector<GLuint> selection_;
 
 	GLfloat background_[3];
+
+	mutable bool moved_since_last_check_;
 };
 		
 }
