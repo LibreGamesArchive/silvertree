@@ -131,10 +131,17 @@ void get_tile_strip(const location& center, DIRECTION dir,
                     int tiles_forward, int tiles_back, int tiles_side,
 					std::vector<location>& res)
 {
+	res.clear();
 	location loc = center;
 	const DIRECTION reverse_dir = static_cast<DIRECTION>((dir+3)%6);
 	for(int n = 0; n != tiles_back; ++n) {
 		loc = tile_in_direction(loc, reverse_dir);
+	}
+	
+	const DIRECTION left[] = {static_cast<DIRECTION>((dir+4)%6),
+	                          static_cast<DIRECTION>((dir+5)%6)};
+	for(int n = 0; n != tiles_side; ++n) {
+		loc = tile_in_direction(loc, left[n%2]);
 	}
 
 	const int length = tiles_forward + tiles_back;
@@ -144,32 +151,15 @@ void get_tile_strip(const location& center, DIRECTION dir,
 		res.push_back(tile_in_direction(res.back(), dir));
 	}
 
-	const DIRECTION left[] = {static_cast<DIRECTION>((dir+4)%6),
-	                          static_cast<DIRECTION>((dir+5)%6)};
-	int begin = 0, end = res.size();
-	const int orig_begin = begin;
-	const int orig_end = end;
-	for(int n = 0; n < tiles_side; ++n) {
-		for(int m = begin; m != end; ++m) {
-			res.push_back(tile_in_direction(res[m], left[n%2]));
-		}
-
-		begin = end;
-		end = res.size();
-	}
-
-	begin = orig_begin;
-	end = orig_end;
-
 	const DIRECTION right[] = {static_cast<DIRECTION>((dir+1)%6),
 	                           static_cast<DIRECTION>((dir+2)%6)};
-	for(int n = 0; n < tiles_side; ++n) {
-		const int real_end = res.size();
+	int begin = 0, end = res.size();
+	for(int n = 0; n < tiles_side*2; ++n) {
 		for(int m = begin; m != end; ++m) {
 			res.push_back(tile_in_direction(res[m], right[n%2]));
 		}
 
-		begin = real_end;
+		begin = end;
 		end = res.size();
 	}
 }
