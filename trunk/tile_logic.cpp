@@ -147,7 +147,8 @@ void get_tile_strip(const location& center, DIRECTION dir,
 	const DIRECTION left[] = {static_cast<DIRECTION>((dir+4)%6),
 	                          static_cast<DIRECTION>((dir+5)%6)};
 	int begin = 0, end = res.size();
-	const int orig_begin = begin, orig_end = end;
+	const int orig_begin = begin;
+	const int orig_end = end;
 	for(int n = 0; n < tiles_side; ++n) {
 		for(int m = begin; m != end; ++m) {
 			res.push_back(tile_in_direction(res[m], left[n%2]));
