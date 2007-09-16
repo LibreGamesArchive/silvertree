@@ -133,25 +133,18 @@ void get_tile_strip(const location& center, DIRECTION dir,
                     int tiles_forward, int tiles_back, int tiles_side,
 					std::vector<location>& res)
 {
-	std::cerr << "TILES: " << tiles_forward << "," << tiles_back << "," << tiles_side << "\n";
 	res.clear();
 	location loc = center;
 	const DIRECTION reverse_dir = static_cast<DIRECTION>((int(dir)+3)%6);
-	std::cerr << "TILES: dir: " << (int)dir << ", " << reverse_dir << "\n";
 	for(int n = 0; n != tiles_back; ++n) {
-		std::cerr << "TILES: " << loc.x() << "," << loc.y() << " move " << (int)reverse_dir << " -> ";
 		loc = tile_in_direction(loc, reverse_dir);
-		std::cerr << loc.x() << "," << loc.y() << "\n";
 	}
 
-	std::cerr << "TILES: MOVE SIDE\n";
 	
 	const DIRECTION left[] = {static_cast<DIRECTION>((int(dir)+4)%6),
 	                          static_cast<DIRECTION>((int(dir)+5)%6)};
 	for(int n = 0; n != tiles_side; ++n) {
-		std::cerr << "TILES: " << loc.x() << "," << loc.y() << " move " << (int)left[n%2] << " -> ";
 		loc = tile_in_direction(loc, left[n%2]);
-		std::cerr << loc.x() << "," << loc.y() << "\n";
 	}
 
 	const int length = tiles_forward + tiles_back;
@@ -159,17 +152,14 @@ void get_tile_strip(const location& center, DIRECTION dir,
 	res.push_back(loc);
 	for(int n = 0; n != length; ++n) {
 		res.push_back(tile_in_direction(res.back(), dir));
-		std::cerr << "TILES: ADD STRIP " << res.back().x() << "," << res.back().y() << "\n";
 	}
 
 	const DIRECTION right[] = {static_cast<DIRECTION>((int(dir)+1)%6),
 	                           static_cast<DIRECTION>((int(dir)+2)%6)};
 	int begin = 0, end = res.size();
 	for(int n = 0; n < tiles_side*2; ++n) {
-		std::cerr << "TILES: NEW STRIP " << n << "\n";
 		for(int m = begin; m != end; ++m) {
 			res.push_back(tile_in_direction(res[m], right[n%2]));
-			std::cerr << "TILES STRIP: " << int(right[n%2]) << " -> " << res.back().x() << "," << res.back().y() << "\n";
 		}
 
 		begin = end;
