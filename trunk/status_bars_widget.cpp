@@ -64,7 +64,7 @@ void draw_anchored_expanding_time_bar(GLfloat time, GLfloat accounted_time, int 
 	}
 }
 
-inline void draw_time_bars(GLfloat time, GLfloat accounted_time, GLfloat start, GLfloat thickness, 
+void draw_time_bars(GLfloat time, GLfloat accounted_time, GLfloat start, GLfloat thickness, 
 			   GLfloat start_ang, GLfloat range, int units, 
 			   const SDL_Color& main_color, const SDL_Color& accounted_color, 
 			   GLUquadric *quad) 
@@ -96,22 +96,7 @@ inline void draw_time_bars(GLfloat time, GLfloat accounted_time, GLfloat start, 
 					 thickness, main_color, accounted_color, quad);
 }
 
-inline void get_bcircle(const GLfloat* bbox, GLfloat* bcircle) {
-	bcircle[0] = (bbox[0] + bbox[2])/2;
-	bcircle[1] = (bbox[1] + bbox[3])/2;
-	bcircle[2] = 0;
-
-	for(int i=0;i<2;++i) {
-		GLfloat dist_x = (bbox[i*2] - bcircle[0]);
-		GLfloat dist_y = (bbox[i*2+1] - bcircle[1]);
-		GLfloat dist = dist_x*dist_x + dist_y*dist_y;
-		if(dist > bcircle[2]) {
-			bcircle[2] = dist;
-		}
-	}
-	bcircle[2] = sqrt(bcircle[2]);
-}
-void smooth_transition(GLfloat& x, GLfloat& prev, GLfloat cur) {
+inline void smooth_transition(GLfloat& x, GLfloat& prev, GLfloat cur) {
 	if(cur != x) {
 		GLfloat step;
 		if(prev >= 0) {
@@ -167,9 +152,6 @@ void status_bars_widget::handle_draw() const {
 		return;
 	}
 
-	GLfloat bbox[4];
-	ch_->loc_tracker().get_bbox(bbox);
-	
 	GLfloat r_max_hitpoints = static_cast<GLfloat>(rch.max_hitpoints());
 
 	if(max_hitpoints_ >= 0) {
@@ -248,7 +230,7 @@ void status_bars_widget::handle_draw() const {
 	SDL_Color damaged_color = { 255, 0, 0 };
 
 	GLfloat bcircle[3];
-	get_bcircle(bbox, bcircle);
+	ch_->loc_tracker().get_bcircle(bcircle);
 
 	scoped_quadric quad(gluNewQuadric());
 
@@ -284,10 +266,8 @@ void time_cost_widget::handle_draw() const {
 		return;
 	}
 
-	GLfloat bbox[4];
-	tracker_->get_bbox(bbox);
 	GLfloat bcircle[3];
-	get_bcircle(bbox, bcircle);
+	tracker_->get_bcircle(bcircle);
 	
 	const SDL_Color cost_color = { 255, 150, 255 };
 	const SDL_Color free_color = { 255, 255, 255 };
