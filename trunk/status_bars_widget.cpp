@@ -7,7 +7,7 @@ namespace game_dialogs {
 
 namespace {
 
-inline void draw_anchored_expanding_time_bar(GLfloat time, GLfloat accounted_time, int units, GLfloat range_start_angle, 
+void draw_anchored_expanding_time_bar(GLfloat time, GLfloat accounted_time, int units, GLfloat range_start_angle, 
 					     GLfloat range_length, GLfloat proportion_ticks, GLfloat inner_radius, 
 					     GLfloat thickness, const SDL_Color& main_color, const SDL_Color& accounted_color,
 					     GLUquadric *quad) 
@@ -155,6 +155,9 @@ inline GLfloat calc_time_to_move(const game_logic::battle_character_ptr ch, cons
 	return ret;
 }
 
+struct release_quadric { void operator()(GLUquadric* quad) const { gluDeleteQuadric(quad); } };
+typedef util::scoped_resource<GLUquadric*, release_quadric> scoped_quadric;
+
 }
 
 
@@ -247,40 +250,33 @@ void status_bars_widget::handle_draw() const {
 	GLfloat bcircle[3];
 	get_bcircle(bbox, bcircle);
 
-	GLUquadric* quad =  gluNewQuadric();
+	scoped_quadric quad(gluNewQuadric());
 
-	try {
-		glDisable(GL_TEXTURE_2D);
-		glPushMatrix();
-		glTranslatef(bcircle[0], bcircle[1], 0);
+	glDisable(GL_TEXTURE_2D);
+	glPushMatrix();
+	glTranslatef(bcircle[0], bcircle[1], 0);
 
-		GLfloat px_radius = bcircle[2] * 0.5 * M_PI/180.0;
+	GLfloat px_radius = bcircle[2] * 0.5 * M_PI/180.0;
 
-		glColor4ub(0,0,0,255);
-		gluPartialDisk(quad, bcircle[2]*9/10-1, bcircle[2]*11/10+1, 16, 1, 
-			       -20 + px_radius, -(health_max_angle + 2*px_radius));
+	glColor4ub(0,0,0,255);
+	gluPartialDisk(quad.get(), bcircle[2]*9/10-1, bcircle[2]*11/10+1, 16, 1, 
+		       -20 + px_radius, -(health_max_angle + 2*px_radius));
 
-		if(health_max_angle - health_angle > 0) {
-			glColor4ub(damaged_color.r, damaged_color.g, damaged_color.b, 255);
-			gluPartialDisk(quad, bcircle[2]*9/10, bcircle[2]*11/10, 16, 1, 
-				       -20, -(health_max_angle-health_angle));
-		}
-		if(health_angle > 0) {
-			glColor4ub(healthy_color.r, healthy_color.g, healthy_color.b, 255);
-			gluPartialDisk(quad, bcircle[2]*9/10, bcircle[2]*11/10, 16, 1, 
-				       -20 - (health_max_angle-health_angle), -health_angle);
-		}
-		draw_time_bars(time, time-time_remaining, bcircle[2]*12/10, bcircle[2]*2/10, -20, -140, 10, 
-			       time_to_go_color, time_waited_color, quad);
-
-		glPopMatrix();
-		glEnable(GL_TEXTURE_2D);
-
-	} catch(...) {
-		gluDeleteQuadric(quad);
-		throw;
+	if(health_max_angle - health_angle > 0) {
+		glColor4ub(damaged_color.r, damaged_color.g, damaged_color.b, 255);
+		gluPartialDisk(quad.get(), bcircle[2]*9/10, bcircle[2]*11/10, 16, 1, 
+			       -20, -(health_max_angle-health_angle));
 	}
-	gluDeleteQuadric(quad);
+	if(health_angle > 0) {
+		glColor4ub(healthy_color.r, healthy_color.g, healthy_color.b, 255);
+		gluPartialDisk(quad.get(), bcircle[2]*9/10, bcircle[2]*11/10, 16, 1, 
+			       -20 - (health_max_angle-health_angle), -health_angle);
+	}
+	draw_time_bars(time, time-time_remaining, bcircle[2]*12/10, bcircle[2]*2/10, -20, -140, 10, 
+		       time_to_go_color, time_waited_color, quad.get());
+
+	glPopMatrix();
+	glEnable(GL_TEXTURE_2D);
 }
 
 void time_cost_widget::handle_draw() const {
@@ -303,23 +299,16 @@ void time_cost_widget::handle_draw() const {
 		free_time = 0;
 	}
 
-	GLUquadric *quad = gluNewQuadric();
-	try {
-		glDisable(GL_TEXTURE_2D);
-		glPushMatrix();
-		glTranslatef(bcircle[0], bcircle[1], 0);
-		
-		draw_time_bars(time_cost_, free_time, bcircle[2]/3, bcircle[2]/10, 180, 360, 10, 
-			       cost_color, free_color, quad);
+	scoped_quadric quad(gluNewQuadric());
+	glDisable(GL_TEXTURE_2D);
+	glPushMatrix();
+	glTranslatef(bcircle[0], bcircle[1], 0);
+	
+	draw_time_bars(time_cost_, free_time, bcircle[2]/3, bcircle[2]/10, 180, 360, 10, 
+		       cost_color, free_color, quad.get());
 
-		glPopMatrix();
-		glEnable(GL_TEXTURE_2D);
-
-		
-	} catch(...) {
-		gluDeleteQuadric(quad);
-	}
-	gluDeleteQuadric(quad);
+	glPopMatrix();
+	glEnable(GL_TEXTURE_2D);
 }
 
 }
