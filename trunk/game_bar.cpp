@@ -109,9 +109,11 @@ void game_bar_portrait_set::construct_interface()
 	left_button->add_skin("game-bar-char-scroll-left-skin-normal", gui::button_widget::NORMAL);
 	left_button->add_skin("game-bar-char-scroll-left-skin-highlighted", gui::button_widget::HIGHLIGHTED);
 	left_button->add_skin("game-bar-char-scroll-left-skin-clicked", gui::button_widget::CLICKED);
+	left_button->add_skin("game-bar-char-scroll-left-skin-disabled", gui::button_widget::DISABLED);
 	right_button->add_skin("game-bar-char-scroll-right-skin-normal", gui::button_widget::NORMAL);
 	right_button->add_skin("game-bar-char-scroll-right-skin-highlighted", gui::button_widget::HIGHLIGHTED);
 	right_button->add_skin("game-bar-char-scroll-right-skin-clicked", gui::button_widget::CLICKED);
+	right_button->add_skin("game-bar-char-scroll-right-skin-disabled", gui::button_widget::DISABLED);
 
 	gui::frame_ptr left_button_frame = gui::frame_manager::make_frame(left_button, "game-bar-char-scroll-left-frame");
 	gui::frame_ptr right_button_frame = gui::frame_manager::make_frame(right_button, "game-bar-char-scroll-right-frame");
