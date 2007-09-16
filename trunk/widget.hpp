@@ -23,7 +23,7 @@ namespace gui {
 class widget
 {
 public:
-	void process_event(const SDL_Event& event);
+	bool process_event(const SDL_Event& event);
 	void draw() const;
 
 	virtual void set_loc(int x, int y) { x_ = x; y_ = y; }
@@ -37,14 +37,14 @@ public:
 	bool visible() { return visible_; }
 	void set_visible(bool visible) { visible_ = visible; }
 protected:
-	widget() : x_(-1), y_(-1), w_(-1), h_(-1), tooltip_displayed_(false), visible_(true)
+	widget() : x_(0), y_(0), w_(0), h_(0), tooltip_displayed_(false), visible_(true)
 	{}
 	~widget();
 
 	void normalize_event(SDL_Event* event);
 private:
 	virtual void handle_draw() const = 0;
-	virtual void handle_event(const SDL_Event& event) {}
+	virtual bool handle_event(const SDL_Event& event) { return false; }
 	int x_, y_;
 	int w_, h_;
 	boost::shared_ptr<std::string> tooltip_;

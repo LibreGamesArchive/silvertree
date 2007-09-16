@@ -24,6 +24,7 @@
 #include "formula_fwd.hpp"
 #include "frame_rate_utils.hpp"
 #include "gamemap.hpp"
+#include "game_bar.hpp"
 #include "game_time.hpp"
 #include "grid_widget_fwd.hpp"
 #include "particle_system.hpp"
@@ -124,6 +125,7 @@ private:
 	event_map handlers_;
 
 	mutable graphics::particle_system particle_system_;
+	game_dialogs::game_bar_ptr game_bar_;
 };
 		
 }

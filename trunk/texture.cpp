@@ -99,7 +99,6 @@ namespace {
     					npot = false;
     		}
     	}
-		npot = false;
     	return npot;
     }
 

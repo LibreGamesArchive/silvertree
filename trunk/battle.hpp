@@ -19,7 +19,9 @@
 
 #include "battle_character.hpp"
 #include "battle_menu_fwd.hpp"
+/* FIXME_MISSILE
 #include "battle_missile.hpp"
+*/
 #include "battle_move_fwd.hpp"
 #include "camera.hpp"
 #include "camera_controller.hpp"
@@ -131,8 +133,9 @@ private:
 	const hex::tile* tracked_tile_;
 	game_dialogs::time_cost_widget_ptr time_cost_widget_;
 	graphics::particle_system particle_system_;
-
-	boost::scoped_ptr<battle_missile> missile_;
+	/* FIXME_MISSILE
+	   boost::scoped_ptr<battle_missile> missile_;
+	*/
 };
 		
 }

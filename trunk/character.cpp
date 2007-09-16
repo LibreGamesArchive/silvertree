@@ -79,6 +79,14 @@ character::character(wml::const_node_ptr node)
 	character_generator::get((*node)["generator"]).generate(*this, node);
 }
 
+const std::string& character::portrait(bool for_bar) const 
+{
+	if(for_bar && !bar_portrait_.empty()) {
+		return bar_portrait_;
+	}
+	return portrait_; 
+}
+
 int character::move_cost(hex::const_base_terrain_ptr terrain,
                          hex::const_terrain_feature_ptr feature,
                          int height_change) const

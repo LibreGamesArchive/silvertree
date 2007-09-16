@@ -72,7 +72,7 @@ public:
 
 	const std::string& model() const { return model_; }
 	const std::string& image() const { return image_; }
-	const std::string& portrait() const { return portrait_; }
+	const std::string& portrait(bool for_bar=false) const;
 
 	enum ALIGNMENT { CHAOTIC = -1, NEUTRAL, LAWFUL };
 	ALIGNMENT alignment() const { return alignment_; }
@@ -150,6 +150,7 @@ private:
 	std::string image_;
 	std::string model_;
 	std::string portrait_;
+	std::string bar_portrait_;
 	ALIGNMENT alignment_;
 
 	std::vector<item_ptr> equipment_;
@@ -159,7 +160,7 @@ private:
 	int improvement_points_;
 	int spent_skill_points_;
 };
-		
+
 }
 
 #endif

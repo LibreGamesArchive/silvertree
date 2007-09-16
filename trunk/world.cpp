@@ -141,6 +141,9 @@ void world::add_party(party_ptr new_party)
 	if(new_party->is_human_controlled()) {
 		std::cerr << "is human\n";
 		focus_ = new_party;
+		game_bar_.reset(new game_dialogs::game_bar(0, graphics::screen_height()-128, 
+							   graphics::screen_width(), 128, this, new_party));
+		game_bar_->set_frame(gui::frame_manager::make_frame(game_bar_, "game-bar-frame"));
 	}
 }
 
@@ -335,6 +338,8 @@ void world::play()
 	graphics::frame_skipper skippy(50, preference_maxfps());
 	fps_track_.reset();
 
+	bool quit = false;
+
 	for(bool done = false; !done; ) {
 		if(!focus_) {
 			for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
@@ -354,6 +359,9 @@ void world::play()
 			
 			if(draw_this_frame) {
 				draw();
+				if(game_bar_) {
+					game_bar_->draw();
+				}
 				SDL_GL_SwapBuffers();
 			}
 			fps_track_.register_frame(draw_this_frame);
@@ -361,9 +369,21 @@ void world::play()
 		
 		SDL_Event event;
 		while(SDL_PollEvent(&event)) {
+			if(game_bar_) {
+				const int start = SDL_GetTicks();
+				bool preclaimed = game_bar_->process_event(event);
+				const int end = SDL_GetTicks();
+				if(end - start > 20) {
+					/* more than 20ms processing an event ... */
+					skippy.reset();
+					fps_track_.reset();
+				}
+				if(preclaimed) continue;
+			}
 			switch(event.type) {
 				case SDL_QUIT:
 					done = true;
+					quit = true;
 					break;
 				default:
 					break;
@@ -454,10 +474,6 @@ void world::play()
 			}
 		}
 
-		if(keys[SDLK_ESCAPE]) {
-			done = true;
-		}
-
 		if(keys[SDLK_g]) {
 			show_grid_ = true;
 		}
@@ -466,13 +482,12 @@ void world::play()
 			show_grid_ = false;
 		}
 
-		if(keys[SDLK_s]) {
-			game_dialogs::party_status_dialog(focus_).show_modal();
-			skippy.reset();
-			fps_track_.reset();
-		}
-
 		camera_controller_.keyboard_control();
+	}
+	if(quit) {
+		SDL_Event e;
+		e.type = SDL_QUIT;
+		SDL_PushEvent(&e);
 	}
 }
 

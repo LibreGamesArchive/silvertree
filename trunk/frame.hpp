@@ -201,7 +201,7 @@ public:
 	void add_key_set(const std::string& name, int x, int y, int w, int h);
 private:
 	virtual void handle_draw() const;
-	virtual void handle_event(const SDL_Event& event);
+	virtual bool handle_event(const SDL_Event& event);
 	void calculate_loc();
 	void calculate_dim();
 	void rebuild_frame();

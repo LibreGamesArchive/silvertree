@@ -52,7 +52,7 @@ private:
 	int row_at(int x, int y) const;
 	void recalculate_dimensions();
 	void handle_draw() const;
-	void handle_event(const SDL_Event& event);
+	bool handle_event(const SDL_Event& event);
 
 	int nrows() const { return cells_.size()/ncols_; }
 	int ncols_;
