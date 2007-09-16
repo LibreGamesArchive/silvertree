@@ -185,7 +185,6 @@ int party::movement_cost(const hex::location& src,
 	for(std::vector<character_ptr>::const_iterator i = members_.begin();
 	    i != members_.end(); ++i) {
 		const int cost = (*i)->move_cost(terrain,feature,gradient);
-		std::cerr << "move cost: " << cost << "\n";
 		if(cost < 0) {
 			return -1;
 		}
@@ -323,7 +322,6 @@ const std::set<hex::location>& party::get_visible_locs() const
 
 void party::get_visible_parties(std::vector<const_party_ptr>& parties) const
 {
-	const int start_ticks = SDL_GetTicks();
 	const int range = vision();
 	world::party_map& all = world_->parties();
 	for(world::party_map::iterator i = all.begin(); i != all.end(); ++i) {
@@ -333,8 +331,6 @@ void party::get_visible_parties(std::vector<const_party_ptr>& parties) const
 			}
 		}
 	}
-	const int taken = SDL_GetTicks() - start_ticks;
-	std::cerr << "get_visible_parties(): " << taken << "\n";
 }
 
 int party::vision() const

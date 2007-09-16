@@ -149,13 +149,11 @@ void npc_party::friendly_encounter(party& p)
 
 party::TURN_RESULT npc_party::do_turn()
 {
-	const int start_ticks = SDL_GetTicks();
+  //const int start_ticks = SDL_GetTicks();
 	std::vector<const_party_ptr> parties;
 	if(aggressive_) {
 		get_visible_parties(parties);
 	}
-
-	std::cerr << "see " << parties.size() << " other parties\n";
 
 	hex::location target;
 	int closest = -1;
@@ -214,8 +212,8 @@ party::TURN_RESULT npc_party::do_turn()
 			pass();
 		}
 
-		const int time_taken = SDL_GetTicks() - start_ticks;
-		std::cerr << "AI took " << time_taken << "\n";
+		//const int time_taken = SDL_GetTicks() - start_ticks;
+		//std::cerr << "AI took " << time_taken << "\n";
 		return TURN_COMPLETE;
 	}
 
