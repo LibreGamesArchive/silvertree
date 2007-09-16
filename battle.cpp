@@ -22,6 +22,7 @@
 #include "foreach.hpp"
 #include "keyboard.hpp"
 #include "label.hpp"
+#include "model.hpp"
 #include "preferences.hpp"
 #include "raster.hpp"
 #include "slider.hpp"
