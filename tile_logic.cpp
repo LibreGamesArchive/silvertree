@@ -133,13 +133,13 @@ void get_tile_strip(const location& center, DIRECTION dir,
 {
 	res.clear();
 	location loc = center;
-	const DIRECTION reverse_dir = static_cast<DIRECTION>((dir+3)%6);
+	const DIRECTION reverse_dir = static_cast<DIRECTION>((int(dir)+3)%6);
 	for(int n = 0; n != tiles_back; ++n) {
 		loc = tile_in_direction(loc, reverse_dir);
 	}
 	
-	const DIRECTION left[] = {static_cast<DIRECTION>((dir+4)%6),
-	                          static_cast<DIRECTION>((dir+5)%6)};
+	const DIRECTION left[] = {static_cast<DIRECTION>((int(dir)+4)%6),
+	                          static_cast<DIRECTION>((int(dir)+5)%6)};
 	for(int n = 0; n != tiles_side; ++n) {
 		loc = tile_in_direction(loc, left[n%2]);
 	}
@@ -151,8 +151,8 @@ void get_tile_strip(const location& center, DIRECTION dir,
 		res.push_back(tile_in_direction(res.back(), dir));
 	}
 
-	const DIRECTION right[] = {static_cast<DIRECTION>((dir+1)%6),
-	                           static_cast<DIRECTION>((dir+2)%6)};
+	const DIRECTION right[] = {static_cast<DIRECTION>((int(dir)+1)%6),
+	                           static_cast<DIRECTION>((int(dir)+2)%6)};
 	int begin = 0, end = res.size();
 	for(int n = 0; n < tiles_side*2; ++n) {
 		for(int m = begin; m != end; ++m) {
