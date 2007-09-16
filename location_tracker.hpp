@@ -1,6 +1,7 @@
 #ifndef LOCATION_TRACKER_HPP_INCLUDED
 #define LOCATION_TRACKER_HPP_INCLUDED
 
+#include <math.h>
 #include <vector>
 #include <iostream>
 #include "boost/shared_array.hpp"
@@ -15,6 +16,7 @@ class location_tracker {
 public:
 	location_tracker();
 	void get_bbox(GLfloat *box) const;
+	void get_bcircle(GLfloat *circ) const;
 	void add_vertex(GLfloat v1, GLfloat v2, GLfloat v3);
 	void clear_vertices();
 	void update();
@@ -34,6 +36,23 @@ inline void location_tracker::get_bbox(GLfloat *box) const {
 		box[i] = box_[i];
 	}
 }
+
+inline void location_tracker::get_bcircle(GLfloat* bcircle) const {
+	bcircle[0] = (box_[0] + box_[2])/2;
+	bcircle[1] = (box_[1] + box_[3])/2;
+	bcircle[2] = 0;
+
+	for(int i=0;i<2;++i) {
+		GLfloat dist_x = (box_[i*2] - bcircle[0]);
+		GLfloat dist_y = (box_[i*2+1] - bcircle[1]);
+		GLfloat dist = dist_x*dist_x + dist_y*dist_y;
+		if(dist > bcircle[2]) {
+			bcircle[2] = dist;
+		}
+	}
+	bcircle[2] = sqrt(bcircle[2]);
+}
+
 
 inline void location_tracker::add_vertex(GLfloat v1, GLfloat v2, GLfloat v3) {
 	boost::shared_array<GLfloat> my_v(new GLfloat[3]);
