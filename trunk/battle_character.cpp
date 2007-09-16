@@ -403,6 +403,11 @@ int battle_character::defense(const std::string& damage_type) const
 	return get_character().defense(damage_type) + mod_stat("defense");
 }
 
+int battle_character::defense_behind() const
+{
+	return get_character().defense_behind();
+}
+
 int battle_character::stat(const std::string& s) const
 {
 	return get_character().stat(s) + mod_stat(s);
