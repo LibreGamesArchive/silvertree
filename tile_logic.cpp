@@ -127,6 +127,52 @@ void get_tiles_in_radius(const location& center, int radius,
 	}
 }
 
+void get_tile_strip(const location& center, DIRECTION dir,
+                    int tiles_forward, int tiles_back, int tiles_side,
+					std::vector<location>& res)
+{
+	location loc = center;
+	const DIRECTION reverse_dir = static_cast<DIRECTION>((dir+3)%6);
+	for(int n = 0; n != tiles_back; ++n) {
+		loc = tile_in_direction(loc, reverse_dir);
+	}
+
+	const int length = tiles_forward + tiles_back;
+
+	res.push_back(loc);
+	for(int n = 0; n != length; ++n) {
+		res.push_back(tile_in_direction(res.back(), dir));
+	}
+
+	const DIRECTION left[] = {static_cast<DIRECTION>((dir+4)%6),
+	                          static_cast<DIRECTION>((dir+5)%6)};
+	int begin = 0, end = res.size();
+	const int orig_begin = begin, orig_end = end;
+	for(int n = 0; n < tiles_side; ++n) {
+		for(int m = begin; m != end; ++m) {
+			res.push_back(tile_in_direction(res[m], left[n%2]));
+		}
+
+		begin = end;
+		end = res.size();
+	}
+
+	begin = orig_begin;
+	end = orig_end;
+
+	const DIRECTION right[] = {static_cast<DIRECTION>((dir+1)%6),
+	                           static_cast<DIRECTION>((dir+2)%6)};
+	for(int n = 0; n < tiles_side; ++n) {
+		const int real_end = res.size();
+		for(int m = begin; m != end; ++m) {
+			res.push_back(tile_in_direction(res[m], right[n%2]));
+		}
+
+		begin = real_end;
+		end = res.size();
+	}
+}
+
 DIRECTION get_adjacent_direction(const location& from, const location& to)
 {
 	location adj[6];
