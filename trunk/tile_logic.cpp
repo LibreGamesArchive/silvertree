@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include <iostream>
+
 #include "tile_logic.hpp"
 #include "util.hpp"
 
@@ -131,6 +133,7 @@ void get_tile_strip(const location& center, DIRECTION dir,
                     int tiles_forward, int tiles_back, int tiles_side,
 					std::vector<location>& res)
 {
+	std::cerr << "TILES: " << tiles_forward << ", " << tiles_back << ", " << tiles_side << "\n";
 	res.clear();
 	location loc = center;
 	const DIRECTION reverse_dir = static_cast<DIRECTION>((int(dir)+3)%6);
