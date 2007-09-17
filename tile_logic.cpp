@@ -158,7 +158,6 @@ void get_tile_strip(const location& center, DIRECTION dir,
 
 	int begin = 0, end = res.size();
 	for(int x = 0; x < tiles_side*2; ++x) {
-		std::cerr << "TILES: iteration " << x << "\n";
 		for(int m = begin; m != end; ++m) {
 			res.push_back(tile_in_direction(res[m], right[x%2]));
 		}
