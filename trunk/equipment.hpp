@@ -35,6 +35,7 @@ public:
 	const std::map<std::string,int>& stats() const { return stats_; }
 	const std::string& missile() const { return missile_; }
 	const std::string& damage_type() const { return damage_type_; }
+	bool can_attack_engaged() const { return can_attack_engaged_; }
 	int parry_against(const std::string& damage_type) const;
 private:
 	variant get_value(const std::string& key) const;
@@ -42,6 +43,7 @@ private:
 	std::map<std::string,int> parry_against_;
 	std::string damage_type_;
 	std::string missile_;
+	bool can_attack_engaged_;
 };
 
 }

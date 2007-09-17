@@ -361,6 +361,27 @@ bool battle_character::can_attack(const battle_character& c,
 				}
 			}
 		}
+
+		if(tiles_adjacent(loc,c.loc()) && !get_character().can_attack_engaged()) {
+			//see if the target is engaged with someone else
+			const hex::location target_facing = hex::tile_in_direction(c.loc(), c.facing());
+
+			//see if they're already facing us, or the position we intend to attack from
+			if(target_facing == loc_ || target_facing == loc) {
+				return false;
+			}
+
+			foreach(const battle_character_ptr& engager, chars) {
+				if(engager->loc() == target_facing && c.is_enemy(*engager) &&
+				   (engager->facing()%6) == c.facing()) {
+					//they are engaged with someone else, so we can attack
+					return true;
+				}
+			}
+
+			//they'd be able to turn toward us and engage, so we can't attack
+			return false;
+		}
 		return true;
 	} else {
 		return tiles_adjacent(loc,c.loc());

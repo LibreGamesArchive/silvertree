@@ -507,6 +507,12 @@ int character::attack_range() const
 	}
 }
 
+bool character::can_attack_engaged() const
+{
+	const game_logic::equipment* w = weapon();
+	return w == NULL || w->can_attack_engaged();
+}
+
 const equipment* character::weapon() const
 {
 	foreach(const item_ptr& i, equipment_) {
