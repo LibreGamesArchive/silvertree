@@ -102,6 +102,7 @@ public:
 
 	const std::vector<item_ptr>& equipment() const { return equipment_; }
 	int attack_range() const;
+	bool can_attack_engaged() const;
 	const game_logic::equipment* weapon() const;
 	void swap_equipment(int index, item_ptr& new_item);
 
