@@ -94,6 +94,7 @@ location tile_in_direction(const location& a, DIRECTION dir)
 		case NORTH_WEST:
 			return location(a.x()-1,a.y() - (is_even(a.x()) ? 1:0));
 		default:
+			std::cerr << "BAD DIRECTION!\n";
 			return location();
 	}
 }
@@ -145,7 +146,7 @@ void get_tile_strip(const location& center, DIRECTION dir,
 	const DIRECTION right[] = {static_cast<DIRECTION>((int(dir)+1)%6),
 	                           static_cast<DIRECTION>((int(dir)+2)%6)};
 	for(int n = 0; n != tiles_side; ++n) {
-		loc = tile_in_direction(loc, right[n%2]);
+		loc = tile_in_direction(loc, left[n%2]);
 	}
 
 	const int length = tiles_forward + tiles_back;
@@ -156,9 +157,10 @@ void get_tile_strip(const location& center, DIRECTION dir,
 	}
 
 	int begin = 0, end = res.size();
-	for(int n = 0; n < tiles_side*2; ++n) {
+	for(int x = 0; x < tiles_side*2; ++x) {
+		std::cerr << "TILES: iteration " << x << "\n";
 		for(int m = begin; m != end; ++m) {
-			res.push_back(tile_in_direction(res[m], left[n%2]));
+			res.push_back(tile_in_direction(res[m], right[x%2]));
 		}
 
 		begin = end;
