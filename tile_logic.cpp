@@ -156,14 +156,12 @@ void get_tile_strip(const location& center, DIRECTION dir,
 		res.push_back(tile_in_direction(res.back(), dir));
 	}
 
-	int begin = 0, end = res.size();
-	for(int x = 0; x < tiles_side*2; ++x) {
+	for(int n = 0; n < tiles_side*2; ++n) {
+		const int begin = res.size() - length;
+		const int end = res.size();
 		for(int m = begin; m != end; ++m) {
-			res.push_back(tile_in_direction(res[m], right[x%2]));
+			res.push_back(tile_in_direction(res[m], right[n%2]));
 		}
-
-		begin = end;
-		end = res.size();
 	}
 }
 
