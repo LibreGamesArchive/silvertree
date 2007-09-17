@@ -244,9 +244,6 @@ void world::draw() const
 		t->draw_cliffs();
 	}
 	foreach(const hex::tile* t, tiles_) {
-		t->draw_cliff_transitions();
-	}
-	foreach(const hex::tile* t, tiles_) {
 		t->emit_particles(particle_system_);
 	}
 
