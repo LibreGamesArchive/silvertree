@@ -1,31 +1,28 @@
 # vi: syntax=python
 
-# To use, type:
-# scons crosscompile=1
-# scons crosscompile=1 editor=1
-#
-# Also, for now, it has some hardcoded pathes of where I put my mingw stuff,
-# need to find a better way to sort this out if anyone else is going to
-# use it for regular cross compilation.
+Help("""
+Type "scons" to build the game. Additional options:
 
-# Note: You need to first build with the makefile, to do all the Qt4 magic.
+* crosscompile=1 Use the MinGW crosscompiler.
+* editor=1       Build the editor instead of the game.
+* debug=1        Use debug mode instead of release mode.
+* builddir=X     Use X as build dir [build].
+* includedir=X   Use X as extra path to look for includes, split multiple
+                 ones with a colon.
+* libdir=X       Same as includedir but for libraries.
+""")
 
-# Pathes to use:
-BUILD_PATH = "../build"
-EXTRA_INCLUDE_PATHS = ["../win-deps/include",
-    "/usr/i586-mingw32msvc/include/GL",
-    "/usr/i586-mingw32msvc/include/SDL"] 
-EXTRA_EDIT_INCLUDE_PATHS = ["/home/elias/.wine/drive_c/Qt/4.3.1/include"]
-EXTRA_LIB_PATHS = ["../win-deps/lib"]
-EXTRA_EDIT_LIB_PATHS = ["/home/elias/.wine/drive_c/Qt/4.3.1/lib"]
+crosscompile = ARGUMENTS.get("crosscompile", "")
+editor = ARGUMENTS.get("editor", "")
+debug = ARGUMENTS.get("debug", "")
+builddir = ARGUMENTS.get("builddir", "build")
+includedir = ARGUMENTS.get("includedir", "")
+libdir = ARGUMENTS.get("libdir", "")
 
 import glob
 
 sources = glob.glob("*.cpp")
 sources += ["xml/xml.c"]
-
-crosscompile = ARGUMENTS.get("crosscompile", "")
-editor = ARGUMENTS.get("editor", "")
 
 name = "game"
 if editor:
@@ -47,15 +44,22 @@ if editor:
 env = Environment()
 
 def buildpath():
-    name = BUILD_PATH
+    name = builddir
     if editor: name += "/st-edit"
     else: name += "st-game"
     if crosscompile: name += "-mingw"
     else: name += "-posix"
+    if debug: name += "-debug"
+    else: name += "-release"
     return name + "/"
 
 bdir = buildpath()
 realsources = [bdir + x for x in sources] 
+
+if debug:
+    env.Append(CCFLAGS = ["-g3"])
+else:
+    env.Append(CCFLAGS = ["-O2"])
 
 if crosscompile:
     # The cross compiler to use
@@ -63,19 +67,17 @@ if crosscompile:
     env["CXX"] = "i586-mingw32msvc-g++"
 
     # Dependencies are here for me (same folder as for Wesnoth).
-    env.Append(CPPPATH = EXTRA_INCLUDE_PATHS)
+    env.Append(CPPPATH = includedir.split(":"))
 
     # This is where I put the dependency libs
-    env.Append(LIBPATH = EXTRA_LIB_PATHS)
+    env.Append(LIBPATH = libdir.split(":"))
     
     # This is where I placed the Qt stuff for mingw
     if editor:
-        env.Append(CPPPATH = EXTRA_EDIT_INCLUDE_PATHS)
-        env.Append(LIBPATH = EXTRA_EDIT_LIB_PATHS)
         env.Append(LIBS = ["QtCore4", "QtGui4", "QtOpenGL4"])
 
     # Compilation settings
-    env.Append(CCFLAGS = ["-O2", "-mthreads"])
+    env.Append(CCFLAGS = ["-mthreads"])
     env.Append(LINKFLAGS = ["-s", "-mwindows", "-lmingwthrd"])
     env.Append(CPPPATH = ["src", "src/widgets"])
     env.Append(LIBS = ["mingw32", "SDLmain", "SDL", "SDL_net", "SDL_mixer", "SDL_image",
