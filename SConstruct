@@ -32,6 +32,14 @@ if editor:
     sources.remove("main.cpp")
     editor_sources = glob.glob("editor/*.cpp")
     editor_sources.remove("editor/oldmain.cpp")
+    editor_uis = glob.glob("editor/*.ui")
+    editor_mocables = Split("""
+        editor/editorglwidget.hpp
+        editor/editormainwindow.hpp
+        editor/terrainhandler.hpp
+        editor/editpartydialog.hpp
+        editor/editwmldialog.hpp
+     """)
     
     sources.extend(editor_sources)
     name = "edit"
@@ -77,11 +85,21 @@ if crosscompile:
 
 else:
     # assume Linux
+    env.AppendUnique(QTDIR='/usr/')
+    env.Tool('qt4', toolpath=['scons'])
+
     env.ParseConfig("sdl-config --cflags")
     env.ParseConfig("sdl-config --libs")
     env.Append(CPPPATH = ["/usr/include/GL"])
     env.Append(LIBS = ["GL", "GLU", "SDL_image", "SDL_ttf", "boost_regex-mt"])
-    env.ParseConfig("pkg-config --cflags --libs QtCore QtGui QtOpenGL")
+    if editor:
+        env.EnableQt4Modules(['QtCore', 'QtGui', 'QtOpenGL'])
+        env.Replace(QT4_UICIMPLSUFFIX=".hpp", QT4_UICDECLSUFFIX=".hpp",
+            QT4_UICIMPLPREFIX="ui_", QT4_MOCHPREFIX="", QT4_MOCHSUFFIX=".moc",
+            QT4_AUTOSCAN=0)
+        env.Uic4([bdir + x for x in editor_uis])
+        for mocable in editor_mocables: # Moc4 doesn't handle lists properly
+            env.Moc4(bdir + mocable)
             
 env.BuildDir(bdir, ".")
 env.SConsignFile("sconsign")
