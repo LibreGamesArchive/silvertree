@@ -111,11 +111,11 @@ int main(int argc, char** argv)
 	}
 
 	EditorMainWindow *mainWindow = new EditorMainWindow();
+	mainWindow->resize(1024,768);
+	mainWindow->show();
 	if (argc == 2) {
 		mainWindow->openScenario(argv[1]);
 	}
-	mainWindow->resize(1024,768);
-	mainWindow->show();
 	app.exec();
 	return 0;
 }

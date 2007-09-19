@@ -99,6 +99,9 @@ namespace {
     					npot = false;
     		}
     	}
+    	if(!npot) {
+		std::cerr << "Using only pot textures\n";
+	}
     	return npot;
     }
 
@@ -124,10 +127,6 @@ namespace {
 
 texture::manager::manager() {
 	assert(!graphics_initialized);
-	npot_allowed = is_npot_allowed();
-	if(!npot_allowed) {
-		std::cerr << "Using only pot textures\n";
-	}
 
 	width_multiplier = 1.0;
 	height_multiplier = 1.0;
@@ -161,6 +160,8 @@ texture::texture(const key& surfs, options_type options)
 	   std::find(surfs.begin(),surfs.end(),surface()) != surfs.end()) {
 		return;
 	}
+
+	npot_allowed = is_npot_allowed();
 
 	width_ = surfs.front()->w;
 	height_ = surfs.front()->h;
