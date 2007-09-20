@@ -53,7 +53,7 @@ pr	cf
 ps	cf
 qu	cfm
 r	c
-rr	cf
+rr	cif
 s	c
 sf	cf
 sh	c

@@ -499,23 +499,31 @@ int main(int argc, char **argv) {
 			break;
 		}
 		words.insert(words.begin(), w);
-		if(w.size() < 16) {
-			w.append(16 - w.size(), ' ');
-		}
-		if(i < 9) {
+	}
+
+	int count = 0;
+	for(std::set<std::string>::iterator i = words.begin();
+	    i != words.end(); ++i) {
+
+		if(count < 9) {
 			std::cout << "  ";
-		} else if(i < 99) {
+		} else if(count < 99) {
 			std::cout <<  " ";
 		}
-		std::cout << (i+1) << ": " << w;
-		if(i % columns != (columns-1)) {
+		std::cout << (count+1) << ": " << (*i);
+		for(int j=0; j < (16 -i->size()); ++j) {
+			std::cout << ' ';
+		}
+
+		if(count % columns != (columns-1)) {
 			std::cout << "\t";
 		} else {
 			std::cout << "\n";
 		}
+		++count;
 	}
-	
-	if(total % columns != 0) {
+
+	if(words.size() % columns != 0) {
 		std::cout << "\n";
 	}
 
