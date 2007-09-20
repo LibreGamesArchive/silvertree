@@ -9,6 +9,8 @@ ei	v
 eo	vi
 ey	v
 i	vi
+ia	vi
+ie	vi
 o	v
 oa	vif
 oi	vi
