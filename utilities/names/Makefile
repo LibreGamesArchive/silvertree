@@ -1,6 +1,6 @@
 OBJECTS=namegen.o
 LD_FLAGS=
-CC_FLAGS=-O2 -c
+CC_FLAGS=-O2 -c  -I/usr/local/include/boost-1_34
 CC=g++
 EXECUTABLE=namegen
 
