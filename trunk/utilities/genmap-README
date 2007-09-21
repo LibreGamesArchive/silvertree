@@ -1,0 +1,12 @@
+Python GenMap Readme
+
+Instructions:
+
+make your SilverTree folder the current directory.
+
+type something like:
+perl utilities/genmap.pl --dim 50x50 --hills 100 --hillsize 10 > newmap
+
+"--dim50x50" indicates the dimension of the new map
+
+"> newmap" or whatever determines the name of the new map.
