@@ -191,7 +191,7 @@ std::vector<const_skill_ptr> character::eligible_skills() const
 		}
 
 		const std::string& prerequisite = p.second->prerequisite();
-		if(p.second->cost(*this) < points &&
+		if(p.second->cost(*this) <= points &&
 		   (prerequisite.empty() || has_skill(prerequisite))) {
 			res.push_back(p.second);
 		}
