@@ -40,11 +40,12 @@ public:
 	void draw() const;
 	game_time enter(party_ptr pty, const hex::location& loc,
 					const game_time& t);
+	const world& get_world() const;
 private:
 	std::map<hex::location, hex::location> portals_;
 	graphics::const_model_ptr model_;
 	wml::const_node_ptr wml_;
-	boost::shared_ptr<world> world_;
+	mutable boost::shared_ptr<world> world_;
 	const hex::gamemap& map_;
 };
 		

@@ -72,9 +72,7 @@ void settlement::draw() const
 game_time settlement::enter(party_ptr pty, const hex::location& loc,
 				            const game_time& t)
 {
-	if(!world_) {
-		world_.reset(new world(wml_));
-	}
+	get_world();
 
 	assert(portals_.count(loc));
 
@@ -89,6 +87,15 @@ game_time settlement::enter(party_ptr pty, const hex::location& loc,
 	}
 
 	return w.current_time();
+}
+
+const world& settlement::get_world() const
+{
+	if(!world_) {
+		world_.reset(new world(wml_));
+	}
+
+	return *world_;
 }
 
 }

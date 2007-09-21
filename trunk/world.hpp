@@ -67,6 +67,8 @@ public:
 	void add_event_handler(const std::string& event, const event_handler& handler);
 	void draw() const;
 private:
+	party_ptr get_pc_party() const;
+
 	bool show_grid_;
 	graphics::frame_rate_tracker fps_track_;
 	graphics::texture compass_;

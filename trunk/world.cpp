@@ -334,6 +334,16 @@ void world::draw() const
 
 void world::play()
 {
+	if(!get_pc_party()) {
+		for(settlement_map::const_iterator i = settlements_.begin();
+		    i != settlements_.end(); ++i) {
+			if(i->second->get_world().get_pc_party()) {
+				// TODO: enter the settlement.
+				break;
+			}
+		}
+	}
+
 	party_ptr active_party;
 
 	const GLfloat game_speed = 0.2;
@@ -443,7 +453,7 @@ void world::play()
 					}
 
 					settlement_map::iterator s = settlements_.find(active_party->loc());
-					if(s != settlements_.end()) {
+					if(s != settlements_.end() && active_party->is_human_controlled()) {
 						//enter the new world
 						time_ = s->second->enter(active_party, active_party->loc(), time_);
 
@@ -635,6 +645,17 @@ void world::fire_event(const std::string& name, const formula_callable& info)
 void world::add_event_handler(const std::string& event, const event_handler& handler)
 {
 	handlers_.insert(std::pair<std::string,event_handler>(event,handler));
+}
+
+party_ptr world::get_pc_party() const
+{
+	for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
+		if(i->second->is_human_controlled()) {
+			return i->second;
+		}
+	}
+
+	return party_ptr();
 }
 
 }
