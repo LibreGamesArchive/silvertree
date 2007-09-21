@@ -30,7 +30,7 @@ namespace game_logic
 {
 
 npc_party::npc_party(wml::const_node_ptr node, world& game_world)
-    : party(node,game_world), aggressive_(wml::get_bool(node,"aggressive"))
+    : party(node,game_world), aggressive_(wml::get_bool(node,"aggressive")), rest_(false)
 {
 	dialog_ = node->get_child("dialog");
 	if(wml::const_node_ptr dst = node->get_child("destination")) {
@@ -161,6 +161,7 @@ party::TURN_RESULT npc_party::do_turn()
 		if(is_enemy(*party) && (closest == -1 || hex::distance_between(loc(),party->loc()) < closest)) {
 			closest = hex::distance_between(loc(),party->loc());
 			target = party->loc();
+			current_destination_ = target;
 			break;
 		}
 	}
@@ -176,8 +177,24 @@ party::TURN_RESULT npc_party::do_turn()
 	}
 
 	if(!map().is_loc_on_map(target) &&
-	   map().is_loc_on_map(current_destination_)) {
+	   map().is_loc_on_map(current_destination_) && !rest_) {
 		target = current_destination_;
+	}
+
+	bool party_refreshed = true;
+	foreach(const const_character_ptr& c, members()) {
+		if(c->fatigue() > 0) {
+			party_refreshed = false;
+		}
+
+		if(c->fatigue() >= c->stamina()) {
+			rest_ = true;
+			break;
+		}
+	}
+
+	if(party_refreshed) {
+		rest_ = false;
 	}
 
 	if(map().is_loc_on_map(target)) {

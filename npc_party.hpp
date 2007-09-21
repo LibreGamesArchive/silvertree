@@ -36,6 +36,7 @@ private:
 
 	hex::location current_destination_;
 	bool aggressive_;
+	bool rest_;
 	std::vector<hex::location> wander_between_;
 };
 		
