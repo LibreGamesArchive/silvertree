@@ -702,7 +702,7 @@ expression_ptr parse_expression(const token* i1, const token* i2)
 
 }
 
-formula::formula(const std::string& str)
+formula::formula(const std::string& str) : str_(str)
 {
 	using namespace formula_tokenizer;
 

@@ -154,9 +154,13 @@ extern "C" int main(int argc, char** argv)
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
 	wml::node_ptr scenario_cfg;
+	std::string save_file = "data/scenario.cfg";
+	if(!preference_save_file().empty() && sys::file_exists(preference_save_file())) {
+		save_file = preference_save_file();
+	}
 
 	try {
-		scenario_cfg = wml::parse_wml(sys::read_file("data/scenario.cfg"));
+		scenario_cfg = wml::parse_wml(sys::read_file(save_file));
 	} catch(...) {
 		std::cerr << "error parsing rules WML...\n";
 		return -1;

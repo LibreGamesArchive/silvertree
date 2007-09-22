@@ -89,6 +89,12 @@ game_time settlement::enter(party_ptr pty, const hex::location& loc,
 	return w.current_time();
 }
 
+void settlement::play()
+{
+	get_world();
+	world_->play();
+}
+
 const world& settlement::get_world() const
 {
 	if(!world_) {

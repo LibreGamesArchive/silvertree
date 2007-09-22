@@ -74,6 +74,29 @@ party::party(wml::const_node_ptr node, world& gameworld)
 	}
 }
 
+wml::node_ptr party::write() const
+{
+	wml::node_ptr res(new wml::node("party"));
+	avatar_->write(res);
+	WML_WRITE_ATTR(res, id);
+	res->set_attr("x", boost::lexical_cast<std::string>(loc_.x()));
+	res->set_attr("y", boost::lexical_cast<std::string>(loc_.y()));
+	WML_WRITE_ATTR(res, allegiance);
+	WML_WRITE_ATTR(res, money);
+
+	if(is_human_controlled()) {
+		res->set_attr("controller", "human");
+	}
+
+	foreach(const_character_ptr c, members_) {
+		res->add_child(c->write());
+	}
+
+	// TODO: serialize items and events
+	
+	return res;
+}
+
 void party::new_world(world& w, const hex::location& loc)
 {
 	world_ = &w;

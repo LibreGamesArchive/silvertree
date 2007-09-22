@@ -219,6 +219,21 @@ void xml_skip_element(XML_PARSER* parser)
 	}
 }
 
+int xml_get_text_and_skip(XML_PARSER* parser, XML_TOKEN* text)
+{
+	xml_skip_attributes(parser);
+	while(xml_get_token(parser, text)) {
+		if(text->type == XML_TOKEN_TEXT) {
+			xml_skip_element(parser);
+			return 1;
+		} else if(text->type == XML_TOKEN_BEGIN_ELEMENT) {
+			xml_skip_element(parser);
+		} else {
+			return 0;
+		}
+	}
+}
+
 void xml_skip_attributes(XML_PARSER* parser)
 {
 	XML_TOKEN token;

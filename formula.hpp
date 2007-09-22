@@ -66,9 +66,11 @@ public:
 	explicit formula(const std::string& str);
 	variant execute(const formula_callable& variables) const;
 	variant execute() const;
+	const std::string& str() const { return str_; }
 
 private:
 	expression_ptr expr_;
+	std::string str_;
 };
 
 struct formula_error

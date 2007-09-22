@@ -128,7 +128,6 @@ std::vector<graphics::model::face> parse_mesh(chunk& c)
 					}
 				}
 
-
 				if(lowest == NULL || v->point[2] < *lowest) {
 					lowest = &v->point[2];
 				}

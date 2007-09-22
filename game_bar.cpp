@@ -1,17 +1,22 @@
 #include <algorithm>
-#include <vector>
+#include <iostream>
 #include <set>
 #include <sstream>
+#include <vector>
 
 #include "character_equip_dialog.hpp"
 #include "character_status_dialog.hpp"
+#include "filesystem.hpp"
 #include "font.hpp"
 #include "game_bar.hpp"
 #include "image_widget.hpp"
 #include "learn_skills_dialog.hpp"
 #include "party_status_dialog.hpp"
+#include "preferences.hpp"
 #include "raster.hpp"
 #include "widget.hpp"
+#include "wml_parser.hpp"
+#include "wml_writer.hpp"
 #include "world.hpp"
 
 namespace game_dialogs {
@@ -42,7 +47,7 @@ void game_bar::construct_interface(const game_logic::world *wp, game_logic::part
 	add_widget(party_button, dialog::MOVE_RIGHT);
 
 	// make  silvertree game_bar_button for the game menu, but add it later
-	gui::menu_widget_ptr game_button(new game_bar_game_button());
+	gui::menu_widget_ptr game_button(new game_bar_game_button(*wp));
 	game_button->set_dim(game_button->width(), height());
 	game_button->set_hotkey(SDLK_ESCAPE, KMOD_NONE);
 	
@@ -277,10 +282,11 @@ void game_bar_portrait_button::inner_draw() const
 	rollin_menu_widget::inner_draw();
 }
 
-game_bar_game_button::game_bar_game_button() 
+game_bar_game_button::game_bar_game_button(const game_logic::world& w)
 	: popup_menu_widget("game-bar-game-menu-option-text-frame", graphics::color_white(), 16,
 			    "game-bar-game-menu-option-frame", 
-			    "game-bar-game-menu-frame") 
+			    "game-bar-game-menu-frame"),
+	  world_(w)
 {
 	add_skin("game-bar-game-button-skin-normal", gui::popup_menu_widget::NORMAL);
 	add_skin("game-bar-game-button-skin-highlighted", gui::popup_menu_widget::HIGHLIGHTED);
@@ -300,14 +306,29 @@ game_bar_game_button::game_bar_game_button()
 	add_option("Quit", 4);
 	set_option_enabled(0, false);
 	set_option_enabled(1, false);
-	set_option_enabled(2, false);
+	if(preference_save_file().empty()) {
+		set_option_enabled(2, false);
+	}
 	set_option_enabled(3, false);
 }
 
 void game_bar_game_button::option_selected(int opt) {
-	SDL_Event e;
-	e.type = SDL_QUIT;
-	SDL_PushEvent(&e);
+	switch(opt) {
+	case 2: {
+		std::string data;
+		wml::write(world_.write(), data);
+		sys::write_file(preference_save_file(), data);
+		break;
+	}
+	case 4: {
+		SDL_Event e;
+		e.type = SDL_QUIT;
+		SDL_PushEvent(&e);
+		break;
+	}
+	default:
+		assert(false);
+	}
 }
 
 }

@@ -69,10 +69,11 @@ private:
 
 class game_bar_game_button : public gui::popup_menu_widget {
 public:
-	game_bar_game_button();
+	explicit game_bar_game_button(const game_logic::world& w);
 	// more functionality later
 private:
 	void option_selected(int opt);
+	const game_logic::world& world_;
 };
 
 }

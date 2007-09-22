@@ -74,6 +74,62 @@ character_ptr character::create(wml::const_node_ptr node)
 	return character_ptr(new character(node));
 }
 
+wml::node_ptr character::write() const
+{
+	wml::node_ptr res(new wml::node("character"));
+	WML_WRITE_ATTR(res, description);
+	WML_WRITE_ATTR(res, fatigue);
+	WML_WRITE_ATTR(res, level);
+	WML_WRITE_ATTR(res, xp);
+	WML_WRITE_ATTR(res, image);
+	WML_WRITE_ATTR(res, model);
+	WML_WRITE_ATTR(res, portrait);
+	WML_WRITE_ATTR(res, bar_portrait);
+	WML_WRITE_ATTR(res, improvement_points);
+	WML_WRITE_ATTR(res, spent_skill_points);
+
+	switch(alignment_) {
+	case LAWFUL:
+		res->set_attr("alignment", "lawful");
+		break;
+	case NEUTRAL:
+		res->set_attr("alignment", "neutral");
+		break;
+	case CHAOTIC:
+		res->set_attr("alignment", "chaotic");
+		break;
+	default:
+		assert(false);
+	}
+
+	res->add_child(wml::write_attribute_map("movement_costs", move_cost_map_));
+	res->add_child(wml::write_attribute_map("attributes", attributes_));
+
+	std::string equipment;
+	foreach(const_item_ptr equip, equipment_) {
+		if(!equipment.empty()) {
+			equipment += ",";
+		}
+
+		equipment += equip->id();
+	}
+
+	res->set_attr("equipment", equipment);
+
+	std::string skills;
+	foreach(const_skill_ptr s, skills_) {
+		if(!skills.empty()) {
+			skills += ",";
+		}
+
+		skills += s->name();
+	}
+
+	res->set_attr("skills", skills);
+
+	return res;
+}
+
 character::character(wml::const_node_ptr node)
 {
 	character_generator::get((*node)["generator"]).generate(*this, node);
