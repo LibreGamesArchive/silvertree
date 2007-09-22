@@ -29,12 +29,19 @@ map_avatar_ptr map_avatar::create(wml::const_node_ptr node,
 
 map_avatar::map_avatar(wml::const_node_ptr node, const GLfloat* pos)
     : map_object(pos),
+      model_id_((*node)["model"]),
 	  image_((*node)["image"]),
 	  rotate_(0.0)
 {
 	if((*node)["model"].empty() == false) {
       model_ = graphics::model::get_model((*node)["model"]);
 	}
+}
+
+void map_avatar::write(wml::node_ptr node) const
+{
+	node->set_attr("model", model_id_);
+	node->set_attr("image", image_);
 }
 
 void map_avatar::set_rotation(GLfloat rotate)

@@ -112,6 +112,35 @@ world::world(wml::const_node_ptr node)
 	}
 }
 
+wml::node_ptr world::write() const
+{
+	wml::node_ptr res(new wml::node("scenario"));
+	res->set_attr("time", boost::lexical_cast<std::string>(time_.since_epoch()));
+	res->set_attr("map_data", map_.write());
+	if(sun_light_) {
+		res->set_attr("sun_light", sun_light_->str());
+	}
+
+	if(ambient_light_) {
+		res->set_attr("ambient_light", ambient_light_->str());
+	}
+
+	for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
+		res->add_child(i->second->write());
+	}
+
+	for(std::map<hex::location,hex::location>::const_iterator i = exits_.begin(); i != exits_.end(); ++i) {
+		wml::node_ptr portal(new wml::node("portal"));
+		portal->set_attr("xdst", boost::lexical_cast<std::string>(i->first.x()));
+		portal->set_attr("ydst", boost::lexical_cast<std::string>(i->first.y()));
+		portal->set_attr("xsrc", boost::lexical_cast<std::string>(i->second.x()));
+		portal->set_attr("ysrc", boost::lexical_cast<std::string>(i->second.y()));
+		res->add_child(portal);
+	}
+
+	return res;
+}
+
 void world::get_parties_at(const hex::location& loc, std::vector<const_party_ptr>& chars) const
 {
 	const_party_map_range range = parties_.equal_range(loc);
@@ -131,9 +160,9 @@ const_settlement_ptr world::settlement_at(const hex::location& loc) const
 	}
 }
 
-void world::add_party(party_ptr new_party)
+world::party_map::iterator world::add_party(party_ptr new_party)
 {
-	parties_.insert(std::pair<hex::location,party_ptr>(
+	party_map::iterator res = parties_.insert(std::pair<hex::location,party_ptr>(
 	                 new_party->loc(),new_party));
 	queue_.push(new_party);
 
@@ -145,6 +174,8 @@ void world::add_party(party_ptr new_party)
 							   graphics::screen_width(), 128, this, new_party));
 		game_bar_->set_frame(gui::frame_manager::make_frame(game_bar_, "game-bar-frame"));
 	}
+
+	return res;
 }
 
 void world::get_matching_parties(const formula_ptr& filter, std::vector<party_ptr>& res)
@@ -335,10 +366,13 @@ void world::draw() const
 void world::play()
 {
 	if(!get_pc_party()) {
-		for(settlement_map::const_iterator i = settlements_.begin();
+		for(settlement_map::iterator i = settlements_.begin();
 		    i != settlements_.end(); ++i) {
-			if(i->second->get_world().get_pc_party()) {
-				// TODO: enter the settlement.
+			if(party_ptr p = i->second->get_world().get_pc_party()) {
+				i->second->play();
+				time_ = i->second->get_world().current_time();
+				p->new_world(*this,p->loc());
+				add_party(p);
 				break;
 			}
 		}
@@ -448,12 +482,14 @@ void world::play()
 					std::map<hex::location,hex::location>::const_iterator exit = exits_.find(active_party->loc());
 					if(exit != exits_.end() && active_party->is_human_controlled()) {
 						active_party->set_loc(exit->second);
+						remove_party(active_party);
 						std::cerr << "returning from world...\n";
 						return;
 					}
 
 					settlement_map::iterator s = settlements_.find(active_party->loc());
 					if(s != settlements_.end() && active_party->is_human_controlled()) {
+						remove_party(active_party);
 						//enter the new world
 						time_ = s->second->enter(active_party, active_party->loc(), time_);
 
@@ -656,6 +692,21 @@ party_ptr world::get_pc_party() const
 	}
 
 	return party_ptr();
+}
+
+bool world::remove_party(party_ptr p)
+{
+	std::pair<party_map::iterator,party_map::iterator> range = parties_.equal_range(p->loc());
+	while(range.first != range.second) {
+		if(range.first->second == p) {
+			parties_.erase(range.first);
+			return true;
+		}
+
+		++range.first;
+	}
+
+	return false;
 }
 
 }

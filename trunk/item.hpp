@@ -35,6 +35,7 @@ public:
 
 	virtual item_ptr clone() const { return item_ptr(new item(*this)); }
 	
+	const std::string& id() const { return id_; }
 	ITEM_TYPE type() const { return type_; }
 	const std::string& item_class() const { return class_; }
 	const std::string& description() const { return description_; }
@@ -44,6 +45,7 @@ public:
 
 	static const std::string& type_name(ITEM_TYPE type);
 private:
+	std::string id_;
 	ITEM_TYPE type_;
 	std::string class_;
 	std::string description_;

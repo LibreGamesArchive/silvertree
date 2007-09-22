@@ -46,6 +46,7 @@ int xml_get_attr(XML_PARSER* parser, XML_TOKEN* attr, XML_TOKEN* value);
 int xml_get_child(XML_PARSER* parser, XML_TOKEN* child);
 void xml_skip_attributes(XML_PARSER* parser);
 void xml_skip_element(XML_PARSER* parser);
+int xml_get_text_and_skip(XML_PARSER* parser, XML_TOKEN* text);
 
 #ifdef __cplusplus
 }

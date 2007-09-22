@@ -11,6 +11,7 @@ bool maxfps = false;
 
 bool mipmapping = true;
 GLenum mipmap_min = GL_NEAREST_MIPMAP_LINEAR, mipmap_max = GL_LINEAR;
+std::string save_file;
 
 GLenum mipmap_arg_to_type(const std::string& arg) {
 	if(arg == "l") {
@@ -54,6 +55,8 @@ bool parse_arg(const std::string& arg)
 		} else {
 			mipmap_max = mipmap_arg_to_type(rest.substr(1));
 		}
+	} else if(util::string_starts_with(arg, "--save=")) {
+		save_file = util::strip_string_prefix(arg, "--save=");
 	} else {
 		std::cerr << "unrecognized argument: '" << arg << "'\n";
 		return false;
@@ -84,6 +87,11 @@ bool preference_nocombat()
 bool preference_maxfps()
 {
 	return maxfps;
+}
+
+const std::string& preference_save_file()
+{
+	return save_file;
 }
 
 bool parse_args(int argc, char** argv)

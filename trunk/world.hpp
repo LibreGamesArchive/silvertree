@@ -40,6 +40,7 @@ class world
 {
 public:
 	explicit world(wml::const_node_ptr node);
+	wml::node_ptr write() const;
 
 	void play();
 
@@ -53,10 +54,10 @@ public:
 	void get_parties_at(const hex::location& loc, std::vector<const_party_ptr>& chars) const;
 
 	const_settlement_ptr settlement_at(const hex::location& loc) const;
-	void add_party(party_ptr pty);
+	typedef std::multimap<hex::location,party_ptr> party_map;
+	party_map::iterator add_party(party_ptr pty);
 	void get_matching_parties(const formula_ptr& filter,
 	                          std::vector<party_ptr>& res);
-	typedef std::multimap<hex::location,party_ptr> party_map;
 	party_map& parties() { return parties_; }
 	const party_map& parties() const { return parties_; }
 
@@ -68,6 +69,7 @@ public:
 	void draw() const;
 private:
 	party_ptr get_pc_party() const;
+	bool remove_party(party_ptr p);
 
 	bool show_grid_;
 	graphics::frame_rate_tracker fps_track_;

@@ -40,6 +40,7 @@ public:
 	void draw() const;
 	game_time enter(party_ptr pty, const hex::location& loc,
 					const game_time& t);
+	void play();
 	const world& get_world() const;
 private:
 	std::map<hex::location, hex::location> portals_;

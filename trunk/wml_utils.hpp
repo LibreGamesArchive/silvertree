@@ -27,6 +27,11 @@
 		} \
 	}
 
+#define WML_WRITE_ATTR(node, var) \
+	{ \
+		node->set_attr(#var, boost::lexical_cast<std::string>(var##_)); \
+	}
+
 namespace wml {
 
 struct error {};
@@ -85,6 +90,17 @@ inline bool require(bool cond)
 	if(!cond) {
 		throw error();
 	}
+}
+
+template<typename Value>
+node_ptr write_attribute_map(const std::string& name, const std::map<std::string,Value>& vals)
+{
+	node_ptr res(new node(name));
+	for(typename std::map<std::string,Value>::const_iterator i = vals.begin(); i != vals.end(); ++i) {
+		res->set_attr(i->first, boost::lexical_cast<std::string>(i->second));
+	}
+
+	return res;
 }
 
 }

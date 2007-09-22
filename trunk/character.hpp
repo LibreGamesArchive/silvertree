@@ -37,6 +37,8 @@ public:
 
 	static character_ptr create(wml::const_node_ptr node);
 
+	wml::node_ptr write() const;
+
 	int move_cost(hex::const_base_terrain_ptr terrain,
 	              hex::const_terrain_feature_ptr feature,
 	              int height_change) const;

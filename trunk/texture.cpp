@@ -41,6 +41,9 @@ namespace {
 
 		if(texture_buf_pos == TextureBufSize) {
 			glGenTextures(TextureBufSize, texture_buf);
+			for(int i = 0; i != TextureBufSize; ++i) {
+				std::cerr << "texture_buf[" << i << "] = " << texture_buf[i] << "\n";
+			}
 			texture_buf_pos = 0;
 		}
 

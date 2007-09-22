@@ -61,7 +61,7 @@ item_ptr item::create_item(const wml::const_node_ptr& node)
 }
 
 item::item(ITEM_TYPE type, const wml::const_node_ptr& node)
-  : type_(type), class_(wml::get_str(node,"class")),
+  : id_(wml::get_str(node,"id")), type_(type), class_(wml::get_str(node,"class")),
     description_(wml::get_str(node,"description")),
 	image_(wml::get_str(node,"image")),
 	null_item_(wml::get_bool(node,"none")),
