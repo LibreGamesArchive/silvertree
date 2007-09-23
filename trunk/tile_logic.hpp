@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "formula.hpp"
+#include "wml_node_fwd.hpp"
 
 namespace hex
 {
@@ -35,6 +36,10 @@ namespace hex
 
 		bool valid() const { return x_ >= 0 && y_ >= 0; }
 	};
+
+	wml::node_ptr write_location(const std::string& name, const location& loc);
+	wml::node_ptr write_src_dst_location(const std::string& name,
+					                     const location& src, const location& dst);
 
 	enum DIRECTION {
 		NORTH, NORTH_EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, NORTH_WEST,

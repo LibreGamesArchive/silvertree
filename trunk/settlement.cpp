@@ -38,6 +38,23 @@ settlement::settlement(const wml::const_node_ptr& node,
 	}
 }
 
+wml::node_ptr settlement::write() const
+{
+	wml::node_ptr res(new wml::node("settlement"));
+	wml::node_ptr world_node = get_world().write();
+	wml::copy_over(world_node, res);
+
+	if(model_) {
+		res->set_attr("model", model_->id());
+	}
+	typedef std::pair<hex::location, hex::location> LocPair;
+	foreach(const LocPair& locs, portals_) {
+		res->add_child(write_src_dst_location("portal", locs.second, locs.first));
+	}
+
+	return res;
+}
+
 void settlement::entry_points(std::vector<hex::location>& result) const
 {
 	typedef std::pair<hex::location,hex::location> loc_pair;

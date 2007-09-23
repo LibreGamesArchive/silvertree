@@ -29,6 +29,8 @@ public:
 	bool is_human_controlled() const { return true; }
 
 	void friendly_encounter(party& p);
+
+	wml::node_ptr write() const;
 private:
 	TURN_RESULT do_turn();
 		

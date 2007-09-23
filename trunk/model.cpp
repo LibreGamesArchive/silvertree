@@ -55,6 +55,7 @@ const_model_ptr model::get_model(const std::string& key)
 	} else {
 		res = parse3ds(data.c_str(),data.c_str()+data.size());
 	}
+	res->id_ = key;
 	model_cache.insert(std::pair<std::string,const_model_ptr>(key,res));
 	return res;
 }

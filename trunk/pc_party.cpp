@@ -25,6 +25,13 @@ pc_party::pc_party(wml::const_node_ptr node, world& game_world)
 {
 }
 
+wml::node_ptr pc_party::write() const
+{
+	wml::node_ptr res = party::write();
+	res->set_attr("controller", "human");
+	return res;
+}
+
 void pc_party::friendly_encounter(party& p)
 {
 	assert(dynamic_cast<pc_party*>(&p) == NULL);
