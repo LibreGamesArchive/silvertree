@@ -30,9 +30,16 @@
 namespace hex
 {
 
+#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
+class frustum;
+#endif
+
 class tile
 {
 public:
+#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
+	friend class frustum;
+#endif
 	typedef std::vector<graphics::const_material_ptr> features_cache;
 	static void initialize_features_cache(const tile** beg, const tile** end,
 	                                      features_cache* cache);

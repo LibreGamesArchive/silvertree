@@ -25,6 +25,10 @@
 #include <math.h>
 #include <stack>
 
+#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
+#include "frustum.hpp"
+#endif
+
 namespace hex
 {
 
@@ -37,6 +41,10 @@ GLuint start_display_list = GLuint(-1);
 int display_hit = 0;
 int display_miss = 0;
 unsigned int frame_number = 0;
+
+#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
+frustum pc_frustum;
+#endif
 
 GLuint get_display_list(unsigned int tile_id, bool* is_new)
 {
@@ -416,6 +424,16 @@ void tile::setup_drawing()
 	glMaterialfv(GL_FRONT,GL_AMBIENT,ambient);
 	glMaterialfv(GL_FRONT,GL_SPECULAR,specular);
 
+#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
+	frustum::initialize();
+	/* use the below format to find the total area seen by the camera */
+	//pc_frustum.set_volume_clip_space(-0.1, 0.1, -0.1, 0.1, -1, 1);
+	/* the number is a pushback radius that prevents talin himself,
+	   and the things directly underneath him from falling into the 
+	   frustum; this was the best heuristic i could find */
+	pc_frustum.set_volume_world_space(0.75);
+#endif
+
 	frame_number++;
 }
 
@@ -463,19 +481,42 @@ void tile::do_draw() const
 	load_texture();
 	texture_.set_as_current_texture();
 
-	glBegin(GL_TRIANGLE_FAN);
+#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
+	bool translucent = pc_frustum.intersects(*this);
+	if(translucent) {
+		glDisable(GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
+		glDepthMask(GL_FALSE);
+		glBegin(GL_TRIANGLE_FAN);
+		glColor4ub(255, 255, 255, 64);
+		draw_point(center_);
+		for(int i=0;i<7;++i) {
+			const int n = i%6;
+			draw_point(corners_[n]);
+		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_LIGHTING);
+		glDepthMask(GL_TRUE);
+	} else {
+#endif
+		glColor4ub(0, 0, 255, 255);
+		glBegin(GL_TRIANGLE_FAN);
 
-	graphics::texture::set_coord(UVCenter[0],UVCenter[1]);
+		graphics::texture::set_coord(UVCenter[0],UVCenter[1]);
+		
+		draw_point(center_);
+
+		for(int i = 0; i != 7; ++i) {
+			const int n = i%6;
+			graphics::texture::set_coord(UVCorners[n][0],UVCorners[n][1]);
+			draw_point(corners_[n]);
+		}
 	
-	draw_point(center_);
-
-	for(int i = 0; i != 7; ++i) {
-		const int n = i%6;
-		graphics::texture::set_coord(UVCorners[n][0],UVCorners[n][1]);
-		draw_point(corners_[n]);
+		glEnd();
+#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
 	}
-	
-	glEnd();
+#endif
 
 	if(active_tracker_) {
 		active_tracker_->update();
