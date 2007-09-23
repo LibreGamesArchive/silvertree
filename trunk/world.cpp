@@ -47,6 +47,23 @@ std::string get_map_data(wml::const_node_ptr node)
 	return sys::read_file((*node)["map"]);
 }
 
+std::vector<const world*> world_stack;
+struct world_context {
+	explicit world_context(const world* w) {
+		world_stack.push_back(w);
+	}
+
+	~world_context() {
+		assert(!world_stack.empty());
+		world_stack.pop_back();
+	}
+};
+
+}
+
+const std::vector<const world*>& world::current_world_stack()
+{
+	return world_stack;
 }
 
 world::world(wml::const_node_ptr node)
@@ -369,6 +386,7 @@ void world::draw() const
 
 void world::play()
 {
+	world_context context(this);
 	if(!get_pc_party()) {
 		for(settlement_map::iterator i = settlements_.begin();
 		    i != settlements_.end(); ++i) {

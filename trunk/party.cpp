@@ -20,6 +20,7 @@
 #include "party.hpp"
 #include "pc_party.hpp"
 #include "preferences.hpp"
+#include "string_utils.hpp"
 #include "tile.hpp"
 #include "tile_logic.hpp"
 #include "world.hpp"
@@ -56,21 +57,18 @@ party::party(wml::const_node_ptr node, world& gameworld)
 		members_.push_back(character::create(i.first->second));
 	}
 
+	const std::string items_csv = node->attr("items");
+	if(!items_csv.empty()) {
+		const std::vector<std::string> items = util::split(items_csv, ',');
+		foreach(const std::string& id, items) {
+			inventory_.push_back(game_logic::item_ptr(game_logic::item::get(id)->clone()));
+		}
+	}
+
 	for(wml::node::const_child_range i =
 	    node->get_child_range("item");
 	    i.first != i.second; ++i.first) {
 		inventory_.push_back(item::create_item(i.first->second));
-	}
-
-	for(wml::node::const_child_range i =
-	    node->get_child_range("event");
-	    i.first != i.second; ++i.first) {
-		const wml::const_node_ptr node = i.first->second;
-		const std::string& type = wml::get_str(node,"type");
-		const formula_ptr f(new formula(formatter() << "id=" << id_));
-		event_handler handler(node);
-		handler.add_filter(f);
-		world_->add_event_handler(type, handler);
 	}
 }
 
@@ -78,7 +76,7 @@ wml::node_ptr party::write() const
 {
 	wml::node_ptr res(new wml::node("party"));
 	avatar_->write(res);
-	WML_WRITE_ATTR(res, id);
+	res->set_attr("id", str_id_);
 	res->set_attr("x", boost::lexical_cast<std::string>(loc_.x()));
 	res->set_attr("y", boost::lexical_cast<std::string>(loc_.y()));
 	WML_WRITE_ATTR(res, allegiance);
@@ -88,7 +86,16 @@ wml::node_ptr party::write() const
 		res->add_child(c->write());
 	}
 
-	// TODO: serialize items and events
+	std::string items;
+	foreach(const_item_ptr it, inventory_) {
+		if(items.empty()) {
+			items += ",";
+		}
+
+		items += it->id();
+	}
+
+	res->set_attr("items", items);
 	
 	return res;
 }

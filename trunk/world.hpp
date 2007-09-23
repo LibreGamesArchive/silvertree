@@ -39,6 +39,10 @@ namespace game_logic
 class world
 {
 public:
+	//function which will return the current stack of worlds the player is in.
+	//The front of this vector will be the top-level world. The back of this vector will be
+	//the current world.
+	static const std::vector<const world*>& current_world_stack();
 	explicit world(wml::const_node_ptr node);
 	wml::node_ptr write() const;
 
