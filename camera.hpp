@@ -45,6 +45,7 @@ public:
 	void set_pan_y(GLfloat y) { translatey_ = y; }
 	GLfloat get_pan_x() const { return translatex_; }
 	GLfloat get_pan_y() const { return translatey_; }
+	GLfloat get_pan_z() const { return translatez_; }
 
 	void rotate_left();
 	void rotate_right();
