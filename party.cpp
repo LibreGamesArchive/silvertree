@@ -84,10 +84,6 @@ wml::node_ptr party::write() const
 	WML_WRITE_ATTR(res, allegiance);
 	WML_WRITE_ATTR(res, money);
 
-	if(is_human_controlled()) {
-		res->set_attr("controller", "human");
-	}
-
 	foreach(const_character_ptr c, members_) {
 		res->add_child(c->write());
 	}

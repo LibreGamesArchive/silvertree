@@ -38,7 +38,7 @@ public:
 	party(wml::const_node_ptr node, world& gameworld);
 	virtual ~party() {}
 
-	wml::node_ptr write() const;
+	virtual wml::node_ptr write() const;
 
 	static party_ptr create_party(
 					wml::const_node_ptr node,

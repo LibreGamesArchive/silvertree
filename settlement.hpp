@@ -35,6 +35,8 @@ public:
 	settlement(const wml::const_node_ptr& node,
 	           const hex::gamemap& map);
 
+	wml::node_ptr write() const;
+
 	void entry_points(std::vector<hex::location>& result) const;
 	bool has_entry_point(const hex::location& loc) const;
 	void draw() const;

@@ -28,6 +28,7 @@ namespace graphics
 class model
 {
 public:
+	const std::string& id() const { return id_; }
 
 	static const_model_ptr get_model(const std::string& key);
 	struct bone;
@@ -68,6 +69,7 @@ public:
 private:
 	void optimize();
 	void init_normals();
+	std::string id_;
 	boost::array<GLfloat,3> face_normal(const face& f, const vertex_ptr& v) const;
 	boost::array<GLfloat,3> face_normal(const face& f, int n) const;
 	void draw_face(const face& f, bool& in_triangles) const;

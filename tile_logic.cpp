@@ -15,8 +15,11 @@
 
 #include <iostream>
 
+#include "boost/lexical_cast.hpp"
+
 #include "tile_logic.hpp"
 #include "util.hpp"
+#include "wml_node.hpp"
 
 namespace hex
 {
@@ -24,9 +27,25 @@ namespace hex
 using namespace util;
 
 namespace {
-
 const std::string abbrev[] = {"n","ne","se","s","sw","nw",""};
-		
+}
+
+wml::node_ptr write_location(const std::string& name, const location& loc)
+{
+	wml::node_ptr res(new wml::node(name));
+	res->set_attr("x", boost::lexical_cast<std::string>(loc.x()));
+	res->set_attr("y", boost::lexical_cast<std::string>(loc.y()));
+	return res;
+}
+
+wml::node_ptr write_src_dst_location(const std::string& name, const location& src, const location& dst)
+{
+	wml::node_ptr res(new wml::node(name));
+	res->set_attr("xsrc", boost::lexical_cast<std::string>(src.x()));
+	res->set_attr("ysrc", boost::lexical_cast<std::string>(src.y()));
+	res->set_attr("xdst", boost::lexical_cast<std::string>(dst.x()));
+	res->set_attr("ydst", boost::lexical_cast<std::string>(dst.y()));
+	return res;
 }
 
 variant location::get_value(const std::string& key) const

@@ -138,6 +138,10 @@ wml::node_ptr world::write() const
 		res->add_child(portal);
 	}
 
+	for(settlement_map::const_iterator i = settlements_.begin(); i != settlements_.end(); ++i) {
+		res->add_child(i->second->write());
+	}
+
 	return res;
 }
 

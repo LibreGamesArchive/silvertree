@@ -30,7 +30,8 @@ namespace game_logic
 {
 
 npc_party::npc_party(wml::const_node_ptr node, world& game_world)
-    : party(node,game_world), aggressive_(wml::get_bool(node,"aggressive")), rest_(false)
+    : party(node,game_world), aggressive_(wml::get_bool(node,"aggressive")),
+      rest_(wml::get_bool(node,"rest",false))
 {
 	dialog_ = node->get_child("dialog");
 	if(wml::const_node_ptr dst = node->get_child("destination")) {
@@ -47,6 +48,26 @@ npc_party::npc_party(wml::const_node_ptr node, world& game_world)
 		std::cerr << "wander (" << wander_between_.back().x() << "," << wander_between_.back().y() << ")\n";
 		++range.first;
 	}
+}
+
+wml::node_ptr npc_party::write() const
+{
+	wml::node_ptr res = party::write();
+	res->set_attr("aggressive", aggressive_ ? "yes" : "no");
+	res->set_attr("rest", rest_ ? "yes" : "no");
+	if(dialog_) {
+		res->add_child(wml::deep_copy(dialog_));
+	}
+
+	if(map().is_loc_on_map(current_destination_)) {
+		res->add_child(hex::write_location("destination", current_destination_));
+	}
+
+	foreach(const hex::location& loc, wander_between_) {
+		res->add_child(hex::write_location("wander", loc));
+	}
+
+	return res;
 }
 
 namespace {
