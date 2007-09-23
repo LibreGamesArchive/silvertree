@@ -112,6 +112,10 @@ public:
 	void clear_tracker() const;
 	const graphics::location_tracker* get_tracker() { return active_tracker_; }
 
+	//function which fills the input array with all the neighbouring tiles which are down (not up)
+	//cliffs from this tile. 'neighbours' must point to an array of size 6.
+	int neighbour_cliffs(const tile** neighbours) const;
+
 	struct compare_texture
 	{
 		bool operator()(const tile* a, const tile* b) const {
