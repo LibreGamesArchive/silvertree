@@ -153,7 +153,6 @@ void get_tile_strip(const location& center, DIRECTION dir,
                     int tiles_forward, int tiles_back, int tiles_side,
 					std::vector<location>& res)
 {
-	res.clear();
 	location loc = center;
 	const DIRECTION reverse_dir = static_cast<DIRECTION>((int(dir)+3)%6);
 	for(int n = 0; n != tiles_back; ++n) {

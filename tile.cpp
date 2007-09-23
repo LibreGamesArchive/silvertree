@@ -795,4 +795,16 @@ void tile::clear_tracker() const {
 	active_tracker_ = NULL;
 }
 
+int tile::neighbour_cliffs(const tile** neighbours) const
+{
+	int index = 0;
+	for(int n = 0; n != 6; ++n) {
+		if(cliffs_[n]) {
+			neighbours[index++] = cliffs_[n];
+		}
+	}
+
+	return index;
+}
+
 }

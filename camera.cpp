@@ -181,9 +181,12 @@ void camera::pan_right()
 
 void camera::set_pan(const GLfloat* buf)
 {
-	translatex_ = -buf[0];
-	translatey_ = -buf[1];
-	translatez_ = -buf[2];
+	if(translatex_ != -buf[0] || translatey_ != -buf[1] || translatez_ != -buf[2]) {
+		moved_since_last_check_ = true;
+		translatex_ = -buf[0];
+		translatey_ = -buf[1];
+		translatez_ = -buf[2];
+	}
 }
 
 GLfloat camera::rotate_radians() const
@@ -365,8 +368,10 @@ void camera::enforce_limits()
 		rotate_ = target_rotation();
 		update_visible_cliffs();
 	} else if(rotate > 0.0) {
+		moved_since_last_check_ = true;
 		rotate_ += RotateSpeed;
 	} else if(rotate < 0.0) {
+		moved_since_last_check_ = true;
 		rotate_ -= RotateSpeed;
 	}
 

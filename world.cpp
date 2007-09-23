@@ -16,6 +16,7 @@
 #include "font.hpp"
 #include "foreach.hpp"
 #include "formatter.hpp"
+#include "frustum.hpp"
 #include "grid_widget.hpp"
 #include "image_widget.hpp"
 #include "label.hpp"
@@ -207,31 +208,77 @@ void world::get_matching_parties(const formula_ptr& filter, std::vector<party_pt
 		}
 	}
 }
+	hex::frustum view_volume;
 
 void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 {
-
+	hex::frustum::initialize();
+	view_volume.set_volume_clip_space(-1, 1, -1, 1, -1, 1);
 	tiles_.clear();
 	current_loc_ = focus_->loc();
-	std::vector<hex::location> hexes;
 	std::cerr << "ZOOM: " << camera_.zoom() << "\n";
 	std::cerr << "TILT: " << camera_.tilt() << "\n";
-	const GLfloat vert = std::abs(camera_.zoom()/4.0) + (camera_.tilt()*camera_.tilt())/100.0;
-	hex::get_tile_strip(focus_->loc(), camera_.direction(), static_cast<int>(vert), 
-			    static_cast<int>(vert), static_cast<int>(std::abs(camera_.zoom()/3.0)), hexes);
-	std::cerr << "TILES: " << vert << ", " << hexes.size();
-	std::sort(hexes.begin(), hexes.end());
-	hexes.erase(std::unique(hexes.begin(), hexes.end()), hexes.end());
-	std::cerr << ", " << hexes.size() << "\n";
-	
-	foreach(const hex::location& loc, hexes) {
-		if(!map_.is_loc_on_map(loc)) {
-			continue;
+	int tiles_tried = 0;
+
+	//find the initial ring which is within view
+	hex::location hex_dir[6];
+	for(int n = 0; n != 6; ++n) {
+		hex_dir[n] = hex::tile_in_direction(current_loc_, static_cast<hex::DIRECTION>(n));
+	}
+
+	int core_radius = 1;
+	bool done = false;
+	while(!done) {
+		for(int n = 0; n != 6; ++n) {
+			hex_dir[n] = hex::tile_in_direction(hex_dir[n], static_cast<hex::DIRECTION>(n));
+			if(!map_.is_loc_on_map(hex_dir[n]) || !view_volume.intersects(map_.get_tile(hex_dir[n]))) {
+				done = true;
+				break;
+			}
 		}
 
-		tiles_.push_back(&map_.get_tile(loc));
-		tiles_.back()->load_texture();
+		++core_radius;
 	}
+
+	std::cerr << "core radius: " << core_radius << "\n";
+	
+	done = false;
+	std::vector<hex::location> hexes;
+	for(int radius = 0; !done; ++radius) {
+		hexes.clear();
+		hex::get_tile_ring(current_loc_, radius, hexes);
+		tiles_tried += hexes.size();
+		done = true;
+		foreach(const hex::location& loc, hexes) {
+			if(!map_.is_loc_on_map(loc)) {
+				continue;
+			}
+
+			const hex::tile& t = map_.get_tile(loc);
+			if(radius >= core_radius && !view_volume.intersects(t)) {
+				//see if this tile has a cliff which is visible, in which case we should draw it.
+				const hex::tile* cliffs[6];
+				const int num_cliffs = t.neighbour_cliffs(cliffs);
+				bool found = false;
+				for(int n = 0; n != num_cliffs; ++n) {
+					if(view_volume.intersects(*cliffs[n])) {
+						found = true;
+						break;
+					}
+				}
+
+				if(!found) {
+					continue;
+				}
+			} else {
+				done = false;
+			}
+			tiles_.push_back(&t);
+			tiles_.back()->load_texture();
+		}
+	}
+
+	std::cerr << "TILES: " << tiles_.size() << "/" << tiles_tried << "\n";
 	
 	std::sort(tiles_.begin(),tiles_.end(), hex::tile::compare_texture());
 
@@ -246,10 +293,6 @@ void world::draw() const
 {
 	const std::set<hex::location>& visible =
 		focus_->get_visible_locs();
-	
-	if(current_loc_ != focus_->loc() || camera_.moved_since_last_check()) {
-		rebuild_drawing_caches(visible);
-	}
 	
 	camera_controller_.prepare_selection();
 	GLuint select_name = 0;
@@ -280,8 +323,10 @@ void world::draw() const
 	}
 	
 	camera_.prepare_frame();
+	if(current_loc_ != focus_->loc() || camera_.moved_since_last_check()) {
+		rebuild_drawing_caches(visible);
+	}
 	set_lighting();
-	
 
 	hex::tile::setup_drawing();
 	foreach(const hex::tile* t, tiles_) {
