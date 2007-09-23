@@ -1,5 +1,3 @@
-#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
-
 #include "camera.hpp"
 #include "frustum.hpp"
 
@@ -94,5 +92,3 @@ void frustum::set_volume_world_space(GLfloat radius)
 }
 
 }
-
-#endif
