@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <set>
 #include <sstream>
@@ -316,7 +317,8 @@ void game_bar_game_button::option_selected(int opt) {
 	switch(opt) {
 	case 2: {
 		std::string data;
-		wml::write(world_.write(), data);
+		assert(!game_logic::world::current_world_stack().empty());
+		wml::write(game_logic::world::current_world_stack().front()->write(), data);
 		sys::write_file(preference_save_file(), data);
 		break;
 	}

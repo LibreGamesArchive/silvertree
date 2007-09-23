@@ -81,6 +81,7 @@ wml::node_ptr character::write() const
 	WML_WRITE_ATTR(res, fatigue);
 	WML_WRITE_ATTR(res, level);
 	WML_WRITE_ATTR(res, xp);
+	WML_WRITE_ATTR(res, hitpoints);
 	WML_WRITE_ATTR(res, image);
 	WML_WRITE_ATTR(res, model);
 	WML_WRITE_ATTR(res, portrait);
