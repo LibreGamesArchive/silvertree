@@ -728,34 +728,60 @@ formula::formula(const std::string& str) : str_(str)
 }
 
 variant formula::execute(const formula_callable& variables) const
-{ 
-	size_t n = memory.size();
-	size_t str_size = memory_strings.size();
-	variant res;
+{
 	try {
-		res = expr_->evaluate(variables);
+		executor e(*this, &variables);
+		variant res = e.result().deep_copy();
+		res.release_resources();
+		return res;
 	} catch(type_error& e) {
 		std::cerr << "formula type error!\n";
+		return variant();
 	}
-	for(size_t m = n; m != memory.size(); ++m) {
-		variant::release_list(memory[m]);
-	}
-	memory.resize(n);
-
-	for(size_t m = str_size; m != memory_strings.size(); ++m) {
-		variant::release_string(memory_strings[m]);
-	}
-	memory_strings.resize(str_size);
-
-	return res;
 }
 
 variant formula::execute() const
 {
-	static map_formula_callable null_callable;
-	return execute(null_callable);
+	try {
+		executor e(*this);
+		variant res = e.result().deep_copy();
+		res.release_resources();
+		return res;
+	} catch(type_error& e) {
+		std::cerr << "formula type error!\n";
+		return variant();
+	}
 }
-		
+
+variant formula::execute_raw(const formula_callable& variables) const
+{
+	return expr_->evaluate(variables);
+}
+
+formula::executor::executor(const formula& f, const formula_callable* variables)
+    : mem_size_(memory.size()), str_size_(memory_strings.size())
+{
+	static map_formula_callable null_callable;
+	if(variables == NULL) {
+		variables = &null_callable;
+	}
+
+	res_ = f.execute_raw(*variables);
+}
+
+formula::executor::~executor()
+{
+	for(size_t m = mem_size_; m != memory.size(); ++m) {
+		variant::release_list(memory[m]);
+	}
+	memory.resize(mem_size_);
+
+	for(size_t m = str_size_; m != memory_strings.size(); ++m) {
+		variant::release_string(memory_strings[m]);
+	}
+	memory_strings.resize(str_size_);
+}
+
 }
 
 #ifdef UNIT_TEST_FORMULA

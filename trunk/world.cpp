@@ -128,6 +128,13 @@ world::world(wml::const_node_ptr node)
 		                   wml::get_attr<int>(portal,"ysrc"));
 		exits_[loc1] = loc2;
 	}
+
+	const std::vector<wml::const_node_ptr> events = wml::child_nodes(node, "event");
+	foreach(const wml::const_node_ptr& event, events) {
+		event_handler handler(event);
+		const std::string& name = event->attr("event");
+		add_event_handler(name, handler);
+	}
 }
 
 wml::node_ptr world::write() const
@@ -158,6 +165,10 @@ wml::node_ptr world::write() const
 
 	for(settlement_map::const_iterator i = settlements_.begin(); i != settlements_.end(); ++i) {
 		res->add_child(i->second->write());
+	}
+
+	for(event_map::const_iterator i = handlers_.begin(); i != handlers_.end(); ++i) {
+		res->add_child(wml::deep_copy(i->second.write()));
 	}
 
 	return res;
@@ -774,6 +785,15 @@ bool world::remove_party(party_ptr p)
 	}
 
 	return false;
+}
+
+variant world::get_value(const std::string& key) const
+{
+	if(key == "time") {
+		return variant(time_.since_epoch());
+	} else {
+		return variant();
+	}
 }
 
 }

@@ -18,6 +18,7 @@ public:
 	void handle(const formula_callable& info, world& world);
 
 	void add_filter(formula_ptr f);
+	wml::const_node_ptr write() const { return node_; }
 
 private:
 	std::vector<formula_ptr> filters_;

@@ -30,6 +30,7 @@
 #include "font.hpp"
 #include "formula_registry.hpp"
 #include "gamemap.hpp"
+#include "global_game_state.hpp"
 #include "item.hpp"
 #include "wml_parser.hpp"
 #include "wml_node.hpp"
@@ -169,7 +170,24 @@ extern "C" int main(int argc, char** argv)
 		std::cerr << "error parsing rules WML...\n";
 		return -1;
 	}
-	game_logic::world w(scenario_cfg);
+
+	wml::node_ptr world_cfg = scenario_cfg;
+	if(scenario_cfg->name() == "scenario") {
+		game_logic::global_game_state::get().reset();
+	} else if(scenario_cfg->name() == "game") {
+		world_cfg = scenario_cfg->get_child("scenario");
+		if(!world_cfg) {
+			std::cerr << "scenario parse error: could not find [scenario]\n";
+			return 0;
+		}
+
+		game_logic::global_game_state::get().init(scenario_cfg);
+	} else {
+		std::cerr << "unrecognized game file\n";
+		return 0;
+	}
+
+	game_logic::world w(world_cfg);
 	w.play();
 
 	graphics::texture::clear_textures();

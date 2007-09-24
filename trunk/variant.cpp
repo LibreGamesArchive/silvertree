@@ -4,7 +4,11 @@
 
 #include <iostream>
 
+#include "boost/lexical_cast.hpp"
+
+#include "foreach.hpp"
 #include "formatter.hpp"
+#include "formula.hpp"
 #include "variant.hpp"
 
 struct variant_list {
@@ -190,4 +194,76 @@ void variant::must_be(variant::TYPE t) const
 	if(type_ != t) {
 		throw type_error("type error");
 	}
+}
+
+void variant::release_resources()
+{
+	switch(type_) {
+	case TYPE_LIST:
+		release_list(list_);
+		*this = variant();
+		break;
+	case TYPE_STRING:
+		release_string(string_);
+		*this = variant();
+		break;
+	}
+}
+
+variant variant::deep_copy() const
+{
+	variant res;
+	switch(type_) {
+	case TYPE_LIST: {
+		variant_list* v = allocate_list(res);
+		v->elements.resize(list_->elements.size());
+		for(int n = 0; n != v->elements.size(); ++n) {
+			v->elements[n] = list_->elements[n].deep_copy();
+		}
+		return res;
+	}
+	case TYPE_STRING:
+		*allocate_string(res) = *string_;
+		return res;
+	default:
+		res = *this;
+		return res;
+	}
+}
+
+void variant::serialize_to_string(std::string& str) const
+{
+	switch(type_) {
+	case TYPE_INT:
+		str += boost::lexical_cast<std::string>(int_value_);
+		break;
+	case TYPE_CALLABLE:
+		std::cerr << "ERROR: attempt to serialize callable variant\n";
+		break;
+	case TYPE_LIST: {
+		str += "[";
+		bool first_time = true;
+		foreach(const variant& var, list_->elements) {
+			if(!first_time) {
+				str += ",";
+			}
+			first_time = false;
+			var.serialize_to_string(str);
+		}
+		str += "]";
+		break;
+	}
+	case TYPE_STRING:
+		str += "'";
+		str += string_->str;
+		str += "'";
+		break;
+	default:
+		assert(false);
+	}
+}
+
+void variant::serialize_from_string(const std::string& str)
+{
+	*this = game_logic::formula(str).execute();
 }

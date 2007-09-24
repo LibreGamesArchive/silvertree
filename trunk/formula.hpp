@@ -68,7 +68,23 @@ public:
 	variant execute() const;
 	const std::string& str() const { return str_; }
 
+	// if the return type of the formula is expected to be a variant type that uses resources
+	// (string or list) then use an executor to execute the formula. The resources will be
+	// cleaned up in the executor's destructor.
+	class executor {
+	public:
+		explicit executor(const formula& f, const formula_callable* variables=NULL);
+		~executor();
+
+		const variant& result() const { return res_; }
+
+	private:
+		int mem_size_, str_size_;
+		variant res_;
+	};
+
 private:
+	variant execute_raw(const formula_callable& variables) const;
 	expression_ptr expr_;
 	std::string str_;
 };

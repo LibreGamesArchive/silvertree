@@ -21,7 +21,7 @@
 #include "camera.hpp"
 #include "camera_controller.hpp"
 #include "event_handler.hpp"
-#include "formula_fwd.hpp"
+#include "formula.hpp"
 #include "frame_rate_utils.hpp"
 #include "gamemap.hpp"
 #include "game_bar.hpp"
@@ -36,7 +36,7 @@
 namespace game_logic
 {
 
-class world
+class world : public formula_callable
 {
 public:
 	//function which will return the current stack of worlds the player is in.
@@ -120,6 +120,8 @@ private:
 	mutable gui::const_grid_ptr track_info_grid_;
 
 	void rebuild_drawing_caches(const std::set<hex::location>& visible) const;
+
+	variant get_value(const std::string& key) const;
 
 	game_time time_;
 	GLfloat subtime_;
