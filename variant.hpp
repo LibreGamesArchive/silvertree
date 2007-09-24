@@ -51,6 +51,12 @@ public:
 	bool operator<=(const variant&) const;
 	bool operator>=(const variant&) const;
 
+	void release_resources();
+	variant deep_copy() const;
+
+	void serialize_to_string(std::string& str) const;
+	void serialize_from_string(const std::string& str);
+
 private:
 
 	enum TYPE { TYPE_INT, TYPE_CALLABLE, TYPE_LIST, TYPE_STRING };

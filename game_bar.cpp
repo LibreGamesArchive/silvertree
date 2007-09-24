@@ -10,6 +10,7 @@
 #include "filesystem.hpp"
 #include "font.hpp"
 #include "game_bar.hpp"
+#include "global_game_state.hpp"
 #include "image_widget.hpp"
 #include "learn_skills_dialog.hpp"
 #include "party_status_dialog.hpp"
@@ -316,9 +317,13 @@ game_bar_game_button::game_bar_game_button(const game_logic::world& w)
 void game_bar_game_button::option_selected(int opt) {
 	switch(opt) {
 	case 2: {
+		// save the game
 		std::string data;
 		assert(!game_logic::world::current_world_stack().empty());
-		wml::write(game_logic::world::current_world_stack().front()->write(), data);
+		wml::node_ptr node(new wml::node("game"));
+		node->add_child(game_logic::world::current_world_stack().front()->write());
+		game_logic::global_game_state::get().write(node);
+		wml::write(node, data);
 		sys::write_file(preference_save_file(), data);
 		break;
 	}

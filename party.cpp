@@ -14,6 +14,7 @@
 #include "foreach.hpp"
 #include "formatter.hpp"
 #include "formula.hpp"
+#include "global_game_state.hpp"
 #include "graphics_logic.hpp"
 #include "item.hpp"
 #include "npc_party.hpp"
@@ -430,7 +431,15 @@ void party::assign_equipment(character_ptr c,
 
 variant party::get_value(const std::string& key) const
 {
-	if(key == "id") {
+	if(key == "var") {
+		return variant(&global_game_state::get().get_variables());
+	} else if(key == "is_npc") {
+		return variant(is_human_controlled() ? 0 : 1);
+	} else if(key == "is_pc") {
+		return variant(is_human_controlled() ? 1 : 0);
+	} else if(key == "world") {
+		return variant(world_);
+	} else if(key == "id") {
 		return variant(id_);
 	} else if(key == "loc") {
 		return variant(&loc_);
