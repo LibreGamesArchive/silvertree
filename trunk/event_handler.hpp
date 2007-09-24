@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "formula.hpp"
+#include "wml_command_fwd.hpp"
 #include "wml_node_fwd.hpp"
 
 namespace game_logic
@@ -22,6 +23,7 @@ public:
 
 private:
 	std::vector<formula_ptr> filters_;
+	std::vector<const_wml_command_ptr> commands_;
 	wml::const_node_ptr node_;
 };
 
