@@ -332,14 +332,14 @@ void world::draw() const
 	foreach(const hex::tile* t, tiles_) {
 		t->draw();
 	}
+	foreach(const hex::tile* t, tiles_) {
+		t->draw_cliffs();
+	}
 	
 	hex::tile::draw_features(&tiles_[0], &tiles_[0] + tiles_.size(),
 				 features_cache_);
 	hex::tile::finish_drawing();
 
-	foreach(const hex::tile* t, tiles_) {
-		t->draw_cliffs();
-	}
 	foreach(const hex::tile* t, tiles_) {
 		t->emit_particles(particle_system_);
 	}
