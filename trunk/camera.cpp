@@ -73,6 +73,8 @@ void camera::prepare_frame()
 	glClearColor(background_[0],background_[1],background_[2],0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glFogfv(GL_FOG_COLOR, background_);
+
 	glViewport(0,0,width_,height_);
 
 	glMatrixMode(GL_PROJECTION);
