@@ -449,8 +449,8 @@ void world::play()
 			if(party_ptr p = i->second->get_world().get_pc_party()) {
 				i->second->play();
 				time_ = i->second->get_world().current_time();
-				p->new_world(*this,p->loc());
 				add_party(p);
+				p->new_world(*this,p->loc(),p->last_move());
 				break;
 			}
 		}
@@ -572,7 +572,7 @@ void world::play()
 						time_ = s->second->enter(active_party, active_party->loc(), time_);
 
 						//player has left the settlement, return to this world
-						active_party->new_world(*this,active_party->loc());
+						active_party->new_world(*this,active_party->loc(),active_party->last_move());
 						skippy.reset();
 						fps_track_.reset();
 					}
