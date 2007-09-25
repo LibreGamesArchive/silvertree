@@ -211,7 +211,7 @@ world::party_map::iterator world::add_party(party_ptr new_party)
 	return res;
 }
 
-void world::get_matching_parties(const formula_ptr& filter, std::vector<party_ptr>& res)
+void world::get_matching_parties(const formula* filter, std::vector<party_ptr>& res)
 {
 	for(party_map::iterator i = parties_.begin(); i != parties_.end(); ++i) {
 		if(!filter || filter->execute(*i->second).as_bool()) {
@@ -440,6 +440,10 @@ void world::draw() const
 	}
 }
 
+namespace {
+const GLfloat game_speed = 0.2;
+}
+
 void world::play()
 {
 	world_context context(this);
@@ -457,8 +461,6 @@ void world::play()
 	}
 
 	party_ptr active_party;
-
-	const GLfloat game_speed = 0.2;
 
 	graphics::frame_skipper skippy(50, preference_maxfps());
 	fps_track_.reset();
@@ -515,6 +517,26 @@ void world::play()
 			}
 		}
 
+		if(!script_.empty()) {
+			bool scripted_moves = false;
+			for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
+				if(i->second->has_script()) {
+					scripted_moves = true;
+					break;
+				}
+			}
+
+			if(!scripted_moves) {
+				const std::string script = script_;
+				script_.clear();
+				map_formula_callable script_callable;
+				variant script_var;
+				script_var.set_string(script);
+				script_callable.add("script", script_var);
+				fire_event("finish_script", script_callable);
+			}
+		}
+
 		if(!active_party) {
 			active_party = get_party_ready_to_move();
 		}
@@ -522,7 +544,13 @@ void world::play()
 		while(active_party && party_result == party::TURN_COMPLETE) {
 			party_map::iterator itor = find_party(active_party);
 			hex::location start_loc = active_party->loc();
-			party_result = active_party->play_turn();
+
+			if(script_.empty() || active_party->has_script()) {
+				party_result = active_party->play_turn();
+			} else {
+				active_party->pass();
+			}
+
 			if(party_result != party::TURN_STILL_THINKING) {
 				if(itor != parties_.end()) {
 					parties_.erase(itor);

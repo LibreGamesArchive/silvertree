@@ -14,6 +14,7 @@
 #define PARTY_HPP_INCLUDED
 
 #include <boost/shared_ptr.hpp>
+#include <deque>
 #include <set>
 #include <vector>
 
@@ -107,9 +108,15 @@ public:
 	int money() const { return money_; }
 	void get_money(int m) { money_ += m; }
 
+	bool has_script() const { return !scripted_moves_.empty(); }
+	void add_scripted_move(const hex::location& loc) {
+		scripted_moves_.push_back(loc);
+	}
+
+	void pass(int minutes=1);
+
 protected:
 	void move(hex::DIRECTION dir);
-	void pass(int minutes=1);
 	int movement_cost(const hex::location& src,
 	                  const hex::location& dst) const;
 	const hex::gamemap& map() const;
@@ -144,6 +151,8 @@ private:
 
 	std::vector<item_ptr> inventory_;
 	int money_;
+
+	std::deque<hex::location> scripted_moves_;
 };
 
 }
