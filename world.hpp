@@ -48,6 +48,8 @@ public:
 
 	void play();
 
+	void set_script(const std::string& script) { script_ = script; }
+
 	const hex::gamemap& map() const { return map_; }
 	const game_time& current_time() const { return time_; }
 	void advance_time_until(const game_time& t) { time_ = t; }
@@ -60,7 +62,7 @@ public:
 	const_settlement_ptr settlement_at(const hex::location& loc) const;
 	typedef std::multimap<hex::location,party_ptr> party_map;
 	party_map::iterator add_party(party_ptr pty);
-	void get_matching_parties(const formula_ptr& filter,
+	void get_matching_parties(const formula* filter,
 	                          std::vector<party_ptr>& res);
 	party_map& parties() { return parties_; }
 	const party_map& parties() const { return parties_; }
@@ -136,6 +138,10 @@ private:
 
 	mutable graphics::particle_system particle_system_;
 	game_dialogs::game_bar_ptr game_bar_;
+
+	//if there is currently a set of scripted actions being run, the name
+	//will be recorded here.
+	std::string script_;
 };
 		
 }

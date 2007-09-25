@@ -131,6 +131,38 @@ void party::draw()
 
 party::TURN_RESULT party::play_turn()
 {
+	if(!scripted_moves_.empty()) {
+		const hex::location& dst = scripted_moves_.front();
+		if(dst == loc_) {
+			scripted_moves_.pop_front();
+			return play_turn();
+		}
+
+		hex::location adj[6];
+		hex::get_adjacent_tiles(loc_, adj);
+		int best = -1;
+		for(int n = 0; n != 6; ++n) {
+			if(movement_cost(loc_, adj[n]) < 0) {
+				continue;
+			}
+
+			if(best == -1 || hex::distance_between(adj[n], dst) < hex::distance_between(adj[best], dst)) {
+				best = n;
+			}
+		}
+
+		if(best == -1) {
+			best = rand()%6;
+			if(movement_cost(loc_, adj[best]) < 0) {
+				pass();
+				return TURN_COMPLETE;
+			}
+		}
+
+		move(static_cast<hex::DIRECTION>(best));
+		return TURN_COMPLETE;
+	}
+
 	return do_turn();
 }
 
