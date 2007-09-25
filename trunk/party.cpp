@@ -44,6 +44,7 @@ party::party(wml::const_node_ptr node, world& gameworld)
      world_(&gameworld), loc_(wml::get_attr<int>(node,"x"),
      wml::get_attr<int>(node,"y")),
      facing_(hex::NORTH), last_facing_(hex::NORTH),
+	 last_move_(hex::NULL_DIRECTION),
      arrive_at_(node),
 	 allegiance_(wml::get_attr<std::string>(node,"allegiance")),
 	 move_mode_(WALK), money_(wml::get_int(node,"money"))
@@ -101,11 +102,14 @@ wml::node_ptr party::write() const
 	return res;
 }
 
-void party::new_world(world& w, const hex::location& loc)
+void party::new_world(world& w, const hex::location& loc, hex::DIRECTION dir)
 {
 	world_ = &w;
 	loc_ = loc;
 	arrive_at_ = game_world().current_time();
+	if(dir != hex::NULL_DIRECTION) {
+		move(dir);
+	}
 }
 
 party_ptr party::create_party(wml::const_node_ptr node,
@@ -163,6 +167,7 @@ void party::merge_party(party& joining_party)
 
 void party::move(hex::DIRECTION dir)
 {
+	last_move_ = dir;
 	world_->get_tracks().add_tracks(loc(), *this, world_->current_time(), dir);
 	last_facing_ = facing_;
 	facing_ = dir;

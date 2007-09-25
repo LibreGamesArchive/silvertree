@@ -47,10 +47,12 @@ public:
 	int id() const { return id_; }
 
 	void draw();
+	hex::DIRECTION last_move() const { return last_move_; }
+	const hex::location& previous_loc() const { return previous_loc_; }
 	const hex::location& loc() const { return loc_; }
 	void set_loc(const hex::location& loc) { loc_ = loc; }
 
-	void new_world(world& w, const hex::location& loc);
+	void new_world(world& w, const hex::location& loc, hex::DIRECTION dir=hex::NULL_DIRECTION);
 
 	enum TURN_RESULT { TURN_COMPLETE, TURN_STILL_THINKING };
 	TURN_RESULT play_turn();
@@ -129,6 +131,7 @@ private:
 	hex::map_avatar_ptr avatar_;
 	hex::location loc_, previous_loc_;
 	hex::DIRECTION facing_, last_facing_;
+	hex::DIRECTION last_move_;
 	game_time departed_at_, arrive_at_;
 
 	std::vector<character_ptr> members_;
