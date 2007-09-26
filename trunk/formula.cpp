@@ -22,36 +22,9 @@
 namespace game_logic
 {
 
-namespace {
-std::vector<variant_list*> memory;
-std::vector<variant_string*> memory_strings;
-
-variant new_list()
+void formula_callable::set_value(const std::string& key, const variant& value)
 {
-	variant res;
-	variant_list* mem = variant::allocate_list(res);
-	memory.push_back(mem);
-	return res;
-}
-
-variant new_string()
-{
-	variant res;
-	variant_string* mem = variant::allocate_string(res);
-	memory_strings.push_back(mem);
-	return res;
-}
-
-}
-
-variant formula_callable::create_list() const
-{
-	return new_list();
-}
-
-variant formula_callable::create_string() const
-{
-	return new_string();
+	std::cerr << "ERROR: cannot set key '" << key << "' on object\n";
 }
 
 map_formula_callable::map_formula_callable(
@@ -73,6 +46,7 @@ variant map_formula_callable::get_value(const std::string& key) const
 
 class formula_expression {
 public:
+	virtual ~formula_expression() {}
 	variant evaluate(const formula_callable& variables) const {
 		return execute(variables);
 	}
@@ -291,16 +265,16 @@ public:
 	{}
 private:
 	variant execute(const formula_callable& variables) const {
-		variant res = new_list();
+		std::vector<variant> vars;
 		const variant items = args()[0]->evaluate(variables);
 		for(int n = 0; n != items.num_elements(); ++n) {
 			const variant val = args()[1]->evaluate(*items[n].as_callable());
 			if(val.as_bool()) {
-				res.add_element(items[n]);
+				vars.push_back(items[n]);
 			}
 		}
 
-		return res;
+		return variant(&vars);
 	}
 };
 
@@ -498,9 +472,10 @@ public:
 	{}
 private:
 	variant execute(const formula_callable& variables) const {
-		return new_string().set_string(str_);
+		return str_;
 	}
-	std::string str_;
+
+	variant str_;
 };
 
 using namespace formula_tokenizer;
@@ -730,10 +705,7 @@ formula::formula(const std::string& str) : str_(str)
 variant formula::execute(const formula_callable& variables) const
 {
 	try {
-		executor e(*this, &variables);
-		variant res = e.result().deep_copy();
-		res.release_resources();
-		return res;
+		return expr_->evaluate(variables);
 	} catch(type_error& e) {
 		std::cerr << "formula type error!\n";
 		return variant();
@@ -742,44 +714,8 @@ variant formula::execute(const formula_callable& variables) const
 
 variant formula::execute() const
 {
-	try {
-		executor e(*this);
-		variant res = e.result().deep_copy();
-		res.release_resources();
-		return res;
-	} catch(type_error& e) {
-		std::cerr << "formula type error!\n";
-		return variant();
-	}
-}
-
-variant formula::execute_raw(const formula_callable& variables) const
-{
-	return expr_->evaluate(variables);
-}
-
-formula::executor::executor(const formula& f, const formula_callable* variables)
-    : mem_size_(memory.size()), str_size_(memory_strings.size())
-{
 	static map_formula_callable null_callable;
-	if(variables == NULL) {
-		variables = &null_callable;
-	}
-
-	res_ = f.execute_raw(*variables);
-}
-
-formula::executor::~executor()
-{
-	for(size_t m = mem_size_; m != memory.size(); ++m) {
-		variant::release_list(memory[m]);
-	}
-	memory.resize(mem_size_);
-
-	for(size_t m = str_size_; m != memory_strings.size(); ++m) {
-		variant::release_string(memory_strings[m]);
-	}
-	memory_strings.resize(str_size_);
+	return execute(null_callable);
 }
 
 }

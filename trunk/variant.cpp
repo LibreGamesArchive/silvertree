@@ -1,4 +1,5 @@
 #include <cmath>
+#include <set>
 #include <stdlib.h>
 #include <vector>
 
@@ -12,37 +13,45 @@
 #include "variant.hpp"
 
 struct variant_list {
+	variant_list() : refcount(1)
+	{}
 	std::vector<variant> elements;
+	int refcount;
 };
 
 struct variant_string {
+	variant_string() : refcount(1)
+	{}
 	std::string str;
+	int refcount;
 };
 
-variant_list* variant::allocate_list(variant& v)
+void variant::increment_refcount()
 {
-	variant_list* res = new variant_list;
-	v.type_ = TYPE_LIST;
-	v.list_ = res;
-	return res;
+	switch(type_) {
+	case TYPE_LIST:
+		++list_->refcount;
+		break;
+	case TYPE_STRING:
+		++string_->refcount;
+		break;
+	}
 }
 
-void variant::release_list(variant_list* l)
+void variant::release()
 {
-	delete l;
-}
-
-variant_string* variant::allocate_string(variant& v)
-{
-	variant_string* res = new variant_string;
-	v.type_ = TYPE_STRING;
-	v.string_ = res;
-	return res;
-}
-
-void variant::release_string(variant_string* s)
-{
-	delete s;
+	switch(type_) {
+	case TYPE_LIST:
+		if(--list_->refcount == 0) {
+			delete list_;
+		}
+		break;
+	case TYPE_STRING:
+		if(--string_->refcount == 0) {
+			delete string_;
+		}
+		break;
+	}
 }
 
 variant::variant(int n) : type_(TYPE_INT), int_value_(n)
@@ -54,19 +63,44 @@ variant::variant(const game_logic::formula_callable* callable)
 	assert(callable_);
 }
 
-variant& variant::operator[](size_t n)
+variant::variant(std::vector<variant>* array)
+    : type_(TYPE_LIST)
 {
-	must_be(TYPE_LIST);
-	assert(list_);
-	if(n >= list_->elements.size()) {
-		throw type_error("invalid index");
-	}
+	assert(array);
+	list_ = new variant_list;
+	list_->elements.swap(*array);
+}
 
-	return list_->elements[n];
+variant::variant(const std::string& str)
+	: type_(TYPE_STRING)
+{
+	string_ = new variant_string;
+	string_->str = str;
+}
+
+variant::variant(const variant& v)
+{
+	memcpy(this, &v, sizeof(v));
+	increment_refcount();
+}
+
+const variant& variant::operator=(const variant& v)
+{
+	if(&v != this) {
+		release();
+		memcpy(this, &v, sizeof(v));
+		increment_refcount();
+	}
+	return *this;
 }
 
 const variant& variant::operator[](size_t n) const
 {
+	if(type_ == TYPE_CALLABLE) {
+		assert(n == 0);
+		return *this;
+	}
+
 	must_be(TYPE_LIST);
 	assert(list_);
 	if(n >= list_->elements.size()) {
@@ -76,26 +110,15 @@ const variant& variant::operator[](size_t n) const
 	return list_->elements[n];
 }
 
-void variant::add_element(const variant& v)
-{
-	must_be(TYPE_LIST);
-	assert(list_);
-	list_->elements.push_back(v);
-}
-
 size_t variant::num_elements() const
 {
+	if(type_ == TYPE_CALLABLE) {
+		return 1;
+	}
+
 	must_be(TYPE_LIST);
 	assert(list_);
 	return list_->elements.size();
-}
-
-const variant& variant::set_string(const std::string& str)
-{
-	must_be(TYPE_STRING);
-	assert(string_);
-	string_->str = str;
-	return *this;
 }
 
 variant variant::operator+(const variant& v) const
@@ -193,41 +216,6 @@ void variant::must_be(variant::TYPE t) const
 {
 	if(type_ != t) {
 		throw type_error("type error");
-	}
-}
-
-void variant::release_resources()
-{
-	switch(type_) {
-	case TYPE_LIST:
-		release_list(list_);
-		*this = variant();
-		break;
-	case TYPE_STRING:
-		release_string(string_);
-		*this = variant();
-		break;
-	}
-}
-
-variant variant::deep_copy() const
-{
-	variant res;
-	switch(type_) {
-	case TYPE_LIST: {
-		variant_list* v = allocate_list(res);
-		v->elements.resize(list_->elements.size());
-		for(int n = 0; n != v->elements.size(); ++n) {
-			v->elements[n] = list_->elements[n].deep_copy();
-		}
-		return res;
-	}
-	case TYPE_STRING:
-		*allocate_string(res) = *string_;
-		return res;
-	default:
-		res = *this;
-		return res;
 	}
 }
 

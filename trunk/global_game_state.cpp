@@ -84,11 +84,7 @@ const variant& global_game_state::get_variable(const std::string& varname) const
 
 void global_game_state::set_variable(const std::string& varname, const variant& value)
 {
-	//if the old value of the variant holds resources, free them. Deep copy the resources of
-	//the new variant into the existing one.
-	variant& var = variables[varname];
-	var.release_resources();
-	var = value.deep_copy();
+	variables[varname] = value;
 }
 
 const formula_callable& global_game_state::get_variables() const

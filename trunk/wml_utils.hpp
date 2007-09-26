@@ -54,6 +54,18 @@ inline const std::string& get_str(const_node_ptr ptr,
 	return (*ptr)[key];
 }
 
+inline std::string get_str(const_node_ptr ptr,
+                           const std::string& key,
+						   const std::string& default_val)
+{
+	const std::string& res = (*ptr)[key];
+	if(res.empty()) {
+		return default_val;
+	}
+
+	return res;
+}
+
 inline bool get_bool(const_node_ptr ptr, const std::string& key,
                      bool default_val=false)
 {

@@ -3,6 +3,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <string>
+#include <vector>
 
 namespace game_logic {
 class formula_callable;
@@ -13,29 +14,26 @@ struct variant_string;
 
 class variant {
 public:
-	static variant_list* allocate_list(variant& v);
-	static void release_list(variant_list* l);
-
-	static variant_string* allocate_string(variant& v);
-	static void release_string(variant_string* s);
-
 	explicit variant(int n=0);
 	explicit variant(const game_logic::formula_callable* callable);
+	explicit variant(std::vector<variant>* array);
+	explicit variant(const std::string& str);
 
-	variant& operator[](size_t n);
+	variant(const variant& v);
+	const variant& operator=(const variant& v);
+
 	const variant& operator[](size_t n) const;
-	void add_element(const variant& v);
 	size_t num_elements() const;
 
 	bool is_int() const { return type_ == TYPE_INT; }
 	int as_int() const { must_be(TYPE_INT); return int_value_; }
 	bool as_bool() const { return int_value_ != 0; }
 
-	const variant& set_string(const std::string& str);
-
 	bool is_callable() const { return type_ == TYPE_CALLABLE; }
 	const game_logic::formula_callable* as_callable() const {
 		must_be(TYPE_CALLABLE); return callable_; }
+	game_logic::formula_callable* mutable_callable() {
+		must_be(TYPE_CALLABLE); return mutable_callable_; }
 
 	variant operator+(const variant&) const;
 	variant operator-(const variant&) const;
@@ -51,9 +49,6 @@ public:
 	bool operator<=(const variant&) const;
 	bool operator>=(const variant&) const;
 
-	void release_resources();
-	variant deep_copy() const;
-
 	void serialize_to_string(std::string& str) const;
 	void serialize_from_string(const std::string& str);
 
@@ -65,9 +60,13 @@ private:
 	union {
 		int int_value_;
 		const game_logic::formula_callable* callable_;
+		game_logic::formula_callable* mutable_callable_;
 		variant_list* list_;
 		variant_string* string_;
 	};
+
+	void increment_refcount();
+	void release();
 };
 
 struct type_error {

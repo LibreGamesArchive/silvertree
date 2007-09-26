@@ -3,6 +3,7 @@
 
 #include "foreach.hpp"
 #include "formula.hpp"
+#include "message_dialog.hpp"
 #include "party.hpp"
 #include "wml_command.hpp"
 #include "wml_node.hpp"
@@ -106,7 +107,84 @@ class execute_script_command : public wml_command {
 public:
 	explicit execute_script_command(wml::const_node_ptr node)
 	   : script_(node->attr("script"))
+	{}
+};
+
+class modify_objects_command : public wml_command {
+	formula object_finder_;
+	std::map<std::string,const_formula_ptr> modify_;
+	void do_execute(const formula_callable& info, world& world) const {
+		const variant objects = object_finder_.execute(info);
+		map_formula_callable callable(&info);
+		for(int n = 0; n != objects.num_elements(); ++n) {
+			variant obj = objects[n];
+			callable.add("object", obj);
+			for(std::map<std::string,const_formula_ptr>::const_iterator i = modify_.begin(); i != modify_.end(); ++i) {
+				obj.mutable_callable()->mutate_value(i->first, i->second->execute(callable));
+			}
+		}
+	}
+public:
+	explicit modify_objects_command(wml::const_node_ptr node)
+	   : object_finder_(node->attr("objects"))
 	{
+		for(wml::node::const_attr_iterator i = node->begin_attr(); i != node->end_attr(); ++i) {
+			if(i->first != "objects") {
+				modify_[i->first].reset(new formula(i->second));
+			}
+		}
+	}
+};
+
+class dialog_command : public wml_command {
+	formula pc_formula_, npc_formula_;
+	std::string text_;
+	std::vector<std::string> options_;
+	std::vector<std::vector<const_wml_command_ptr> > consequences_;
+	void do_execute(const formula_callable& info, world& world) const {
+		const formula_callable* pc = pc_formula_.execute(info).as_callable();
+		const formula_callable* npc = npc_formula_.execute(info).as_callable();
+		const party* pc_party = dynamic_cast<const party*>(pc);
+		const party* npc_party = dynamic_cast<const party*>(npc);
+		if(!pc_party || !npc_party) {
+			std::cerr << "Could not calculate parties in dialog\n";
+			return;
+		}
+
+		gui::message_dialog dialog(*pc_party, *npc_party, text_,
+		                           options_.empty() ? NULL : &options_,
+								   false);
+		dialog.show_modal();
+		if(!options_.empty()) {
+			const int option = dialog.selected();
+			if(option >= 0 && option < consequences_.size()) {
+				const std::vector<const_wml_command_ptr> cons = consequences_[option];
+				foreach(const const_wml_command_ptr& c, cons) {
+					c->execute(info, world);
+				}
+			}
+		}
+	}
+public:
+	explicit dialog_command(wml::const_node_ptr node)
+	   : pc_formula_(wml::get_str(node, "pc", "pc")),
+		 npc_formula_(wml::get_str(node, "npc", "npc")),
+		 text_(wml::get_str(node, "text"))
+	{
+		wml::node::const_child_range options = node->get_child_range("option");
+		while(options.first != options.second) {
+			const wml::const_node_ptr op = options.first->second;
+			options_.push_back(wml::get_str(op, "text"));
+			std::vector<const_wml_command_ptr> consequences;
+			for(wml::node::const_all_child_iterator j = op->begin_children(); j != op->end_children(); ++j) {
+				const_wml_command_ptr cmd = create(*j);
+				if(cmd) {
+					consequences.push_back(cmd);
+				}
+			}
+			consequences_.push_back(consequences);
+			++options.first;
+		}
 	}
 };
 
@@ -124,6 +202,8 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	DEFINE_COMMAND(if);
 	DEFINE_COMMAND(scripted_moves);
 	DEFINE_COMMAND(execute_script);
+	DEFINE_COMMAND(modify_objects);
+	DEFINE_COMMAND(dialog);
 
 	return const_wml_command_ptr();
 }

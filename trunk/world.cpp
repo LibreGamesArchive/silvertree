@@ -527,12 +527,9 @@ void world::play()
 			}
 
 			if(!scripted_moves) {
-				const std::string script = script_;
-				script_.clear();
 				map_formula_callable script_callable;
-				variant script_var;
-				script_var.set_string(script);
-				script_callable.add("script", script_var);
+				script_callable.add("script", variant(script_));
+				script_.clear();
 				fire_event("finish_script", script_callable);
 			}
 		}

@@ -138,6 +138,7 @@ private:
 	explicit character(wml::const_node_ptr node);
 
 	variant get_value(const std::string& key) const;
+	void set_value(const std::string& key, const variant& value);
 	int total_skill_points() const;
 
 	void calculate_moves();

@@ -28,6 +28,7 @@ class map_object
 public:
 	typedef boost::array<GLfloat,3> point;
 
+	virtual ~map_object() {}
 	virtual void draw() = 0;
 	const point& position() const { return point_; }
 

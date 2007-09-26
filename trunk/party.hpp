@@ -74,6 +74,8 @@ public:
 
 	int trackability() const;
 
+	std::vector<character_ptr>::const_iterator begin_members() const { return members_.begin(); }
+	std::vector<character_ptr>::const_iterator end_members() const { return members_.end(); }
 	const std::vector<character_ptr>& members() { return members_; }
 	void destroy();
 	bool is_destroyed() const;
@@ -85,6 +87,7 @@ public:
 
 	virtual void friendly_encounter(party& p) {}
 
+	world& game_world() { return *world_; }
 	const world& game_world() const { return *world_; }
 
 	enum MOVEMENT_MODE { WALK = 1, RUN };

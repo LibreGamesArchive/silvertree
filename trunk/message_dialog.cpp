@@ -18,8 +18,8 @@
 
 namespace gui {
 
-message_dialog::message_dialog(game_logic::party& pc,
-			       game_logic::party& npc,
+message_dialog::message_dialog(const game_logic::party& pc,
+			       const game_logic::party& npc,
 			       const std::string& msg,
 			       const std::vector<std::string>* options,
 			       bool starts_conversation) 
@@ -62,7 +62,7 @@ void message_dialog::construct_interface()
 	dialog_labels_.clear();
 	option_frames_.clear();
 
-	const std::string npcname = npc_.members().front()->portrait();
+	const std::string npcname = (*npc_.begin_members())->portrait();
 
 	set_padding(0);
 	dialog_label_ptr msg_label_inner(new dialog_label(msg_, color, 18));
@@ -90,7 +90,7 @@ void message_dialog::construct_interface()
 	}
 
 	if(options_) {		
-		const std::string pcname = pc_.members().front()->portrait();
+		const std::string pcname = (*pc_.begin_members())->portrait();
 		int left_offset = 0;
 
 		set_cursor(s_width/8, s_height*7/8 - 200);
