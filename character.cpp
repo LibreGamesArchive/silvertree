@@ -280,6 +280,15 @@ variant character::get_value(const std::string& key) const
 	return variant(base_stat(key));
 }
 
+void character::set_value(const std::string& key, const variant& value)
+{
+	if(key == "hitpoints") {
+		hitpoints_ = value.as_int();
+	} else {
+		formula_callable::set_value(key, value);
+	}
+}
+
 int character::total_skill_points() const
 {
 	return stat(SkillPointsStat);

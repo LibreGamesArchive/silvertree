@@ -107,7 +107,7 @@ void party::new_world(world& w, const hex::location& loc, hex::DIRECTION dir)
 	world_ = &w;
 	loc_ = loc;
 	arrive_at_ = game_world().current_time();
-	if(dir != hex::NULL_DIRECTION) {
+	if(dir != hex::NULL_DIRECTION && movement_cost(loc_, hex::tile_in_direction(loc_, dir)) >= 0) {
 		move(dir);
 	}
 }
@@ -477,16 +477,22 @@ variant party::get_value(const std::string& key) const
 	} else if(key == "world") {
 		return variant(world_);
 	} else if(key == "id") {
-		return variant(id_);
+		return variant(str_id_);
 	} else if(key == "loc") {
 		return variant(&loc_);
 	} else if(key == "previous") {
 		return variant(&previous_loc_);
+	} else if(key == "members") {
+		std::vector<variant> members;
+		foreach(const character_ptr& c, members_) {
+			members.push_back(variant(c.get()));
+		}
+		return variant(&members);
 	} else if(key == str_id_) {
 		return variant(id_);
-	} else {
-		return variant();
 	}
+
+	return variant();
 }
 
 }

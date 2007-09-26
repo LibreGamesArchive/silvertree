@@ -28,6 +28,7 @@ private:
 class phantom_dialog: public dialog {
 public:
 	phantom_dialog() : dialog(0, 0, 0, 0) { set_clear_bg(false); }
+	virtual ~phantom_dialog() {}
 	virtual dialog& add_widget(widget_ptr w, MOVE_DIRECTION dir=MOVE_DOWN);
 	virtual dialog& add_widget(widget_ptr w, int x, int y,
 	                MOVE_DIRECTION dir=MOVE_DOWN);
@@ -43,6 +44,7 @@ typedef boost::shared_ptr<phantom_dialog> phantom_dialog_ptr;
 class skinned_widget: public widget {
 public:
 	skinned_widget();
+	virtual ~skinned_widget() {}
 	int state() const { return state_; }
 	void set_state(int state) const;
 	int add_skin(const std::string& name, int state=-1);
@@ -79,6 +81,7 @@ public:
 	void set_hotkey(SDLKey sym, SDLMod mod) { hotkey_.sym = sym; hotkey_.mod = mod, has_hotkey_ = true; }
 	void remove_hotkey() { has_hotkey_ = false; }
 protected:
+	virtual ~button_widget() {}
 	bool hit_me(const SDL_Event &e);
 private:
 	void do_click();
@@ -157,6 +160,7 @@ public:
 	menu_widget(const std::string& option_text_frame, const SDL_Color& color, int font_size) 
 		: option_text_frame_(option_text_frame), font_size_(font_size),
 		  color_(color), key_selection_(-1) {}
+	virtual ~menu_widget() {}
 
 	void add_option(const std::string& opt, int value);
 	void remove_option(int value);

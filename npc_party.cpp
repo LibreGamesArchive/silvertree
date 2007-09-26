@@ -13,6 +13,7 @@
 #include "battle.hpp"
 #include "battle_character.hpp"
 #include "battle_map_generator.hpp"
+#include "global_game_state.hpp"
 #include "message_dialog.hpp"
 #include "foreach.hpp"
 #include "gamemap.hpp"
@@ -161,10 +162,16 @@ void dialog_sequence(const wml::const_node_ptr& node, party& npc, party& pc, boo
 
 void npc_party::friendly_encounter(party& p)
 {
-	if(!dialog_) {
+	if(!p.is_human_controlled()) {
 		return;
 	}
 
+	map_formula_callable callable;
+	callable.add("pc", variant(&p));
+	callable.add("npc", variant(this));
+	callable.add("world", variant(&game_world()));
+	callable.add("var", variant(&global_game_state::get().get_variables()));
+	game_world().fire_event("encounter", callable);
 	dialog_sequence(dialog_, *this, p);
 }
 

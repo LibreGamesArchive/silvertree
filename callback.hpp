@@ -21,6 +21,7 @@ namespace functional
 class callback_base
 {
 public:
+	virtual ~callback_base() {}
 	void call() { do_call(); }
 private:
 	virtual void do_call() = 0;
@@ -46,6 +47,7 @@ template<typename Arg>
 class callback_base_arg1
 {
 public:
+	virtual ~callback_base_arg1() {}
 	void call(const Arg& arg) { do_call(arg); }
 private:
 	virtual void do_call(const Arg& arg) = 0;

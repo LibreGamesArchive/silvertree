@@ -14,6 +14,7 @@ class wml_command
 {
 public:
 	static const_wml_command_ptr create(wml::const_node_ptr node);
+	virtual ~wml_command() {}
 
 	void execute(const formula_callable& info, world& world) const { do_execute(info, world); }
 

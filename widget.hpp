@@ -39,7 +39,7 @@ public:
 protected:
 	widget() : x_(0), y_(0), w_(0), h_(0), tooltip_displayed_(false), visible_(true)
 	{}
-	~widget();
+	virtual ~widget();
 
 	void normalize_event(SDL_Event* event);
 private:
