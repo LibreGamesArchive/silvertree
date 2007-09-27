@@ -453,8 +453,8 @@ void world::play()
 			if(party_ptr p = i->second->get_world().get_pc_party()) {
 				i->second->play();
 				time_ = i->second->get_world().current_time();
-				add_party(p);
 				p->new_world(*this,p->loc(),p->last_move());
+				add_party(p);
 				break;
 			}
 		}
