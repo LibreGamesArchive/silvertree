@@ -35,12 +35,9 @@
 namespace game_logic
 {
 
-namespace {
-int current_id = 1;
-}
-
 party::party(wml::const_node_ptr node, world& gameworld)
-   : id_(current_id++), str_id_(wml::get_str(node,"id")),
+   : id_(wml::get_int(node,"unique_id",-1)),
+     str_id_(wml::get_str(node,"id")),
      world_(&gameworld), loc_(wml::get_attr<int>(node,"x"),
      wml::get_attr<int>(node,"y")),
      facing_(hex::NORTH), last_facing_(hex::NORTH),
@@ -49,6 +46,10 @@ party::party(wml::const_node_ptr node, world& gameworld)
 	 allegiance_(wml::get_attr<std::string>(node,"allegiance")),
 	 move_mode_(WALK), money_(wml::get_int(node,"money"))
 {
+	if(id_ == -1) {
+		id_ = global_game_state::get().generate_new_party_id();
+	}
+
 	GLfloat pos[3];
 	get_pos(pos);
 	avatar_ = hex::map_avatar::create(node,pos);
@@ -72,6 +73,20 @@ party::party(wml::const_node_ptr node, world& gameworld)
 	    i.first != i.second; ++i.first) {
 		inventory_.push_back(item::create_item(i.first->second));
 	}
+
+	//as a convenience users can place [encounter] tags within the [party]
+	//and this will translate into a world [event] of type 'event' with a filter
+	//for this party.
+	for(wml::node::const_child_range i = node->get_child_range("encounter");
+	    i.first != i.second; ++i.first) {
+		wml::node_ptr event(new wml::node("event"));
+		wml::copy_over(i.first->second, event);
+		wml::node_ptr filter(new wml::node("filter"));
+		filter->set_attr("filter", formatter() << "npc.unique_id = " << id_);
+		event->add_child(filter);
+		event_handler handler(event);
+		gameworld.add_event_handler("encounter", handler);
+	}
 }
 
 wml::node_ptr party::write() const
@@ -79,8 +94,9 @@ wml::node_ptr party::write() const
 	wml::node_ptr res(new wml::node("party"));
 	avatar_->write(res);
 	res->set_attr("id", str_id_);
-	res->set_attr("x", boost::lexical_cast<std::string>(loc_.x()));
-	res->set_attr("y", boost::lexical_cast<std::string>(loc_.y()));
+	res->set_attr("unique_id", formatter() << id_);
+	res->set_attr("x", formatter() << loc_.x());
+	res->set_attr("y", formatter() << loc_.y());
 	WML_WRITE_ATTR(res, allegiance);
 	WML_WRITE_ATTR(res, money);
 
@@ -108,6 +124,7 @@ void party::new_world(world& w, const hex::location& loc, hex::DIRECTION dir)
 	loc_ = loc;
 	arrive_at_ = game_world().current_time();
 	if(dir != hex::NULL_DIRECTION && movement_cost(loc_, hex::tile_in_direction(loc_, dir)) >= 0) {
+		hex::location dst = hex::tile_in_direction(loc_, dir);
 		move(dir);
 	}
 }
@@ -478,6 +495,8 @@ variant party::get_value(const std::string& key) const
 		return variant(world_);
 	} else if(key == "id") {
 		return variant(str_id_);
+	} else if(key == "unique_id") {
+		return variant(id_);
 	} else if(key == "loc") {
 		return variant(&loc_);
 	} else if(key == "previous") {

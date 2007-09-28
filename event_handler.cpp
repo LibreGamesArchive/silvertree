@@ -21,6 +21,11 @@ event_handler::event_handler(wml::const_node_ptr node) : node_(node)
 
 	for(wml::node::const_all_child_iterator i = node->begin_children();
 	    i != node->end_children(); ++i) {
+		if((*i)->name() == "filter") {
+			filters_.push_back(formula_ptr(new formula((*i)->attr("filter"))));
+			continue;
+		}
+
 		const_wml_command_ptr cmd(wml_command::create(*i));
 		if(cmd) {
 			commands_.push_back(cmd);
