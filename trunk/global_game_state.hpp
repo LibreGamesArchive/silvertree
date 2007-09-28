@@ -18,6 +18,8 @@ public:
 	void init(wml::const_node_ptr node);
 	void write(wml::node_ptr node) const;
 
+	int generate_new_party_id() const;
+
 	const variant& get_variable(const std::string& varname) const;
 	void set_variable(const std::string& varname, const variant& value);
 

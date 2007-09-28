@@ -3,14 +3,17 @@
 #include <map>
 #include <string>
 
+#include "formatter.hpp"
 #include "formula.hpp"
 #include "global_game_state.hpp"
 #include "variant.hpp"
 #include "wml_node.hpp"
+#include "wml_utils.hpp"
 
 namespace game_logic {
 
 namespace {
+int current_party_id = 1;
 typedef std::map<std::string, variant> variable_map;
 variable_map variables;
 
@@ -50,6 +53,8 @@ void global_game_state::init(wml::const_node_ptr node)
 			variables[i->first] = v;
 		}
 	}
+
+	current_party_id = wml::get_int(node, "current_party_id", 1);
 }
 
 void global_game_state::write(wml::node_ptr node) const
@@ -62,6 +67,8 @@ void global_game_state::write(wml::node_ptr node) const
 	}
 
 	node->add_child(var);
+
+	node->set_attr("current_party_id", formatter() << current_party_id);
 }
 
 global_game_state::global_game_state()
@@ -69,6 +76,11 @@ global_game_state::global_game_state()
 	static bool first_and_only_time = true;
 	assert(first_and_only_time);
 	first_and_only_time = false;
+}
+
+int global_game_state::generate_new_party_id() const
+{
+	return current_party_id++;
 }
 
 const variant& global_game_state::get_variable(const std::string& varname) const

@@ -168,7 +168,9 @@ wml::node_ptr world::write() const
 	}
 
 	for(event_map::const_iterator i = handlers_.begin(); i != handlers_.end(); ++i) {
-		res->add_child(wml::deep_copy(i->second.write()));
+		wml::node_ptr event = wml::deep_copy(i->second.write());
+		event->set_attr("event", i->first);
+		res->add_child(event);
 	}
 
 	return res;
