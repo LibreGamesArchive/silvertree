@@ -1,9 +1,14 @@
+#ifdef __WIN32__
+#include "stdafx.h"
+#endif
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
 
-#include <stdlib.h>
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
+#include <ctime>
 
 #include "namegen.hpp"
 
@@ -17,11 +22,11 @@ namespace namegen {
 
 
 float ranfu() {
-	return rand()/(static_cast<float>(INT_MAX));
+	return rand()/(static_cast<float>(RAND_MAX));
 }
 
 int raniu(int n) {
-	return static_cast<int>(n*(rand()/(static_cast<float>(INT_MAX))));
+	return static_cast<int>(n*(rand()/static_cast<float>(RAND_MAX)));
 }
 
 float phoneme::transition_prob(const phoneme_ptr p) const {
@@ -149,7 +154,7 @@ std::string typography::generate_word(int length) const {
 	if(length == 1) {
 		phoneme_ptr p;
 		do {
-			p = phones_.at(raniu(phones_.size()));
+			p = phones_.at(raniu(static_cast<int>(phones_.size())));
 		} while(non_initials_.find(p) != non_initials_.end() ||
 			non_finals_.find(p) != non_finals_.end());
 		return p->rep();
@@ -158,7 +163,7 @@ std::string typography::generate_word(int length) const {
 	/* generate initial */
 	phoneme_ptr p;
 	do {
-		int index = raniu(phones_.size());
+		int index = raniu(static_cast<int>(phones_.size()));
 		p = phones_.at(index);
 	} while(non_initials_.find(p) != non_initials_.end());
        
@@ -191,10 +196,16 @@ std::string typography::generate_word(int length) const {
 
 std::string read_file(const std::string& filename) {
 	std::ifstream file(filename.c_str(), std::ios_base::binary);
+
+	if(!file.is_open()) 
+	{
+		std::cerr << "Error opening file: "<<filename<<"\n";
+		exit(2);
+	}
+
 	std::stringstream ss;
-
 	ss << file.rdbuf();
-
+	
 	file.close();
 	return ss.str();
 }
@@ -212,8 +223,7 @@ std::vector< std::string > split(std::string const &val, const std::string& deli
 		if(delim.find(*i2) != std::string::npos) {
 			std::string new_val(i1, i2);
 			res.push_back(new_val);
-			while(delim.find(*(++i2)) != std::string::npos && 
-			      i2 != val.end()) {}
+			while((++i2) != val.end() && delim.find(*i2) != std::string::npos) {}
 			i1 = i2;
 		} else {
 			++i2;
@@ -368,7 +378,7 @@ namegen::typo_ptr read_typography(const std::string& cluster_file, const std::st
 			std::cerr << "["<<(*i)<<"] has only "<<words.size()<<" words.\n";
 			continue;
 		}
-		phones[words[0]][words[1]] = atof(words[2].c_str());
+		phones[words[0]][words[1]] = static_cast<float>(atof(words[2].c_str()));
 	}
 	
 	std::vector<std::string> vowels;
@@ -416,17 +426,17 @@ namegen::typo_ptr make_language(const std::string& cluster_file,
 	read_clusters(cluster_file, vowels, consonants, 
 		      non_initials, non_medials, non_finals);
 
-	int vsize = vowels.size() - num_vowels;
+	int vsize = static_cast<int>(vowels.size()) - num_vowels;
 	if(vsize < 0) vsize = 0;
 	for(int i =0 ;i<vsize; ++i) {
-		std::vector<std::string>::iterator i = vowels.begin();
-		vowels.erase(i + namegen::raniu(vowels.size()));
+		std::vector<std::string>::iterator iter = vowels.begin();
+		vowels.erase(iter + namegen::raniu(static_cast<int>(vowels.size())));
 	}
-	int csize = consonants.size() - num_consonants;
+	int csize = static_cast<int>(consonants.size()) - num_consonants;
 	if(csize < 0) csize = 0;
 	for(int i =0 ;i<csize; ++i) {
-		std::vector<std::string>::iterator i = consonants.begin();
-		consonants.erase(i + namegen::raniu(consonants.size()));
+		std::vector<std::string>::iterator iter = consonants.begin();
+		consonants.erase(iter + namegen::raniu(static_cast<int>(consonants.size())));
 	}
 
 	if(verbose) {
@@ -450,8 +460,7 @@ bool file_exists(const std::string& name) {
 }
 
 int main(int argc, char **argv) {
-	
-	srand(time(NULL));
+	srand(static_cast<unsigned int>(time(NULL)));
 
 	if(argc < 3) {
 		std::cerr << "Usage: "<<argv[0]<<" <cluster file> <output file> [<minlen> <maxlen> <vowels> <consonants>]\n";
@@ -511,7 +520,7 @@ int main(int argc, char **argv) {
 			std::cout <<  " ";
 		}
 		std::cout << (count+1) << ": " << (*i);
-		for(int j=0; j < (16 -i->size()); ++j) {
+		for(int j=0; j < (16 -static_cast<int>(i->size())); ++j) {
 			std::cout << ' ';
 		}
 
