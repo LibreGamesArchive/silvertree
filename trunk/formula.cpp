@@ -58,6 +58,26 @@ private:
 
 namespace {
 
+class list_expression : public formula_expression {
+public:
+	explicit list_expression(const std::vector<expression_ptr>& items)
+	   : items_(items)
+	{}
+
+private:
+	variant execute(const formula_callable& variables) const {
+		std::vector<variant> res;
+		res.reserve(items_.size());
+		for(std::vector<expression_ptr>::const_iterator i = items_.begin(); i != items_.end(); ++i) {
+			res.push_back((*i)->evaluate(variables));
+		}
+
+		return variant(&res);
+	}
+
+	std::vector<expression_ptr> items_;
+};
+
 class function_expression : public formula_expression {
 public:
 	typedef std::vector<expression_ptr> args_list;
@@ -553,9 +573,9 @@ void parse_args(const token* i1, const token* i2,
 	int parens = 0;
 	const token* beg = i1;
 	while(i1 != i2) {
-		if(i1->type == TOKEN_LPARENS) {
+		if(i1->type == TOKEN_LPARENS || i1->type == TOKEN_LSQUARE) {
 			++parens;
-		} else if(i1->type == TOKEN_RPARENS) {
+		} else if(i1->type == TOKEN_RPARENS || i1->type == TOKEN_RSQUARE) {
 			--parens;
 		} else if(i1->type == TOKEN_COMMA && !parens) {
 			res->push_back(parse_expression(beg,i1));
@@ -639,9 +659,9 @@ expression_ptr parse_expression(const token* i1, const token* i2)
 	int parens = 0;
 	const token* op = NULL;
 	for(const token* i = i1; i != i2; ++i) {
-		if(i->type == TOKEN_LPARENS) {
+		if(i->type == TOKEN_LPARENS || i->type == TOKEN_LSQUARE) {
 			++parens;
-		} else if(i->type == TOKEN_RPARENS) {
+		} else if(i->type == TOKEN_RPARENS || i->type == TOKEN_RSQUARE) {
 			--parens;
 		} else if(parens == 0 && i->type == TOKEN_OPERATOR) {
 			if(op == NULL || operator_precedence(*op) >
@@ -654,6 +674,10 @@ expression_ptr parse_expression(const token* i1, const token* i2)
 	if(op == NULL) {
 		if(i1->type == TOKEN_LPARENS && (i2-1)->type == TOKEN_RPARENS) {
 			return parse_expression(i1+1,i2-1);
+		} else if(i1->type == TOKEN_LSQUARE && (i2-1)->type == TOKEN_RSQUARE) {
+				std::vector<expression_ptr> args;
+				parse_args(i1+1,i2-1,&args);
+				return expression_ptr(new list_expression(args));
 		} else if(i2 - i1 == 1) {
 			if(i1->type == TOKEN_IDENTIFIER) {
 				return expression_ptr(new identifier_expression(
@@ -684,7 +708,12 @@ expression_ptr parse_expression(const token* i1, const token* i2)
 			}
 		}
 
-		std::cerr << "could not parse expression\n";
+		std::ostringstream expr;
+		while(i1 != i2) {
+			expr << std::string(i1->begin,i1->end);
+			++i1;
+		}
+		std::cerr << "could not parse expression: '" << expr.str() << "'\n";
 		throw formula_error();
 	}
 
@@ -849,6 +878,11 @@ int main()
 
 		assert(formula::create_string_formula("Your strength is {strength}")->execute(c).as_string() ==
 						"Your strength is 15");
+		variant myarray = formula("[1,2,3]").execute();
+		assert(myarray.num_elements() == 3);
+		assert(myarray[0].as_int() == 1);
+		assert(myarray[1].as_int() == 2);
+		assert(myarray[2].as_int() == 3);
 	} catch(formula_error& e) {
 		std::cerr << "parse error\n";
 	}

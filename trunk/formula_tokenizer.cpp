@@ -36,6 +36,8 @@ token get_token(iterator& i1, iterator i2) {
 	                       { regex("^\\d+"),       TOKEN_INTEGER },
 	                       { regex("^\\("),        TOKEN_LPARENS },
 	                       { regex("^\\)"),        TOKEN_RPARENS },
+						   { regex("^\\["),        TOKEN_LSQUARE },
+						   { regex("^\\]"),        TOKEN_RSQUARE },
 	                       { regex("^,"),          TOKEN_COMMA },
 	                       { regex("^\\s+"),       TOKEN_WHITESPACE } };
 

@@ -546,4 +546,20 @@ variant party::get_value(const std::string& key) const
 	return variant();
 }
 
+void party::set_value(const std::string& key, const variant& value)
+{
+	if(key == "members") {
+		members_.clear();
+		for(int n = 0; n != value.num_elements(); ++n) {
+			variant val = value[n];
+			if(val.is_callable()) {
+				character* c = dynamic_cast<character*>(val.mutable_callable());
+				if(c) {
+					members_.push_back(character_ptr(c));
+				}
+			}
+		}
+	}
+}
+
 }
