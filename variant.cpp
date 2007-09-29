@@ -138,6 +138,22 @@ const std::string& variant::as_string() const
 
 variant variant::operator+(const variant& v) const
 {
+	if(type_ == TYPE_LIST) {
+		if(v.type_ == TYPE_LIST) {
+			std::vector<variant> res;
+			res.reserve(list_->elements.size() + v.list_->elements.size());
+			foreach(const variant& var, list_->elements) {
+				res.push_back(var);
+			}
+
+			foreach(const variant& var, v.list_->elements) {
+				res.push_back(var);
+			}
+
+			return variant(&res);
+		}
+	}
+
 	must_be(TYPE_INT);
 	v.must_be(TYPE_INT);
 	return variant(int_value_ + v.int_value_);

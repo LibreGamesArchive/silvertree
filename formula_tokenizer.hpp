@@ -22,7 +22,8 @@ typedef std::string::const_iterator iterator;
 
 enum TOKEN_TYPE { TOKEN_OPERATOR, TOKEN_STRING_LITERAL,
 		          TOKEN_IDENTIFIER, TOKEN_INTEGER,
-                  TOKEN_LPARENS, TOKEN_RPARENS, TOKEN_COMMA,
+                  TOKEN_LPARENS, TOKEN_RPARENS,
+				  TOKEN_LSQUARE, TOKEN_RSQUARE, TOKEN_COMMA,
 				  TOKEN_WHITESPACE };
 
 struct token {
