@@ -14,6 +14,7 @@
 #include "foreach.hpp"
 #include "formatter.hpp"
 #include "formula.hpp"
+#include "formula_registry.hpp"
 #include "global_game_state.hpp"
 #include "graphics_logic.hpp"
 #include "item.hpp"
@@ -241,6 +242,15 @@ void party::pass(int minutes)
 	foreach(const character_ptr& c, members_) {
 		c->use_stamina(-minutes * 2);
 	}
+
+	const_formula_ptr heal_formula = formula_registry::get_stat_calculation("heal_amount");
+	const int healing = heal();
+	foreach(const character_ptr& c, members_) {
+		if(heal_formula) {
+			variant amount = heal_formula->execute(map_formula_callable(c.get()).add("heal",variant(healing)));
+			c->heal(amount.as_int());
+		}
+	}
 }
 
 int party::movement_cost(const hex::location& src,
@@ -305,7 +315,10 @@ int party::aggregate_stat_max(const std::string& stat) const
 {
 	int res = 0;
 	foreach(const character_ptr& c, members_) {
-		res += c->stat(stat);
+		const int val = c->stat(stat);
+		if(val > res) {
+			res = val;
+		}
 	}
 
 	return res;
@@ -423,6 +436,12 @@ int party::vision() const
 int party::track() const
 {
 	static const std::string Stat = "track";
+	return aggregate_stat_max(Stat);
+}
+
+int party::heal() const
+{
+	static const std::string Stat = "heal";
 	return aggregate_stat_max(Stat);
 }
 
