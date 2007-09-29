@@ -84,4 +84,9 @@ const std::string& item::type_name(ITEM_TYPE type)
 	return type_names[type];
 }
 
+variant item::get_value(const std::string& key) const
+{
+	return variant();
+}
+
 }

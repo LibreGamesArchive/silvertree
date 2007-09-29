@@ -5,6 +5,7 @@
 
 #include "formatter.hpp"
 #include "formula.hpp"
+#include "formula_callable.hpp"
 #include "global_game_state.hpp"
 #include "variant.hpp"
 #include "wml_node.hpp"
@@ -101,7 +102,14 @@ void global_game_state::set_variable(const std::string& varname, const variant& 
 
 const formula_callable& global_game_state::get_variables() const
 {
+	static bool first_time = true;
 	static variables_callable callable;
+
+	//make sure the callable will never run out of references by giving it one to begin with
+	if(first_time) {
+		first_time = false;
+		callable.add_ref();
+	}
 	return callable;
 }
 

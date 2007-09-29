@@ -10,17 +10,18 @@
 #include "foreach.hpp"
 #include "formatter.hpp"
 #include "formula.hpp"
+#include "formula_callable.hpp"
 #include "variant.hpp"
 
 struct variant_list {
-	variant_list() : refcount(1)
+	variant_list() : refcount(0)
 	{}
 	std::vector<variant> elements;
 	int refcount;
 };
 
 struct variant_string {
-	variant_string() : refcount(1)
+	variant_string() : refcount(0)
 	{}
 	std::string str;
 	int refcount;
@@ -34,6 +35,9 @@ void variant::increment_refcount()
 		break;
 	case TYPE_STRING:
 		++string_->refcount;
+		break;
+	case TYPE_CALLABLE:
+		intrusive_ptr_add_ref(callable_);
 		break;
 	}
 }
@@ -51,6 +55,9 @@ void variant::release()
 			delete string_;
 		}
 		break;
+	case TYPE_CALLABLE:
+		intrusive_ptr_release(callable_);
+		break;
 	}
 }
 
@@ -61,6 +68,7 @@ variant::variant(const game_logic::formula_callable* callable)
 	: type_(TYPE_CALLABLE), callable_(callable)
 {
 	assert(callable_);
+	increment_refcount();
 }
 
 variant::variant(std::vector<variant>* array)

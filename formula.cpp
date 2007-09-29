@@ -17,6 +17,7 @@
 
 #include "foreach.hpp"
 #include "formula.hpp"
+#include "formula_callable.hpp"
 #include "formula_tokenizer.hpp"
 #include "map_utils.hpp"
 

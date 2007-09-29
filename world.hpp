@@ -32,6 +32,7 @@
 #include "settlement_fwd.hpp"
 #include "tracks.hpp"
 #include "wml_node.hpp"
+#include "world_fwd.hpp"
 
 namespace game_logic
 {

@@ -22,36 +22,7 @@
 namespace game_logic
 {
 
-//interface for objects that can have formulae run on them
-class formula_callable {
-public:
-	variant query_value(const std::string& key) const {
-		return get_value(key);
-	}
-
-	void mutate_value(const std::string& key, const variant& value) {
-		set_value(key, value);
-	}
-
-protected:
-	virtual ~formula_callable() {}
-
-	virtual void set_value(const std::string& key, const variant& value);
-
-private:
-	virtual variant get_value(const std::string& key) const = 0;
-};
-
-class map_formula_callable : public formula_callable {
-public:
-	explicit map_formula_callable(const formula_callable* fallback=NULL);
-	map_formula_callable& add(const std::string& key, const variant& value);
-private:
-	variant get_value(const std::string& key) const;
-	std::map<std::string,variant> values_;
-	const formula_callable* fallback_;
-};
-
+class formula_callable;
 class formula_expression;
 typedef boost::shared_ptr<formula_expression> expression_ptr;
 

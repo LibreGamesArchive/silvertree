@@ -16,7 +16,7 @@
 #include <vector>
 
 #include "dialog.hpp"
-#include "item_fwd.hpp"
+#include "item.hpp"
 #include "party_fwd.hpp"
 
 namespace game_dialogs {

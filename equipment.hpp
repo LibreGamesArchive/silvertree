@@ -23,7 +23,7 @@
 namespace game_logic
 {
 
-class equipment : public item, public formula_callable
+class equipment : public item
 {
 public:
 	equipment(ITEM_TYPE type, const wml::const_node_ptr& node);

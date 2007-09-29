@@ -21,6 +21,7 @@
 #include "texture.hpp"
 #include "widget.hpp"
 #include "formula.hpp"
+#include "formula_callable.hpp"
 #include "font.hpp"
 #include "wml_node.hpp"
 

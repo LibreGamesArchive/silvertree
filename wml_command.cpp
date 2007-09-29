@@ -115,12 +115,12 @@ class modify_objects_command : public wml_command {
 	std::map<std::string,const_formula_ptr> modify_;
 	void do_execute(const formula_callable& info, world& world) const {
 		const variant objects = object_finder_.execute(info);
-		map_formula_callable callable(&info);
+		map_formula_callable_ptr callable(new map_formula_callable(&info));
 		for(int n = 0; n != objects.num_elements(); ++n) {
 			variant obj = objects[n];
-			callable.add("object", obj);
+			callable->add("object", obj);
 			for(std::map<std::string,const_formula_ptr>::const_iterator i = modify_.begin(); i != modify_.end(); ++i) {
-				obj.mutable_callable()->mutate_value(i->first, i->second->execute(callable));
+				obj.mutable_callable()->mutate_value(i->first, i->second->execute(*callable));
 			}
 		}
 	}
