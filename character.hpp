@@ -88,6 +88,7 @@ public:
 	int level() const { return level_; }
 
 	void full_heal() { hitpoints_ = max_hitpoints(); fatigue_ = 0; }
+	void heal(int amount) { hitpoints_ += amount; if(hitpoints_ > max_hitpoints()) { hitpoints_ = max_hitpoints(); } }
 
 	int get_attr(const std::string& str) const;
 	bool can_improve_attr(const std::string& str) const;

@@ -71,6 +71,7 @@ public:
 	
 	int vision() const;
 	int track() const;
+	int heal() const;
 
 	int trackability() const;
 
