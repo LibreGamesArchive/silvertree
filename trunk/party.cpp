@@ -90,6 +90,10 @@ party::party(wml::const_node_ptr node, world& gameworld)
 	}
 }
 
+party::~party()
+{
+}
+
 wml::node_ptr party::write() const
 {
 	wml::node_ptr res(new wml::node("party"));
@@ -215,6 +219,11 @@ void party::merge_party(party& joining_party)
 	joining_party.members_.clear();
 }
 
+void party::acquire_item(item_ptr i)
+{
+	inventory_.push_back(i);
+}
+
 void party::move(hex::DIRECTION dir)
 {
 	last_move_ = dir;
@@ -247,7 +256,8 @@ void party::pass(int minutes)
 	const int healing = heal();
 	foreach(const character_ptr& c, members_) {
 		if(heal_formula) {
-			variant amount = heal_formula->execute(map_formula_callable(c.get()).add("heal",variant(healing)));
+			variant amount = heal_formula->execute(
+							map_formula_callable_ptr(new map_formula_callable(c.get()))->add("heal",variant(healing)));
 			c->heal(amount.as_int());
 		}
 	}
@@ -517,9 +527,9 @@ variant party::get_value(const std::string& key) const
 	} else if(key == "unique_id") {
 		return variant(id_);
 	} else if(key == "loc") {
-		return variant(&loc_);
+		return variant(new hex::location(loc_));
 	} else if(key == "previous") {
-		return variant(&previous_loc_);
+		return variant(new hex::location(previous_loc_));
 	} else if(key == "members") {
 		std::vector<variant> members;
 		foreach(const character_ptr& c, members_) {

@@ -15,6 +15,7 @@
 
 #include <string>
 
+#include "formula_callable.hpp"
 #include "item_fwd.hpp"
 #include "wml_node_fwd.hpp"
 
@@ -23,7 +24,7 @@ namespace game_logic
 
 class equipment;
 
-class item
+class item : public formula_callable
 {
 public:
 	static void initialize(const wml::const_node_ptr& node);
@@ -45,6 +46,7 @@ public:
 
 	static const std::string& type_name(ITEM_TYPE type);
 private:
+	virtual variant get_value(const std::string& key) const;
 	std::string id_;
 	ITEM_TYPE type_;
 	std::string class_;

@@ -21,6 +21,7 @@
 #include "battle_move_fwd.hpp"
 #include "character_fwd.hpp"
 #include "formula.hpp"
+#include "formula_callable.hpp"
 #include "item_fwd.hpp"
 #include "skill_fwd.hpp"
 #include "terrain_feature_fwd.hpp"

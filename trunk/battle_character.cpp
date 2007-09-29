@@ -49,6 +49,10 @@ battle_character::battle_character(
 	loc_tracker_.add_vertex(-0.5, 0, 1.0);
 }
 
+battle_character::~battle_character()
+{
+}
+
 battle_character_ptr battle_character::make_battle_character(
           character_ptr ch, const party& p,
           const hex::location& loc, hex::DIRECTION facing,

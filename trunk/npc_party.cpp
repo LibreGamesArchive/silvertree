@@ -166,12 +166,12 @@ void npc_party::friendly_encounter(party& p)
 		return;
 	}
 
-	map_formula_callable callable;
-	callable.add("pc", variant(&p));
-	callable.add("npc", variant(this));
-	callable.add("world", variant(&game_world()));
-	callable.add("var", variant(&global_game_state::get().get_variables()));
-	game_world().fire_event("encounter", callable);
+	map_formula_callable_ptr callable(new map_formula_callable);
+	callable->add("pc", variant(&p))
+	         .add("npc", variant(this))
+	         .add("world", variant(&game_world()))
+	         .add("var", variant(&global_game_state::get().get_variables()));
+	game_world().fire_event("encounter", *callable);
 	dialog_sequence(dialog_, *this, p);
 }
 

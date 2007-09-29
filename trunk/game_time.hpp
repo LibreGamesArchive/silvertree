@@ -16,6 +16,7 @@
 #include <string>
 
 #include "formula.hpp"
+#include "formula_callable.hpp"
 #include "wml_node_fwd.hpp"
 
 namespace game_logic

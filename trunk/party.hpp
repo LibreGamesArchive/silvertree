@@ -20,6 +20,7 @@
 
 #include "character_fwd.hpp"
 #include "formula.hpp"
+#include "formula_callable.hpp"
 #include "gamemap.hpp"
 #include "game_time.hpp"
 #include "item_fwd.hpp"
@@ -37,7 +38,7 @@ class party : public formula_callable
 {
 public:
 	party(wml::const_node_ptr node, world& gameworld);
-	virtual ~party() {}
+	virtual ~party();
 
 	virtual wml::node_ptr write() const;
 
@@ -99,9 +100,8 @@ public:
 	void join_party(character_ptr new_char);
 	void merge_party(party& joining_party);
 
-	void acquire_item(item_ptr i) {
-		inventory_.push_back(i);
-	}
+	void acquire_item(item_ptr i);
+
 	const std::vector<item_ptr>& inventory() const {
 		return inventory_;
 	}

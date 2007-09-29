@@ -41,7 +41,7 @@ public:
 	battle_character(character_ptr ch, const party& p,
 	                 const hex::location& loc, hex::DIRECTION facing,
 					 const hex::gamemap& map, const game_time& time);
-	virtual ~battle_character() {}
+	virtual ~battle_character();
 
 	static battle_character_ptr
 	make_battle_character(character_ptr ch, const party& p,

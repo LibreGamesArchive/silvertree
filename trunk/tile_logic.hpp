@@ -17,6 +17,8 @@
 #include <vector>
 
 #include "formula.hpp"
+#include "formula_callable.hpp"
+#include "location_fwd.hpp"
 #include "wml_node_fwd.hpp"
 
 namespace hex

@@ -13,7 +13,7 @@
 #ifndef ITEM_FWD_HPP_INCLUDED
 #define ITEM_FWD_HPP_INCLUDED
 
-#include <boost/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 
 namespace game_logic
 {
@@ -21,10 +21,10 @@ namespace game_logic
 class item;
 class equipment;
 
-typedef boost::shared_ptr<item> item_ptr;
-typedef boost::shared_ptr<const item> const_item_ptr;
-typedef boost::shared_ptr<equipment> equipment_ptr;
-typedef boost::shared_ptr<const equipment> const_equipment_ptr;
+typedef boost::intrusive_ptr<item> item_ptr;
+typedef boost::intrusive_ptr<const item> const_item_ptr;
+typedef boost::intrusive_ptr<equipment> equipment_ptr;
+typedef boost::intrusive_ptr<const equipment> const_equipment_ptr;
 
 enum ITEM_TYPE { ITEM_NONE,
                  EQUIPMENT_WEAPON, EQUIPMENT_SHIELD, EQUIPMENT_ARMOR,

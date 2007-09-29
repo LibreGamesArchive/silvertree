@@ -187,8 +187,8 @@ extern "C" int main(int argc, char** argv)
 		return 0;
 	}
 
-	game_logic::world w(world_cfg);
-	w.play();
+	game_logic::world_ptr w(new game_logic::world(world_cfg));
+	w->play();
 
 	graphics::texture::clear_textures();
 

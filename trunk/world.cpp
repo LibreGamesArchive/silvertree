@@ -529,10 +529,10 @@ void world::play()
 			}
 
 			if(!scripted_moves) {
-				map_formula_callable script_callable;
-				script_callable.add("script", variant(script_));
+				map_formula_callable_ptr script_callable(new map_formula_callable);
+				script_callable->add("script", variant(script_));
 				script_.clear();
-				fire_event("finish_script", script_callable);
+				fire_event("finish_script", *script_callable);
 			}
 		}
 
