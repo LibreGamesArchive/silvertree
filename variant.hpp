@@ -29,6 +29,8 @@ public:
 	int as_int() const { must_be(TYPE_INT); return int_value_; }
 	bool as_bool() const { return int_value_ != 0; }
 
+	const std::string& as_string() const;
+
 	bool is_callable() const { return type_ == TYPE_CALLABLE; }
 	const game_logic::formula_callable* as_callable() const {
 		must_be(TYPE_CALLABLE); return callable_; }
@@ -51,6 +53,8 @@ public:
 
 	void serialize_to_string(std::string& str) const;
 	void serialize_from_string(const std::string& str);
+
+	std::string string_cast() const;
 
 private:
 

@@ -275,6 +275,8 @@ variant character::get_value(const std::string& key) const
 			static game_logic::equipment empty_weapon(EQUIPMENT_WEAPON);
 			return variant(&empty_weapon);
 		}
+	} else if(key == "description") {
+		return variant(description_);
 	}
 
 	return variant(base_stat(key));
@@ -419,7 +421,7 @@ int character::initiative() const
 
 int character::max_hitpoints() const
 {
-	return stat(MaxHitpointsStat);
+	return std::max<int>(1,stat(MaxHitpointsStat));
 }
 
 int character::speed() const

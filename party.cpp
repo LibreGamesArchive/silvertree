@@ -526,6 +526,9 @@ variant party::get_value(const std::string& key) const
 			members.push_back(variant(c.get()));
 		}
 		return variant(&members);
+	} else if(key == "leader") {
+		assert(!members_.empty());
+		return variant(members_.front().get());
 	} else if(key == str_id_) {
 		return variant(id_);
 	}
