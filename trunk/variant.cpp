@@ -121,6 +121,13 @@ size_t variant::num_elements() const
 	return list_->elements.size();
 }
 
+const std::string& variant::as_string() const
+{
+	must_be(TYPE_STRING);
+	assert(string_);
+	return string_->str;
+}
+
 variant variant::operator+(const variant& v) const
 {
 	must_be(TYPE_INT);
@@ -170,7 +177,6 @@ bool variant::operator==(const variant& v) const
 {
 	if(type_ == TYPE_STRING) {
 		v.must_be(TYPE_STRING);
-		std::cerr << "compare: '" << string_->str << "' vs '" << v.string_->str << "'\n";
 		return string_->str == v.string_->str;
 	}
 
@@ -254,4 +260,31 @@ void variant::serialize_to_string(std::string& str) const
 void variant::serialize_from_string(const std::string& str)
 {
 	*this = game_logic::formula(str).execute();
+}
+
+std::string variant::string_cast() const
+{
+	switch(type_) {
+	case TYPE_INT:
+		return boost::lexical_cast<std::string>(int_value_);
+	case TYPE_CALLABLE:
+		return "(object)";
+	case TYPE_LIST: {
+		std::string res = "";
+		foreach(const variant& var, list_->elements) {
+			if(!res.empty()) {
+				res += ", ";
+			}
+
+			res += var.string_cast();
+		}
+
+		return res;
+	}
+
+	case TYPE_STRING:
+		return string_->str;
+	default:
+		assert(false);
+	}
 }

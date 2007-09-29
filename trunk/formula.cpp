@@ -15,6 +15,7 @@
 #include <iostream>
 #include <vector>
 
+#include "foreach.hpp"
 #include "formula.hpp"
 #include "formula_tokenizer.hpp"
 #include "map_utils.hpp"
@@ -468,14 +469,51 @@ private:
 
 class string_expression : public formula_expression {
 public:
-	explicit string_expression(const std::string& str) : str_(str)
-	{}
+	explicit string_expression(std::string str)
+	{
+		std::string::iterator i;
+		while((i = std::find(str.begin(), str.end(), '{')) != str.end()) {
+			std::string::iterator j = std::find(i, str.end(), '}');
+			if(j == str.end()) {
+				break;
+			}
+
+			const std::string formula_str(i+1, j);
+			const int pos = i - str.begin();
+			str.erase(i, j+1);
+
+			substitution sub;
+			sub.pos = pos;
+			sub.calculation.reset(new formula(formula_str));
+			subs_.push_back(sub);
+		}
+
+		std::reverse(subs_.begin(), subs_.end());
+
+		str_ = variant(str);
+	}
 private:
 	variant execute(const formula_callable& variables) const {
-		return str_;
+		if(subs_.empty()) {
+			return str_;
+		} else {
+			std::string res = str_.as_string();
+			foreach(const substitution& sub, subs_) {
+				const std::string str = sub.calculation->execute(variables).string_cast();
+				res.insert(sub.pos, str);
+			}
+
+			return variant(res);
+		}
 	}
 
+	struct substitution {
+		int pos;
+		const_formula_ptr calculation;
+	};
+
 	variant str_;
+	std::vector<substitution> subs_;
 };
 
 using namespace formula_tokenizer;
@@ -677,6 +715,13 @@ expression_ptr parse_expression(const token* i1, const token* i2)
 
 }
 
+formula_ptr formula::create_string_formula(const std::string& str)
+{
+	formula_ptr res(new formula());
+	res->expr_.reset(new string_expression(str));
+	return res;
+}
+
 formula::formula(const std::string& str) : str_(str)
 {
 	using namespace formula_tokenizer;
@@ -736,16 +781,15 @@ class mock_char : public formula_callable {
 class mock_party : public formula_callable {
 	variant get_value(const std::string& key) const {
 		if(key == "members") {
-			variant m = create_list();
-
 			i_[0].add("strength",variant(12));
 			i_[1].add("strength",variant(16));
 			i_[2].add("strength",variant(14));
+			std::vector<variant> members;
 			for(int n = 0; n != 3; ++n) {
-				m.add_element(variant(&i_[n]));
+				members.push_back(variant(&i_[n]));
 			}
 
-			return m;
+			return variant(&members);
 		} else if(key == "char") {
 			return variant(&c_);
 		} else {
@@ -797,8 +841,13 @@ int main()
 		assert(formula("char.strength * ability where ability=3").execute(p).as_int() == 45);
 		assert(formula("'abcd' = 'abcd'").execute(p).as_bool() == true);
 		assert(formula("'abcd' = 'acd'").execute(p).as_bool() == false);
+		assert(formula("'strength, agility: {strength}, {agility}'").execute(c).as_string() ==
+		               "strength, agility: 15, 12");
 		const int dice_roll = formula("3d6").execute().as_int();
 		assert(dice_roll >= 3 && dice_roll <= 18);
+
+		assert(formula::create_string_formula("Your strength is {strength}")->execute(c).as_string() ==
+						"Your strength is 15");
 	} catch(formula_error& e) {
 		std::cerr << "parse error\n";
 	}

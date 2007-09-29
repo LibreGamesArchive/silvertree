@@ -66,12 +66,17 @@ public:
 			return default_res;
 		}
 	}
+
+	// function which will create a formula that is a single string literal, 'str'.
+	// 'str' should not be enclosed in quotes.
+	static formula_ptr create_string_formula(const std::string& str);
 	explicit formula(const std::string& str);
 	variant execute(const formula_callable& variables) const;
 	variant execute() const;
 	const std::string& str() const { return str_; }
 
 private:
+	formula() {}
 	expression_ptr expr_;
 	std::string str_;
 };

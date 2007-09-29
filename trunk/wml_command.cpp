@@ -138,7 +138,7 @@ public:
 
 class dialog_command : public wml_command {
 	formula pc_formula_, npc_formula_;
-	std::string text_;
+	const_formula_ptr text_;
 	std::vector<std::string> options_;
 	std::vector<std::vector<const_wml_command_ptr> > consequences_;
 	void do_execute(const formula_callable& info, world& world) const {
@@ -151,7 +151,7 @@ class dialog_command : public wml_command {
 			return;
 		}
 
-		gui::message_dialog dialog(*pc_party, *npc_party, text_,
+		gui::message_dialog dialog(*pc_party, *npc_party, text_->execute(info).as_string(),
 		                           options_.empty() ? NULL : &options_,
 								   false);
 		dialog.show_modal();
@@ -169,7 +169,7 @@ public:
 	explicit dialog_command(wml::const_node_ptr node)
 	   : pc_formula_(wml::get_str(node, "pc", "pc")),
 		 npc_formula_(wml::get_str(node, "npc", "npc")),
-		 text_(wml::get_str(node, "text"))
+		 text_(formula::create_string_formula(wml::get_str(node, "text")))
 	{
 		wml::node::const_child_range options = node->get_child_range("option");
 		while(options.first != options.second) {
