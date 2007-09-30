@@ -219,9 +219,6 @@ void character_status_dialog::init()
 	button_ptr add_skill_button(new button(ptr(new label("Learn Skill", color)), skill_callback));
 	add_widget(add_skill_button);
 
-	// came from here
-
-
 	widget_ptr close_label(new label("Close",color));
 	callback_ptr close_callback(new gui::close_dialog_callback(this));
 	button_ptr close_button(new button(close_label,close_callback));
