@@ -68,7 +68,7 @@ inline bool frustum::intersects(const tile& t) {
 	}
 	plane_misses[6] = calculate_misses(t.center_);
 
-	Uint32 all_plane_miss = -1;
+	Uint32 all_plane_miss = static_cast<Uint32>(-1);
 	for(int i=0;i<7;++i) {
 		all_plane_miss &= plane_misses[i];
 	}
