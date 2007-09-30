@@ -113,6 +113,16 @@ void character_status_dialog::init()
 		  add_col(lb.create("vision","vision_tip")).
 		  add_col(lb.create(formatter() << c->vision())).
 		  add_col(lb.create(""));
+
+	const std::string optional_stats[] = {"track", "heal"};
+	for(int n = 0; n != sizeof(optional_stats)/sizeof(*optional_stats); ++n) {
+		const int val = c->stat(optional_stats[n]);
+		if(val) {
+			grid->add_col(lb.create(optional_stats[n], optional_stats[n] + "_tip")).
+			      add_col(lb.create(formatter() << val)).
+				  add_col(lb.create(""));
+		}
+	}
 	grid->set_col_width(0,60).set_col_width(1,60).set_col_width(2,60)
 	     .set_align(1,grid::ALIGN_RIGHT).set_align(2,grid::ALIGN_RIGHT);
 	add_widget(grid, MOVE_RIGHT);
