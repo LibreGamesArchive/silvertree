@@ -22,9 +22,9 @@
 #include "sdl_algo.hpp"
 #include "string_utils.hpp"
 
-#ifdef __APPLE__
+//#ifdef __APPLE__
 #define SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-#endif
+//#endif
 
 namespace graphics
 {
