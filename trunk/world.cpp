@@ -114,11 +114,32 @@ world::world(wml::const_node_ptr node)
 	wml::node::const_child_iterator e1 = node->begin_child("exit");
 	const wml::node::const_child_iterator e2 = node->end_child("exit");
 	for(; e1 != e2; ++e1) {
-		hex::location loc1(wml::get_attr<int>(e1->second,"x"),
-		                   wml::get_attr<int>(e1->second,"y"));
+		hex::location loc1(wml::get_attr<int>(e1->second,"x", -1),
+		                   wml::get_attr<int>(e1->second,"y", -1));
 		hex::location loc2(wml::get_attr<int>(e1->second,"xdst",-1),
 		                   wml::get_attr<int>(e1->second,"ydst",-1));
-		exits_[loc1] = loc2;
+
+		const std::string& form = e1->second->attr("formula");
+		if(!form.empty()) {
+			const int begin = SDL_GetTicks();
+			formula f(form);
+			hex::location_ptr loc_ptr(new hex::location);
+			for(int x = 0; x != map_.size().x(); ++x) {
+				for(int y = 0; y != map_.size().y(); ++y) {
+					*loc_ptr = hex::location(x,y);
+					if(f.execute(*loc_ptr).as_bool()) {
+						exits_[*loc_ptr] = loc2;
+					}
+				}
+			}
+
+			const int time = SDL_GetTicks() - begin;
+			std::cerr << "time: " << time << "\n";
+		}
+
+		if(loc1.valid()) {
+			exits_[loc1] = loc2;
+		}
 	}
 
 	const std::vector<wml::const_node_ptr> portals = wml::child_nodes(node, "portal");
