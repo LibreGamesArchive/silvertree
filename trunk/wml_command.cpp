@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 
+#include "battle.hpp"
+#include "battle_character.hpp"
+#include "battle_map_generator.hpp"
 #include "foreach.hpp"
 #include "formula.hpp"
 #include "message_dialog.hpp"
@@ -136,6 +139,61 @@ public:
 	}
 };
 
+class battle_command : public wml_command {
+	formula loc_;
+	formula pc_chars_, npc_chars_;
+	formula pc_party_, npc_party_;
+	const_wml_command_ptr onvictory_, ondefeat_;
+	void do_execute(const formula_callable& info, world& world) const {
+		const hex::location_ptr battle_loc(loc_.execute(info).convert_to<hex::location>());
+		boost::shared_ptr<hex::gamemap> battle_map =
+				generate_battle_map(world.map(), *battle_loc);
+		party_ptr pc_party(pc_party_.execute(info).convert_to<party>());
+		party_ptr npc_party(npc_party_.execute(info).convert_to<party>());
+		
+		std::vector<battle_character_ptr> chars;
+
+		variant pc_chars = pc_chars_.execute(info);
+		for(int n = 0; n != pc_chars.num_elements(); ++n) {
+			character_ptr c(pc_chars[n].convert_to<character>());
+			hex::location loc(2 + n, 2);
+			chars.push_back(battle_character::make_battle_character(
+							c, *pc_party, loc, hex::NORTH, *battle_map, world.current_time()));
+		}
+
+		variant npc_chars = npc_chars_.execute(info);
+		for(int n = 0; n != npc_chars.num_elements(); ++n) {
+			character_ptr c(npc_chars[n].convert_to<character>());
+			hex::location loc(2 + n, 8);
+			chars.push_back(battle_character::make_battle_character(
+							c, *npc_party, loc, hex::NORTH, *battle_map, world.current_time()));
+		}
+
+		battle b(chars, *battle_map);
+		b.play();
+
+		const bool victory = npc_party->is_destroyed();
+		if(victory && onvictory_) {
+			onvictory_->execute(info, world);
+		}
+
+		if(!victory && ondefeat_) {
+			ondefeat_->execute(info, world);
+		}
+	}
+public:
+	explicit battle_command(wml::const_node_ptr node)
+		: loc_(wml::get_str(node, "loc", "npc.loc")),
+		  pc_chars_(wml::get_str(node, "pc_chars", "pc.members")),
+		  npc_chars_(wml::get_str(node, "npc_chars", "npc.members")),
+		  pc_party_(wml::get_str(node, "pc_party", "pc")),
+		  npc_party_(wml::get_str(node, "npc_party", "npc")),
+		  onvictory_(wml_command::create(node->get_child("onvictory"))),
+		  ondefeat_(wml_command::create(node->get_child("ondefeat")))
+	{
+	}
+};
+
 class dialog_command : public wml_command {
 	formula pc_formula_, npc_formula_;
 	const_formula_ptr text_;
@@ -192,6 +250,10 @@ public:
 
 const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 {
+	if(!node) {
+		return const_wml_command_ptr();
+	}
+
 #define DEFINE_COMMAND(cmd) \
 	if(node->name() == #cmd) { \
 		return const_wml_command_ptr(new cmd##_command(node)); \
@@ -203,6 +265,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	DEFINE_COMMAND(scripted_moves);
 	DEFINE_COMMAND(execute_script);
 	DEFINE_COMMAND(modify_objects);
+	DEFINE_COMMAND(battle);
 	DEFINE_COMMAND(dialog);
 
 	return const_wml_command_ptr();

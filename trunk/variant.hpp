@@ -12,6 +12,10 @@ class formula_callable;
 struct variant_list;
 struct variant_string;
 
+struct type_error {
+	explicit type_error(const std::string& str) {}
+};
+
 class variant {
 public:
 	explicit variant(int n=0);
@@ -34,8 +38,19 @@ public:
 	bool is_callable() const { return type_ == TYPE_CALLABLE; }
 	const game_logic::formula_callable* as_callable() const {
 		must_be(TYPE_CALLABLE); return callable_; }
-	game_logic::formula_callable* mutable_callable() {
+	game_logic::formula_callable* mutable_callable() const {
 		must_be(TYPE_CALLABLE); return mutable_callable_; }
+
+	template<typename T>
+	T* convert_to() const {
+		must_be(TYPE_CALLABLE);
+		T* res = dynamic_cast<T*>(mutable_callable());
+		if(!res) {
+			throw type_error("could not convert type");
+		}
+
+		return res;
+	}
 
 	variant operator+(const variant&) const;
 	variant operator-(const variant&) const;
@@ -71,10 +86,6 @@ private:
 
 	void increment_refcount();
 	void release();
-};
-
-struct type_error {
-	explicit type_error(const std::string& str) {}
 };
 
 #endif
