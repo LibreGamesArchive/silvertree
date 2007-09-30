@@ -71,7 +71,8 @@ world::world(wml::const_node_ptr node)
 	: compass_(graphics::texture::get(graphics::surface_cache::get("compass-rose.png"))),
 	  map_(get_map_data(node)), camera_(map_),
 	  camera_controller_(camera_),
-	  time_(node), subtime_(0.0), tracks_(map_)
+	  time_(node), subtime_(0.0), tracks_(map_),
+	  border_tile_(wml::get_str(node, "border_tile"))
 {
 	show_grid_ = false;
 
@@ -150,6 +151,8 @@ wml::node_ptr world::write() const
 		res->set_attr("ambient_light", ambient_light_->str());
 	}
 
+	res->set_attr("border_tile", border_tile_);
+
 	for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
 		res->add_child(i->second->write());
 	}
@@ -221,7 +224,32 @@ void world::get_matching_parties(const formula* filter, std::vector<party_ptr>& 
 		}
 	}
 }
-	hex::frustum view_volume;
+
+namespace {
+hex::frustum view_volume;
+}
+
+const hex::tile* world::get_tile_including_outside(const hex::location& loc) const
+{
+	if(map_.is_loc_on_map(loc)) {
+		return &map_.get_tile(loc);
+	} else {
+		// the location is off the map. See if there is a default tile to use.
+		if(border_tile_.empty()) {
+			return NULL;
+		} else {
+			boost::shared_ptr<hex::tile>& ptr = outside_tiles_[loc];
+			if(!ptr) {
+				std::cerr << "init tiles..\n";
+				ptr.reset(new hex::tile(loc, border_tile_));
+				ptr->init_corners();
+				ptr->init_normals();
+			}
+
+			return ptr.get();
+		}
+	}
+}
 
 void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 {
@@ -244,7 +272,8 @@ void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 	while(!done) {
 		for(int n = 0; n != 6; ++n) {
 			hex_dir[n] = hex::tile_in_direction(hex_dir[n], static_cast<hex::DIRECTION>(n));
-			if(!map_.is_loc_on_map(hex_dir[n]) || !view_volume.intersects(map_.get_tile(hex_dir[n]))) {
+			const hex::tile* t = get_tile_including_outside(hex_dir[n]);
+			if(!t || !view_volume.intersects(*t)) {
 				done = true;
 				break;
 			}
@@ -263,11 +292,12 @@ void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 		tiles_tried += hexes.size();
 		done = true;
 		foreach(const hex::location& loc, hexes) {
-			if(!map_.is_loc_on_map(loc)) {
+			const hex::tile* tile_ptr = get_tile_including_outside(loc);
+			if(!tile_ptr) {
 				continue;
 			}
 
-			const hex::tile& t = map_.get_tile(loc);
+			const hex::tile& t = *tile_ptr;
 			if(radius >= core_radius && !view_volume.intersects(t)) {
 				//see if this tile has a cliff which is visible, in which case we should draw it.
 				const hex::tile* cliffs[6];

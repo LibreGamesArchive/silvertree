@@ -143,6 +143,12 @@ private:
 	//if there is currently a set of scripted actions being run, the name
 	//will be recorded here.
 	std::string script_;
+
+	std::string border_tile_;
+
+	const hex::tile* get_tile_including_outside(const hex::location& loc) const;
+	typedef std::map<hex::location,boost::shared_ptr<hex::tile> > outside_tiles_map;
+	mutable outside_tiles_map outside_tiles_;
 };
 		
 }
