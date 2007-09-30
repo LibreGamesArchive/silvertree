@@ -224,6 +224,7 @@ void status_bars_widget::handle_draw() const {
 		} 
 	}
 
+	SDL_Color energy_color = {255,0,255};
 	SDL_Color time_waited_color = {1,195,255};
 	SDL_Color time_to_go_color = {13,20,108};
 	SDL_Color healthy_color = { 15, 87, 5 };
@@ -239,6 +240,13 @@ void status_bars_widget::handle_draw() const {
 	glTranslatef(bcircle[0], bcircle[1], 0);
 
 	GLfloat px_radius = bcircle[2] * 0.5 * M_PI/180.0;
+
+	// draw the character's magic energy
+	if(ch_->energy() > 0) {
+		glColor4ub(energy_color.r, energy_color.g, energy_color.b, 255);
+		gluPartialDisk(quad.get(), bcircle[2]*6/10-1, bcircle[2]*8/10+1, 16, 1,
+		               -20, -20 - std::min<int>(ch_->energy(),25)*5);
+	}
 
 	glColor4ub(0,0,0,255);
 	gluPartialDisk(quad.get(), bcircle[2]*9/10-1, bcircle[2]*11/10+1, 16, 1, 

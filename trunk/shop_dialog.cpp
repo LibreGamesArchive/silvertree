@@ -30,6 +30,7 @@ shop_dialog::shop_dialog(game_logic::party& party, int cost,
                          const std::string& items_str)
    : dialog(0,0,1024,768), party_(party), cost_(cost)
 {
+	std::cerr << "COST: " << cost_ << "\n";
 	const std::vector<std::string> items = util::split(items_str);
 	foreach(const std::string& str, items) {
 		std::cerr << "adding item: '" << str << "'\n";

@@ -108,9 +108,10 @@ skill::skill(const wml::const_node_ptr& node)
 		}
 	}
 
-	wml::const_node_ptr move = node->get_child("move");
-	if(move) {
-		move_.reset(new battle_move(move));
+	for(wml::node::const_child_range r = node->get_child_range("move");
+	    r.first != r.second; ++r.first) {
+		wml::const_node_ptr move = r.first->second;
+		moves_.push_back(const_battle_move_ptr(new battle_move(move)));
 	}
 }
 

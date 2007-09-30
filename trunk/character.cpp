@@ -303,8 +303,10 @@ void character::calculate_moves()
 	moves_.push_back(battle_move::standard_attack());
 	moves_.push_back(battle_move::standard_pass());
 	foreach(const const_skill_ptr& s, skills_) {
-		if(s->is_active(*this) && s->move()) {
-			moves_.push_back(s->move());
+		if(s->is_active(*this)) {
+			foreach(const const_battle_move_ptr& move, s->moves()) {
+				moves_.push_back(move);
+			}
 		}
 	}
 }

@@ -86,6 +86,16 @@ world::world(wml::const_node_ptr node)
 		ambient_light_.reset(new formula(ambient_light));
 	}
 
+	const std::string& party_light = wml::get_str(node, "party_light");
+	if(!party_light.empty()) {
+		party_light_.reset(new formula(party_light));
+	}
+
+	const std::string& party_light_power = wml::get_str(node, "party_light_power");
+	if(!party_light_power.empty()) {
+		party_light_power_.reset(new formula(party_light_power));
+	}
+
 	wml::node::const_child_iterator p1 = node->begin_child("party");
 	const wml::node::const_child_iterator p2 = node->end_child("party");
 	for(; p1 != p2; ++p1) {
@@ -170,6 +180,14 @@ wml::node_ptr world::write() const
 
 	if(ambient_light_) {
 		res->set_attr("ambient_light", ambient_light_->str());
+	}
+
+	if(party_light_) {
+		res->set_attr("party_light", party_light_->str());
+	}
+
+	if(party_light_power_) {
+		res->set_attr("party_light_power", party_light_power_->str());
 	}
 
 	res->set_attr("border_tile", border_tile_);
@@ -820,6 +838,32 @@ void world::set_lighting() const
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+
+	int party_light = 0, party_light_power = 0;
+	if(focus_ && party_light_ && party_light_power_) {
+		party_light = party_light_->execute(time_).as_int();
+		party_light_power = party_light_power_->execute(time_).as_int();
+	}
+
+	if(party_light && party_light_power) {
+		GLfloat position[] = { 0.0, 0.0, 0.0, 1.0 };
+		focus_->get_pos(position);
+		position[2] += 5.0;
+		glEnable(GL_LIGHT4);
+		GLfloat ambient[] = {0.0,0.0,0.0,0.0};
+		GLfloat diffuse[] = {1.0,1.0,1.0,1.0};
+		diffuse[0] = GLfloat((party_light/10000)%100)/100.0;
+		diffuse[1] = GLfloat((party_light/100)%100)/100.0;
+		diffuse[2] = GLfloat(party_light%100)/100.0;
+
+		glLightfv(GL_LIGHT4, GL_POSITION, position);
+		glLightfv(GL_LIGHT4, GL_AMBIENT, ambient);
+		glLightfv(GL_LIGHT4, GL_DIFFUSE, diffuse);
+		glLightf(GL_LIGHT4, GL_CONSTANT_ATTENUATION, 0.0);
+		glLightf(GL_LIGHT4, GL_QUADRATIC_ATTENUATION, GLfloat(party_light_power)/100.0);
+	} else {
+		glDisable(GL_LIGHT4);
+	}
 }
 
 void world::fire_event(const std::string& name, const formula_callable& info)
