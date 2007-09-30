@@ -8,6 +8,7 @@
 #include "formula.hpp"
 #include "message_dialog.hpp"
 #include "party.hpp"
+#include "shop_dialog.hpp"
 #include "wml_command.hpp"
 #include "wml_node.hpp"
 #include "wml_utils.hpp"
@@ -139,6 +140,19 @@ public:
 	}
 };
 
+class shop_command : public wml_command {
+	std::string items_;
+	formula cost_;
+	formula pc_;
+	void do_execute(const formula_callable& info, world& world) const {
+		game_dialogs::shop_dialog(*pc_.execute(info).convert_to<party>(), cost_.execute(info).as_int(), items_).show_modal();
+	}
+public:
+	explicit shop_command(wml::const_node_ptr node)
+	   : items_(node->attr("items")), cost_(wml::get_str(node, "cost", "100")), pc_(wml::get_str(node, "pc", "pc"))
+	{}
+};
+
 class battle_command : public wml_command {
 	formula loc_;
 	formula pc_chars_, npc_chars_;
@@ -267,6 +281,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	DEFINE_COMMAND(modify_objects);
 	DEFINE_COMMAND(battle);
 	DEFINE_COMMAND(dialog);
+	DEFINE_COMMAND(shop);
 
 	return const_wml_command_ptr();
 }
