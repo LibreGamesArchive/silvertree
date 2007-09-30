@@ -132,7 +132,7 @@ private:
 
 	std::map<hex::location,hex::location> exits_;
 
-	const_formula_ptr sun_light_, ambient_light_;
+	const_formula_ptr sun_light_, ambient_light_, party_light_, party_light_power_;
 
 	typedef std::multimap<std::string,event_handler> event_map;
 	event_map handlers_;

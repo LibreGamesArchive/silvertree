@@ -455,6 +455,12 @@ int party::heal() const
 	return aggregate_stat_max(Stat);
 }
 
+int party::haggle() const
+{
+	static const std::string Stat = "haggle";
+	return aggregate_stat_max(Stat);
+}
+
 int party::trackability() const
 {
 	return members_.size()*100;
@@ -539,6 +545,8 @@ variant party::get_value(const std::string& key) const
 	} else if(key == "leader") {
 		assert(!members_.empty());
 		return variant(members_.front().get());
+	} else if(key == "haggle") {
+		return variant(haggle());
 	} else if(key == str_id_) {
 		return variant(id_);
 	}

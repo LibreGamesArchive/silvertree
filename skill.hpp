@@ -49,8 +49,8 @@ public:
 	const std::string& prerequisite() const { return prerequisite_; }
 
 	int effect_on_stat(const character& c, const std::string& stat) const;
-	const const_battle_move_ptr& move() const {
-		return move_;
+	const std::vector<const_battle_move_ptr>& moves() const {
+		return moves_;
 	}
 
 	bool is_active(const character& c) const;
@@ -62,7 +62,7 @@ private:
 	std::string prerequisite_;
 	std::vector<skill_requirement_ptr> requirements_;
 	std::map<std::string,const_formula_ptr> effects_;
-	const_battle_move_ptr move_;
+	std::vector<const_battle_move_ptr> moves_;
 	formula cost_;
 };
 

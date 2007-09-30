@@ -697,6 +697,7 @@ void battle::attack_character(battle_character& attacker,
 	defender.end_facing_change();
 
 	attacker.set_time_until_next_move(stats.time_taken);
+	(*focus_)->use_energy(attack_move.energy_required());
 
 	int damage = stats.damage;
 	if(random <= stats.defense) {
@@ -791,6 +792,7 @@ void battle::target_mod(battle_character& caster,
 	assert(move.mod());
 	const battle_modification& mod = *move.mod();
 	caster.set_time_until_next_move(time_to_perform);
+	caster.use_energy(move.energy_required());
 	const battle_modification::TARGET_TYPE type = mod.target();
 	const int radius = mod.radius();
 	std::vector<hex::location> locs;
