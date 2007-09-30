@@ -11,6 +11,7 @@
    See the COPYING file for more details.
 */
 #include "tooltip.hpp"
+#include "translate.hpp"
 #include "widget.hpp"
 
 #include <iostream>
@@ -47,7 +48,7 @@ void widget::set_tooltip(const std::string& str)
 		gui::remove_tooltip(tooltip_);
 		tooltip_displayed_ = false;
 	}
-	tooltip_.reset(new std::string(str));
+	tooltip_.reset(new std::string(i18n::translate(str)));
 }
 
 bool widget::process_event(const SDL_Event& event)
