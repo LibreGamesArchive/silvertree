@@ -260,12 +260,19 @@ public:
 	}
 };
 
+class null_command : public wml_command
+{
+	void do_execute(const formula_callable& info, world& world) const {
+	}
+};
+
 }
 
 const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 {
+	static const_wml_command_ptr empty_command(new null_command);
 	if(!node) {
-		return const_wml_command_ptr();
+		return empty_command;
 	}
 
 #define DEFINE_COMMAND(cmd) \
@@ -283,7 +290,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	DEFINE_COMMAND(dialog);
 	DEFINE_COMMAND(shop);
 
-	return const_wml_command_ptr();
+	return empty_command;
 }
 
 }

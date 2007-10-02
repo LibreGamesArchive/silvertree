@@ -167,6 +167,11 @@ world::world(wml::const_node_ptr node)
 		const std::string& name = event->attr("event");
 		add_event_handler(name, handler);
 	}
+
+	wml::const_node_ptr tracks = node->get_child("tracks");
+	if(tracks) {
+		tracks_.read(tracks);
+	}
 }
 
 wml::node_ptr world::write() const
@@ -214,6 +219,8 @@ wml::node_ptr world::write() const
 		event->set_attr("event", i->first);
 		res->add_child(event);
 	}
+
+	res->add_child(tracks_.write());
 
 	return res;
 }
