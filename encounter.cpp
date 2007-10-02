@@ -80,7 +80,10 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 	if(p1->is_destroyed() == false) {
 		foreach(const character_ptr& c, p1->members()) {
 			if(!c->dead()) {
-				c->award_experience(xp2);
+				//now gets awarded in the post battle dialog, but
+				//later when there are NPC vs NPC fights we should still
+				//award experience to NPCs here
+				//c->award_experience(xp2);
 			} else {
 				c->set_to_near_death();
 			}
@@ -90,7 +93,7 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 	if(p2->is_destroyed() == false) {
 		foreach(const character_ptr& c, p2->members()) {
 			if(!c->dead()) {
-				c->award_experience(xp1);
+				//c->award_experience(xp1);
 			} else {
 				c->set_to_near_death();
 			}

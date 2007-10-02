@@ -49,7 +49,7 @@ wml::node_ptr settlement::write() const
 	}
 	typedef std::pair<hex::location, hex::location> LocPair;
 	foreach(const LocPair& locs, portals_) {
-		res->add_child(write_src_dst_location("portal", locs.second, locs.first));
+		res->add_child(write_src_dst_location("portal", locs.first, locs.second));
 	}
 
 	return res;

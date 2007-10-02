@@ -8,6 +8,7 @@
 #include "gamemap.hpp"
 #include "party_fwd.hpp"
 #include "tile_logic.hpp"
+#include "wml_node_fwd.hpp"
 
 namespace game_logic
 {
@@ -16,6 +17,8 @@ class tracks {
 public:
 	explicit tracks(const hex::gamemap& m) : map_(m)
 	{}
+	void read(const wml::const_node_ptr& node);
+	wml::node_ptr write() const;
 	void add_tracks(const hex::location& loc, const party& p,
 	                const game_time& t, hex::DIRECTION dir);
 
