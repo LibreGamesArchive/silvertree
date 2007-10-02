@@ -197,11 +197,11 @@ wml::node_ptr world::write() const
 	}
 
 	for(std::map<hex::location,hex::location>::const_iterator i = exits_.begin(); i != exits_.end(); ++i) {
-		wml::node_ptr portal(new wml::node("portal"));
-		portal->set_attr("xdst", boost::lexical_cast<std::string>(i->first.x()));
-		portal->set_attr("ydst", boost::lexical_cast<std::string>(i->first.y()));
-		portal->set_attr("xsrc", boost::lexical_cast<std::string>(i->second.x()));
-		portal->set_attr("ysrc", boost::lexical_cast<std::string>(i->second.y()));
+		wml::node_ptr portal(new wml::node("exit"));
+		portal->set_attr("x", boost::lexical_cast<std::string>(i->first.x()));
+		portal->set_attr("y", boost::lexical_cast<std::string>(i->first.y()));
+		portal->set_attr("xdst", boost::lexical_cast<std::string>(i->second.x()));
+		portal->set_attr("ydst", boost::lexical_cast<std::string>(i->second.y()));
 		res->add_child(portal);
 	}
 
@@ -448,10 +448,14 @@ void world::draw() const
 		glEnable(GL_LIGHTING);
 	}
 	
+	std::vector<const_party_ptr> enemies;
 	for(party_map::const_iterator i = parties_.begin();
 	    i != parties_.end(); ++i) {
 		if(visible.count(i->second->loc())) {
 			i->second->draw();
+			if(focus_ && i->second->is_enemy(*focus_)) {
+				enemies.push_back(i->second);
+			}
 		}
 	}
 	
@@ -463,6 +467,31 @@ void world::draw() const
 			i->second->draw();
 			seen_settlements.push_back(i->second);
 		}
+	}
+
+	if(!enemies.empty()) {
+		glDisable(GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_ALPHA_TEST);
+		glDisable(GL_BLEND);
+		glBegin(GL_LINES);
+		glColor4ub(255, 0, 0, 255);
+		foreach(const const_party_ptr& p, enemies) {
+			GLfloat from[3];
+			GLfloat to[3];
+			focus_->get_pos(from);
+			p->get_pos(to);
+			std::cerr << "LINE: " <<p->id() << "\n";
+			from[2] += 0.5;
+			to[2] += 0.5;
+			glVertex3fv(from);
+			glVertex3fv(to);
+		}
+		glEnd();
+		glEnable(GL_ALPHA_TEST);
+		glEnable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_LIGHTING);
 	}
 
 	particle_system_.draw();
