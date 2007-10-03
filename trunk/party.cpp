@@ -65,6 +65,11 @@ party::party(wml::const_node_ptr node, world& gameworld)
 	if(!items_csv.empty()) {
 		const std::vector<std::string> items = util::split(items_csv, ',');
 		foreach(const std::string& id, items) {
+			game_logic::const_item_ptr i = game_logic::item::get(id);
+			if(!i) {
+				std::cerr << "ERROR: unrecognized item: '" << id << "'\n";
+				continue;
+			}
 			inventory_.push_back(game_logic::item_ptr(game_logic::item::get(id)->clone()));
 		}
 	}
@@ -111,7 +116,7 @@ wml::node_ptr party::write() const
 
 	std::string items;
 	foreach(const_item_ptr it, inventory_) {
-		if(items.empty()) {
+		if(!items.empty()) {
 			items += ",";
 		}
 
