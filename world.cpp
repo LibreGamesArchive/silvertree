@@ -488,7 +488,6 @@ void world::draw() const
 			GLfloat to[3];
 			focus_->get_pos(from);
 			p->get_pos(to);
-			std::cerr << "LINE: " <<p->id() << "\n";
 			from[2] += 0.5;
 			to[2] += 0.5;
 			glVertex3fv(from);

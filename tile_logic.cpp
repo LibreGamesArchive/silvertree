@@ -113,7 +113,7 @@ location tile_in_direction(const location& a, DIRECTION dir)
 		case NORTH_WEST:
 			return location(a.x()-1,a.y() - (is_even(a.x()) ? 1:0));
 		default:
-			std::cerr << "BAD DIRECTION!\n";
+			assert(false);
 			return location();
 	}
 }
