@@ -178,7 +178,7 @@ void skinned_widget::inner_set_loc(int x, int y)
 	widget::set_loc(x,y);
 }
 
-bool button_widget::hit_me(const SDL_Event &e) {
+bool skinned_widget::hit_me(const SDL_Event &e) {
 	switch(e.type) {
 	case SDL_MOUSEBUTTONUP:
 	case SDL_MOUSEBUTTONDOWN:
@@ -272,7 +272,7 @@ bool button_widget::handle_event(const SDL_Event &e)
 	default:
 		break;
 	}
-
+	
 	return claimed;
 }	   
 
@@ -473,25 +473,6 @@ void menu_widget::set_option_enabled(int opt, bool enabled) {
 	} else {
 		options_[opt]->set_state(menu_option::DISABLED);
 	}
-}
-
-bool menu_widget::hit_me(const SDL_Event &e) 
-{
-	int mx, my;
-	switch(e.type) {
-	case SDL_MOUSEBUTTONDOWN:
-	case SDL_MOUSEBUTTONUP:
-		mx = e.button.x;
-		my = e.button.y;
-		break;
-	case SDL_MOUSEMOTION:
-		mx = e.motion.x;
-		my = e.motion.y;
-		break;
-	default:
-		return false;
-	}
-	return mx > x() && mx < x() + width() && my > y() && my < y()+height();
 }
 
 int menu_widget::find_option(const SDL_Event &e) 

@@ -32,6 +32,12 @@ void label::set_color(const SDL_Color& color)
 	recalculate_texture();
 }
 
+void label::set_font_size(int size)
+{
+	size_ = size;
+	recalculate_texture();
+}
+
 void label::set_text(const std::string& text)
 {
 	text_ = i18n::translate(text);

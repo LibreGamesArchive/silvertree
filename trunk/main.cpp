@@ -39,6 +39,7 @@
 #include "preferences.hpp"
 #include "skill.hpp"
 #include "terrain_feature.hpp"
+#include "text_gui.hpp"
 #include "texture.hpp"
 #include "translate.hpp"
 #include "world.hpp"
@@ -49,7 +50,7 @@ extern "C" int main(int argc, char** argv)
 		return -1;
 	}
 
-	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0) {
+	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_NOPARACHUTE) < 0) {
 		std::cerr << "could not init SDL\n";
 		return -1;
 	}
@@ -72,6 +73,7 @@ extern "C" int main(int argc, char** argv)
 
 	graphics::font::manager font_manager;
 	graphics::texture::manager texture_manager;
+	gui::text::init();
 
 	wml::node_ptr rules_cfg;
 

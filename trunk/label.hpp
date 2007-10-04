@@ -38,6 +38,7 @@ public:
 	}
 	label(const std::string& text, const SDL_Color& color, int size=14);
 
+	void set_font_size(int font_size);
 	void set_color(const SDL_Color& color);
 	void set_text(const std::string& text);
 	void set_fixed_width(bool fixed_width);

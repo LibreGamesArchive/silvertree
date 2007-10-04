@@ -255,7 +255,7 @@ world::party_map::iterator world::add_party(party_ptr new_party)
 		std::cerr << "is human\n";
 		focus_ = new_party;
 		game_bar_.reset(new game_dialogs::game_bar(0, graphics::screen_height()-128, 
-							   graphics::screen_width(), 128, this, new_party));
+							   graphics::screen_width(), 128, new_party, this));
 		game_bar_->set_frame(gui::frame_manager::make_frame(game_bar_, "game-bar-frame"));
 	}
 
