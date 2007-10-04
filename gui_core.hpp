@@ -6,9 +6,11 @@
 #include "SDL.h"
 #include "boost/shared_ptr.hpp"
 
-#include "widget.hpp"
 #include "dialog.hpp"
 #include "frame.hpp"
+#include "label.hpp"
+#include "raster.hpp"
+#include "widget.hpp"
 
 namespace gui {
 
@@ -57,6 +59,7 @@ protected:
 	virtual void finish_draw() const {}
 	virtual void inner_set_loc(int x, int y);
 	virtual void inner_set_dim(int w, int h);
+	virtual bool hit_me(const SDL_Event &e);
 private:
 	void handle_draw() const;
 	bool valid_frame() const;
@@ -82,7 +85,6 @@ public:
 	void remove_hotkey() { has_hotkey_ = false; }
 protected:
 	virtual ~button_widget() {}
-	bool hit_me(const SDL_Event &e);
 private:
 	void do_click();
 	bool handle_event(const SDL_Event &e);
@@ -92,6 +94,26 @@ private:
 };
 
 typedef boost::shared_ptr<button_widget> button_widget_ptr;
+
+class labelled_button_widget: public button_widget {
+public:
+	labelled_button_widget() : label_(new label("", graphics::color_white())) {}
+
+	void set_label_color(const SDL_Color& color) { label_->set_color(color); }
+	void set_label_font_size(int size) { label_->set_font_size(size); }
+	void set_label_text(const std::string& text) { label_->set_text(text); }
+
+protected:
+	void inner_draw() const {
+		glPushMatrix();
+		glTranslatef(x()+(width() - label_->width())/2, 
+			     y()+(height()- label_->height())/2, 0);
+		label_->draw();
+		glPopMatrix();
+	}
+private:
+	label_ptr label_;
+};
 
 class scrolled_container : public widget {
 public:
@@ -188,7 +210,6 @@ protected:
 	virtual void option_selected(int option)=0;
 	virtual void rebuild_options() =0;
 	virtual void get_options_loc(int *x, int *y) =0;
-	bool hit_me(const SDL_Event &e);
 	int find_option(const SDL_Event &e);
 private:
 	std::map<int,std::string> option_skins_;
@@ -255,16 +276,18 @@ private:
 
 class framed_dialog: public dialog {
 public:
+	framed_dialog(int x, int y, int w, int h) 
+		: dialog(x,y,w,h), 
+		  nested_draw_(false), nested_set_dim_(false), nested_set_loc_(false) {}
+	virtual ~framed_dialog() {}
+
 	void set_frame(frame_ptr frame) { frame_ = frame; }
 	const frame_ptr get_frame() { return frame_; }
 	void set_loc(int x, int y);
 	void set_dim(int w, int h);
 protected:
-	framed_dialog(int x, int y, int w, int h) 
-		: dialog(x,y,w,h), 
-		  nested_draw_(false), nested_set_dim_(false), nested_set_loc_(false) {}
-	virtual ~framed_dialog() {}
 	void handle_draw_children() const;
+	bool handle_event(const SDL_Event &e) { return handle_event_children(e); }
 private:
 	void handle_draw() const;
 	virtual void inner_set_dim(int w, int h);
@@ -276,6 +299,8 @@ private:
 	frame_ptr frame_;
 	mutable bool nested_draw_, nested_set_dim_, nested_set_loc_;
 };
+
+typedef boost::shared_ptr<framed_dialog> framed_dialog_ptr;
 
 }
 

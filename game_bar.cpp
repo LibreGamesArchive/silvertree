@@ -7,19 +7,14 @@
 
 #include "character_equip_dialog.hpp"
 #include "character_status_dialog.hpp"
-#include "filesystem.hpp"
 #include "font.hpp"
 #include "game_bar.hpp"
-#include "global_game_state.hpp"
+#include "game_persistence.hpp"
 #include "image_widget.hpp"
 #include "learn_skills_dialog.hpp"
 #include "party_status_dialog.hpp"
-#include "preferences.hpp"
 #include "raster.hpp"
 #include "widget.hpp"
-#include "wml_parser.hpp"
-#include "wml_writer.hpp"
-#include "world.hpp"
 
 namespace game_dialogs {
 
@@ -33,7 +28,7 @@ bool game_bar::handle_event(const SDL_Event &e)
 	return handle_event_children(e);
 }
 
-void game_bar::construct_interface(const game_logic::world *wp, game_logic::party_ptr pty)
+void game_bar::construct_interface(game_logic::party_ptr pty, game_logic::world *wp)
 {
 	set_padding(0);
 	{
@@ -49,7 +44,7 @@ void game_bar::construct_interface(const game_logic::world *wp, game_logic::part
 	add_widget(party_button, dialog::MOVE_RIGHT);
 
 	// make  silvertree game_bar_button for the game menu, but add it later
-	gui::menu_widget_ptr game_button(new game_bar_game_button(*wp));
+	gui::menu_widget_ptr game_button(new game_bar_game_button(wp));
 	game_button->set_dim(game_button->width(), height());
 	game_button->set_hotkey(SDLK_ESCAPE, KMOD_NONE);
 	
@@ -198,9 +193,9 @@ void game_bar_portrait_button::construct_interface() {
 
 namespace {
 
-inline void draw_bar(int x, int y, int w, int h, int level, int max_level, 
-		     const SDL_Color& level_bar_color, const SDL_Color& max_bar_color,
-		     const SDL_Color& level_text_color, const SDL_Color& max_text_color)
+void draw_bar(int x, int y, int w, int h, int level, int max_level, 
+	      const SDL_Color& level_bar_color, const SDL_Color& max_bar_color,
+	      const SDL_Color& level_text_color, const SDL_Color& max_text_color)
 {
 	{
 		SDL_Rect r = { x, y, w, h };
@@ -284,11 +279,11 @@ void game_bar_portrait_button::inner_draw() const
 	rollin_menu_widget::inner_draw();
 }
 
-game_bar_game_button::game_bar_game_button(const game_logic::world& w)
+game_bar_game_button::game_bar_game_button(game_logic::world *wp)
 	: popup_menu_widget("game-bar-game-menu-option-text-frame", graphics::color_white(), 16,
 			    "game-bar-game-menu-option-frame", 
-			    "game-bar-game-menu-frame"),
-	  world_(w)
+			    "game-bar-game-menu-frame"), 
+	  wp_(wp)
 {
 	add_skin("game-bar-game-button-skin-normal", gui::popup_menu_widget::NORMAL);
 	add_skin("game-bar-game-button-skin-highlighted", gui::popup_menu_widget::HIGHLIGHTED);
@@ -308,23 +303,13 @@ game_bar_game_button::game_bar_game_button(const game_logic::world& w)
 	add_option("Quit", 4);
 	set_option_enabled(0, false);
 	set_option_enabled(1, false);
-	if(preference_save_file().empty()) {
-		set_option_enabled(2, false);
-	}
 	set_option_enabled(3, false);
 }
 
 void game_bar_game_button::option_selected(int opt) {
 	switch(opt) {
 	case 2: {
-		// save the game
-		std::string data;
-		assert(!game_logic::world::current_world_stack().empty());
-		wml::node_ptr node(new wml::node("game"));
-		node->add_child(game_logic::world::current_world_stack().front()->write());
-		game_logic::global_game_state::get().write(node);
-		wml::write(node, data);
-		sys::write_file(preference_save_file(), data);
+		game_dialogs::save("silvertree-save", wp_);
 		break;
 	}
 	case 4: {

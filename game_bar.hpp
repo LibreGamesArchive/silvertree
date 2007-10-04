@@ -12,14 +12,15 @@ namespace game_dialogs {
 
 class game_bar : public gui::framed_dialog {
 public:
-	game_bar(int x, int y, int w, int h, const game_logic::world* wp, game_logic::party_ptr pty) 
+	game_bar(int x, int y, int w, int h, game_logic::party_ptr pty,
+		 game_logic::world *wp) 
 		: gui::framed_dialog(x,y,w,h) {
-		construct_interface(wp, pty);
+		construct_interface(pty, wp);
 	}
 
 private:
 	bool handle_event(const SDL_Event &e);
-	void construct_interface(const game_logic::world *wp, game_logic::party_ptr pty);
+	void construct_interface(game_logic::party_ptr pty, game_logic::world *wp);
 	void inner_draw() const;
 };
 
@@ -69,11 +70,12 @@ private:
 
 class game_bar_game_button : public gui::popup_menu_widget {
 public:
-	explicit game_bar_game_button(const game_logic::world& w);
+	game_bar_game_button(game_logic::world *wp);
 	// more functionality later
 private:
 	void option_selected(int opt);
-	const game_logic::world& world_;
+	
+	game_logic::world *wp_;
 };
 
 }
