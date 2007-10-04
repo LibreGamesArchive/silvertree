@@ -69,31 +69,31 @@ void draw_time_bars(GLfloat time, GLfloat accounted_time, GLfloat start, GLfloat
 			   const SDL_Color& main_color, const SDL_Color& accounted_color, 
 			   GLUquadric *quad) 
 {
-	int cur_bar = 1;
-	GLfloat divisor = 1.0;
-	while(time / divisor > units) {
-		divisor *= units;
-		++cur_bar;
+	if(time == 0.0) {
+		return;
 	}
+
+	const int max_bar = static_cast<int>(time / units);
 	GLfloat cur_time = time;
 	GLfloat cur_accounted = accounted_time;
-	while(divisor > 1.0) {
-		const GLfloat bar_time = cur_time/divisor;
 
-		GLfloat bar_accounted = cur_accounted/divisor;
-		const GLfloat bar_inner = start + (1 + (cur_bar-1))*thickness;
-		const GLfloat bar_thickness = thickness/2;
-		draw_anchored_expanding_time_bar(bar_time, bar_accounted, units, start_ang, range, 10.0/14.0, bar_inner,
-						 bar_thickness, main_color, accounted_color, quad);
-		--cur_bar;
-		cur_time -= static_cast<int>(bar_time)*divisor;
-		cur_accounted -= static_cast<int>(bar_time)*divisor;
+	for(int cur_bar = 0; cur_bar < max_bar; ++cur_bar) {
+		GLfloat bar_accounted;
+		if(cur_accounted <= units) {
+			bar_accounted = cur_accounted;
+		} else {
+			bar_accounted = units;
+		}
+		const GLfloat bar_inner = start + (3/2)*cur_bar*thickness;
+		draw_anchored_expanding_time_bar(units, bar_accounted, units, start_ang, range, 10.0/14.0, bar_inner,
+						 thickness, main_color, accounted_color, quad);
+		cur_time -= units;
+		cur_accounted -= bar_accounted;
 		if(cur_accounted < 0) cur_accounted = 0;
-		divisor /= units;
 	}
+	draw_anchored_expanding_time_bar(cur_time, cur_accounted, units, start_ang, range, 10.0/14.0, 
+					 start + (3/2)*max_bar*thickness, thickness, main_color, accounted_color, quad);
 
-	draw_anchored_expanding_time_bar(cur_time, cur_accounted, units, start_ang, range, 10.0/14.0, start, 
-					 thickness, main_color, accounted_color, quad);
 }
 
 inline void smooth_transition(GLfloat& x, GLfloat& prev, GLfloat cur) {
@@ -104,11 +104,18 @@ inline void smooth_transition(GLfloat& x, GLfloat& prev, GLfloat cur) {
 			if ((cur - x - step) * (cur - prev) < 0) {
 				step = (cur - x);
 			}
+			/* force a minimum transition rate */
+			if(step < 0 && step > -0.1) {
+				step = -0.1;
+			} else if(step > 0 && step < 0.1) {
+				step = 0.1;
+			}
 		} else {
 			step = (cur - x);
 			if(step < -0.1) step = -0.1;
 			if(step >  0.1) step =  0.1;
 		}
+
 		x += step;
 	} else {
 		prev = cur;
@@ -255,12 +262,12 @@ void status_bars_widget::handle_draw() const {
 	if(health_max_angle - health_angle > 0) {
 		glColor4ub(damaged_color.r, damaged_color.g, damaged_color.b, 255);
 		gluPartialDisk(quad.get(), bcircle[2]*9/10, bcircle[2]*11/10, 16, 1, 
-			       -20, -(health_max_angle-health_angle));
+			       -20-health_angle, -(health_max_angle - health_angle));
 	}
 	if(health_angle > 0) {
 		glColor4ub(healthy_color.r, healthy_color.g, healthy_color.b, 255);
 		gluPartialDisk(quad.get(), bcircle[2]*9/10, bcircle[2]*11/10, 16, 1, 
-			       -20 - (health_max_angle-health_angle), -health_angle);
+			       -20, -health_angle);
 	}
 	draw_time_bars(time, time-time_remaining, bcircle[2]*12/10, bcircle[2]*2/10, -20, -140, 10, 
 		       time_to_go_color, time_waited_color, quad.get());
