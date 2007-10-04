@@ -93,7 +93,7 @@ void message_dialog::construct_interface()
 		const std::string pcname = (*pc_.begin_members())->portrait();
 		int left_offset = 0;
 
-		set_cursor(s_width/8, s_height*7/8 - 200);
+		set_cursor(s_width/8, s_height*7/8 - 205);
 		if(!pcname.empty()) {
 			pc_portrait_ = widget_ptr(new image_widget(pcname, 205, 205));
 			frame_ptr pc_frame = frame_manager::make_frame(pc_portrait_, "dialog-pc-portrait");
@@ -116,6 +116,7 @@ void message_dialog::construct_interface()
 
 		int option = 0;
 		option_box_ = boost::shared_ptr<phantom_dialog>(new phantom_dialog());
+		option_box_->set_padding(0);
 		foreach(const std::string& s, *options_) {
 			std::ostringstream option_text_s;
 			if(option < 9) {
@@ -130,7 +131,7 @@ void message_dialog::construct_interface()
 			frame_ptr option_frame = 
 				make_option_frame(option, option_label_inner);
 			
-			option_frame->set_dim(s_width - s_width/4 - 200 + left_offset, 0);
+			option_frame->set_dim(s_width - s_width/4 - left_offset, 0);
 			option_frame->set_visible(false);
 			option_frames_.push_back(option_frame);
 			if(option_frame->width() > wbox) {
