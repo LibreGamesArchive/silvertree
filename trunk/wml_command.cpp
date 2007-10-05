@@ -28,6 +28,25 @@ public:
 	{}
 };
 
+class compound_command : public wml_command {
+	std::vector<const_wml_command_ptr> cmd_;
+	void do_execute(const formula_callable& info, world& world) const {
+		foreach(const const_wml_command_ptr& cmd, cmd_) {
+			cmd->execute(info, world);
+		}
+	}
+public:
+	explicit compound_command(wml::const_node_ptr node) {
+		if(!node) {
+			return;
+		}
+
+		for(wml::node::const_all_child_iterator i = node->begin_children(); i != node->end_children(); ++i) {
+			cmd_.push_back(create(*i));
+		}
+	}
+};
+
 class destroy_party_command : public wml_command {
 	formula_ptr filter_;
 	void do_execute(const formula_callable& info, world& world) const {
@@ -202,8 +221,8 @@ public:
 		  npc_chars_(wml::get_str(node, "npc_chars", "npc.members")),
 		  pc_party_(wml::get_str(node, "pc_party", "pc")),
 		  npc_party_(wml::get_str(node, "npc_party", "npc")),
-		  onvictory_(wml_command::create(node->get_child("onvictory"))),
-		  ondefeat_(wml_command::create(node->get_child("ondefeat")))
+		  onvictory_(new compound_command(node->get_child("onvictory"))),
+		  ondefeat_(new compound_command(node->get_child("ondefeat")))
 	{
 	}
 };
