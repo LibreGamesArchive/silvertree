@@ -18,7 +18,7 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
-#include <gl.h>
+#include <GL/gl.h>
 
 #include "surface.hpp"
 

@@ -10,8 +10,8 @@
 
    See the COPYING file for more details.
 */
-#include <gl.h>
-#include <glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <SDL.h>
 
 #include <cmath>
@@ -162,37 +162,48 @@ extern "C" int main(int argc, char** argv)
 
 	wml::node_ptr scenario_cfg;
 	std::string save_file = "data/scenario.cfg";
+
 	if(!preference_save_file().empty() && sys::file_exists(preference_save_file())) {
 		save_file = preference_save_file();
 	}
 
-	try {
-		scenario_cfg = wml::parse_wml(sys::read_file(save_file));
-	} catch(...) {
-		std::cerr << "error parsing rules WML...\n";
-		return -1;
-	}
+	int retcode = 0;
 
-	wml::node_ptr world_cfg = scenario_cfg;
-	if(scenario_cfg->name() == "scenario") {
-		game_logic::global_game_state::get().reset();
-	} else if(scenario_cfg->name() == "game") {
-		world_cfg = scenario_cfg->get_child("scenario");
-		if(!world_cfg) {
-			std::cerr << "scenario parse error: could not find [scenario]\n";
-			return 0;
+	while(true) {
+		try {
+			scenario_cfg = wml::parse_wml(sys::read_file(save_file));
+		} catch(...) {
+			std::cerr << "error parsing rules WML...\n";
+			retcode = -1;
+			break;
 		}
-
-		game_logic::global_game_state::get().init(scenario_cfg);
-	} else {
-		std::cerr << "unrecognized game file\n";
-		return 0;
+		
+		wml::node_ptr world_cfg = scenario_cfg;
+		if(scenario_cfg->name() == "scenario") {
+			game_logic::global_game_state::get().reset();
+		} else if(scenario_cfg->name() == "game") {
+			world_cfg = scenario_cfg->get_child("scenario");
+			if(!world_cfg) {
+				std::cerr << "scenario parse error: could not find [scenario]\n";
+				break;
+			}
+			
+			game_logic::global_game_state::get().init(scenario_cfg);
+		} else {
+			std::cerr << "unrecognized game file\n";
+			break;
+		}
+		
+		game_logic::world_ptr w(new game_logic::world(world_cfg));
+		try {
+			w->play();
+		} catch(game_logic::world::new_game_exception new_game) {
+			save_file = new_game.filename();
+			continue;
+		}
+		graphics::texture::clear_textures();
+		break;
 	}
-
-	game_logic::world_ptr w(new game_logic::world(world_cfg));
-	w->play();
-
-	graphics::texture::clear_textures();
 
 	SDL_Quit();
 	return 0;

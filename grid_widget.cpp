@@ -16,7 +16,7 @@
 #include "grid_widget.hpp"
 #include "raster.hpp"
 
-#include "gl.h"
+#include <GL/gl.h>
 
 namespace gui {
 

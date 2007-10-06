@@ -13,8 +13,8 @@
 #include "preferences.hpp"
 #include "surface_cache.hpp"
 #include "texture.hpp"
-#include <gl.h>
-#include <glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <map>
 #include <iostream>
 

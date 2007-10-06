@@ -15,7 +15,7 @@
 #include "surface_cache.hpp"
 #include "texture.hpp"
 
-#include <gl.h>
+#include <GL/gl.h>
 #include <iostream>
 
 namespace hex

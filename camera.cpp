@@ -13,7 +13,7 @@
 #include "camera.hpp"
 #include "gamemap.hpp"
 
-#include <glu.h>
+#include <GL/glu.h>
 
 #include <cmath>
 #include <iostream>

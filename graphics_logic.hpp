@@ -13,7 +13,7 @@
 #ifndef GRAPHICS_LOGIC_HPP_INCLUDED
 #define GRAPHICS_LOGIC_HPP_INCLUDED
 
-#include "gl.h"
+#include <GL/gl.h>
 
 namespace graphics {
 
