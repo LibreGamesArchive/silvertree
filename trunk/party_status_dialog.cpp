@@ -81,6 +81,15 @@ party_status_dialog::party_status_dialog(game_logic::party_ptr p)
 
 	add_widget(grid);
 
+	grid.reset(new gui::grid(2));
+	grid->set_hpad(10).set_align(1, grid::ALIGN_RIGHT);
+	grid->add_col(lb.create("vision")).add_col(lb.create(formatter() << p->vision()))
+	     .add_col(lb.create("track")).add_col(lb.create(formatter() << p->track()))
+	     .add_col(lb.create("heal")).add_col(lb.create(formatter() << p->heal()))
+	     .add_col(lb.create("haggle")).add_col(lb.create(formatter() << p->haggle()));
+
+	add_widget(grid);
+
 	add_widget(lb.create(formatter() << party_->money() << " " <<
 	                     i18n::translate("currency_units")), 20, cursor_y());
 

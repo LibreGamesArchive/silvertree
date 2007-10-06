@@ -339,6 +339,23 @@ int party::aggregate_stat_max(const std::string& stat) const
 	return res;
 }
 
+int party::aggregate_stat_expert_and_assistant(const std::string& stat) const
+{
+	int scores[2] = {0, 0};
+	foreach(const character_ptr& c, members_) {
+		int val = c->stat(stat);
+		if(val > scores[0]) {
+			std::swap(scores[0], val);
+		}
+
+		if(val > scores[1]) {
+			scores[1] = val;
+		}
+	}
+
+	return scores[0] + scores[1]/2;
+}
+
 void party::get_pos(GLfloat* pos) const
 {
 	using hex::tile;
@@ -445,25 +462,25 @@ void party::get_visible_parties(std::vector<const_party_ptr>& parties) const
 int party::vision() const
 {
 	static const std::string Stat = "vision";
-	return aggregate_stat_max(Stat);
+	return aggregate_stat_expert_and_assistant(Stat);
 }
 
 int party::track() const
 {
 	static const std::string Stat = "track";
-	return aggregate_stat_max(Stat);
+	return aggregate_stat_expert_and_assistant(Stat);
 }
 
 int party::heal() const
 {
 	static const std::string Stat = "heal";
-	return aggregate_stat_max(Stat);
+	return aggregate_stat_expert_and_assistant(Stat);
 }
 
 int party::haggle() const
 {
 	static const std::string Stat = "haggle";
-	return aggregate_stat_max(Stat);
+	return aggregate_stat_expert_and_assistant(Stat);
 }
 
 int party::trackability() const
