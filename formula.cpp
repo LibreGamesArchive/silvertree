@@ -300,6 +300,24 @@ private:
 	}
 };
 
+class map_function : public function_expression {
+public:
+	explicit map_function(const args_list& args)
+	    : function_expression(args, 2, 2)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		std::vector<variant> vars;
+		const variant items = args()[0]->evaluate(variables);
+		for(int n = 0; n != items.num_elements(); ++n) {
+			const variant val = args()[1]->evaluate(*items[n].as_callable());
+			vars.push_back(val);
+		}
+
+		return variant(&vars);
+	}
+};
+
 expression_ptr create_function(const std::string& fn,
                                const std::vector<expression_ptr>& args)
 {
@@ -315,6 +333,8 @@ expression_ptr create_function(const std::string& fn,
 		return expression_ptr(new choose_element_function(args));
 	} else if(fn == "filter") {
 		return expression_ptr(new filter_function(args));
+	} else if(fn == "map") {
+		return expression_ptr(new map_function(args));
 	} else if(fn == "rgb") {
 		return expression_ptr(new rgb_function(args));
 	} else if(fn == "transition") {

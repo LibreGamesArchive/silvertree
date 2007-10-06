@@ -129,6 +129,17 @@ protected:
 private:
 	int aggregate_stat_max(const std::string& stat) const;
 
+	// function which aggregates a party stat based on the
+	// "expert and assistant method". This method has the assumption that
+	// the skill is primarily performed by an 'expert' -- the best character
+	// in the party at this stat. The expert is assisted by an 'assistant' --
+	// the second best character in the party at this stat. Further
+	// characters in the party do not impact the final rating (too many cooks
+	// spoil the broth).
+	//
+	// The formula is expert + assistant/2
+	int aggregate_stat_expert_and_assistant(const std::string& stat) const;
+
 	void apply_fatigue(const hex::location& src,
 	                   const hex::location& dst);
 
