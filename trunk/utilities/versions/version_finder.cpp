@@ -5,6 +5,9 @@
 #include <GL/glu.h>
 #include "boost/version.hpp"
 
+#include <stdlib.h>
+#include <string.h>
+
 #ifdef SDL_VERSION
 void print_sdl_version(char *txt, const SDL_version *version) {
   printf("%s : %d.%d.%d\n", txt, version->major, 
