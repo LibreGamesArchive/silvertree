@@ -1,8 +1,8 @@
 #include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_ttf.h"
-#include "gl.h"
-#include "glu.h"
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include "boost/version.hpp"
 
 #ifdef SDL_VERSION
@@ -169,7 +169,6 @@ int main(int argc, char **argv) {
 
   SDL_Init(SDL_INIT_VIDEO);
   SDL_SetVideoMode(1, 1, 32, SDL_OPENGL);
-  atexit(SDL_Quit);
 
   if(!gl_only) {
     status_sdl();
@@ -184,5 +183,6 @@ int main(int argc, char **argv) {
     printf("Use \"%s --gl\" for detailed OpenGL information\n", argv[0]);
   }
 
+  SDL_Quit();
   exit(0);
 }
