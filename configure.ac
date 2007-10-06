@@ -3,7 +3,7 @@ AC_INIT([silvertree-rpg], [0.2], [dave@whitevine.net])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([main.cpp])
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE([foreign -Wall -Werror])
+AM_INIT_AUTOMAKE([foreign])
 AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_CXX
