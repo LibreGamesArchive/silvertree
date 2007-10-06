@@ -425,6 +425,7 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
+@WANT_EDITOR_FALSE@mostlyclean-local:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
@@ -470,7 +471,8 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-local
 
 pdf: pdf-am
 
@@ -494,14 +496,18 @@ uninstall-am: uninstall-binPROGRAMS
 	install-pdf-am install-ps install-ps-am install-strip \
 	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-binPROGRAMS
+	mostlyclean-generic mostlyclean-local pdf pdf-am ps ps-am tags \
+	uninstall uninstall-am uninstall-binPROGRAMS
 
 
 @WANT_EDITOR_TRUE@.ui.hpp:
 @WANT_EDITOR_TRUE@	@QT_UIC@ $< > $@
 @WANT_EDITOR_TRUE@.hpp.moc:
 @WANT_EDITOR_TRUE@	@QT_MOC@ $< > $@
+
+@WANT_EDITOR_TRUE@mostlyclean-local:
+@WANT_EDITOR_TRUE@	rm -f *.moc
+@WANT_EDITOR_TRUE@	rm -f ui_*.hpp
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

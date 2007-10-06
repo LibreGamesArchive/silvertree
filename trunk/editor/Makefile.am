@@ -36,4 +36,8 @@ LIBS += @QT_LIBS@
 .hpp.moc:
 	@QT_MOC@ $< > $@
 
+mostlyclean-local:
+	rm -f *.moc
+	rm -f ui_*.hpp
+
 endif
