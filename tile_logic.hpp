@@ -48,6 +48,7 @@ namespace hex
 		NULL_DIRECTION
 	};
 
+	inline bool is_valid_direction(DIRECTION dir) { return dir != NULL_DIRECTION; }
 	const std::string& direction_abbreviation(DIRECTION dir);
 
 	bool tiles_adjacent(const location& a, const location& b);
@@ -63,6 +64,10 @@ namespace hex
 						std::vector<location>& res);
 
 	DIRECTION get_adjacent_direction(const location& a, const location& b);
+
+	// function which returns the direction we'd have to go in the furthest
+	// to go from a to b
+	DIRECTION get_main_direction(const location& a, const location& b);
 	
 	unsigned int distance_between(const location& a, const location& b);
 
