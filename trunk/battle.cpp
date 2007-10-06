@@ -645,11 +645,11 @@ void battle::attack_character(battle_character& attacker,
 
 	attacker.get_character().use_stamina(stats.stamina_used);
 	attacker.begin_facing_change(
-	  hex::get_adjacent_direction(attacker.loc(),defender.loc()));
+	  hex::get_main_direction(attacker.loc(),defender.loc()));
 
 	if(!otherwise_engaged) {
 		defender.begin_facing_change(
-		  hex::get_adjacent_direction(defender.loc(),attacker.loc()));
+		  hex::get_main_direction(defender.loc(),attacker.loc()));
 	}
 
 	const int random = rand()%(stats.attack+stats.defense);
@@ -669,6 +669,8 @@ void battle::attack_character(battle_character& attacker,
 			GLfloat src[3], dst[3];
 			attacker.get_pos(src, NULL);
 			defender.get_pos(dst, NULL);
+			src[2] += 2.0;
+			dst[2] += 2.0;
 			missile_.reset(new battle_missile(model, src, dst));
 		}
 	}

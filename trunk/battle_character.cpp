@@ -392,6 +392,12 @@ bool battle_character::can_attack(const battle_character& c,
 	}
 }
 
+void battle_character::begin_facing_change(hex::DIRECTION facing)
+{
+	assert(hex::is_valid_direction(facing));
+	facing_ = facing;
+}
+
 void battle_character::end_move()
 {
 	set_time_until_next_move(route_cost(move_));
@@ -399,15 +405,14 @@ void battle_character::end_move()
 	loc_ = move_.back();
 	if(move_.size() > 1) {
 		old_facing_ = facing_ = get_adjacent_direction(move_[move_.size()-2],move_.back());
-		assert(old_facing_ >= hex::NORTH && old_facing_ <= hex::NULL_DIRECTION);
+		assert(hex::is_valid_direction(facing_));
 	}
 	move_.clear();
 }
 
 void battle_character::begin_attack(const battle_character& enemy)
 {
-	old_facing_ = facing_ = get_adjacent_direction(loc_, enemy.loc());
-		assert(old_facing_ >= hex::NORTH && old_facing_ <= hex::NULL_DIRECTION);
+	old_facing_ = facing_ = get_main_direction(loc_, enemy.loc());
 }
 
 void battle_character::end_attack()

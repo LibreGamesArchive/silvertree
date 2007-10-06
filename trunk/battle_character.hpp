@@ -90,9 +90,7 @@ public:
 
 	int ready_to_move_at() const { return move_at_; }
 
-	void begin_facing_change(hex::DIRECTION facing) {
-		facing_ = facing;
-	}
+	void begin_facing_change(hex::DIRECTION facing);
 	void end_facing_change() {
 		old_facing_ = facing_;
 		assert(old_facing_ >= hex::NORTH && old_facing_ <= hex::NULL_DIRECTION);

@@ -196,6 +196,40 @@ DIRECTION get_adjacent_direction(const location& from, const location& to)
 	return NULL_DIRECTION;
 }
 
+DIRECTION get_main_direction(const location& a, const location& b)
+{
+	if(tiles_adjacent(a,b)) {
+		return get_adjacent_direction(a, b);
+	}
+
+	const unsigned int hdistance = std::abs(a.x() - b.x());
+
+	const unsigned int vpenalty = ( (is_even(a.x()) && is_odd(b.x()) && (a.y() < b.y()))
+		|| (is_even(b.x()) && is_odd(a.x()) && (b.y() < a.y())) ) ? 1 : 0;
+	const unsigned int vdistance = std::abs(a.y() - b.y()) + vpenalty;
+	if(hdistance > vdistance) {
+		if(a.x() < b.x()) {
+			if(a.y() < b.y()) {
+				return SOUTH_EAST;
+			} else {
+				return NORTH_EAST;
+			}
+		} else {
+			if(a.y() < b.y()) {
+				return SOUTH_WEST;
+			} else {
+				return NORTH_WEST;
+			}
+		}
+	} else {
+		if(a.y() < b.y()) {
+			return SOUTH;
+		} else {
+			return NORTH;
+		}
+	}
+}
+
 bool tiles_adjacent(const location& a, const location& b)
 {
 	//two tiles are adjacent if y is different by 1, and x by 0, or if
