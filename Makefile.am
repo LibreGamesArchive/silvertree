@@ -553,6 +553,7 @@ model-sources/blender/colorCube.blend \
 model-sources/blender/fountain1.blend \
 model-sources/blender/male-base.blend \
 model-sources/blender/suzanne.blend \
+model-sources/blender/talin.blend \
 model-sources/sketchup/arrow.skp \
 model-sources/sketchup/bridge.skp \
 model-sources/sketchup/cave-entrace.skp \

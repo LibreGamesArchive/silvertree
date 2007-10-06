@@ -524,7 +524,6 @@ images/maison_toit1.jpg \
 images/male-base.jpg \
 images/move-icon.png \
 images/red.jpg \
-images/SilverTree.png \
 images/Stone_Marble1.jpg \
 images/Stone_MarblenoCulling.jpg \
 images/suzanne.jpg \
@@ -827,6 +826,7 @@ model-sources/blender/colorCube.blend \
 model-sources/blender/fountain1.blend \
 model-sources/blender/male-base.blend \
 model-sources/blender/suzanne.blend \
+model-sources/blender/talin.blend \
 model-sources/sketchup/arrow.skp \
 model-sources/sketchup/bridge.skp \
 model-sources/sketchup/cave-entrace.skp \
