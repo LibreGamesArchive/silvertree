@@ -28,7 +28,7 @@ editpartydialog.moc \
 editwmldialog.moc
 
 AM_CPPFLAGS = -DDATADIR=\"$(pkgdatadir)\" -DVERSION=\"$(VERSION)\"
-AM_CXXFLAGS = @QT_CXXFLAGS@
+AM_CXXFLAGS = @QT_CXXFLAGS@ -Wall -Werror -Wno-sign-compare -Wno-switch -Wno-switch-enum
 LIBS += @QT_LIBS@
 
 .ui.hpp:

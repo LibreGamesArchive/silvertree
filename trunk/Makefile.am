@@ -2,7 +2,8 @@ noinst_LIBRARIES=libsilvertree.a
 bin_PROGRAMS=silvertreerpg
 silvertreerpg_SOURCES= main.cpp $(SHARED_SOURCES)
 silvertreerpg_LDADD=libsilvertree.a
-AM_CPPFLAGS = -DDATADIR=\"$(pkgdatadir)\" -DVERSION=\"$(VERSION)\"
+AM_CPPFLAGS = -DDATADIR=\"$(pkgdatadir)\" -DVERSION=\"$(VERSION)\" 
+AM_CXXFLAGS = -Wall -Werror -Wno-sign-compare -Wno-switch -Wno-switch-enum
 SUBDIRS=. editor utilities
 
 libsilvertree_a_SOURCES=\

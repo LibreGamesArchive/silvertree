@@ -325,6 +325,7 @@ void editable_text::redo() {
 class caret_transform {
 public:
 	typedef editable_text buf_type;
+	virtual ~caret_transform() {}
 	virtual buf_type::const_iterator operator()(const buf_type& buf, 
 					      const buf_type::const_iterator& caret) =0;
 };

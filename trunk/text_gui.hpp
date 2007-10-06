@@ -172,6 +172,7 @@ void init();
 class edit_operation {
 public:
 	virtual void operator()(editable_text &buf) =0;
+	virtual ~edit_operation() {}
 protected:
 	editable_text::iterator unconst(editable_text& b, const editable_text::const_iterator& ci) {
 		editable_text::iterator i = b.begin();
@@ -185,12 +186,14 @@ typedef boost::shared_ptr<edit_operation> edit_operation_ptr;
 class editor {
 public:
 	virtual bool process_event(const SDL_Event &e) =0;
+	virtual ~editor() {}
 };
 
 typedef boost::shared_ptr<editor> editor_ptr;
 
 class key_filter {
 public:
+	virtual ~key_filter() {}
 	virtual bool matches(Uint32 ch) =0;
 	std::vector<Uint32> filter(const std::vector<Uint32>& input);
 };
