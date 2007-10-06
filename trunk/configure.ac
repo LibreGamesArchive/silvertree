@@ -51,7 +51,7 @@ AS_IF([test x$have_qt = xno],
 )
 
 AS_IF([test x$have_qt = xno],
-     AC_MSG_ERROR([**** Editor will not be built.])
+     AC_MSG_WARN([**** Editor will not be built.])
 )
 
 AM_CONDITIONAL([WANT_EDITOR], [test x$have_qt = xyes])
