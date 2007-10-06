@@ -251,7 +251,6 @@ images/maison_toit1.jpg \
 images/male-base.jpg \
 images/move-icon.png \
 images/red.jpg \
-images/SilverTree.png \
 images/Stone_Marble1.jpg \
 images/Stone_MarblenoCulling.jpg \
 images/suzanne.jpg \
