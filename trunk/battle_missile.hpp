@@ -1,7 +1,7 @@
 #ifndef BATTLE_MISSILE_HPP_INCLUDED
 #define BATTLE_MISSILE_HPP_INCLUDED
 
-#include <gl.h>
+#include <GL/gl.h>
 
 #include "model_fwd.hpp"
 

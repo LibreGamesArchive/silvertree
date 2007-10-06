@@ -40,6 +40,14 @@ namespace game_logic
 class world : public formula_callable
 {
 public:
+	class new_game_exception {
+	public:
+		new_game_exception(const std::string& filename) : filename_(filename) {}
+		const std::string& filename() { return filename_; }
+	private:
+		std::string filename_;
+	};
+
 	//function which will return the current stack of worlds the player is in.
 	//The front of this vector will be the top-level world. The back of this vector will be
 	//the current world.

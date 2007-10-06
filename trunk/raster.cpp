@@ -10,8 +10,8 @@
 
    See the COPYING file for more details.
 */
-#include <gl.h>
-#include <glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <SDL.h>
 
 #include "raster.hpp"

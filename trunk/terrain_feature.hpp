@@ -13,7 +13,7 @@
 #ifndef TERRAIN_FEATURE_HPP_INCLUDED
 #define TERRAIN_FEATURE_HPP_INCLUDED
 
-#include "gl.h"
+#include <GL/gl.h>
 
 #include <string>
 #include <vector>

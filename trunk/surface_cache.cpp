@@ -10,6 +10,7 @@
 
    See the COPYING file for more details.
 */
+#include "filesystem.hpp"
 #include "surface_cache.hpp"
 #include "SDL_image.h"
 
@@ -36,7 +37,7 @@ surface get(const std::string& key)
 		return i->second;
 	} else {
 		const std::string fname = path + key;
-		surface surf(IMG_Load(fname.c_str()));
+		surface surf(IMG_Load(sys::find_file(fname).c_str()));
 		if(surf.get() == false) {
 			std::cerr << "failed to load image '" << key << "'\n";
 		}

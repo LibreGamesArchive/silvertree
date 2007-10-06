@@ -17,14 +17,11 @@
 #include <map>
 #include <string.h>
 
+#include "filesystem.hpp"
 #include "font.hpp"
 #include "foreach.hpp"
 #include "sdl_algo.hpp"
 #include "string_utils.hpp"
-
-//#ifdef __APPLE__
-#define SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-//#endif
 
 namespace graphics
 {
@@ -60,7 +57,7 @@ font_ptr get_font(int size)
 	if(i != fonts.end()) {
 		return i->second;
 	} else {
-		font_ptr new_font(TTF_OpenFont("FreeSans.ttf",size),
+		font_ptr new_font(TTF_OpenFont(sys::find_file("FreeSans.ttf").c_str(),size),
 		                  release_font());
 		if(!new_font) {
 			std::cerr << "ttf open failed: " << TTF_GetError() << "\n";
@@ -117,48 +114,24 @@ texture render_text(const std::string& text, int font_size,
 	std::vector<surface> surfs;
 	unsigned int width = 0, height = 0;
 
-#ifndef SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-	const unsigned int lineskip = TTF_FontLineSkip(font.get());
-	std::vector<int> heights;
-	int ascent = TTF_FontAscent(font.get());
-#endif
 	foreach(const std::string& s, v) {
-		surface surf(get_non_transparent_portion(
-				     TTF_RenderUTF8_Blended(font.get(),s.c_str(),color)));
+		surface surf(TTF_RenderUTF8_Blended(font.get(),s.c_str(),color));
 		surfs.push_back(surf);
 		if(surf->w > width) {
 			width = surf->w;
 		}
-#ifndef SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-		heights.push_back(get_string_height(s, font_size));
-		height += lineskip;
-#else
 		height += surf->h;
-#endif
 	}
 
 	
 	surface res(SDL_CreateRGBSurface(SDL_SWSURFACE,width,height,
 					 32,SURFACE_MASK));
 	int y = 0;
-#ifndef SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-	std::vector<int>::iterator iter = heights.begin();
-#endif
 	foreach(const surface& surf, surfs) {
 		SDL_SetAlpha(surf.get(), 0, SDL_ALPHA_OPAQUE);
-
-#ifndef SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-		int y_adjust = ascent - *(iter++);
-		SDL_Rect rect = {0,y + y_adjust,surf->w,surf->h};
-#else
 		SDL_Rect rect = {0,y,surf->w,surf->h};
-#endif
 		SDL_BlitSurface(surf.get(), NULL, res.get(), &rect);
-#ifndef SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-		y += lineskip;
-#else
 		y += surf->h;
-#endif
 	}
 	return texture::get_no_cache(res, 1 << texture::NO_MIPMAP);
 }
