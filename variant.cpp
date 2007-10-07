@@ -129,6 +129,22 @@ size_t variant::num_elements() const
 	return list_->elements.size();
 }
 
+bool variant::as_bool() const
+{
+	switch(type_) {
+	case TYPE_INT:
+		return int_value_ != 0;
+	case TYPE_CALLABLE:
+		return callable_ != NULL;
+	case TYPE_LIST:
+		return !list_->elements.empty();
+	case TYPE_STRING:
+		return !string_->str.empty();
+	default:
+		assert(false);
+	}
+}
+
 const std::string& variant::as_string() const
 {
 	must_be(TYPE_STRING);

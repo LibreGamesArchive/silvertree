@@ -13,7 +13,8 @@ struct variant_list;
 struct variant_string;
 
 struct type_error {
-	explicit type_error(const std::string& str) {}
+	explicit type_error(const std::string& str) : message(str) {}
+	std::string message;
 };
 
 class variant {
@@ -31,7 +32,7 @@ public:
 
 	bool is_int() const { return type_ == TYPE_INT; }
 	int as_int() const { must_be(TYPE_INT); return int_value_; }
-	bool as_bool() const { return int_value_ != 0; }
+	bool as_bool() const;
 
 	const std::string& as_string() const;
 

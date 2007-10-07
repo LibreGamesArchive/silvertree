@@ -175,6 +175,21 @@ void npc_party::friendly_encounter(party& p)
 	dialog_sequence(dialog_, *this, p);
 }
 
+void npc_party::set_value(const std::string& key, const variant& value)
+{
+	if(key == "destination") {
+		const hex::location* loc = dynamic_cast<const hex::location*>(value.as_callable());
+		if(!loc) {
+			std::cerr << "ERROR: npc_party::set_value: location expected, but type is not a location\n";
+			return;
+		}
+
+		current_destination_ = *loc;
+	}
+	
+	return party::set_value(key, value);
+}
+
 party::TURN_RESULT npc_party::do_turn()
 {
   //const int start_ticks = SDL_GetTicks();

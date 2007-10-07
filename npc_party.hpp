@@ -32,6 +32,7 @@ public:
 	wml::node_ptr write() const;
 
 private:
+	void set_value(const std::string& key, const variant& value);
 	bool is_human_controlled() const { return false; }
 	TURN_RESULT do_turn();
 	wml::const_node_ptr dialog_;
