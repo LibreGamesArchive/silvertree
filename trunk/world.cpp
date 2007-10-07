@@ -17,6 +17,7 @@
 #include "foreach.hpp"
 #include "formatter.hpp"
 #include "frustum.hpp"
+#include "global_game_state.hpp"
 #include "grid_widget.hpp"
 #include "image_widget.hpp"
 #include "label.hpp"
@@ -215,9 +216,12 @@ wml::node_ptr world::write() const
 	}
 
 	for(event_map::const_iterator i = handlers_.begin(); i != handlers_.end(); ++i) {
-		wml::node_ptr event = wml::deep_copy(i->second.write());
-		event->set_attr("event", i->first);
-		res->add_child(event);
+		wml::const_node_ptr event = i->second.write();
+		if(event) {
+			wml::node_ptr event_copy = wml::deep_copy(event);
+			event_copy->set_attr("event", i->first);
+			res->add_child(event_copy);
+		}
 	}
 
 	res->add_child(tracks_.write());
@@ -566,6 +570,15 @@ void world::play()
 		}
 	}
 
+	{
+		map_formula_callable_ptr callable(new map_formula_callable);
+		callable->add("world", variant(this))
+		         .add("pc", variant(get_pc_party().get()))
+				 .add("var", variant(&global_game_state::get().get_variables()));
+		fire_event("start", *callable);
+	}
+
+
 	party_ptr active_party;
 
 	graphics::frame_skipper skippy(50, preference_maxfps());
@@ -634,7 +647,10 @@ void world::play()
 
 			if(!scripted_moves) {
 				map_formula_callable_ptr script_callable(new map_formula_callable);
-				script_callable->add("script", variant(script_));
+				script_callable->add("script", variant(script_))
+		                        .add("pc", variant(get_pc_party().get()))
+				                .add("world", variant(this))
+				                .add("var", variant(&global_game_state::get().get_variables()));
 				script_.clear();
 				fire_event("finish_script", *script_callable);
 			}
@@ -725,7 +741,8 @@ void world::play()
 		const Uint8* keys = SDL_GetKeyState(NULL);
 
 		if(!active_party) {
-			subtime_ += game_speed * (keys[SDLK_SPACE] ? 2.0 : 1.0);
+			const bool accel = keys[SDLK_SPACE] || !script_.empty();
+			subtime_ += game_speed * (accel ? 2.0 : 1.0);
 			if(subtime_ >= 1.0) {
 				++time_;
 				subtime_ = 0.0;
@@ -948,6 +965,15 @@ variant world::get_value(const std::string& key) const
 {
 	if(key == "time") {
 		return variant(time_.since_epoch());
+	} else if(key == "pc") {
+		return variant(get_pc_party().get());
+	} else if(key == "parties") {
+		std::vector<variant> parties;
+		for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
+			parties.push_back(variant(i->second.get()));
+		}
+
+		return variant(&parties);
 	} else {
 		return variant();
 	}

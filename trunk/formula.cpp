@@ -20,6 +20,7 @@
 #include "formula_callable.hpp"
 #include "formula_tokenizer.hpp"
 #include "map_utils.hpp"
+#include "tile_logic.hpp"
 
 namespace game_logic
 {
@@ -318,9 +319,51 @@ private:
 	}
 };
 
+class sum_function : public function_expression {
+public:
+	explicit sum_function(const args_list& args)
+	    : function_expression(args, 1, 1)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		variant res(0);
+		const variant items = args()[0]->evaluate(variables);
+		for(int n = 0; n != items.num_elements(); ++n) {
+			res = res + items[n];
+		}
+
+		return res;
+	}
+};
+
+class head_function : public function_expression {
+public:
+	explicit head_function(const args_list& args)
+	    : function_expression(args, 1, 1)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		const variant items = args()[0]->evaluate(variables);
+		return items[0];
+	}
+};
+
+class loc_function : public function_expression {
+public:
+	explicit loc_function(const args_list& args)
+	    : function_expression(args, 2, 2)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		return variant(new hex::location(args()[0]->evaluate(variables).as_int(),
+		                                 args()[1]->evaluate(variables).as_int()));
+	}
+};
+
 expression_ptr create_function(const std::string& fn,
                                const std::vector<expression_ptr>& args)
 {
+	std::cerr << "FN: '" << fn << "' " << fn.size() << "\n";
 	if(fn == "if") {
 		return expression_ptr(new if_function(args));
 	} else if(fn == "abs") {
@@ -335,12 +378,18 @@ expression_ptr create_function(const std::string& fn,
 		return expression_ptr(new filter_function(args));
 	} else if(fn == "map") {
 		return expression_ptr(new map_function(args));
+	} else if(fn == "sum") {
+		return expression_ptr(new sum_function(args));
+	} else if(fn == "head") {
+		return expression_ptr(new head_function(args));
 	} else if(fn == "rgb") {
 		return expression_ptr(new rgb_function(args));
 	} else if(fn == "transition") {
 		return expression_ptr(new transition_function(args));
 	} else if(fn == "color_transition") {
 		return expression_ptr(new color_transition_function(args));
+	} else if(fn == "loc") {
+		return expression_ptr(new loc_function(args));
 	} else {
 		std::cerr << "no function '" << fn << "'\n";
 		throw formula_error();
@@ -802,7 +851,7 @@ variant formula::execute(const formula_callable& variables) const
 	try {
 		return expr_->evaluate(variables);
 	} catch(type_error& e) {
-		std::cerr << "formula type error!\n";
+		std::cerr << "formula type error: " << e.message << "\n";
 		return variant();
 	}
 }

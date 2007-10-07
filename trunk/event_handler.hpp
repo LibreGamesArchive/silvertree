@@ -19,12 +19,14 @@ public:
 	void handle(const formula_callable& info, world& world);
 
 	void add_filter(formula_ptr f);
-	wml::const_node_ptr write() const { return node_; }
+	wml::const_node_ptr write() const;
 
 private:
 	std::vector<formula_ptr> filters_;
 	std::vector<const_wml_command_ptr> commands_;
 	wml::const_node_ptr node_;
+	bool first_time_only_;
+	bool already_run_;
 };
 
 }

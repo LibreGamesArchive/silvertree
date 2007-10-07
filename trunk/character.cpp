@@ -277,6 +277,11 @@ variant character::get_value(const std::string& key) const
 		}
 	} else if(key == "description") {
 		return variant(description_);
+	} else if(key == "max_hp" || key == "max_hitpoints") {
+		std::cerr << "get max hp: " << max_hitpoints() << "\n";
+		return variant(max_hitpoints());
+	} else if(key == "hp" || key == "hitpoints") {
+		return variant(hitpoints());
 	}
 
 	return variant(base_stat(key));
@@ -284,8 +289,9 @@ variant character::get_value(const std::string& key) const
 
 void character::set_value(const std::string& key, const variant& value)
 {
-	if(key == "hitpoints") {
+	if(key == "hitpoints" || key == "hp") {
 		hitpoints_ = value.as_int();
+		std::cerr << "modify hitpoints to: " << hitpoints_ << "\n";
 	} else {
 		formula_callable::set_value(key, value);
 	}

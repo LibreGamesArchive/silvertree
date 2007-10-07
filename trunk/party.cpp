@@ -567,6 +567,8 @@ variant party::get_value(const std::string& key) const
 	} else if(key == "leader") {
 		assert(!members_.empty());
 		return variant(members_.front().get());
+	} else if(key == "money") {
+		return variant(money());
 	} else if(key == "haggle") {
 		return variant(haggle());
 	} else if(key == str_id_) {
@@ -589,6 +591,8 @@ void party::set_value(const std::string& key, const variant& value)
 				}
 			}
 		}
+	} else if(key == "money") {
+		money_ = value.as_int();
 	}
 }
 

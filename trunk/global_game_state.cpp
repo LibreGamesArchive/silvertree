@@ -29,6 +29,10 @@ private:
 			return variant();
 		}
 	}
+
+	void set_value(const std::string& key, const variant& value) {
+		variables[key] = value;
+	}
 };
 }
 

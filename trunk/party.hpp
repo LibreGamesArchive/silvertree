@@ -125,6 +125,7 @@ protected:
 	int movement_cost(const hex::location& src,
 	                  const hex::location& dst) const;
 	const hex::gamemap& map() const;
+	virtual void set_value(const std::string& key, const variant& value);
 	
 private:
 	int aggregate_stat_max(const std::string& stat) const;
@@ -146,7 +147,6 @@ private:
 	virtual TURN_RESULT do_turn() = 0;
 
 	variant get_value(const std::string& key) const;
-	void set_value(const std::string& key, const variant& value);
 
 	int id_;
 	std::string str_id_;

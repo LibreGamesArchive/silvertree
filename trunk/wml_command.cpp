@@ -233,8 +233,11 @@ class dialog_command : public wml_command {
 	std::vector<std::string> options_;
 	std::vector<std::vector<const_wml_command_ptr> > consequences_;
 	void do_execute(const formula_callable& info, world& world) const {
+		std::cerr << "pc: " << pc_formula_.str() << "\n";
 		const formula_callable* pc = pc_formula_.execute(info).as_callable();
+		std::cerr << "npc: " << npc_formula_.str() << "\n";
 		const formula_callable* npc = npc_formula_.execute(info).as_callable();
+		std::cerr << "done\n";
 		const party* pc_party = dynamic_cast<const party*>(pc);
 		const party* npc_party = dynamic_cast<const party*>(npc);
 		if(!pc_party || !npc_party) {
