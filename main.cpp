@@ -200,6 +200,8 @@ extern "C" int main(int argc, char** argv)
 		} catch(game_logic::world::new_game_exception new_game) {
 			save_file = new_game.filename();
 			continue;
+		} catch(game_logic::world::quit_exception) {
+			break;
 		}
 		graphics::texture::clear_textures();
 		break;

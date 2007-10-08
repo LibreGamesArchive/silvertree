@@ -48,6 +48,9 @@ public:
 		std::string filename_;
 	};
 
+	class quit_exception {
+	};
+
 	//function which will return the current stack of worlds the player is in.
 	//The front of this vector will be the top-level world. The back of this vector will be
 	//the current world.

@@ -758,9 +758,7 @@ void world::play()
 		camera_controller_.keyboard_control();
 	}
 	if(quit_) {
-		SDL_Event e;
-		e.type = SDL_QUIT;
-		SDL_PushEvent(&e);
+		throw quit_exception();
 	}
 }
 
