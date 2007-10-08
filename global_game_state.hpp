@@ -11,6 +11,8 @@ namespace game_logic {
 
 class formula_callable;
 
+struct event_context_internal;
+
 class global_game_state {
 public:
 	static global_game_state& get();
@@ -24,6 +26,15 @@ public:
 	void set_variable(const std::string& varname, const variant& value);
 
 	const formula_callable& get_variables() const;
+
+	struct event_context {
+		event_context();
+		~event_context();
+		event_context_internal* impl_;
+	private:
+		event_context(const event_context&);
+		void operator=(const event_context&);
+	};
 
 private:
 	global_game_state();

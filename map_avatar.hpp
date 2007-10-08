@@ -30,6 +30,7 @@ class map_avatar : public map_object
 public:
 	static map_avatar_ptr create(wml::const_node_ptr node,
 	                             const GLfloat* pos);
+	bool valid() const;
 	void write(wml::node_ptr node) const;
 	void set_rotation(GLfloat rotate);
 	void draw();

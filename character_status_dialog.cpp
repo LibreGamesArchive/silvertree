@@ -75,7 +75,6 @@ void character_status_dialog::init()
 	clear();
 
 	game_logic::character_ptr c = char_;
-	game_logic::party_ptr p = party_;
 
 	using namespace gui;
 	using functional::callback_ptr;
@@ -225,16 +224,18 @@ void character_status_dialog::init()
 	add_widget(close_button, 1024-100, 800-100);
 
 	index = 0;
-	foreach(const game_logic::character_ptr& ch, party_->members()) {
-		callback_ptr char_callback(new change_character_callback(this,index));
-		widget_ptr image(new image_widget(ch->portrait(),100,100));
-		button_ptr char_button(new button(image,char_callback));
-		if(index == 0) {
-			add_widget(char_button, 0, height()-char_button->height(), MOVE_RIGHT);
-		} else {
-			add_widget(char_button);
+	if(party_) {
+		foreach(const game_logic::character_ptr& ch, party_->members()) {
+			callback_ptr char_callback(new change_character_callback(this,index));
+			widget_ptr image(new image_widget(ch->portrait(),100,100));
+			button_ptr char_button(new button(image,char_callback));
+			if(index == 0) {
+				add_widget(char_button, 0, height()-char_button->height(), MOVE_RIGHT);
+			} else {
+				add_widget(char_button);
+			}
+			++index;
 		}
-		++index;
 	}
 }
 
@@ -254,6 +255,7 @@ bool character_status_dialog::handle_event(const SDL_Event& event)
 
 void character_status_dialog::change_character(int index)
 {
+	assert(party_);
 	char_ = party_->members()[index%party_->members().size()];
 	init();
 }

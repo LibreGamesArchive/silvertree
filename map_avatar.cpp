@@ -38,6 +38,11 @@ map_avatar::map_avatar(wml::const_node_ptr node, const GLfloat* pos)
 	}
 }
 
+bool map_avatar::valid() const
+{
+	return model_ || !image_.empty();
+}
+
 void map_avatar::write(wml::node_ptr node) const
 {
 	node->set_attr("model", model_id_);

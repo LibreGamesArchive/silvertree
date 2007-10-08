@@ -32,8 +32,9 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		return;
 	}
 
+	p2->encounter(*p1, "encounter");
+
 	if(!p1->is_enemy(*p2)) {
-		p2->friendly_encounter(*p1);
 		return;
 	}
 
@@ -66,7 +67,6 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 
 	if(p1->is_destroyed() || p2->is_destroyed()) {
 		if(p1->is_destroyed()) {
-			std::cerr << "SWAP!\n";
 			std::swap(p1,p2);
 			std::swap(xp1,xp2);
 		}
@@ -74,6 +74,9 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		if(p1->is_human_controlled()) {
 			game_dialogs::post_battle_dialog d(p1, xp2, p2->money());
 			d.show();
+			p2->encounter(*p1, "win_battle");
+		} else {
+			p2->encounter(*p1, "lose_battle");
 		}
 	}
 

@@ -50,6 +50,8 @@ void event_handler::handle(const formula_callable& info, world& world)
 
 	already_run_ = true;
 
+	global_game_state::event_context context;
+
 	foreach(const const_wml_command_ptr& cmd, commands_) {
 		cmd->execute(info, world);
 	}

@@ -26,6 +26,7 @@ void character_generator::initialize(wml::const_node_ptr node)
 	for(wml::node::const_child_range r = node->get_child_range("character_generator"); r.first != r.second; ++r.first) {
 		wml::const_node_ptr n = r.first->second;
 		gen_map[(*n)["id"]] = character_generator(n);
+		std::cerr << "character_generator: '" << (*n)["id"] << "'\n";
 	}
 }
 
@@ -119,10 +120,16 @@ void character_generator::generate(character& c, wml::const_node_ptr node) const
 		}
 	}
 
-	wml::const_node_ptr attr = get_child(node, node_, "attributes");
-	if(attr) {
-		for(wml::node::const_attr_iterator i = attr->begin_attr();
-		    i != attr->end_attr(); ++i) {
+	
+	wml::const_node_ptr attr[] = { node_ ? node_->get_child("attributes") : wml::const_node_ptr(),
+	                               node ? node->get_child("attributes") : wml::const_node_ptr()};
+	for(int n = 0; n != sizeof(attr)/sizeof(*attr); ++n) {
+		wml::const_node_ptr a = attr[n];
+		if(!a) {
+			continue;
+		}
+		for(wml::node::const_attr_iterator i = a->begin_attr();
+		    i != a->end_attr(); ++i) {
 			c.attributes_[i->first] = formula(i->second).execute().as_int();
 		}
 	}

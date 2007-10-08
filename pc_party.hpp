@@ -28,7 +28,7 @@ public:
 
 	bool is_human_controlled() const { return true; }
 
-	void friendly_encounter(party& p);
+	void encounter(party& p, const std::string& type);
 
 	wml::node_ptr write() const;
 private:

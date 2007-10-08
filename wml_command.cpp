@@ -4,6 +4,7 @@
 #include "battle.hpp"
 #include "battle_character.hpp"
 #include "battle_map_generator.hpp"
+#include "character_status_dialog.hpp"
 #include "foreach.hpp"
 #include "formula.hpp"
 #include "message_dialog.hpp"
@@ -13,18 +14,20 @@
 #include "wml_node.hpp"
 #include "wml_utils.hpp"
 #include "world.hpp"
+#include "wml_writer.hpp"
 
 namespace game_logic {
 
 namespace {
 
 class debug_command : public wml_command {
-	std::string text_;
+	const_formula_ptr text_;
 	void do_execute(const formula_callable& info, world& world) const {
-		std::cerr << "DEBUG: " << text_ << "\n";
+		std::cerr << "DEBUG " << SDL_GetTicks() << ": " << text_->execute(info).as_string() << "\n";
 	}
 public:
-	explicit debug_command(wml::const_node_ptr node) : text_(node->attr("text"))
+	explicit debug_command(wml::const_node_ptr node)
+	    : text_(formula::create_string_formula(node->attr("text")))
 	{}
 };
 
@@ -89,7 +92,7 @@ public:
 		}
 
 		wml::const_node_ptr else_branch = node->get_child("else");
-		if(then) {
+		if(else_branch) {
 			for(wml::node::const_all_child_iterator i = else_branch->begin_children();
 			    i != else_branch->end_children(); ++i) {
 				else_.push_back(wml_command::create(*i));
@@ -231,6 +234,7 @@ class dialog_command : public wml_command {
 	formula pc_formula_, npc_formula_;
 	const_formula_ptr text_;
 	std::vector<std::string> options_;
+	std::vector<const_formula_ptr> option_conditions_;
 	std::vector<std::vector<const_wml_command_ptr> > consequences_;
 	void do_execute(const formula_callable& info, world& world) const {
 		std::cerr << "pc: " << pc_formula_.str() << "\n";
@@ -245,12 +249,21 @@ class dialog_command : public wml_command {
 			return;
 		}
 
+		std::map<int,int> options_map_;
+		std::vector<std::string> options;
+		for(int n = 0; n != options_.size(); ++n) {
+			if(!option_conditions_[n] || option_conditions_[n]->execute(info).as_bool()) {
+				options_map_[options.size()] = n;
+				options.push_back(options_[n]);
+			}
+		}
+
 		gui::message_dialog dialog(*pc_party, *npc_party, text_->execute(info).as_string(),
-		                           options_.empty() ? NULL : &options_,
+		                           options.empty() ? NULL : &options,
 								   false);
 		dialog.show_modal();
-		if(!options_.empty()) {
-			const int option = dialog.selected();
+		if(!options.empty()) {
+			const int option = options_map_[dialog.selected()];
 			if(option >= 0 && option < consequences_.size()) {
 				const std::vector<const_wml_command_ptr> cons = consequences_[option];
 				foreach(const const_wml_command_ptr& c, cons) {
@@ -268,6 +281,12 @@ public:
 		wml::node::const_child_range options = node->get_child_range("option");
 		while(options.first != options.second) {
 			const wml::const_node_ptr op = options.first->second;
+			const std::string cond = wml::get_str(op, "condition");
+			if(cond.empty()) {
+				option_conditions_.push_back(const_formula_ptr());
+			} else {
+				option_conditions_.push_back(const_formula_ptr(new formula(cond)));
+			}
 			options_.push_back(wml::get_str(op, "text"));
 			std::vector<const_wml_command_ptr> consequences;
 			for(wml::node::const_all_child_iterator j = op->begin_children(); j != op->end_children(); ++j) {
@@ -280,6 +299,61 @@ public:
 			++options.first;
 		}
 	}
+};
+
+namespace {
+
+void formula_substitute_wml(wml::node_ptr node, const formula_callable& info) {
+	for(wml::node::const_attr_iterator i = node->begin_attr(); i != node->end_attr(); ++i) {
+		node->set_attr(i->first, formula::evaluate(formula::create_string_formula(i->second), info).as_string());
+	}
+
+	for(wml::node::all_child_iterator i = node->begin_children(); i != node->end_children(); ++i) {
+		formula_substitute_wml(*i, info);
+	}
+}
+
+}
+
+class party_command : public wml_command
+{
+	wml::const_node_ptr node_;
+	void do_execute(const formula_callable& info, world& world) const {
+		wml::node_ptr node(wml::deep_copy(node_));
+		formula_substitute_wml(node, info);
+		world.add_party(party::create_party(node, world));
+	}
+public:
+	explicit party_command(wml::const_node_ptr node) : node_(node)
+	{}
+};
+
+class quit_command : public wml_command
+{
+	void do_execute(const formula_callable& info, world& world) const {
+		world.quit();
+	}
+public:
+	explicit quit_command(wml::const_node_ptr node)
+	{}
+};
+
+class character_status_dialog_command : public wml_command
+{
+	formula character_;
+	void do_execute(const formula_callable& info, world& world) const {
+		variant var = character_.execute(info);
+		character_ptr ch(dynamic_cast<character*>(var.mutable_callable()));
+		if(ch) {
+			game_dialogs::character_status_dialog(ch, party_ptr()).show_modal();
+		} else {
+			std::cerr << "ERROR: formula '" << character_.str() << "' did not return a character\n";
+		}
+	}
+public:
+	explicit character_status_dialog_command(wml::const_node_ptr node)
+	    : character_(node->attr("character"))
+	{}
 };
 
 class null_command : public wml_command
@@ -302,6 +376,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 		return const_wml_command_ptr(new cmd##_command(node)); \
 	}
 
+	try {
 	DEFINE_COMMAND(debug);
 	DEFINE_COMMAND(destroy_party);
 	DEFINE_COMMAND(if);
@@ -311,6 +386,15 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	DEFINE_COMMAND(battle);
 	DEFINE_COMMAND(dialog);
 	DEFINE_COMMAND(shop);
+	DEFINE_COMMAND(party);
+	DEFINE_COMMAND(quit);
+	DEFINE_COMMAND(character_status_dialog);
+	} catch(...) {
+		std::string str;
+		wml::write(node, str);
+		std::cerr << "ERROR in command:\n" << str << "\n";
+		throw;
+	}
 
 	return empty_command;
 }

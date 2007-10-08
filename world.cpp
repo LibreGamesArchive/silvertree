@@ -73,7 +73,8 @@ world::world(wml::const_node_ptr node)
 	  map_(get_map_data(node)), camera_(map_),
 	  camera_controller_(camera_),
 	  time_(node), subtime_(0.0), tracks_(map_),
-	  border_tile_(wml::get_str(node, "border_tile"))
+	  border_tile_(wml::get_str(node, "border_tile")),
+	  done_(false), quit_(false)
 {
 	show_grid_ = false;
 
@@ -570,23 +571,19 @@ void world::play()
 		}
 	}
 
-	{
-		map_formula_callable_ptr callable(new map_formula_callable);
-		callable->add("world", variant(this))
-		         .add("pc", variant(get_pc_party().get()))
-				 .add("var", variant(&global_game_state::get().get_variables()));
-		fire_event("start", *callable);
-	}
+	map_formula_callable_ptr standard_callable(new map_formula_callable);
+	standard_callable->add("world", variant(this))
+	                  .add("pc", variant(get_pc_party().get()))
+	                  .add("var", variant(&global_game_state::get().get_variables()));
 
+	fire_event("start", *standard_callable);
 
 	party_ptr active_party;
 
 	graphics::frame_skipper skippy(50, preference_maxfps());
 	fps_track_.reset();
 
-	bool quit = false;
-
-	for(bool done = false; !done; ) {
+	while(!done_) {
 		if(!focus_) {
 			for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
 				if(i->second->is_human_controlled()) {
@@ -628,8 +625,8 @@ void world::play()
 			}
 			switch(event.type) {
 				case SDL_QUIT:
-					done = true;
-					quit = true;
+					done_ = true;
+					quit_ = true;
 					break;
 				default:
 					break;
@@ -746,6 +743,7 @@ void world::play()
 			if(subtime_ >= 1.0) {
 				++time_;
 				subtime_ = 0.0;
+				fire_event("tick", *standard_callable);
 			}
 		}
 
@@ -759,7 +757,7 @@ void world::play()
 
 		camera_controller_.keyboard_control();
 	}
-	if(quit) {
+	if(quit_) {
 		SDL_Event e;
 		e.type = SDL_QUIT;
 		SDL_PushEvent(&e);
@@ -964,7 +962,7 @@ bool world::remove_party(party_ptr p)
 variant world::get_value(const std::string& key) const
 {
 	if(key == "time") {
-		return variant(time_.since_epoch());
+		return variant(new game_time(time_));
 	} else if(key == "pc") {
 		return variant(get_pc_party().get());
 	} else if(key == "parties") {

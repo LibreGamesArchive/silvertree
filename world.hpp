@@ -82,6 +82,8 @@ public:
 	void fire_event(const std::string& name, const formula_callable& info);
 	void add_event_handler(const std::string& event, const event_handler& handler);
 	void draw() const;
+
+	void quit() { done_ = true; quit_ = true; }
 private:
 	party_ptr get_pc_party() const;
 	bool remove_party(party_ptr p);
@@ -157,6 +159,8 @@ private:
 	const hex::tile* get_tile_including_outside(const hex::location& loc) const;
 	typedef std::map<hex::location,boost::shared_ptr<hex::tile> > outside_tiles_map;
 	mutable outside_tiles_map outside_tiles_;
+	bool done_;
+	bool quit_;
 };
 		
 }

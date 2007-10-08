@@ -15,6 +15,7 @@
 
 #include <vector>
 
+#include "formula_fwd.hpp"
 #include "party.hpp"
 #include "tile_logic.hpp"
 #include "wml_node_fwd.hpp"
@@ -27,7 +28,7 @@ class npc_party : public party
 public:
 	npc_party(wml::const_node_ptr node, world& gameworld);
 
-	void friendly_encounter(party& p);
+	void encounter(party& p, const std::string& type);
 
 	wml::node_ptr write() const;
 
@@ -35,12 +36,14 @@ private:
 	void set_value(const std::string& key, const variant& value);
 	bool is_human_controlled() const { return false; }
 	TURN_RESULT do_turn();
+	void choose_new_destination();
 	wml::const_node_ptr dialog_;
 
 	hex::location current_destination_;
 	bool aggressive_;
 	bool rest_;
 	std::vector<hex::location> wander_between_;
+	const_formula_ptr next_destination_;
 };
 		
 }

@@ -34,6 +34,11 @@ npc_party::npc_party(wml::const_node_ptr node, world& game_world)
     : party(node,game_world), aggressive_(wml::get_bool(node,"aggressive")),
       rest_(wml::get_bool(node,"rest",false))
 {
+	const std::string& dest_chooser = node->attr("destination_chooser");
+	if(!dest_chooser.empty()) {
+		next_destination_.reset(new formula(dest_chooser));
+	}
+
 	dialog_ = node->get_child("dialog");
 	if(wml::const_node_ptr dst = node->get_child("destination")) {
 		current_destination_ = hex::location(
@@ -68,99 +73,14 @@ wml::node_ptr npc_party::write() const
 		res->add_child(hex::write_location("wander", loc));
 	}
 
+	if(next_destination_) {
+		res->set_attr("destination_chooser", next_destination_->str());
+	}
+
 	return res;
 }
 
-namespace {
-
-void dialog_sequence(const wml::const_node_ptr& node, party& npc, party& pc, bool nested = false)
-{
-	if(!node) {
-		return;
-	}
-
-	wml::node::const_child_range range = node->get_child_range("talk");
-
-	while(range.first != range.second) {
-		const wml::const_node_ptr& talk = range.first->second;
-		std::vector<std::string> options;
-		wml::node::const_child_range op = talk->get_child_range("option");
-		while(op.first != op.second) {
-			options.push_back((*op.first->second)["text"]);
-			++op.first;
-		}
-
-		const std::vector<std::string>* options_ptr = options.empty() ? NULL : &options;
-
-		gui::message_dialog dialog(pc, npc, (*talk)["message"],options_ptr, !nested);
-		dialog.show_modal();
-		int select = dialog.selected();
-		
-		if(options_ptr) {
-			op = talk->get_child_range("option");
-			while(select) {
-				++op.first;
-				--select;
-			}
-
-			dialog_sequence(op.first->second, npc, pc, true);
-		}
-		++range.first;
-	}
-
-	if(node->get_child("full_heal").get()) {
-		pc.full_heal();
-	}
-
-	if(node->get_child("merge_party").get()) {
-		std::cerr << "merge party...\n";
-		pc.merge_party(npc);
-	}
-
-	wml::const_node_ptr shop = node->get_child("shop");
-	if(shop) {
-		game_dialogs::shop_dialog(pc, wml::get_int(shop,"cost",100),
-		                          (*shop)["items"]).show_modal();
-	}
-
-	wml::const_node_ptr spar = node->get_child("spar");
-	if(spar) {
-		boost::shared_ptr<hex::gamemap> battle_map =
-		     generate_battle_map(npc.game_world().map(), npc.loc());
-		std::vector<battle_character_ptr> chars;
-
-		for(std::vector<character_ptr>::const_iterator i =
-		    pc.members().begin(); i != pc.members().end(); ++i) {
-			hex::location loc(2 + i - pc.members().begin(), 2);
-			chars.push_back(battle_character::make_battle_character(
-			      *i,pc,loc,hex::NORTH,*battle_map,
-			      npc.game_world().current_time()));
-		}
-
-		for(std::vector<character_ptr>::const_iterator i =
-		    npc.members().begin(); i != npc.members().end(); ++i) {
-			hex::location loc(8 + i - npc.members().begin(), 8);
-			chars.push_back(battle_character::make_battle_character(
-			      *i,npc,loc,hex::NORTH,*battle_map,
-			      npc.game_world().current_time()));
-		}
-
-		battle b(chars, *battle_map);
-		b.play();
-
-		const bool victory = npc.is_destroyed();
-		wml::const_node_ptr action = spar->get_child(victory ? "onvictory" : "ondefeat");
-
-		pc.full_heal();
-		npc.full_heal();
-
-		dialog_sequence(action, npc, pc);
-	}
-}
-		
-}
-
-void npc_party::friendly_encounter(party& p)
+void npc_party::encounter(party& p, const std::string& type)
 {
 	if(!p.is_human_controlled()) {
 		return;
@@ -171,8 +91,7 @@ void npc_party::friendly_encounter(party& p)
 	         .add("npc", variant(this))
 	         .add("world", variant(&game_world()))
 	         .add("var", variant(&global_game_state::get().get_variables()));
-	game_world().fire_event("encounter", *callable);
-	dialog_sequence(dialog_, *this, p);
+	game_world().fire_event(type, *callable);
 }
 
 void npc_party::set_value(const std::string& key, const variant& value)
@@ -213,10 +132,8 @@ party::TURN_RESULT npc_party::do_turn()
 		current_destination_ = hex::location();
 	}
 
-	if(!wander_between_.empty() &&
-	   !map().is_loc_on_map(current_destination_)) {
-		current_destination_ = wander_between_[rand()%wander_between_.size()];
-		std::cerr << "set dest to " << current_destination_.x() << "," << current_destination_.y() << "\n";
+	if(!map().is_loc_on_map(current_destination_)) {
+		choose_new_destination();
 	}
 
 	if(!map().is_loc_on_map(target) &&
@@ -255,6 +172,12 @@ party::TURN_RESULT npc_party::do_turn()
 				continue;
 			}
 
+			std::vector<const_party_ptr> parties_at;
+			game_world().get_parties_at(adj[n], parties_at);
+			if(!parties_at.empty()) {
+				continue;
+			}
+
 			const int cost = movement_cost(loc(),adj[n]);
 			if(cost != -1 && (best == -1 || cost < best)) {
 				best = movement_cost(loc(),adj[n]);
@@ -265,10 +188,7 @@ party::TURN_RESULT npc_party::do_turn()
 		if(dir != hex::NULL_DIRECTION) {
 			move(dir);
 		} else {
-			if(!wander_between_.empty()) {
-				//we seem to be stuck, so choose a new destination
-				current_destination_ = wander_between_[rand()%wander_between_.size()];
-			}
+			choose_new_destination();
 			pass();
 		}
 
@@ -280,5 +200,21 @@ party::TURN_RESULT npc_party::do_turn()
 	pass();
 	return TURN_COMPLETE;
 }
-		
+
+void npc_party::choose_new_destination()
+{
+	if(next_destination_) {
+		variant res = next_destination_->execute(*this);
+		const hex::location* loc = dynamic_cast<const hex::location*>(res.as_callable());
+		if(loc) {
+			current_destination_ = *loc;
+			return;
+		}
+	}
+
+	if(!wander_between_.empty()) {
+		current_destination_ = wander_between_[rand()%wander_between_.size()];
+	}
+}
+
 }

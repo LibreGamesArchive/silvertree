@@ -88,7 +88,7 @@ public:
 
 	const std::string& allegiance() const { return allegiance_; }
 
-	virtual void friendly_encounter(party& p) {}
+	virtual void encounter(party& p, const std::string& type) {}
 
 	world& game_world() { return *world_; }
 	const world& game_world() const { return *world_; }
