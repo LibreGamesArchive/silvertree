@@ -2,9 +2,9 @@
 
 namespace wml {
 
-node_ptr deep_copy(const_node_ptr ptr)
+node_ptr deep_copy(const_node_ptr ptr, const std::string& name)
 {
-	node_ptr res(new node(ptr->name()));
+	node_ptr res(new node(name));
 	for(node::const_attr_iterator i = ptr->begin_attr();
 	    i != ptr->end_attr(); ++i) {
 		res->set_attr(i->first,i->second);
@@ -16,6 +16,11 @@ node_ptr deep_copy(const_node_ptr ptr)
 	}
 
 	return res;
+}
+
+node_ptr deep_copy(const_node_ptr ptr)
+{
+	return deep_copy(ptr, ptr->name());
 }
 
 void merge_over(const_node_ptr src, node_ptr dst)

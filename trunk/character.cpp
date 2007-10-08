@@ -133,7 +133,7 @@ wml::node_ptr character::write() const
 
 character::character(wml::const_node_ptr node)
 {
-	character_generator::get((*node)["generator"]).generate(*this, node);
+	character_generator::get((*node)["id"]).generate(*this, node);
 }
 
 const std::string& character::portrait(bool for_bar) const 

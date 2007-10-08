@@ -32,10 +32,10 @@ wml::node_ptr pc_party::write() const
 	return res;
 }
 
-void pc_party::friendly_encounter(party& p)
+void pc_party::encounter(party& p, const std::string& type)
 {
 	assert(dynamic_cast<pc_party*>(&p) == NULL);
-	p.friendly_encounter(*this);
+	p.encounter(*this, type);
 }
 
 party::TURN_RESULT pc_party::do_turn()

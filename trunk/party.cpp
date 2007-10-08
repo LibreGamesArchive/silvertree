@@ -58,7 +58,19 @@ party::party(wml::const_node_ptr node, world& gameworld)
 	for(wml::node::const_child_range i =
 	    node->get_child_range("character");
 	    i.first != i.second; ++i.first) {
-		members_.push_back(character::create(i.first->second));
+		const std::string& copies = i.first->second->attr("copies");
+		int ncopies = 1;
+		if(!copies.empty()) {
+			ncopies = boost::lexical_cast<int>(copies);
+		}
+
+		while(ncopies-- > 0) {
+			members_.push_back(character::create(i.first->second));
+		}
+
+		if(!avatar_->valid()) {
+			avatar_ = hex::map_avatar::create(members_.back()->write(),pos);
+		}
 	}
 
 	const std::string items_csv = node->attr("items");

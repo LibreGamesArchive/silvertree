@@ -348,6 +348,18 @@ private:
 	}
 };
 
+class size_function : public function_expression {
+public:
+	explicit size_function(const args_list& args)
+	    : function_expression(args, 1, 1)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		const variant items = args()[0]->evaluate(variables);
+		return variant(static_cast<int>(items.num_elements()));
+	}
+};
+
 class loc_function : public function_expression {
 public:
 	explicit loc_function(const args_list& args)
@@ -390,6 +402,8 @@ expression_ptr create_function(const std::string& fn,
 		return expression_ptr(new color_transition_function(args));
 	} else if(fn == "loc") {
 		return expression_ptr(new loc_function(args));
+	} else if(fn == "size") {
+		return expression_ptr(new size_function(args));
 	} else {
 		std::cerr << "no function '" << fn << "'\n";
 		throw formula_error();
