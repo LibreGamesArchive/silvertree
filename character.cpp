@@ -324,8 +324,11 @@ bool character::can_improve_attr(const std::string& str) const
 
 void character::improve_attr(const std::string& str)
 {
+	const int before_max_hp = max_hitpoints();
 	improvement_points_ -= improvement_cost(get_attr(str));
 	attributes_[str]++;
+	const int hp_increase = max_hitpoints() - before_max_hp;
+	hitpoints_ += hp_increase;
 }
 
 void character::learn_skill(const std::string& name)
