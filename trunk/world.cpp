@@ -650,6 +650,7 @@ void world::play()
 				                .add("var", variant(&global_game_state::get().get_variables()));
 				script_.clear();
 				fire_event("finish_script", *script_callable);
+				skippy.reset();
 			}
 		}
 
