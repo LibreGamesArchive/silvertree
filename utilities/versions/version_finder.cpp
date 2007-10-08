@@ -12,8 +12,10 @@
 
 #ifdef SDL_VERSION
 void print_sdl_version(std::string txt, const SDL_version *version) {
-  std::cout << txt << " : " << version->major << "." <<
-    version->minor << "." << version->patch << "\n";
+  std::cout << txt << " : " << 
+    static_cast<int>(version->major) << "." <<
+    static_cast<int>(version->minor) << "." << 
+    static_cast<int>(version->patch) << "\n";
 }
 #endif
 
