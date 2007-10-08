@@ -175,7 +175,9 @@ party::TURN_RESULT npc_party::do_turn()
 			std::vector<const_party_ptr> parties_at;
 			game_world().get_parties_at(adj[n], parties_at);
 			if(!parties_at.empty()) {
-				continue;
+				if(!parties_at.front()->is_enemy(*this)) {
+					continue;
+				}
 			}
 
 			const int cost = movement_cost(loc(),adj[n]);
