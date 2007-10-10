@@ -1,18 +1,18 @@
-Welcome to Silver Tree 0.1!
+Welcome to Silver Tree 0.2!
 
 Silver Tree is a project which aims to create an Open Source single player RPG.
 
 BUILDING
 
-Type 'make' to build the game. Type 'make edit' to build the editor. The Makefile is kinda hacky so you might have to modify it to get it working on your system.
+Type './configure' and then 'make' to build the game.
 
-Notable dependencies are Boost, SDL, and OpenGL. The editor depends on Qt 4.
+Notable dependencies are Boost, SDL, SDL_ttf, and SDL_image, and OpenGL. The editor depends on Qt 4.
 
 RUNNING
 
-To play the game type './game'. 
+To play the game type './silvertreerpg'. 
 
-To run the editor (on the main scenario file) type './edit data/scenario.cfg' .
+To run the editor (on the main scenario file) type './editorsilvertree-editor data/scenario.cfg' .
 
 CONTROLS
 
@@ -23,11 +23,6 @@ For instance, press left and down to move south-west.
 You move your party one hex at a time. Once your party begins moving from one hex to another, you've committed to that move and won't have control over your party again until the move is complete.  Other parties will only move while you are moving or resting.  Whenever your party isn't carrying out your commands, the game automatically pauses until you issue a new command.
 
 You can also control the camera. Press 'z' to zoom in, and 'x' to zoom out. Hold control and press the arrow keys to rotate and tilt the camera.  As alternate keys, 'p' and 'l' will tilt the camera, while '<' and '>' will rotate the camera.
-
-GETTING STARTED
-
-We suggest that you first visit the small town of Felson (the house visible from your starting position).
-See also "Character Status" below.
 
 CHARACTER STATUS
 
