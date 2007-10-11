@@ -25,6 +25,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 #ifdef _WIN32
 
 /* /////////////////////////////////////////////////////////////////////////
