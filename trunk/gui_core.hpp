@@ -102,7 +102,7 @@ public:
 	void set_label_color(const SDL_Color& color) { label_->set_color(color); }
 	void set_label_font_size(int size) { label_->set_font_size(size); }
 	void set_label_text(const std::string& text) { label_->set_text(text); }
-
+	std::string label_text() const { return label_->text(); }
 protected:
 	void inner_draw() const {
 		glPushMatrix();
@@ -115,12 +115,16 @@ private:
 	label_ptr label_;
 };
 
+typedef boost::shared_ptr<labelled_button_widget> labelled_button_widget_ptr;
+
 class scrolled_container : public widget {
 public:
 	typedef std::vector<widget_ptr>::iterator iterator;
 	typedef std::vector<widget_ptr>::const_iterator const_iterator;
 
-	scrolled_container() : offset_(0) {}
+	enum AXIS { HORIZONTAL, VERTICAL };
+
+	scrolled_container(AXIS axis=HORIZONTAL) : offset_(0), axis_(axis) {}
 
 	int offset() const { return offset_; }
 	int max_offset() const { return widgets_.size() - 1; }
@@ -129,6 +133,7 @@ public:
 	void add_widget(widget_ptr p);
 	void remove_widget(widget_ptr p);
 	void clear() { widgets_.clear(); }
+	AXIS axis() const { return axis_; }
 	const_iterator begin_children() const { return widgets_.begin(); }
 	const_iterator end_children() const { return widgets_.end(); }
 private:
@@ -137,6 +142,7 @@ private:
 	bool handle_event(const SDL_Event& e);
 	int offset_;
 	std::vector<widget_ptr> widgets_;
+	AXIS axis_;
 };
 
 typedef boost::shared_ptr<scrolled_container> scrolled_container_ptr;

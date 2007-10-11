@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 
+#include "filesystem.hpp"
 #include "preferences.hpp"
 #include "string_utils.hpp"
 
@@ -56,7 +57,7 @@ bool parse_arg(const std::string& arg)
 			mipmap_max = mipmap_arg_to_type(rest.substr(1));
 		}
 	} else if(util::string_starts_with(arg, "--save=")) {
-		save_file = util::strip_string_prefix(arg, "--save=");
+		save_file = sys::get_saves_dir() + "/" + util::strip_string_prefix(arg, "--save=");
 	} else {
 		std::cerr << "unrecognized argument: '" << arg << "'\n";
 		return false;
