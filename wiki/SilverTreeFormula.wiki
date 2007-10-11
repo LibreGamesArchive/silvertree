@@ -1,0 +1,71 @@
+#summary SilverTree Formula System.
+
+= Introduction =
+
+Certain SilverTreeWML attributes can contain formulas. A formula is a calculation which will be run at the appropriate time in-game to calculate a result for some game logic.
+
+As an example, suppose in the rules WML you wanted to say that damage was equal to the character's strength + 10, you would simply put,
+
+damage=strength + 10
+
+This means of course, that simple numbers, for instance, are legal formulas. So, you could just go,
+
+damage=10
+
+to make damage always equal to 10. Some WML attributes are usually just specified as numbers, but have the added flexibility of being formulas where desired.
+
+= Details =
+
+Different formulas are used at different times, of course. For instance, the formula to determine the color of sunlight wouldn't depend on a character's strength. For this reason, different formulas have different sets of inputs, depending on their context. The input for light calculations is the time of day: 'hour', 'minute', and 'second'. If one tried to use 'strength' in a light calculation, it wouldn't be recognized (meaning it would be considered equal to 0).
+
+Most formulas that calculate character statistics have characters as inputs. This means you can access all standard character statistics. This includes the basic attributes, strength, endurance, etc. hitpoints and max_hitpoints, speed, and so on and so forth.
+
+The [rules]/[calculations] section in data/rules.cfg for instance contains calculations of a large range of character stats based on other stats the character has.
+ 
+= Functions =
+
+In addition to standard arithmetic, there are 'functions' which are available for more complex operations. A common example of such a function is the 'if' function. Suppose you wanted to make it so that damage was equal to 10, unless the character's strength was greater than 10, in which case it was equal to the character's strength. You could do this:
+
+damage=if(strength > 10, strength, 10)
+
+The 'if' function evaluates the first argument. If it is 'true' it will then evaluate to the second argument, otherwise it will evaluate to the third argument.
+
+Another function is the rgb function, which given three numbers, will evaluate to an integer which merges the three numbers correctly to be given back as a value for lighting purposes. For instance, to make sun light always pure white,
+
+sun_light=rgb(100,100,100)
+
+You can of course merge functions together. For instance, to make sun light pure white between 6 am and 6 pm and pure black otherwise,
+
+sun_light=if(hour >= 6 and hour <= 18, rgb(100,100,100), rgb(0,0,0))
+
+= Objects and Lists =
+
+It is also possible for formulas to have 'objects' as inputs. An object is an input that contains other values. For instance, a party is an input. When an 'encounter' event is fired, the input to all formulas in the event handler contains 'pc' which is an object referring to the character's party, and 'npc', which is an object referring to the NPC party the PC has encountered.
+
+For instance, to make an event occur only if the PC has more than 1000 gold, one might put this filter inside the [event]:
+
+filter="pc.money > 1000"
+
+'pc' is an input that contains many inputs, including 'money'. The '.' accesses an input within another input.
+
+Some inputs may also be lists. A list contains multiple inputs in a sequence. For instance, a party contains an input called 'members' which is a list of all the members of the party, each of which is itself a character input, which contains all the characters attributes -- strength, endurance, etc.
+
+A list can be operated on by several functions. For instance,
+
+size(list): number of items in the list
+EXAMPLE: size(pc.members) -- number of characters in the PC's party
+
+head(list): the first item in the list
+EXAMPLE: head(npc.members) -- the first character in the NPC's party (i.e. the party leader).
+
+map(list, formula): will run 'formula' on each item in the list, and evaluate to a new list which contains the same number of items as in 'list', with the formulas run on each item.
+EXAMPLE: map(pc.members, hitpoints) -- will give a list back with the number of hitpoints each party member has. This is more useful in conjunction with other functions.
+
+filter(list, formula): will run 'formula' on each item in the list. Will evaluate to a list which only contains items the formula was true for.
+EXAMPLE: size(filter(pc.members, hitpoints < max_hitpoints)) > 0 -- tells you if any of the characters in the party are injured.
+
+sum(list): evaluates to the sum of the items in the list (which all must be numbers)
+EXAMPLE: sum(map(pc.members, max_hitpoints - hitpoints)) -- finds the total damage the characters in the party have taken (perhaps to calculate healing costs): 
+
+max(list) and min(list): evaluates to the maximum or minimum item in the list (which all must be numbers)
+EXAMPLE: max(map(pc.members, strength)) -- finds the strength of the strongest character in the party
