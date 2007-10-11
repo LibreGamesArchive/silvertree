@@ -104,6 +104,8 @@ void npc_party::set_value(const std::string& key, const variant& value)
 		}
 
 		current_destination_ = *loc;
+	} else if(key == "aggressive") {
+		aggressive_ = value.as_bool();
 	}
 	
 	return party::set_value(key, value);
