@@ -45,6 +45,7 @@ public:
 	virtual void set_dim(int x, int y);
 	SDL_Color color() { return color_; }
 	int size() { return size_; }
+	std::string text() { return text_; }
 protected:
 	std::string& current_text();
 	virtual void recalculate_texture();

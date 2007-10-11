@@ -302,7 +302,6 @@ game_bar_game_button::game_bar_game_button(game_logic::world *wp)
 	add_option("Save game", 2);
 	add_option("Credits", 3);
 	add_option("Quit", 4);
-	set_option_enabled(1, false);
 	set_option_enabled(3, false);
 }
 
@@ -310,6 +309,9 @@ void game_bar_game_button::option_selected(int opt) {
 	switch(opt) {
 	case 0:
 		throw game_logic::world::new_game_exception("data/scenario.cfg");
+		break;
+	case 1:
+		game_dialogs::load("silvertree-save", wp_);
 		break;
 	case 2: {
 		game_dialogs::save("silvertree-save", wp_);

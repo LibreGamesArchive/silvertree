@@ -203,6 +203,7 @@ bool skinned_widget::hit_me(const SDL_Event &e) {
 
 void button_widget::do_click() 
 {
+	// NB heuristic since finding mouse pos is hard
 	const int start = SDL_GetTicks();
 	clicked();
 	const int end = SDL_GetTicks();
@@ -231,7 +232,6 @@ bool button_widget::handle_event(const SDL_Event &e)
 		}
 		break;
 	case SDL_MOUSEBUTTONUP:
-		// NB heuristic since finding mouse pos is hard
 	        {
 			if(ready_ && hit_me(e)) {
 				do_click();
@@ -305,20 +305,25 @@ void scrolled_container::remove_widget(widget_ptr p) {
 
 void scrolled_container::handle_draw() const 
 {
-	glPushMatrix();
-	glTranslatef(x(), y(), 0);
 	SDL_Rect self = { x(), y(), width(), height() };
 	graphics::push_clip(self);
+	glPushMatrix();
+	glTranslatef(x(), y(), 0);
 
 	const int max_widget = widgets_.size();
 	int widget = offset_;
-	int x_used = 0;
-	while(widget < max_widget && x_used < width()) {
-		int w_used = widgets_[widget]->width();
+	int p_used = 0;
+	int max_p = axis() == HORIZONTAL ? width() : height();
+	while(widget < max_widget && p_used < max_p) {
+		int d_used = axis() == HORIZONTAL ? widgets_[widget]->width() : widgets_[widget]->height();
 		widgets_[widget]->draw();
-		x_used += w_used;
+		p_used += d_used;
 		++widget;
-		glTranslatef(w_used, 0, 0);
+		if(axis() == HORIZONTAL) {
+			glTranslatef(d_used, 0, 0);
+		} else {
+			glTranslatef(0, d_used, 0);
+		}
 	}
 
 	graphics::pop_clip();
@@ -363,17 +368,21 @@ bool scrolled_container::handle_event(const SDL_Event &e)
 	move_event(&ev, x(), y());
 	const int max_widget = widgets_.size() - offset_;
 	int widget = offset_;
-	int x_used = 0;
-	while(widget < max_widget && x_used < width()) {
-		int w_used = widgets_[widget]->width();
+	int p_used = 0;
+	int max_p = axis() == HORIZONTAL ? width() : height();
+	while(widget < max_widget && p_used < max_p) {
+		int d_used = axis() == HORIZONTAL ? widgets_[widget]->width() : widgets_[widget]->height();
 		claimed = widgets_[widget]->process_event(ev);
-		x_used += w_used;
+		p_used += d_used;
 		++widget;
 		if(claimed) {
 			break;
 		}
-
-		move_event(&ev, w_used, 0);
+		if(axis() == HORIZONTAL) {
+			move_event(&ev, d_used, 0);
+		} else {
+			move_event(&ev, 0, d_used);
+		}
 	}
 	return claimed;
 

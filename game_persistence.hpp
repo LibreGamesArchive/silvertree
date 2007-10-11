@@ -5,7 +5,8 @@ namespace game_dialogs {
 
 void silent_save(const std::string& filename);
 bool save(const std::string& filename, game_logic::world *wp);
-
+void silent_load(const std::string& filename);
+bool load(const std::string& filename, game_logic::world *wp);
 }
 
 #endif
