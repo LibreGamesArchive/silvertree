@@ -34,6 +34,8 @@ public:
 	int as_int() const { must_be(TYPE_INT); return int_value_; }
 	bool as_bool() const;
 
+	bool is_list() const { return type_ == TYPE_LIST; }
+
 	const std::string& as_string() const;
 
 	bool is_callable() const { return type_ == TYPE_CALLABLE; }

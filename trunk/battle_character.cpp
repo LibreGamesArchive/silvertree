@@ -464,7 +464,8 @@ std::string battle_character::status_text() const
 	  << "HP: " << char_->hitpoints() << "/"
 	  << char_->max_hitpoints() << "\n"
 	  << "Attack: " << attack() << "\n"
-	  << "Defense: " << defense() << "\n"
+	  << "Dodge: " << char_->dodge() << "\n"
+	  << "Parry: " << char_->parry() << "\n"
 	  << "Damage: " << adjust_damage(char_->damage()) << "\n"
 	  << char_->alignment_description() << "("
 	  << (time_of_day_adjustment_ > 0 ? "+" : "")

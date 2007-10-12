@@ -229,28 +229,62 @@ private:
 class min_function : public function_expression {
 public:
 	explicit min_function(const args_list& args)
-	     : function_expression(args, 2, 2)
+	     : function_expression(args, 1, -1)
 	{}
 
 private:
 	variant execute(const formula_callable& variables) const {
-		const variant n1 = args()[0]->evaluate(variables);
-		const variant n2 = args()[1]->evaluate(variables);
-		return n1 < n2 ? n1 : n2;
+		bool found = false;
+		int res = 0;
+		for(int n = 0; n != args().size(); ++n) {
+			const variant v = args()[n]->evaluate(variables);
+			if(v.is_list()) {
+				for(int m = 0; m != v.num_elements(); ++m) {
+					if(!found || v[m].as_int() < res) {
+						res = v[m].as_int();
+						found = true;
+					}
+				}
+			} else if(v.is_int()) {
+				if(!found || v.as_int() < res) {
+					res = v.as_int();
+					found = true;
+				}
+			}
+		}
+
+		return variant(res);
 	}
 };
 
 class max_function : public function_expression {
 public:
 	explicit max_function(const args_list& args)
-	     : function_expression(args, 2, 2)
+	     : function_expression(args, 1, -1)
 	{}
 
 private:
 	variant execute(const formula_callable& variables) const {
-		const variant n1 = args()[0]->evaluate(variables);
-		const variant n2 = args()[1]->evaluate(variables);
-		return n1 > n2 ? n1 : n2;
+		bool found = false;
+		int res = 0;
+		for(int n = 0; n != args().size(); ++n) {
+			const variant v = args()[n]->evaluate(variables);
+			if(v.is_list()) {
+				for(int m = 0; m != v.num_elements(); ++m) {
+					if(!found || v[m].as_int() > res) {
+						res = v[m].as_int();
+						found = true;
+					}
+				}
+			} else if(v.is_int()) {
+				if(!found || v.as_int() > res) {
+					res = v.as_int();
+					found = true;
+				}
+			}
+		}
+
+		return variant(res);
 	}
 };
 
@@ -943,6 +977,7 @@ int main()
 		assert(formula("min(5,2)").execute(c).as_int() == 2);
 		assert(formula("max(3,5)").execute(c).as_int() == 5);
 		assert(formula("max(5,2)").execute(c).as_int() == 5);
+		assert(formula("max(4,5,[2,18,7])").execute(c).as_int() == 18);
 		assert(formula("char.strength").execute(p).as_int() == 15);
 		assert(formula("choose(members,strength).strength").execute(p).as_int() == 16);
 		assert(formula("4^2").execute().as_int() == 16);

@@ -567,7 +567,9 @@ bool character::award_experience(int xp)
 {
 	xp_ += xp;
 	if(xp_ >= experience_required()) {
+		const int old_maxhp = max_hitpoints();
 		++level_;
+		hitpoints_ += max_hitpoints() - old_maxhp;
 		improvement_points_ += formula_registry::get_stat_calculation("improvement_points")->execute(*this).as_int();
 		return true;
 	} else {

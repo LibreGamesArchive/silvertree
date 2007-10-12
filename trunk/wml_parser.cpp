@@ -374,6 +374,7 @@ node_ptr parse_wml(const std::string& doc)
 		} else if(*i == '#') {
 			skip_comment(i,doc.end());
 		} else {
+			std::cerr << "unexpected chars: {{{" << &*i << "}}}\n";
 			throw parse_error("unexpected characters in wml document");
 		}
 	}
