@@ -554,7 +554,9 @@ void party::assign_equipment(character_ptr c,
 
 variant party::get_value(const std::string& key) const
 {
-	if(key == "var") {
+	if(key == "party") {
+		return variant(this);
+	} else if(key == "var") {
 		return variant(&global_game_state::get().get_variables());
 	} else if(key == "is_npc") {
 		return variant(is_human_controlled() ? 0 : 1);
