@@ -46,7 +46,7 @@ env = Environment()
 def buildpath():
     name = builddir
     if editor: name += "/st-edit"
-    else: name += "st-game"
+    else: name += "/st-game"
     if crosscompile: name += "-mingw"
     else: name += "-posix"
     if debug: name += "-debug"
@@ -93,7 +93,7 @@ else:
     env.ParseConfig("sdl-config --cflags")
     env.ParseConfig("sdl-config --libs")
     env.Append(CPPPATH = ["/usr/include/GL"])
-    env.Append(LIBS = ["GL", "GLU", "SDL_image", "SDL_ttf", "boost_regex-mt"])
+    env.Append(LIBS = ["GL", "GLU", "SDL_image", "SDL_ttf", "boost_regex"])
     if editor:
         env.EnableQt4Modules(['QtCore', 'QtGui', 'QtOpenGL'])
         env.Replace(QT4_UICIMPLSUFFIX=".hpp", QT4_UICDECLSUFFIX=".hpp",
