@@ -15,11 +15,11 @@
 #include <string>
 #include <vector>
 
+#include "character.hpp"
 #include "dialog.hpp"
 #include "frame.hpp"
 #include "gui_core.hpp"
 #include "label.hpp"
-#include "party.hpp"
 #include "widget.hpp"
 #include "world.hpp"
 
@@ -27,8 +27,9 @@ namespace gui {
 
 class message_dialog: public dialog {
 public:
-	message_dialog(const game_logic::party& pc,
-		       const game_logic::party& npc,
+	message_dialog(const game_logic::world& world,
+	           const game_logic::character& pc,
+		       const game_logic::character& npc,
 		       const std::string& msg,
 		       const std::vector<std::string>* options=NULL,
 		       bool starts_conversation = true);
@@ -51,8 +52,9 @@ private:
 	int selected_;
 	const std::string& msg_;
 	const std::vector<std::string>* options_;
-	const game_logic::party& pc_;
-	const game_logic::party& npc_;
+	const game_logic::world& world_;
+	const game_logic::character& pc_;
+	const game_logic::character& npc_;
 	std::vector<frame_ptr> option_frames_;
 	std::vector<boost::shared_ptr<dialog_label> > dialog_labels_;
 	widget_ptr pc_portrait_;

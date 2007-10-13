@@ -270,10 +270,26 @@ class dialog_command : public wml_command {
 		std::cerr << "npc: " << npc_formula_.str() << "\n";
 		const formula_callable* npc = npc_formula_.execute(info).as_callable();
 		std::cerr << "done\n";
+
+		const character* pc_char = NULL;
+		const character* npc_char = NULL;
 		const party* pc_party = dynamic_cast<const party*>(pc);
 		const party* npc_party = dynamic_cast<const party*>(npc);
-		if(!pc_party || !npc_party) {
-			std::cerr << "Could not calculate parties in dialog\n";
+
+		if(pc_party) {
+			pc_char = pc_party->begin_members()->get();
+		} else {
+			pc_char = dynamic_cast<const character*>(pc);
+		}
+
+		if(npc_party) {
+			npc_char = npc_party->begin_members()->get();
+		} else {
+			npc_char = dynamic_cast<const character*>(npc);
+		}
+
+		if(!pc_char || !npc_char) {
+			std::cerr << "Could not calculate characters in dialog\n";
 			return;
 		}
 
@@ -286,7 +302,7 @@ class dialog_command : public wml_command {
 			}
 		}
 
-		gui::message_dialog dialog(*pc_party, *npc_party, text_->execute(info).as_string(),
+		gui::message_dialog dialog(world, *pc_char, *npc_char, text_->execute(info).as_string(),
 		                           options.empty() ? NULL : &options,
 								   false);
 		dialog.show_modal();
