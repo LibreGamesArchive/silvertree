@@ -18,13 +18,14 @@
 
 namespace gui {
 
-message_dialog::message_dialog(const game_logic::party& pc,
-			       const game_logic::party& npc,
+message_dialog::message_dialog(const game_logic::world& world,
+				   const game_logic::character& pc,
+			       const game_logic::character& npc,
 			       const std::string& msg,
 			       const std::vector<std::string>* options,
 			       bool starts_conversation) 
 	: dialog(0,0,graphics::screen_width(),graphics::screen_height()), 
-	  msg_(msg), options_(options), pc_(pc), npc_(npc), 
+	  msg_(msg), options_(options), world_(world), pc_(pc), npc_(npc), 
 	  fade_in_rate_(30), starts_conversation_(starts_conversation)
 {
 	
@@ -62,7 +63,7 @@ void message_dialog::construct_interface()
 	dialog_labels_.clear();
 	option_frames_.clear();
 
-	const std::string npcname = (*npc_.begin_members())->portrait();
+	const std::string npcname = npc_.portrait();
 
 	set_padding(0);
 	dialog_label_ptr msg_label_inner(new dialog_label(msg_, color, 18));
@@ -90,7 +91,7 @@ void message_dialog::construct_interface()
 	}
 
 	if(options_) {		
-		const std::string pcname = (*pc_.begin_members())->portrait();
+		const std::string pcname = pc_.portrait();
 		int left_offset = 0;
 
 		set_cursor(s_width/8, s_height*7/8 - 205);
@@ -157,7 +158,7 @@ void message_dialog::construct_interface()
 	
 void message_dialog::handle_draw() const 
 {
-	pc_.game_world().draw();
+	world_.draw();
 
 	graphics::prepare_raster();
 	dialog::handle_draw_children();
