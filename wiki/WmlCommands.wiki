@@ -41,7 +41,10 @@ Generally if you want to use a script to move some characters, and then when the
 
 = modify_objects =
 
-Will modify the objects given by 'objects'. 
+Will modify the objects given by 'objects'.
+
+ * objects: Formula which evaluates to an object or a list of objects which will be modified
+ * (all other attributes): the attribute to set, with the formula used to set it. Takes all inputs of the event plus 'object' which refers to the object being modified.
 
 = party_chat =
 
