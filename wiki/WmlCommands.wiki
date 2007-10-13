@@ -1,0 +1,9 @@
+= Introduction =
+
+This page documents possible WML commands that are available when an event is triggered.
+
+= party_chat =
+
+text: A text string which contains the message to display
+speaker: The character who speaks. This may be null, in which case no message will be displayed.
+delay: The number of milliseconds to delay the speech. This is useful if you want to make a sequence of speech by different characters.
