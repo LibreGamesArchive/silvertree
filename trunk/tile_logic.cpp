@@ -48,6 +48,13 @@ wml::node_ptr write_src_dst_location(const std::string& name, const location& sr
 	return res;
 }
 
+void location::get_inputs(std::vector<game_logic::formula_input>* inputs) const
+{
+	inputs->push_back(game_logic::formula_input("x", game_logic::FORMULA_READ_ONLY));
+	inputs->push_back(game_logic::formula_input("y", game_logic::FORMULA_READ_ONLY));
+	inputs->push_back(game_logic::formula_input("valid", game_logic::FORMULA_READ_ONLY));
+}
+
 variant location::get_value(const std::string& key) const
 {
 	if(key == "x") {

@@ -917,7 +917,7 @@ void world::set_lighting() const
 
 void world::fire_event(const std::string& name, const formula_callable& info)
 {
-	//std::cerr << "event: '" << name << ": " << handlers_.size() << "'\n";
+	//std::cerr << "event: '" << name << "': " << variant(&info).to_debug_string() << "\n";
 	std::pair<event_map::iterator,event_map::iterator> range =
 	     handlers_.equal_range(name);
 	while(range.first != range.second) {
@@ -956,6 +956,13 @@ bool world::remove_party(party_ptr p)
 	}
 
 	return false;
+}
+
+void world::get_inputs(std::vector<formula_input>* inputs) const
+{
+	inputs->push_back(formula_input("time", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("pc", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("parties", FORMULA_READ_ONLY));
 }
 
 variant world::get_value(const std::string& key) const

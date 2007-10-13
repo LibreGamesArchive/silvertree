@@ -43,6 +43,7 @@ public:
 
 private:
 	variant get_value(const std::string& key) const;
+	void get_inputs(std::vector<formula_input>* inputs) const;
 	int minutes_since_epoch_;
 };
 

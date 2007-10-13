@@ -25,6 +25,11 @@ class mod_callable : public formula_callable
 			return caster_.query_value(stat);
 		}
 	}
+
+	void get_inputs(std::vector<formula_input>* inputs) const {
+		inputs->push_back(formula_input("target", FORMULA_READ_ONLY));
+		inputs->push_back(formula_input("caster", FORMULA_READ_ONLY));
+	}
 public:
 	mod_callable(const character& target, const character& caster)
 	  : target_(target), caster_(caster)

@@ -10,6 +10,15 @@
 namespace game_logic
 {
 
+enum FORMULA_ACCESS_TYPE { FORMULA_READ_ONLY, FORMULA_WRITE_ONLY, FORMULA_READ_WRITE };
+struct formula_input {
+	std::string name;
+	FORMULA_ACCESS_TYPE access;
+	explicit formula_input(const std::string& name, FORMULA_ACCESS_TYPE access=FORMULA_READ_WRITE)
+			: name(name), access(access)
+	{}
+};
+
 //interface for objects that can have formulae run on them
 class formula_callable : public reference_counted_object {
 public:
@@ -21,11 +30,17 @@ public:
 		set_value(key, value);
 	}
 
+	std::vector<formula_input> inputs() const {
+		std::vector<formula_input> res;
+		get_inputs(&res);
+		return res;
+	}
+
+	virtual void get_inputs(std::vector<formula_input>* inputs) const = 0;
 protected:
 	virtual ~formula_callable() {}
 
 	virtual void set_value(const std::string& key, const variant& value);
-
 private:
 	virtual variant get_value(const std::string& key) const = 0;
 };
@@ -36,6 +51,7 @@ public:
 	map_formula_callable& add(const std::string& key, const variant& value);
 private:
 	variant get_value(const std::string& key) const;
+	void get_inputs(std::vector<formula_input>* inputs) const;
 	std::map<std::string,variant> values_;
 	const formula_callable* fallback_;
 };

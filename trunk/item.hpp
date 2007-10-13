@@ -47,6 +47,7 @@ public:
 	static const std::string& type_name(ITEM_TYPE type);
 private:
 	virtual variant get_value(const std::string& key) const;
+	void get_inputs(std::vector<formula_input>* inputs) const;
 	std::string id_;
 	ITEM_TYPE type_;
 	std::string class_;

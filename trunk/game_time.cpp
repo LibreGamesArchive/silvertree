@@ -137,6 +137,14 @@ variant game_time::get_value(const std::string& key) const
 	}
 }
 
+void game_time::get_inputs(std::vector<formula_input>* inputs) const
+{
+	inputs->push_back(formula_input("day", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("hour", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("minute", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("daypercent", FORMULA_READ_ONLY));
+}
+
 int game_time::alignment_adjustment() const
 {
 	switch(hour()) {

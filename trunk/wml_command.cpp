@@ -20,6 +20,34 @@ namespace game_logic {
 
 namespace {
 
+class debug_console_command : public wml_command {
+	void do_execute(const formula_callable& info, world& world) const {
+		std::cerr << "starting debug console. Type formula to evaluate. Type 'continue' when you're ready to continue\n";
+		std::cerr << variant(&info).to_debug_string() << "\n";
+		for(;;) {
+			std::cerr << "\n>>> ";
+			char buf[1024];
+			std::cin.getline(buf, sizeof(buf));
+			std::string cmd(buf);
+			if(cmd == "continue") {
+				break;
+			}
+
+			try {
+				formula f(cmd);
+				const variant v = f.execute(info);
+				std::cerr << v.to_debug_string() << "\n";
+			} catch(formula_error& e) {
+				std::cerr << "ERROR IN FORMULA\n";
+			}
+		}
+	}
+public:
+	explicit debug_console_command(wml::const_node_ptr node)
+	{}
+	
+};
+
 class debug_command : public wml_command {
 	const_formula_ptr text_;
 	void do_execute(const formula_callable& info, world& world) const {
@@ -378,6 +406,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 
 	try {
 	DEFINE_COMMAND(debug);
+	DEFINE_COMMAND(debug_console);
 	DEFINE_COMMAND(destroy_party);
 	DEFINE_COMMAND(if);
 	DEFINE_COMMAND(scripted_moves);

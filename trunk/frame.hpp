@@ -93,6 +93,7 @@ class rect_mapper: public game_logic::formula_callable {
 public:
 	rect_mapper(const SDL_Rect& rect);
 private:
+	void get_inputs(std::vector<game_logic::formula_input>* inputs) const;
 	variant get_value(const std::string& key) const;
 
 	int x_, y_, w_, h_;
@@ -103,6 +104,7 @@ public:
 	void add_rect(const std::string& name, int x, int y, int w, int h);
 	void remove_rect(const std::string& name);
 private:
+	void get_inputs(std::vector<game_logic::formula_input>* inputs) const;
 	variant get_value(const std::string& key) const;
 
 	std::map<std::string,boost::shared_ptr<rect_mapper> > rects_;
