@@ -75,10 +75,8 @@ public:
 	std::string string_cast() const;
 
 	std::string to_debug_string(std::vector<const game_logic::formula_callable*>* seen=NULL) const;
-
-private:
-
 	enum TYPE { TYPE_INT, TYPE_CALLABLE, TYPE_LIST, TYPE_STRING };
+private:
 	void must_be(TYPE t) const;
 	TYPE type_;
 	union {

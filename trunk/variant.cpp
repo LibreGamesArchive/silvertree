@@ -13,6 +13,19 @@
 #include "formula_callable.hpp"
 #include "variant.hpp"
 
+namespace {
+std::string variant_type_to_string(variant::TYPE type) {
+	switch(type) {
+	case variant::TYPE_INT: return "int";
+	case variant::TYPE_CALLABLE: return "object";
+	case variant::TYPE_LIST: return "list";
+	case variant::TYPE_STRING: return "string";
+	default:
+		assert(false);
+	}
+}
+}
+
 struct variant_list {
 	variant_list() : refcount(0)
 	{}
@@ -261,7 +274,7 @@ bool variant::operator>(const variant& v) const
 void variant::must_be(variant::TYPE t) const
 {
 	if(type_ != t) {
-		throw type_error("type error");
+		throw type_error(formatter() << "type error: " << " expected " << variant_type_to_string(t) << " but found " << variant_type_to_string(type_) << " (" << to_debug_string() << ")");
 	}
 }
 
