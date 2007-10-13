@@ -1,6 +1,8 @@
 #ifndef GAME_BAR_HPP_INCLUDED
 #define GAME_BAR_HPP_INCLUDED
 
+#include <vector>
+
 #include "character.hpp"
 #include "dialog.hpp"
 #include "frame.hpp"
@@ -18,10 +20,15 @@ public:
 		construct_interface(pty, wp);
 	}
 
+	SDL_Rect character_rect(int index) const;
+
 private:
 	bool handle_event(const SDL_Event &e);
 	void construct_interface(game_logic::party_ptr pty, game_logic::world *wp);
 	void inner_draw() const;
+
+	gui::const_widget_ptr portrait_set_;
+	std::vector<gui::const_widget_ptr> char_rects_;
 };
 
 typedef boost::shared_ptr<game_bar> game_bar_ptr;
@@ -41,15 +48,16 @@ private:
 
 class game_bar_portrait_set : public gui::dialog {
 public:
-	game_bar_portrait_set(game_logic::party_ptr pty, int w, int h)
+	game_bar_portrait_set(game_logic::party_ptr pty, int w, int h,
+	                      std::vector<gui::const_widget_ptr>* char_rects=NULL)
 		: dialog(0,0,w,h), pty_(pty) 
 	{
-		construct_interface();
+		construct_interface(char_rects);
 	}
 private:
 	void handle_draw() const;
-	void construct_interface();
-	void build_scrolly() const;
+	void construct_interface(std::vector<gui::const_widget_ptr>* char_rects=NULL);
+	void build_scrolly(std::vector<gui::const_widget_ptr>* char_rects=NULL) const;
 	game_logic::party_ptr pty_;
 	mutable gui::scrolled_container_ptr scrolly_;
 };

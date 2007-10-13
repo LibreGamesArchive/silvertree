@@ -43,6 +43,15 @@ public:
 		must_be(TYPE_CALLABLE); return callable_; }
 	game_logic::formula_callable* mutable_callable() const {
 		must_be(TYPE_CALLABLE); return mutable_callable_; }
+	
+	template<typename T>
+	T* try_convert() const {
+		if(!is_callable()) {
+			return NULL;
+		}
+
+		return dynamic_cast<T*>(mutable_callable());
+	}
 
 	template<typename T>
 	T* convert_to() const {

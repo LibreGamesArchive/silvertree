@@ -10,6 +10,8 @@
 
    See the COPYING file for more details.
 */
+#include "foreach.hpp"
+#include "global_game_state.hpp"
 #include "keyboard.hpp"
 #include "pc_party.hpp"
 #include "tile_logic.hpp"
@@ -40,6 +42,21 @@ void pc_party::encounter(party& p, const std::string& type)
 
 party::TURN_RESULT pc_party::do_turn()
 {
+	std::vector<const_party_ptr> now_visible;
+	get_visible_parties(now_visible);
+	foreach(const_party_ptr& p, now_visible) {
+		if(std::find(seen_.begin(), seen_.end(), p) == seen_.end()) {
+			map_formula_callable_ptr callable(new map_formula_callable);
+			callable->add("world", variant(&game_world()))
+			         .add("var", variant(&global_game_state::get().get_variables()))
+					 .add("pc", variant(this))
+					 .add("npc", variant(p.get()));
+			game_world().fire_event("sight", *callable);
+		}
+	}
+
+	seen_.swap(now_visible);
+	
 	const hex::DIRECTION dir = keyboard::dir(
 	               game_world().camera().direction());
 

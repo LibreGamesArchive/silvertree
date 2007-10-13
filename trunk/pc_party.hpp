@@ -13,6 +13,8 @@
 #ifndef PC_PARTY_HPP_INCLUDED
 #define PC_PARTY_HPP_INCLUDED
 
+#include <vector>
+
 #include "party.hpp"
 #include "wml_node.hpp"
 
@@ -33,7 +35,8 @@ public:
 	wml::node_ptr write() const;
 private:
 	TURN_RESULT do_turn();
-		
+	
+	std::vector<const_party_ptr> seen_;
 };
 		
 }

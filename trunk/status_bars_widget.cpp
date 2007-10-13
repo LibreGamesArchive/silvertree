@@ -62,6 +62,8 @@ void draw_anchored_expanding_time_bar(GLfloat time, GLfloat accounted_time, int 
 				       drawn_tick_angle * (1-acc)); 
 		}
 	}
+
+	glColor4ub(255, 255, 255, 255);
 }
 
 void draw_time_bars(GLfloat time, GLfloat accounted_time, GLfloat start, GLfloat thickness, 
@@ -274,6 +276,8 @@ void status_bars_widget::handle_draw() const {
 
 	glPopMatrix();
 	glEnable(GL_TEXTURE_2D);
+
+	glColor4ub(255, 255, 255, 255);
 }
 
 void time_cost_widget::handle_draw() const {

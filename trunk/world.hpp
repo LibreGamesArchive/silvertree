@@ -87,6 +87,8 @@ public:
 	void draw() const;
 
 	void quit() { done_ = true; quit_ = true; }
+	
+	void add_chat_label(gui::label_ptr label, const_character_ptr ch, int delay);
 private:
 	party_ptr get_pc_party() const;
 	bool remove_party(party_ptr p);
@@ -165,6 +167,14 @@ private:
 	mutable outside_tiles_map outside_tiles_;
 	bool done_;
 	bool quit_;
+
+	struct chat_label {
+		gui::label_ptr label;
+		int started_at;
+		int y_loc;
+		const_character_ptr character;
+	};
+	mutable std::vector<chat_label> chat_labels_;
 };
 		
 }

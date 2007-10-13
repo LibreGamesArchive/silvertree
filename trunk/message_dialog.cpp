@@ -354,5 +354,4 @@ bool message_dialog::handle_event(const SDL_Event& event) {
 	return claimed;
 }
 
-
 } // namespace gui

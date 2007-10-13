@@ -44,6 +44,8 @@ void prepare_raster()
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
+
+	glColor4f(1.0, 1.0, 1.0, 1.0);
 }
 
 void blit_texture(const texture& tex, int x, int y, GLfloat rotate)
@@ -67,7 +69,6 @@ void blit_texture(const texture& tex, int x, int y, GLfloat rotate)
 	tex.set_as_current_texture();
 
 	glBegin(GL_QUADS);
-	glColor3f(1.0,1.0,1.0);
 	graphics::texture::set_coord(0.0,0.0);
 	glVertex3i(-w,-h,0);
 	graphics::texture::set_coord(0.0,1.0);
@@ -97,7 +98,6 @@ void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate
 	glTranslatef(x+w,y+h,0.0);
 	glRotatef(rotate,0.0,0.0,1.0);
 	glBegin(GL_QUADS);
-	glColor3f(1.0,1.0,1.0);
 	graphics::texture::set_coord(0.0,0.0);
 	glVertex3i(-w,-h,0);
 	graphics::texture::set_coord(0.0,1.0);
@@ -116,6 +116,7 @@ void draw_rect(const SDL_Rect& r, const SDL_Color& color,
 	glDisable(GL_TEXTURE_2D);
 	glColor4ub(color.r,color.g,color.b,alpha);
 	glRecti(r.x,r.y,r.x+r.w,r.y+r.h);
+	glColor4ub(255, 255, 255, 255);
 	glEnable(GL_TEXTURE_2D);
 }
 
@@ -129,6 +130,7 @@ void draw_hollow_rect(const SDL_Rect& r, const SDL_Color& color,
 	glVertex3f( r.x + r.w, r.y, 0);
 	glVertex3f( r.x + r.w, r.y + r.h, 0);
 	glVertex3f( r.x, r.y + r.h, 0);
+	glColor4ub(255, 255, 255, 255);
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
 }
