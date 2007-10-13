@@ -62,4 +62,4 @@ filter: a formula which runs on the event's input. The event handler will only b
 
 first_time_only: if set, the event handler will only be run once.
 
-An [event] should have one or more child elements which contain WMLCommands. Each of these commands will be executed when the event is triggered.
+An event should have one or more child elements which contain WmlCommands. Each of these commands will be executed when the event is triggered.
