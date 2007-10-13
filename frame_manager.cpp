@@ -368,6 +368,13 @@ void key_mapper::remove_rect(const std::string& name)
 	rects_.erase(name);
 }
 
+void key_mapper::get_inputs(std::vector<game_logic::formula_input>* inputs) const
+{
+	for(std::map<std::string,boost::shared_ptr<rect_mapper> >::const_iterator i = rects_.begin(); i != rects_.end(); ++i) {
+		inputs->push_back(game_logic::formula_input(i->first, game_logic::FORMULA_READ_ONLY));
+	}
+}
+
 variant key_mapper::get_value(const std::string& name) const
 {
 	std::map<std::string,boost::shared_ptr<rect_mapper> >::const_iterator i =
@@ -380,6 +387,14 @@ variant key_mapper::get_value(const std::string& name) const
 
 rect_mapper::rect_mapper(const SDL_Rect& r)
 	: x_(r.x), y_(r.y), w_(r.w), h_(r.h) {}
+
+void rect_mapper::get_inputs(std::vector<game_logic::formula_input>* inputs) const
+{
+	inputs->push_back(game_logic::formula_input("x", game_logic::FORMULA_READ_ONLY));
+	inputs->push_back(game_logic::formula_input("y", game_logic::FORMULA_READ_ONLY));
+	inputs->push_back(game_logic::formula_input("w", game_logic::FORMULA_READ_ONLY));
+	inputs->push_back(game_logic::formula_input("h", game_logic::FORMULA_READ_ONLY));
+}
 
 variant rect_mapper::get_value(const std::string& name) const
 {

@@ -47,6 +47,16 @@ variant map_formula_callable::get_value(const std::string& key) const
 	        fallback_ ? fallback_->query_value(key) : variant(0));
 }
 
+void map_formula_callable::get_inputs(std::vector<formula_input>* inputs) const
+{
+	if(fallback_) {
+		fallback_->get_inputs(inputs);
+	}
+	for(std::map<std::string,variant>::const_iterator i = values_.begin(); i != values_.end(); ++i) {
+		inputs->push_back(formula_input(i->first, FORMULA_READ_ONLY));
+	}
+}
+
 class formula_expression {
 public:
 	virtual ~formula_expression() {}
@@ -554,6 +564,12 @@ public:
 private:
 	const formula_callable& base_;
 	expr_table_ptr table_;
+
+	void get_inputs(std::vector<formula_input>* inputs) const {
+		for(expr_table::const_iterator i = table_->begin(); i != table_->end(); ++i) {
+			inputs->push_back(formula_input(i->first, FORMULA_READ_ONLY));
+		}
+	}
 
 	variant get_value(const std::string& key) const {
 		expr_table::iterator i = table_->find(key);

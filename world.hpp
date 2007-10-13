@@ -138,6 +138,7 @@ private:
 	void rebuild_drawing_caches(const std::set<hex::location>& visible) const;
 
 	variant get_value(const std::string& key) const;
+	void get_inputs(std::vector<formula_input>* inputs) const;
 
 	game_time time_;
 	GLfloat subtime_;

@@ -126,6 +126,10 @@ public:
 		{}
 
 	private:
+		void get_inputs(std::vector<game_logic::formula_input>* inputs) const {
+			char_.get_inputs(inputs);
+		}
+
 		variant get_value(const std::string& key) const {
 			int res = char_.stat(key);
 			if(res == 0) {
@@ -139,6 +143,7 @@ public:
 private:
 	explicit character(wml::const_node_ptr node);
 
+	void get_inputs(std::vector<game_logic::formula_input>* inputs) const;
 	variant get_value(const std::string& key) const;
 	void set_value(const std::string& key, const variant& value);
 	int total_skill_points() const;

@@ -38,7 +38,16 @@ const int DownHillFree = 50;
 class strength_penalty_callable : public formula_callable
 {
 	variant val_;
-	variant get_value(const std::string& key) const { return val_; }
+	variant get_value(const std::string& key) const {
+		if(key == "shortfall") {
+			return val_;
+		} else {
+			return variant();
+		}
+	}
+	void get_inputs(std::vector<formula_input>* inputs) const {
+		inputs->push_back(formula_input("shortfall", FORMULA_READ_ONLY));
+	}
 public:
 	explicit strength_penalty_callable(int val) : val_(val) {}
 };
@@ -47,6 +56,11 @@ class fatigue_penalty_callable : public formula_callable
 {
 	const character& char_;
 	variant get_value(const std::string& stat) const { return variant(char_.stat_before_fatigue(stat)); }
+	void get_inputs(std::vector<formula_input>* inputs) const {
+		foreach(const std::string& str, character::attributes()) {
+			inputs->push_back(formula_input(str, FORMULA_READ_ONLY));
+		}
+	}
 public:
 	explicit fatigue_penalty_callable(const character& c) : char_(c)
 	{}
@@ -255,6 +269,23 @@ std::vector<const_skill_ptr> character::eligible_skills() const
 	}
 
 	return res;
+}
+
+void character::get_inputs(std::vector<formula_input>* inputs) const
+{
+	inputs->push_back(formula_input("level", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("weapon", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("description", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("max_hp", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("max_hitpoints", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("hp", FORMULA_READ_WRITE));
+	inputs->push_back(formula_input("hitpoints", FORMULA_READ_WRITE));
+	inputs->push_back(formula_input("strength", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("agility", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("endurance", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("persona", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("intelligence", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("persona", FORMULA_READ_ONLY));
 }
 
 variant character::get_value(const std::string& key) const

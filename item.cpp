@@ -96,4 +96,8 @@ variant item::get_value(const std::string& key) const
 	return variant();
 }
 
+void item::get_inputs(std::vector<formula_input>* inputs) const
+{
+}
+
 }

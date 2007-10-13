@@ -25,6 +25,12 @@ public:
 	explicit variables_callable(variable_map& var) : var_(var) {
 	}
 private:
+	void get_inputs(std::vector<formula_input>* inputs) const {
+		for(variable_map::const_iterator i = var_.begin(); i != var_.end(); ++i) {
+			inputs->push_back(formula_input(i->first, FORMULA_READ_WRITE));
+		}
+	}
+
 	variant get_value(const std::string& key) const {
 		variable_map::const_iterator i = var_.find(key);
 		if(i != var_.end()) {

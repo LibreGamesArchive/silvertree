@@ -26,6 +26,7 @@ namespace hex
 	class location : public game_logic::formula_callable {
 		int x_, y_;
 		variant get_value(const std::string& key) const;
+		void get_inputs(std::vector<game_logic::formula_input>* inputs) const;
 	public:
 		location() : x_(-1), y_(-1)
 		{}

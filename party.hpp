@@ -147,6 +147,7 @@ private:
 	virtual TURN_RESULT do_turn() = 0;
 
 	variant get_value(const std::string& key) const;
+	void get_inputs(std::vector<formula_input>* inputs) const;
 
 	int id_;
 	std::string str_id_;

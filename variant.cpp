@@ -328,3 +328,57 @@ std::string variant::string_cast() const
 		assert(false);
 	}
 }
+
+std::string variant::to_debug_string(std::vector<const game_logic::formula_callable*>* seen) const
+{
+	std::vector<const game_logic::formula_callable*> seen_stack;
+	if(!seen) {
+		seen = &seen_stack;
+	}
+
+	std::ostringstream s;
+	switch(type_) {
+	case TYPE_INT:
+		s << int_value_;
+		break;
+	case TYPE_LIST: {
+		s << "[";
+		for(int n = 0; n != num_elements(); ++n) {
+			if(n != 0) {
+				s << ", ";
+			}
+
+			s << operator[](n).to_debug_string(seen);
+		}
+		s << "]";
+		break;
+	}
+	case TYPE_CALLABLE: {
+		s << "{";
+		if(seen->empty()) { //std::find(seen->begin(), seen->end(), callable_) == seen->end()) {
+			seen->push_back(callable_);
+			std::vector<game_logic::formula_input> v = callable_->inputs();
+			foreach(const game_logic::formula_input& input, v) {
+				s << "'" << input.name << "' ";
+				if(input.access == game_logic::FORMULA_READ_ONLY) {
+					s << "(readonly) ";
+				} else if(input.access == game_logic::FORMULA_WRITE_ONLY) {
+					s << "(writeonly) ";
+				}
+
+				s << "-> " << callable_->query_value(input.name).to_debug_string(seen) << ", ";
+			}
+		} else {
+			s << "...";
+		}
+		s << "}";
+		break;
+	}
+	case TYPE_STRING: {
+		s << "'" << string_->str << "'";
+		break;
+	}
+	}
+
+	return s.str();
+}

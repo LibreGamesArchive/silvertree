@@ -552,6 +552,24 @@ void party::assign_equipment(character_ptr c,
 	}
 }
 
+void party::get_inputs(std::vector<formula_input>* inputs) const
+{
+	inputs->push_back(formula_input("party", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("var", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("is_npc", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("is_pc", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("world", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("id", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("unique_id", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("loc", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("previous", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("members", FORMULA_READ_WRITE));
+	inputs->push_back(formula_input("leader", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("money", FORMULA_READ_WRITE));
+	inputs->push_back(formula_input("haggle", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("var", FORMULA_READ_ONLY));
+}
+
 variant party::get_value(const std::string& key) const
 {
 	if(key == "party") {
