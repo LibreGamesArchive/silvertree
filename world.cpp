@@ -503,6 +503,7 @@ void world::draw() const
 		glEnable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_LIGHTING);
+		glColor4ub(255, 255, 255, 255);
 	}
 
 	particle_system_.draw();
@@ -548,6 +549,36 @@ void world::draw() const
 	if(selected_party != parties_.end()) {
 		graphics::texture text = graphics::font::render_text(selected_party->second->status_text(), 20, white);
 		graphics::blit_texture(text,1024 - 50 - text.width(),200);
+	}
+
+	if(!chat_labels_.empty()) {
+		const int ticks = SDL_GetTicks();
+		for(std::vector<chat_label>::iterator cl = chat_labels_.begin(); cl != chat_labels_.end(); ) {
+			const int age = ticks - cl->started_at;
+			if(age > 10000) {
+				cl = chat_labels_.erase(cl);
+			} else {
+				if(age >= 0) {
+					const int color = cl->character->color().as_int();
+					GLfloat colorv[4] = {
+					  GLfloat((color/10000)%100)/100.0,
+					  GLfloat((color/100)%100)/100.0,
+					  GLfloat(color%100)/100.0,
+					  1.0 - pow(static_cast<GLfloat>(age)/10000.0, 2.0)
+					};
+
+					glColor4fv(colorv);
+					cl->label->set_loc(cl->label->x(), cl->y_loc - age/100);
+					cl->label->draw();
+				}
+				++cl;
+			}
+		}
+	}
+
+	glColor4f(1.0,1.0,1.0,1.0);
+	if(game_bar_) {
+		game_bar_->draw();
 	}
 }
 
@@ -602,9 +633,6 @@ void world::play()
 			
 			if(draw_this_frame) {
 				draw();
-				if(game_bar_) {
-					game_bar_->draw();
-				}
 				SDL_GL_SwapBuffers();
 			}
 			fps_track_.register_frame(draw_this_frame);
@@ -981,6 +1009,34 @@ variant world::get_value(const std::string& key) const
 	} else {
 		return variant();
 	}
+}
+
+void world::add_chat_label(gui::label_ptr label, const_character_ptr ch, int delay)
+{
+	party_ptr pc = get_pc_party();
+	if(!game_bar_ || !pc) {
+		std::cerr << "failed\n";
+		return;
+	}
+
+	std::vector<character_ptr>::const_iterator ch_itor = std::find(pc->begin_members(), pc->end_members(), ch);
+	if(ch_itor == pc->end_members()) {
+		std::cerr << "not found..\n";
+		return;
+	}
+
+	const int index = ch_itor - pc->begin_members();
+	const SDL_Rect rect = game_bar_->character_rect(index);
+	label->set_fixed_width(true);
+	label->set_loc(rect.x, rect.y - 50);
+	label->set_dim(rect.w, 100);
+
+	chat_label new_label;
+	new_label.label = label;
+	new_label.started_at = SDL_GetTicks() + delay;
+	new_label.y_loc = rect.y - 50;
+	new_label.character = ch;
+	chat_labels_.push_back(new_label);
 }
 
 }

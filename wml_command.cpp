@@ -7,6 +7,7 @@
 #include "character_status_dialog.hpp"
 #include "foreach.hpp"
 #include "formula.hpp"
+#include "label.hpp"
 #include "message_dialog.hpp"
 #include "party.hpp"
 #include "shop_dialog.hpp"
@@ -258,6 +259,28 @@ public:
 	}
 };
 
+class party_chat_command : public wml_command {
+	const_formula_ptr text_;
+	formula speaker_, delay_;
+	void do_execute(const formula_callable& info, world& world) const {
+		const character* c = speaker_.execute(info).try_convert<character>();
+		if(!c) {
+			return;
+		}
+
+		const int delay = delay_.execute(info).as_int();
+		variant var = text_->execute(info);
+		const SDL_Color col = {0xFF, 0xFF, 0xFF, 0xFF};
+		world.add_chat_label(gui::label::create(var.as_string(), col), c, delay);
+	}
+public:
+	explicit party_chat_command(wml::const_node_ptr node)
+	   : text_(formula::create_string_formula(wml::get_str(node, "text"))),
+	     speaker_(wml::get_str(node, "speaker")),
+		 delay_(wml::get_str(node, "delay", "0"))
+	{}
+};
+
 class dialog_command : public wml_command {
 	formula pc_formula_, npc_formula_;
 	const_formula_ptr text_;
@@ -429,6 +452,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	DEFINE_COMMAND(execute_script);
 	DEFINE_COMMAND(modify_objects);
 	DEFINE_COMMAND(battle);
+	DEFINE_COMMAND(party_chat);
 	DEFINE_COMMAND(dialog);
 	DEFINE_COMMAND(shop);
 	DEFINE_COMMAND(party);

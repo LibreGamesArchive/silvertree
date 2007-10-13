@@ -140,6 +140,8 @@ public:
 		const character& char_;
 	};
 
+	variant color() const;
+
 private:
 	explicit character(wml::const_node_ptr node);
 
@@ -171,6 +173,8 @@ private:
 
 	int improvement_points_;
 	int spent_skill_points_;
+	
+	formula color_;
 };
 
 }

@@ -141,11 +141,13 @@ wml::node_ptr character::write() const
 	}
 
 	res->set_attr("skills", skills);
+	res->set_attr("color", color_.str());
 
 	return res;
 }
 
 character::character(wml::const_node_ptr node)
+  : color_(wml::get_str(node, "color", "rgb(100,100,100)"))
 {
 	character_generator::get((*node)["id"]).generate(*this, node);
 }
@@ -643,6 +645,11 @@ void character::swap_equipment(int index, item_ptr& new_item)
 	assert(new_item->type() == equipment_[index]->type());
 	equipment_[index].swap(new_item);
 	calculate_moves();
+}
+
+variant character::color() const
+{
+	return color_.execute(*this);
 }
 
 }
