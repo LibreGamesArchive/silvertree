@@ -61,3 +61,5 @@ event: the type of the event being caught. The events currently supported are,
 filter: a formula which runs on the event's input. The event handler will only be run if the filter evaluates to true.
 
 first_time_only: if set, the event handler will only be run once.
+
+An [event] should have one or more child elements which contain WMLCommands. Each of these commands will be executed when the event is triggered.
