@@ -267,6 +267,13 @@ world::party_map::iterator world::add_party(party_ptr new_party)
 	return res;
 }
 
+void world::relocate_party(party_ptr party, const hex::location& loc)
+{
+	remove_party(party);
+	party->set_loc(loc);
+	parties_.insert(std::pair<hex::location,party_ptr>(loc,party));
+}
+
 void world::get_matching_parties(const formula* filter, std::vector<party_ptr>& res)
 {
 	for(party_map::iterator i = parties_.begin(); i != parties_.end(); ++i) {

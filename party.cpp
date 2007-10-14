@@ -562,7 +562,7 @@ void party::get_inputs(std::vector<formula_input>* inputs) const
 	inputs->push_back(formula_input("world", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("id", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("unique_id", FORMULA_READ_ONLY));
-	inputs->push_back(formula_input("loc", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("loc", FORMULA_READ_WRITE));
 	inputs->push_back(formula_input("previous", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("members", FORMULA_READ_WRITE));
 	inputs->push_back(formula_input("leader", FORMULA_READ_ONLY));
@@ -630,6 +630,8 @@ void party::set_value(const std::string& key, const variant& value)
 		}
 	} else if(key == "money") {
 		money_ = value.as_int();
+	} else if(key == "loc") {
+		game_world().relocate_party(this, *value.convert_to<hex::location>());
 	}
 }
 
