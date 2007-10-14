@@ -36,7 +36,11 @@ bool battle_character_npc::is_human() const
 
 namespace {
 int rate_attack_stats(const battle::attack_stats& stats) {
-	return ((stats.attack*100)/(stats.attack+stats.defense)) * stats.damage;
+	if(stats.attack + stats.defense > 0) {
+		return ((stats.attack*100)/(stats.attack+stats.defense)) * stats.damage;
+	} else {
+		return 0;
+	}
 }
 }
 
