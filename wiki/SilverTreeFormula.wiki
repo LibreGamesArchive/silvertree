@@ -69,3 +69,5 @@ EXAMPLE: sum(map(pc.members, max_hitpoints - hitpoints)) -- finds the total dama
 
 max(list) and min(list): evaluates to the maximum or minimum item in the list (which all must be numbers)
 EXAMPLE: max(map(pc.members, strength)) -- finds the strength of the strongest character in the party
+
+choose(list, formula): evaluates 'formula' for each item in the list. Will evaluate to the item which 'formula' gave the highest value. EXAMPLE: to give back the character with the highest strength, choose(pc.members, strength). Note that this is different to max(map(pc.members, strength)) because choose will return the actual character. max+map will return the character's strength, not the character themselves. This is very useful for finding a character with the highest or lowest of a certain attribute.
