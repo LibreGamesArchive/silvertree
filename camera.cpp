@@ -12,6 +12,7 @@
 */
 #include "camera.hpp"
 #include "gamemap.hpp"
+#include "raster.hpp"
 
 #include <GL/glu.h>
 
@@ -44,7 +45,8 @@ camera* camera::current_camera()
 }
 		
 camera::camera(const gamemap& m)
-   : map_(m), width_(1024), height_(768), translatex_(0.0), translatey_(0.0),
+   : map_(m), width_(graphics::screen_width()), height_(graphics::screen_height()),
+     translatex_(0.0), translatey_(0.0),
      translatez_(0.0),
      rotate_(0.0), dir_(NORTH),
      tilt_(-30.0), zoom_(-30.0), debug_adjust_(false),

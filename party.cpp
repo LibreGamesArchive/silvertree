@@ -554,6 +554,7 @@ void party::assign_equipment(character_ptr c,
 
 void party::get_inputs(std::vector<formula_input>* inputs) const
 {
+	inputs->push_back(formula_input("allegiance", FORMULA_READ_WRITE));
 	inputs->push_back(formula_input("party", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("var", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("is_npc", FORMULA_READ_ONLY));
@@ -572,7 +573,9 @@ void party::get_inputs(std::vector<formula_input>* inputs) const
 
 variant party::get_value(const std::string& key) const
 {
-	if(key == "party") {
+	if(key == "allegiance") {
+		return variant(allegiance());
+	} else if(key == "party") {
 		return variant(this);
 	} else if(key == "var") {
 		return variant(&global_game_state::get().get_variables());
@@ -612,7 +615,9 @@ variant party::get_value(const std::string& key) const
 
 void party::set_value(const std::string& key, const variant& value)
 {
-	if(key == "members") {
+	if(key == "allegiance") {
+		allegiance_ = value.as_string();
+	} else if(key == "members") {
 		members_.clear();
 		for(int n = 0; n != value.num_elements(); ++n) {
 			variant val = value[n];

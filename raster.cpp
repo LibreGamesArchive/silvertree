@@ -211,12 +211,12 @@ void pop_clip() {
 
 int screen_width()
 {
-	return 1024;
+	return SDL_GetVideoSurface()->w;
 }
 
 int screen_height()
 {
-	return 768;
+	return SDL_GetVideoSurface()->h;
 }
 
 const SDL_Color& color_black()

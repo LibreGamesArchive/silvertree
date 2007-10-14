@@ -55,7 +55,7 @@ extern "C" int main(int argc, char** argv)
 		return -1;
 	}
 
-	if(SDL_SetVideoMode(1024,768,0,SDL_OPENGL) == NULL) {
+	if(SDL_SetVideoMode(preference_screen_width(),preference_screen_height(),0,SDL_OPENGL | preference_fullscreen()) == NULL) {
 		std::cerr << "could not set video mode\n";
 		return -1;
 	}

@@ -14,6 +14,10 @@ bool preference_mipmapping();
 GLenum preference_mipmap_min();
 GLenum preference_mipmap_max();
 
+int preference_screen_width();
+int preference_screen_height();
+unsigned int preference_fullscreen();
+
 const std::string& preference_save_file();
 
 #endif

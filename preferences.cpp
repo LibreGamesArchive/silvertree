@@ -1,6 +1,10 @@
 #include <iostream>
 #include <string>
 
+#include <boost/lexical_cast.hpp>
+
+#include <SDL.h>
+
 #include "filesystem.hpp"
 #include "preferences.hpp"
 #include "string_utils.hpp"
@@ -12,6 +16,9 @@ bool maxfps = false;
 
 bool mipmapping = true;
 GLenum mipmap_min = GL_NEAREST_MIPMAP_LINEAR, mipmap_max = GL_LINEAR;
+int screen_width = 1024;
+int screen_height = 768;
+bool fullscreen = false;
 std::string save_file;
 
 GLenum mipmap_arg_to_type(const std::string& arg) {
@@ -34,7 +41,17 @@ GLenum mipmap_arg_to_type(const std::string& arg) {
 
 bool parse_arg(const std::string& arg)
 {
-	if(arg == "--nocombat") {
+	if(util::string_starts_with(arg, "--width=")) {
+		std::string rest = util::strip_string_prefix(arg, "--width=");
+		screen_width = boost::lexical_cast<int>(rest);
+	} else if(util::string_starts_with(arg, "--height=")) {
+		std::string rest = util::strip_string_prefix(arg, "--height=");
+		screen_height = boost::lexical_cast<int>(rest);
+	} else if(arg == "--fullscreen") {
+		fullscreen = true;
+	} else if(arg == "--windowed") {
+		fullscreen = false;
+	} else if(arg == "--nocombat") {
 		nocombat = true;
 	} else if(arg == "--maxfps") {
 		maxfps = true;
@@ -88,6 +105,21 @@ bool preference_nocombat()
 bool preference_maxfps()
 {
 	return maxfps;
+}
+
+int preference_screen_width()
+{
+	return screen_width;
+}
+
+int preference_screen_height()
+{
+	return screen_height;
+}
+
+unsigned int preference_fullscreen()
+{
+	return fullscreen ? SDL_FULLSCREEN : 0;
 }
 
 const std::string& preference_save_file()

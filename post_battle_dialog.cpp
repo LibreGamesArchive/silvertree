@@ -7,12 +7,13 @@
 #include "image_widget.hpp"
 #include "party.hpp"
 #include "post_battle_dialog.hpp"
+#include "raster.hpp"
 
 namespace game_dialogs {
 
 post_battle_dialog::post_battle_dialog(game_logic::party_ptr p,
                                        int xp, int money)
-    : dialog(0,0,1024,768), party_(p), xp_(xp), money_(money)
+    : dialog(0,0,graphics::screen_width(),graphics::screen_height()), party_(p), xp_(xp), money_(money)
 {
 	using namespace gui;
 	typedef widget_ptr ptr;

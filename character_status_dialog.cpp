@@ -25,6 +25,7 @@
 #include "label.hpp"
 #include "learn_skills_dialog.hpp"
 #include "party.hpp"
+#include "raster.hpp"
 #include "skill.hpp"
 #include "translate.hpp"
 
@@ -64,7 +65,7 @@ private:
 
 character_status_dialog::character_status_dialog(
      game_logic::character_ptr c, game_logic::party_ptr p)
-  : gui::dialog(0,0,1024,768), char_(c), party_(p),
+  : gui::dialog(0,0,graphics::screen_width(),graphics::screen_height()), char_(c), party_(p),
     equipment_change_(-1)
 {
 	init();
