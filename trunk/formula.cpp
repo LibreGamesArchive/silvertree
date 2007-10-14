@@ -325,6 +325,61 @@ private:
 	}
 };
 
+namespace {
+class variant_comparator : public formula_callable {
+	expression_ptr expr_;
+	const formula_callable* fallback_;
+	mutable variant a_, b_;
+	variant get_value(const std::string& key) const {
+		if(key == "a") {
+			return a_;
+		} else if(key == "b") {
+			return b_;
+		} else {
+			return fallback_->query_value(key);
+		}
+	}
+
+	void get_inputs(std::vector<formula_input>* inputs) const {
+		fallback_->get_inputs(inputs);
+	}
+public:
+	variant_comparator(const expression_ptr& expr, const formula_callable& fallback) : expr_(expr), fallback_(&fallback)
+	{}
+
+	bool operator()(const variant& a, const variant& b) const {
+		a_ = a;
+		b_ = b;
+		return expr_->evaluate(*this).as_bool();
+	}
+};
+}
+
+class sort_function : public function_expression {
+public:
+	explicit sort_function(const args_list& args)
+	     : function_expression(args, 1, 2)
+	{}
+
+private:
+	variant execute(const formula_callable& variables) const {
+		variant list = args()[0]->evaluate(variables);
+		std::vector<variant> vars;
+		vars.reserve(list.num_elements());
+		for(int n = 0; n != list.num_elements(); ++n) {
+			vars.push_back(list[n]);
+		}
+
+		if(args().size() == 1) {
+			std::sort(vars.begin(), vars.end());
+		} else {
+			std::sort(vars.begin(), vars.end(), variant_comparator(args()[1], variables));
+		}
+
+		return variant(&vars);
+	}
+};
+
 class filter_function : public function_expression {
 public:
 	explicit filter_function(const args_list& args)
@@ -430,6 +485,8 @@ expression_ptr create_function(const std::string& fn,
 		return expression_ptr(new max_function(args));
 	} else if(fn == "choose") {
 		return expression_ptr(new choose_element_function(args));
+	} else if(fn == "sort") {
+		return expression_ptr(new sort_function(args));
 	} else if(fn == "filter") {
 		return expression_ptr(new filter_function(args));
 	} else if(fn == "map") {
@@ -490,6 +547,11 @@ public:
 private:
 	variant execute(const formula_callable& variables) const {
 		const variant left = left_->evaluate(variables);
+		if(left.is_list()) {
+			const variant index = right_->evaluate(variables);
+			return left[index.as_int()];
+		}
+
 		return right_->evaluate(*left.as_callable());
 	}
 
