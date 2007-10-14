@@ -71,7 +71,7 @@ public:
 
 character_equip_dialog::character_equip_dialog(
      game_logic::character_ptr c, game_logic::party_ptr p)
-  : gui::dialog(0,0,1024,768), char_(c), party_(p),
+  : gui::dialog(0,0,graphics::screen_width(),graphics::screen_height()), char_(c), party_(p),
     equipment_change_(-1)
 {
 	init();
@@ -210,12 +210,12 @@ void character_equip_dialog::change_equipment(int index)
 	int mousex, mousey;
 	SDL_GetMouseState(&mousex,&mousey);
 
-	if(mousex+grid->width() > 1024) {
-		mousey = 1024 - grid->width();
+	if(mousex+grid->width() > graphics::screen_width()) {
+		mousey = graphics::screen_width() - grid->width();
 	}
 
-	if(mousey+grid->height() > 768) {
-		mousey = 768 - grid->height();
+	if(mousey+grid->height() > graphics::screen_height()) {
+		mousey = graphics::screen_height() - grid->height();
 	}
 
 	add_widget(modify_char_widget_, mousex, mousey);

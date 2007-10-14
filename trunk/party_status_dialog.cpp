@@ -24,6 +24,7 @@
 #include "label.hpp"
 #include "party_status_dialog.hpp"
 #include "party.hpp"
+#include "raster.hpp"
 #include "translate.hpp"
 
 namespace game_dialogs {
@@ -40,7 +41,7 @@ public:
 }
 
 party_status_dialog::party_status_dialog(game_logic::party_ptr p)
-  : gui::dialog(0,0,1024,768), party_(p)
+  : gui::dialog(0,0,graphics::screen_width(),graphics::screen_height()), party_(p)
 {
 	using namespace gui;
 	using functional::callback_ptr;

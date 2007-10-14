@@ -11,6 +11,7 @@
 #include "item_display_dialog.hpp"
 #include "label.hpp"
 #include "party.hpp"
+#include "raster.hpp"
 #include "shop_dialog.hpp"
 #include "string_utils.hpp"
 #include "translate.hpp"
@@ -28,7 +29,7 @@ public:
 
 shop_dialog::shop_dialog(game_logic::party& party, int cost,
                          const std::string& items_str)
-   : dialog(0,0,1024,768), party_(party), cost_(cost)
+   : dialog(0,0,graphics::screen_width(),graphics::screen_height()), party_(party), cost_(cost)
 {
 	std::cerr << "COST: " << cost_ << "\n";
 	const std::vector<std::string> items = util::split(items_str);

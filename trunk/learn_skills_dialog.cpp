@@ -19,6 +19,7 @@
 #include "image_widget.hpp"
 #include "label.hpp"
 #include "learn_skills_dialog.hpp"
+#include "raster.hpp"
 #include "skill_dialog.hpp"
 #include "translate.hpp"
 
@@ -61,7 +62,7 @@ gui::grid_ptr learn_skills_dialog::get_grid_for_skill(const_skill_ptr s)
 }
 
 learn_skills_dialog::learn_skills_dialog(game_logic::character_ptr c)
-  : gui::dialog(0,0,1024,768), char_(c), page_(0), page_size_(0)
+  : gui::dialog(0,0,graphics::screen_width(),graphics::screen_height()), char_(c), page_(0), page_size_(0)
 {
 	init();
 }
