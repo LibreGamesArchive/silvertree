@@ -862,17 +862,16 @@ void battle::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
 		} else if(highlight_targets_ && current_move_->can_attack()) {
 			battle_character_ptr target_char = selected_char();
 
-			if(target_char) {
+			if(target_char && targets_.count(target_char->loc())) {
 				turn_done_ = true;
 				attack_character(**focus_, *target_char, *current_move_);
-			}
+				if(move_done_) {
+					turn_done_ = true;
+				}
 
-			if(move_done_) {
-				turn_done_ = true;
+				highlight_targets_ = false;
+				targets_.clear();
 			}
-
-			highlight_targets_ = false;
-			targets_.clear();
 		} else if(highlight_targets_) {
 			hex::location loc = selected_loc();
 			if(map_.is_loc_on_map(loc)) {
