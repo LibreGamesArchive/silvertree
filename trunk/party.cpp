@@ -632,6 +632,7 @@ void party::set_value(const std::string& key, const variant& value)
 		money_ = value.as_int();
 	} else if(key == "loc") {
 		game_world().relocate_party(this, *value.convert_to<hex::location>());
+		previous_loc_ = loc_;
 	}
 }
 
