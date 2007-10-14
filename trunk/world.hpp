@@ -74,6 +74,7 @@ public:
 	const_settlement_ptr settlement_at(const hex::location& loc) const;
 	typedef std::multimap<hex::location,party_ptr> party_map;
 	party_map::iterator add_party(party_ptr pty);
+	void relocate_party(party_ptr party, const hex::location& loc);
 	void get_matching_parties(const formula* filter,
 	                          std::vector<party_ptr>& res);
 	party_map& parties() { return parties_; }
