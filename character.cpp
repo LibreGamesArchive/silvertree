@@ -74,7 +74,7 @@ const std::vector<std::string>& character::attributes()
 	if(res.empty()) {
 		const std::string attr[] = {
 		  "strength", "agility", "endurance",
-		  "intelligence", "perception", "persona"};
+		  "intelligence", "perception", "will"};
 		foreach(const std::string& a, attr) {
 			res.push_back(a);
 		}
@@ -214,7 +214,7 @@ const std::string AgilityAttribute = "agility";
 const std::string EnduranceAttribute = "endurance";
 const std::string IntelligenceAttribute = "intelligence";
 const std::string PerceptionAttribute = "perception";
-const std::string PersonaAttribute = "persona";
+const std::string PersonaAttribute = "will";
 
 const std::string MaxHitpointsStat = "max_hitpoints";
 const std::string InitiativeStat = "initiative";
@@ -285,9 +285,8 @@ void character::get_inputs(std::vector<formula_input>* inputs) const
 	inputs->push_back(formula_input("strength", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("agility", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("endurance", FORMULA_READ_ONLY));
-	inputs->push_back(formula_input("persona", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("intelligence", FORMULA_READ_ONLY));
-	inputs->push_back(formula_input("persona", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("will", FORMULA_READ_ONLY));
 }
 
 variant character::get_value(const std::string& key) const
