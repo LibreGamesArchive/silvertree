@@ -154,7 +154,7 @@ extern "C" int main(int argc, char** argv)
 
 	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-	
+
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -177,7 +177,7 @@ extern "C" int main(int argc, char** argv)
 			retcode = -1;
 			break;
 		}
-		
+
 		wml::node_ptr world_cfg = scenario_cfg;
 		if(scenario_cfg->name() == "scenario") {
 			game_logic::global_game_state::get().reset();
@@ -187,13 +187,13 @@ extern "C" int main(int argc, char** argv)
 				std::cerr << "scenario parse error: could not find [scenario]\n";
 				break;
 			}
-			
+
 			game_logic::global_game_state::get().init(scenario_cfg);
 		} else {
 			std::cerr << "unrecognized game file\n";
 			break;
 		}
-		
+
 		game_logic::world_ptr w(new game_logic::world(world_cfg));
 		try {
 			w->play();

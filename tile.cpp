@@ -353,7 +353,7 @@ void tile::calculate_corner(int n)
 		corners_[n] = adja->corners_[point_a];
 		return;
 	}
-	
+
 	if(adjb != NULL && adjb->corners_[point_b].init) {
 		corners_[n] = adjb->corners_[point_b];
 		return;
@@ -411,7 +411,7 @@ const GLfloat UVCorners[6][2] = {
 	{UVHorizontalMargin,1.0-UVVerticalMargin},
 	{0.0,0.5},
 	{UVHorizontalMargin,UVVerticalMargin} };
-		
+
 }
 
 void tile::setup_drawing()
@@ -429,7 +429,7 @@ void tile::setup_drawing()
 	/* use the below format to find the total area seen by the camera */
 	//pc_frustum.set_volume_clip_space(-0.1, 0.1, -0.1, 0.1, -1, 1);
 	/* the number is a pushback radius that prevents talin himself,
-	   and the things directly underneath him from falling into the 
+	   and the things directly underneath him from falling into the
 	   frustum; this was the best heuristic i could find */
 	pc_frustum.set_volume_world_space(0.75);
 #endif
@@ -455,7 +455,7 @@ void tile::load_texture() const
 			}
 		}
 
-		
+
 		texture_ = terrain_->generate_texture(loc_,height_,adj);
 	}
 }
@@ -504,7 +504,7 @@ void tile::do_draw() const
 		glBegin(GL_TRIANGLE_FAN);
 
 		graphics::texture::set_coord(UVCenter[0],UVCenter[1]);
-		
+
 		draw_point(center_);
 
 		for(int i = 0; i != 7; ++i) {
@@ -512,7 +512,7 @@ void tile::do_draw() const
 			graphics::texture::set_coord(UVCorners[n][0],UVCorners[n][1]);
 			draw_point(corners_[n]);
 		}
-	
+
 		glEnd();
 #ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
 	}
@@ -776,7 +776,7 @@ void tile::draw_highlight() const
 		const int n = i%6;
 		draw_point(corners_[n]);
 	}
-	
+
 	glEnd();
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);

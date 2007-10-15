@@ -37,10 +37,10 @@ class typography {
 public:
 	typedef std::vector<phoneme_ptr>::const_iterator const_iterator;
 
-	static typo_ptr generate_random(const std::vector<std::string>& vowels, 
-					const std::vector<std::string>& consonants, 
-					const std::vector<std::string>& non_initials, 
-					const std::vector<std::string>& non_medials, 
+	static typo_ptr generate_random(const std::vector<std::string>& vowels,
+					const std::vector<std::string>& consonants,
+					const std::vector<std::string>& non_initials,
+					const std::vector<std::string>& non_medials,
 					const std::vector<std::string>& non_finals);
 	std::string generate_word(int length) const;
 	const_iterator begin_phones() const { return phones_.begin(); }
@@ -49,15 +49,15 @@ public:
 	void set_non_initial(phoneme_ptr p);
 	void set_non_medial(phoneme_ptr p);
 	void set_non_final(phoneme_ptr p);
-	static void add_qualifiers(phoneme_ptr p, 
-				   typo_ptr t, 
+	static void add_qualifiers(phoneme_ptr p,
+				   typo_ptr t,
 				   const std::vector<std::string>& non_initials,
 				   const std::vector<std::string>& non_medials,
 				   const std::vector<std::string>& non_finals);
 	static void normalise_phones(const std::vector<phoneme_ptr>& phones);
 	void push_phone(phoneme_ptr p) { phones_.push_back(p); }
 private:
-	static void gen_transitions(const std::vector<phoneme_ptr>& starts, 
+	static void gen_transitions(const std::vector<phoneme_ptr>& starts,
 				    const std::vector<phoneme_ptr>& ends);
 
 	std::set<phoneme_ptr> non_initials_, non_medials_, non_finals_;

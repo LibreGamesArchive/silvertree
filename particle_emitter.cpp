@@ -70,7 +70,7 @@ void particle_emitter::emit_particle(particle_system& system)
 	next_ -= 100;
 	while(next_ <= 0) {
 		initialize_particle(system.add());
-		
+
 		const int time = time_->execute().as_int();
 		next_ += time;
 		if(time <= 0) {
@@ -102,7 +102,7 @@ void particle_emitter::initialize_particle(particle& p) const
 		if(velocity_diffs_[n]) {
 			p.velocity_[n] += velocity_diffs_[n]->execute().as_int()/1000.0;
 		}
-		
+
 		if(acceleration_[n]) {
 			p.acceleration_[n] = acceleration_[n]->execute().as_int()/10000.0;
 		} else {

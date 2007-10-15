@@ -198,5 +198,5 @@ boost::shared_ptr<hex::gamemap> generate_battle_map(
 	return boost::shared_ptr<hex::gamemap>(
 	                new hex::gamemap(tiles,dim));
 }
-		
+
 }

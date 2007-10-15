@@ -59,5 +59,5 @@ bool pass()
 	const Uint8* keys = SDL_GetKeyState(NULL);
 	return keys[SDLK_SPACE];
 }
-		
+
 }

@@ -132,7 +132,7 @@ void get_tile_ring(const location& a, int radius,
 		res.push_back(a);
 		return;
 	}
-	
+
 	location loc(a);
 	for(int i = 0; i != radius; ++i) {
 		loc = tile_in_direction(loc,SOUTH_WEST);
@@ -165,7 +165,7 @@ void get_tile_strip(const location& center, DIRECTION dir,
 	for(int n = 0; n != tiles_back; ++n) {
 		loc = tile_in_direction(loc, reverse_dir);
 	}
-	
+
 	const DIRECTION left[] = {static_cast<DIRECTION>((int(dir)+4)%6),
 	                          static_cast<DIRECTION>((int(dir)+5)%6)};
 	const DIRECTION right[] = {static_cast<DIRECTION>((int(dir)+1)%6),
@@ -248,5 +248,5 @@ bool tiles_adjacent(const location& a, const location& b)
 	return ydiff == 1 && a.x() == b.x() || xdiff == 1 && a.y() == b.y() ||
 	       xdiff == 1 && ydiff == 1 && (a.y() > b.y() ? is_even(a.x()) : is_even(b.x()));
 }
-	
+
 }

@@ -23,7 +23,7 @@ class battle_character;
 typedef boost::shared_ptr<battle_character> battle_character_ptr;
 typedef boost::shared_ptr<const battle_character>
                           const_battle_character_ptr;
-		
+
 }
 
 #endif

@@ -29,7 +29,7 @@ void clear();
 
 void update_labels();
 void draw_labels();
-		
+
 }
 
 }

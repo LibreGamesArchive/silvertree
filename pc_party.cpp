@@ -56,7 +56,7 @@ party::TURN_RESULT pc_party::do_turn()
 	}
 
 	seen_.swap(now_visible);
-	
+
 	const hex::DIRECTION dir = keyboard::dir(
 	               game_world().camera().direction());
 
@@ -71,7 +71,7 @@ party::TURN_RESULT pc_party::do_turn()
 		pass();
 		return TURN_COMPLETE;
 	}
-	
+
 	return TURN_STILL_THINKING;
 }
 

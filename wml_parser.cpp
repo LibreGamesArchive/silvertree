@@ -225,7 +225,7 @@ void skip_comment(std::string::const_iterator& i1,
 		++i1;
 	}
 }
-		
+
 }
 
 node_ptr parse_wml(const std::string& doc)
@@ -394,7 +394,7 @@ parse_error::parse_error(const std::string& msg) : message(msg)
 {
 	std::cerr << "wml parse error: '" << msg << "'\n";
 }
-		
+
 }
 
 #ifdef WML_PARSER_UNIT_TEST

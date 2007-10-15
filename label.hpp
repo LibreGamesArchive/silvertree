@@ -62,7 +62,7 @@ private:
 	bool fixed_width_;
 };
 
-class dialog_label : public label 
+class dialog_label : public label
 {
 public:
 	dialog_label(const std::string& text, const SDL_Color& color, int size=18);

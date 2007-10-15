@@ -241,7 +241,7 @@ bool EditorMainWindow::openMap(const char *file) {
 	}
 	struct stat fileinfo;
 	fstat(fd,&fileinfo);
-	
+
 	std::string mapdata;
 
 	std::vector<char> filebuf(fileinfo.st_size);

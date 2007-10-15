@@ -28,7 +28,7 @@ class gamemap
 public:
 	explicit gamemap(const std::string& data);
 	gamemap(const std::vector<tile>& tiles, const location& dim);
-	
+
 	std::string write() const;
 
 	const location& size() const { return dim_; }
@@ -52,12 +52,12 @@ public:
 	void adjust_height(const hex::location& loc, int adjust);
 	void set_terrain(const hex::location& loc, const std::string& terrain_id);
 	void set_feature(const hex::location& loc, const std::string& feature_id);
-	
+
 private:
 
 	void parse(const std::string& data);
 	void init_tiles();
-	
+
 	std::vector<tile> map_;
 	location dim_;
 };
@@ -66,7 +66,7 @@ bool line_of_sight(const gamemap& m,
                    const location& a, const location& b,
                    std::vector<const tile*>* tiles=NULL,
 				   int range=-1, bool draw=false);
-		
+
 }
 
 #endif

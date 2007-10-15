@@ -637,7 +637,7 @@ private:
 		expr_table::iterator i = table_->find(key);
 		if(i != table_->end()) {
 			return i->second->evaluate(base_);
-		} 
+		}
 		return base_.query_value(key);
 	}
 };
@@ -648,7 +648,7 @@ public:
 				  expr_table_ptr clauses)
 		: body_(body), clauses_(clauses)
 	{}
-	
+
 private:
 	expression_ptr body_;
 	expr_table_ptr clauses_;
@@ -786,7 +786,7 @@ void parse_args(const token* i1, const token* i2,
 }
 
 void parse_where_clauses(const token* i1, const token * i2,
-	 		             expr_table_ptr res) {
+			             expr_table_ptr res) {
 	int parens = 0;
 	const token *original_i1_cached = i1;
 	const token *beg = i1;
@@ -814,7 +814,7 @@ void parse_where_clauses(const token* i1, const token * i2,
 							std::cerr<< "There is 'where =<expression'; "
 								 << "'where name=<expression>' was needed.\n";
 						} else {
-							std::cerr<< "There is 'where <expression>=<expression>'; " 
+							std::cerr<< "There is 'where <expression>=<expression>'; "
 								 << "'where name=<expression>' was needed.\n";
 						}
 						throw formula_error();

@@ -33,7 +33,7 @@ void game_bar::inner_draw() const
 	handle_draw_children();
 }
 
-bool game_bar::handle_event(const SDL_Event &e) 
+bool game_bar::handle_event(const SDL_Event &e)
 {
 	return handle_event_children(e);
 }
@@ -57,7 +57,7 @@ void game_bar::construct_interface(game_logic::party_ptr pty, game_logic::world 
 	gui::menu_widget_ptr game_button(new game_bar_game_button(wp));
 	game_button->set_dim(game_button->width(), height());
 	game_button->set_hotkey(SDLK_ESCAPE, KMOD_NONE);
-	
+
 	{
 		char_rects_.clear();
 		// add a scrollable char portrait widgets
@@ -69,8 +69,8 @@ void game_bar::construct_interface(game_logic::party_ptr pty, game_logic::world 
 	add_widget(game_button, dialog::MOVE_RIGHT);
 }
 
-game_bar_party_button::game_bar_party_button(game_logic::party_ptr pty)		
-	: pty_(pty), old_cash_(-1) 
+game_bar_party_button::game_bar_party_button(game_logic::party_ptr pty)
+	: pty_(pty), old_cash_(-1)
 {
 	label_.reset(new gui::label("", graphics::color_white(), 14));
 }
@@ -90,7 +90,7 @@ void game_bar_party_button::inner_draw() const
 	frame_->draw();
 }
 
-void game_bar_party_button::clicked() 
+void game_bar_party_button::clicked()
 {
 	party_status_dialog(pty_).show_modal();
 }
@@ -100,7 +100,7 @@ void game_bar_portrait_set::build_scrolly(std::vector<gui::const_widget_ptr>* ch
 	int count = 0;
 	scrolly_->clear();
 	for(std::vector<game_logic::character_ptr>::const_iterator i = pty_->members().begin();
-	    i != pty_->members().end(); ++i) 
+	    i != pty_->members().end(); ++i)
 	{
 		gui::widget_ptr w(new game_bar_portrait_button(*i, pty_));
 		w = gui::frame_manager::make_frame(w, "game-bar-portrait-frame");
@@ -113,7 +113,7 @@ void game_bar_portrait_set::build_scrolly(std::vector<gui::const_widget_ptr>* ch
 	}
 }
 
-void game_bar_portrait_set::construct_interface(std::vector<gui::const_widget_ptr>* char_rects) 
+void game_bar_portrait_set::construct_interface(std::vector<gui::const_widget_ptr>* char_rects)
 {
 	set_padding(0);
 
@@ -134,7 +134,7 @@ void game_bar_portrait_set::construct_interface(std::vector<gui::const_widget_pt
 
 	gui::frame_ptr left_button_frame = gui::frame_manager::make_frame(left_button, "game-bar-char-scroll-left-frame");
 	gui::frame_ptr right_button_frame = gui::frame_manager::make_frame(right_button, "game-bar-char-scroll-right-frame");
-	
+
 	left_button_frame->set_dim(left_button_frame->width(), height()/2);
 	right_button_frame->set_dim(right_button_frame->width(), height()/2);
 
@@ -162,7 +162,7 @@ const SDL_Color text_color = { 0xE9, 0xD6, 0x7E };
 game_bar_portrait_button::game_bar_portrait_button(game_logic::character_ptr ch, game_logic::party_ptr pty)
 	: rollin_menu_widget("game-bar-portrait-option-text-frame", text_color, 16,
 			     "game-bar-portrait-option-frame", "game-bar-portrait-menu-frame"),
-	  ch_(ch), pty_(pty) 
+	  ch_(ch), pty_(pty)
 {
 	add_option("Skills", 0);
 	add_option("Statistics", 1);
@@ -208,7 +208,7 @@ void game_bar_portrait_button::construct_interface() {
 
 namespace {
 
-void draw_bar(int x, int y, int w, int h, int level, int max_level, 
+void draw_bar(int x, int y, int w, int h, int level, int max_level,
 	      const SDL_Color& level_bar_color, const SDL_Color& max_bar_color,
 	      const SDL_Color& level_text_color, const SDL_Color& max_text_color)
 {
@@ -228,7 +228,7 @@ void draw_bar(int x, int y, int w, int h, int level, int max_level,
 	} else if(bar_level > bar_max_level) {
 		bar_level = bar_max_level;
 	}
-	
+
 	int level_px = bar_max_level == 0 ? w : w*bar_level/bar_max_level;
 	{
 		SDL_Rect r = { x, y, level_px, h };
@@ -249,7 +249,7 @@ void draw_bar(int x, int y, int w, int h, int level, int max_level,
 }
 }
 
-void game_bar_portrait_button::inner_draw() const 
+void game_bar_portrait_button::inner_draw() const
 {
 	if(portrait_) {
 		if(p_dims_.x != x() || p_dims_.y != y() || p_dims_.w != width() || p_dims_.h != height()) {
@@ -283,12 +283,12 @@ void game_bar_portrait_button::inner_draw() const
 	SDL_Color health_present = { 4, 40, 12 };
 	SDL_Color health_missing = { 221, 2, 0 };
 
-	draw_bar(x() + width()/24, y() + height()*6/8 - 1, width()-width()/12, height()/8, 
-		 ch_->hitpoints(), ch_->max_hitpoints(), 
+	draw_bar(x() + width()/24, y() + height()*6/8 - 1, width()-width()/12, height()/8,
+		 ch_->hitpoints(), ch_->max_hitpoints(),
 		 health_present, health_missing, graphics::color_white(), graphics::color_white());
-		
-	draw_bar(x() + width()/24, y() + height()*7/8 - 1, width()-width()/12, height()/8, 
-		 ch_->fatigue()/10, ch_->stamina()/10, 
+
+	draw_bar(x() + width()/24, y() + height()*7/8 - 1, width()-width()/12, height()/8,
+		 ch_->fatigue()/10, ch_->stamina()/10,
 		 fatigue_missing, fatigue_present, graphics::color_white(), graphics::color_white());
 
 	rollin_menu_widget::inner_draw();
@@ -296,8 +296,8 @@ void game_bar_portrait_button::inner_draw() const
 
 game_bar_game_button::game_bar_game_button(game_logic::world *wp)
 	: popup_menu_widget("game-bar-game-menu-option-text-frame", graphics::color_white(), 16,
-			    "game-bar-game-menu-option-frame", 
-			    "game-bar-game-menu-frame"), 
+			    "game-bar-game-menu-option-frame",
+			    "game-bar-game-menu-frame"),
 	  wp_(wp)
 {
 	add_skin("game-bar-game-button-skin-normal", gui::popup_menu_widget::NORMAL);

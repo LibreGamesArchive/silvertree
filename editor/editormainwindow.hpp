@@ -13,10 +13,10 @@ class EditorMainWindow : public QMainWindow
 	Q_OBJECT
 
 	public:
-		EditorMainWindow(QWidget *parent = 0); 
+		EditorMainWindow(QWidget *parent = 0);
 		bool openScenario(const char* file);
 		bool openMap(const char *file);
-	
+
 	public slots:
 		void openRequested();
 		void saveRequested();

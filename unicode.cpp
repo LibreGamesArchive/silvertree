@@ -16,15 +16,15 @@ inline void insert_punc(Uint32 x) {
 	punctuation.insert(x);
 }
 
-inline void insert_range_punc(Uint32 start, Uint32 end) 
+inline void insert_range_punc(Uint32 start, Uint32 end)
 {
-	for(Uint32 i = start; i <= end; ++i) 
+	for(Uint32 i = start; i <= end; ++i)
 	{
 		insert_punc(i);
 	}
 }
 
-void init_punctuation() 
+void init_punctuation()
 {
 	/* the following is derived from the Unicode Standard Annex #14
 	   on the line breaking properties of codepoints (v5.0)*/
@@ -52,7 +52,7 @@ void init_punctuation()
 	/* old word separators */
 	insert_range_punc(0x16EB, 0x16ED); /* runic */
 	insert_punc(0x2056);
-	insert_range_punc(0x2058, 0x205B); 
+	insert_range_punc(0x2058, 0x205B);
 	insert_punc(0x205D);
 	insert_punc(0x205E);
 
@@ -82,7 +82,7 @@ void init_punctuation()
 
 	insert_punc(0x00B4); /* acute accent */
 	insert_punc(0x02C8);
-	insert_punc(0x02CC); 
+	insert_punc(0x02CC);
 
 	/* tibetan head letters */
 	insert_range_punc(0x0F01, 0x0F04);
@@ -93,11 +93,11 @@ void init_punctuation()
 	insert_punc(0x1806); /* mongolian soft hyphen */
 
 	insert_punc(0x2014); /* em dash */
-	
+
 	insert_punc(0xFFFC); /* object replacement character */
 
 	insert_range_punc(0x3001, 0x3002); /* ideographic punctuation */
-	insert_range_punc(0xFE11, 0xFE12); 
+	insert_range_punc(0xFE11, 0xFE12);
 	insert_punc(0xFE50);
 	insert_punc(0xFE52);
 	insert_punc(0xFF0C);
@@ -110,19 +110,19 @@ void init_punctuation()
 	insert_punc(0x05C6); /* nun hafukha */
 	insert_punc(0x060C); /* arabic comma */
 	insert_punc(0x061B); /* arabic semicolon */
-	insert_range_punc(0x061E, 0x061F); 
-	insert_punc(0x066A); 
+	insert_range_punc(0x061E, 0x061F);
+	insert_punc(0x066A);
 	insert_punc(0x06D4);
 	insert_punc(0x07F9); /* niko exclamation sign */
 	insert_range_punc(0x0F0D, 0x0F11); /* tibetan */
-	insert_punc(0x0F14); 
+	insert_punc(0x0F14);
 	insert_range_punc(0x1944, 0x1945); /* limbu */
 	insert_range_punc(0x2762, 0x2763); /* ornaments */
 	insert_range_punc(0xA876, 0xA877); /* phags-pa */
-	insert_range_punc(0xFE15, 0xFE16); 
+	insert_range_punc(0xFE15, 0xFE16);
 	insert_range_punc(0xFE56, 0xFE57); /* small marks */
-	insert_punc(0xFF01); 
-	insert_punc(0xFF1F); 
+	insert_punc(0xFF01);
+	insert_punc(0xFF1F);
 
 	/* tibetan */
 	insert_punc(0x0F08);
@@ -130,7 +130,7 @@ void init_punctuation()
 	insert_punc(0x0F12);
 
 	insert_punc(0x002D); /* hyphen-minus */
-	
+
 	insert_punc(0x002C); /* comma */
 	insert_punc(0x002E); /* full stop */
 	insert_range_punc(0x003A, 0x003B); /* colon, semicolon */
@@ -149,9 +149,9 @@ inline void insert_ws(Uint32 x) {
 	whitespace.insert(x);
 }
 
-inline void insert_range_ws(Uint32 start, Uint32 end) 
+inline void insert_range_ws(Uint32 start, Uint32 end)
 {
-	for(Uint32 i = start; i <= end; ++i) 
+	for(Uint32 i = start; i <= end; ++i)
 	{
 		insert_ws(i);
 	}
@@ -188,7 +188,7 @@ bool is_breakable_p::operator()(Uint32 x) {
 	return punctuation.find(x) != punctuation.end();
 }
 
-bool is_whitespace_p::operator()(Uint32 x) 
+bool is_whitespace_p::operator()(Uint32 x)
 {
 	if(!whitespace_init) {
 		init_whitespace();
@@ -196,19 +196,19 @@ bool is_whitespace_p::operator()(Uint32 x)
 	return whitespace.find(x) != whitespace.end();
 }
 
-bool is_punctuation_p::operator()(Uint32 x) 
+bool is_punctuation_p::operator()(Uint32 x)
 {
 	if(!punctuation_init) {
 		init_punctuation();
 	}
-				   
+
 	return punctuation.find(x) != punctuation.end();
 }
 
 std::string utf32_to_utf8(const std::vector<Uint32>& vec) {
 	std::string ret;
 	for(std::vector<Uint32>::const_iterator i = vec.begin();
-	    i != vec.end(); ++i) 
+	    i != vec.end(); ++i)
 	{
 		Uint32 v = *i;
 
@@ -243,7 +243,7 @@ std::string utf32_to_utf8(const std::vector<Uint32>& vec) {
 			ret += static_cast<char>(low_val);
 			continue;
 		} else {
-			/* out of range - either data is corrupt or 
+			/* out of range - either data is corrupt or
 			   unicode 4.0 is not being used */
 			assert(false);
 		}

@@ -35,10 +35,10 @@ public:
 	wml::node_ptr write() const;
 private:
 	TURN_RESULT do_turn();
-	
+
 	std::vector<const_party_ptr> seen_;
 };
-		
+
 }
 
 #endif

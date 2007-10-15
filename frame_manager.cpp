@@ -38,7 +38,7 @@ frame_ptr make_frame(widget_ptr w, const std::string& name, key_mapper_ptr keys)
 		builder = i->second;
 	}
 	frame_ptr ret(new frame(w, builder, keys));
-	
+
 	return ret;
 }
 
@@ -52,7 +52,7 @@ void flush_frame(const std::string& name) { frame_builders.erase(name); };
 void flush_frames() { frame_builders.clear(); }
 
 /* internal */
-fdb_ptr make_fdb(const wml::node_ptr& node) { 
+fdb_ptr make_fdb(const wml::node_ptr& node) {
 	fdb_ptr ret;
 
 	const std::string& type = node->name();
@@ -70,7 +70,7 @@ fdb_ptr make_fdb(const wml::node_ptr& node) {
 	return ret;
 }
 
-void parse_predraw(wml::const_node_ptr predraw, fb_ptr builder) 
+void parse_predraw(wml::const_node_ptr predraw, fb_ptr builder)
 {
 	for(wml::node::const_all_child_iterator i = predraw->begin_children();
 	    i != predraw->end_children(); ++i) {
@@ -80,7 +80,7 @@ void parse_predraw(wml::const_node_ptr predraw, fb_ptr builder)
 	}
 }
 
-void parse_postdraw(wml::const_node_ptr postdraw, fb_ptr builder) 
+void parse_postdraw(wml::const_node_ptr postdraw, fb_ptr builder)
 {
 	for(wml::node::const_all_child_iterator i = postdraw->begin_children();
 	    i != postdraw->end_children(); ++i) {
@@ -92,7 +92,7 @@ void parse_postdraw(wml::const_node_ptr postdraw, fb_ptr builder)
 
 void load_frame_data(const std::string& name) {
 	const std::string filename = "images/frames/" + name + ".cfg";
-	
+
 	wml::const_node_ptr frame_wml;
 	try {
 		frame_wml = wml::parse_wml(sys::read_file(filename));
@@ -100,8 +100,8 @@ void load_frame_data(const std::string& name) {
 		std::cerr << "Errors parsing frame file "<<filename<<"\n";
 		return;
 	}
-	
-	fb_ptr builder(new frame_builder()); 
+
+	fb_ptr builder(new frame_builder());
 
 	for(wml::node::const_attr_iterator at_iter = frame_wml->begin_attr();
 	    at_iter != frame_wml->end_attr(); ++at_iter) {
@@ -154,23 +154,23 @@ void texture_fdo::draw() const
 	if(!texture_.valid()) {
 		return;
 	}
-  	graphics::push_clip(r_);
+	graphics::push_clip(r_);
 	if(!tile_) {
 		graphics::blit_texture(texture_, r_.x,r_.y,r_.w,r_.h);
 	} else {
 		const int tw = texture_.width();
 		const int th = texture_.height();
-		
+
 		const int tx_max = r_.x + r_.w;
 		const int ty_max = r_.y + r_.h;
-		
+
 		for(int ty = r_.y; ty < ty_max; ty += th) {
 			for(int tx = r_.x; tx < tx_max; tx += tw) {
 				graphics::blit_texture(texture_, tx, ty);
 			}
 		}
 	}
-  	graphics::pop_clip();
+	graphics::pop_clip();
 }
 
 void rect_fdo::draw() const
@@ -195,7 +195,7 @@ void frame_draw_builder::init_from_wml(const wml::const_node_ptr& node) {
 	    i != node->end_attr(); ++i) {
 		set_attr(i->first, i->second);
 	}
-}	
+}
 
 void frame_draw_builder::set_attr(const std::string& name, const std::string& value)
 {
@@ -227,14 +227,14 @@ formula_ptr frame_draw_builder::get_formula_attr(const std::string& name) const
 	return formula_ptr();
 }
 
-int frame_draw_builder::get_int_attr(const std::string& name, 
+int frame_draw_builder::get_int_attr(const std::string& name,
 				     const key_mapper_ptr &keys, int deflt) const
 {
 	formula_ptr fptr = get_formula_attr(name);
 	int ret = deflt;
 	if(fptr.get()) {
 		ret= fptr->execute(*keys).as_int();
-	}		
+	}
 	return ret;
 }
 
@@ -252,7 +252,7 @@ int frame_draw_builder::get_int_attr(const std::string& name,
 }
 
 bool frame_draw_builder::get_bool_attr(const std::string& name,
-				       const key_mapper_ptr& keys, 
+				       const key_mapper_ptr& keys,
 				       bool deflt) const
 {
 	formula_ptr fptr = get_formula_attr(name);
@@ -265,7 +265,7 @@ bool frame_draw_builder::get_bool_attr(const std::string& name,
 
 std::string frame_draw_builder::get_string_attr(const std::string& name,
 						const key_mapper_ptr &keys,
-						const std::string& deflt) const {	
+						const std::string& deflt) const {
 	std::map<std::string, std::string>::const_iterator i =
 		string_attrs_.find(name);
 	if(i != string_attrs_.end()) {
@@ -287,7 +287,7 @@ fdo_ptr texture_fdb::make_fdo(const key_mapper_ptr& keys) const
 	return fdo_ptr(new texture_fdo(x,y,w,h,texture,tile));
 }
 
-frame_draw_builder::attr_type texture_fdb::get_attr_type(const std::string& name) const 
+frame_draw_builder::attr_type texture_fdb::get_attr_type(const std::string& name) const
 {
 	if(name == "x" || name == "y" || name == "w" || name == "h") {
 		return ATTR_INT;
@@ -351,7 +351,7 @@ frame_draw_builder::attr_type text_fdb::get_attr_type(const std::string& name) c
 	return ATTR_UNKNOWN;
 }
 
-void key_mapper::add_rect(const std::string& name, int x, int y, int w, int h) 
+void key_mapper::add_rect(const std::string& name, int x, int y, int w, int h)
 {
 	SDL_Rect r;
 	r.x = x;
@@ -362,8 +362,8 @@ void key_mapper::add_rect(const std::string& name, int x, int y, int w, int h)
 	boost::shared_ptr<rect_mapper> rect(new rect_mapper(r));
 	rects_[name] = rect;
 }
-	
-void key_mapper::remove_rect(const std::string& name) 
+
+void key_mapper::remove_rect(const std::string& name)
 {
 	rects_.erase(name);
 }

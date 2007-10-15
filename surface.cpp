@@ -31,7 +31,7 @@ namespace {
 
 		return format;
 	}
-		
+
 }
 
 surface surface::convert_opengl_format() const
@@ -44,5 +44,5 @@ surface surface::clone() const
 	return SDL_ConvertSurface(get(),&get_neutral_pixel_format(),
 	                          SDL_SWSURFACE);
 }
-		
+
 }

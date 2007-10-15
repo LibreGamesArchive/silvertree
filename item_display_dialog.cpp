@@ -50,5 +50,5 @@ item_display_dialog::item_display_dialog(const const_item_ptr i)
 		add_widget(grid);
 	}
 }
-		
+
 }

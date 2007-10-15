@@ -9,7 +9,7 @@
 class EditPartyDialog : public QDialog
 {
 	Q_OBJECT
-	
+
 public:
 	EditPartyDialog(wml::node_ptr party, QWidget *parent = 0);
 

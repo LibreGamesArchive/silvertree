@@ -9,7 +9,7 @@
 class EditWmlDialog : public QDialog
 {
 	Q_OBJECT
-	
+
 public:
 	EditWmlDialog(wml::node_ptr node);
 

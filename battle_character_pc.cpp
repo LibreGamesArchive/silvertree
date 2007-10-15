@@ -34,5 +34,5 @@ void battle_character_pc::do_turn(battle& b)
 {
 	b.player_turn(*this);
 }
-		
+
 }

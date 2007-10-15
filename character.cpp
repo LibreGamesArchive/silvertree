@@ -65,7 +65,7 @@ public:
 	explicit fatigue_penalty_callable(const character& c) : char_(c)
 	{}
 };
-		
+
 }
 
 const std::vector<std::string>& character::attributes()
@@ -152,12 +152,12 @@ character::character(wml::const_node_ptr node)
 	character_generator::get((*node)["id"]).generate(*this, node);
 }
 
-const std::string& character::portrait(bool for_bar) const 
+const std::string& character::portrait(bool for_bar) const
 {
 	if(for_bar && !bar_portrait_.empty()) {
 		return bar_portrait_;
 	}
-	return portrait_; 
+	return portrait_;
 }
 
 int character::move_cost(hex::const_base_terrain_ptr terrain,

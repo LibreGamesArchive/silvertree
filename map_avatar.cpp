@@ -85,5 +85,5 @@ void map_avatar::draw()
 
 	glPopMatrix();
 }
-		
+
 }

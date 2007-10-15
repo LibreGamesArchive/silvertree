@@ -136,7 +136,7 @@ wml::node_ptr party::write() const
 	}
 
 	res->set_attr("items", items);
-	
+
 	return res;
 }
 
@@ -311,7 +311,7 @@ int party::movement_cost(const hex::location& src,
 			res = cost;
 		}
 	}
-	
+
 	return res;
 }
 
@@ -401,7 +401,7 @@ void party::get_pos(GLfloat* pos) const
 			pos[2] = 0.0;
 		}
 	} else {
-	
+
 		pos[0] = tile::translate_x(loc_);
 		pos[1] = tile::translate_y(loc_);
 

@@ -15,9 +15,9 @@
 #include <fstream>
 #include <sstream>
 
-// Include files for opendir(3), readdir(3), etc. 
-// These files may vary from platform to platform, 
-// since these functions are NOT ANSI-conforming functions. 
+// Include files for opendir(3), readdir(3), etc.
+// These files may vary from platform to platform,
+// since these functions are NOT ANSI-conforming functions.
 // They may have to be altered to port to new platforms
 #include <sys/types.h>
 
@@ -77,7 +77,7 @@
 struct dirent
 {
 	char	d_name[NAME_MAX + 1];	   /*!< file name (null-terminated) */
-	int 	d_mode;
+	int	d_mode;
 };
 
 struct DIR
@@ -121,17 +121,17 @@ static HANDLE dirent__findfile_directory(char const *name, LPWIN32_FIND_DATAA da
 
 DIR *opendir(char const *name)
 {
-	DIR 	*result =	NULL;
+	DIR	*result =	NULL;
 	DWORD	dwAttr;
 
-	// Must be a valid name 
+	// Must be a valid name
 	if( !name ||
 		!*name ||
 		(dwAttr = GetFileAttributes(name)) == 0xFFFFFFFF)
 	{
 		errno = ENOENT;
 	}
-	// Must be a directory 
+	// Must be a directory
 	else if(!(dwAttr & FILE_ATTRIBUTE_DIRECTORY))
 	{
 		errno = ENOTDIR;
@@ -156,7 +156,7 @@ DIR *opendir(char const *name)
 			}
 			else
 			{
-				// Save the directory, in case of rewind. 
+				// Save the directory, in case of rewind.
 				(void)lstrcpyA(result->directory, name);
 				(void)lstrcpyA(result->dirent.d_name, result->find_data.cFileName);
 				result->dirent.d_mode	=	(int)result->find_data.dwFileAttributes;
@@ -311,7 +311,7 @@ void get_files_in_dir(const std::string& directory,
 		if(entry->d_name[0] == '.')
 			continue;
 #ifdef __APPLE__
-		// HFS Mac OS X decomposes filenames using combining unicode characters. 
+		// HFS Mac OS X decomposes filenames using combining unicode characters.
 		// Try to get the precomposed form.
 		char basename[MAXNAMLEN+1];
 		CFStringRef cstr = CFStringCreateWithCString(NULL,
@@ -326,7 +326,7 @@ void get_files_in_dir(const std::string& directory,
 		CFRelease(cstr);
 		CFRelease(mut_str);
 #else
-		// generic Unix 
+		// generic Unix
 		char *basename = entry->d_name;
 #endif /* !APPLE */
 
@@ -484,12 +484,12 @@ bool do_file_exists(const std::string& fname)
 	file.close();
 	return true;
 }
-	
-std::string find_file(const std::string& fname) 
+
+std::string find_file(const std::string& fname)
 {
 	if(do_file_exists(fname)) {
 		return fname;
-	} 
+	}
 	if(have_datadir) {
 		std::string data_fname = data_dir + "/" + fname;
 		if(do_file_exists(data_fname)) {
@@ -503,7 +503,7 @@ bool file_exists(const std::string& name)
 {
 	return do_file_exists(find_file(name));
 }
-	
+
 std::string read_file(const std::string& name)
 {
 	std::string fname = find_file(name);

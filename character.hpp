@@ -60,7 +60,7 @@ public:
 	int defense_behind() const;
 	int parry(const std::string& damage_type="") const;
 	int dodge() const;
-	
+
 	//the character's resistance: on each blow, will ignore the first
 	//percent% of the first 'amount' of damage.
 	void get_resistance(const std::string& damage_type,
@@ -173,7 +173,7 @@ private:
 
 	int improvement_points_;
 	int spent_skill_points_;
-	
+
 	formula color_;
 };
 

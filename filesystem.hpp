@@ -21,8 +21,8 @@ namespace sys
 
 enum FILE_NAME_MODE { ENTIRE_FILE_PATH, FILE_NAME_ONLY };
 
-//! Populates 'files' with all the files and 
-//! 'dirs' with all the directories in dir. 
+//! Populates 'files' with all the files and
+//! 'dirs' with all the directories in dir.
 //! If files or dirs are NULL they will not be used.
 //!
 //! Mode determines whether the entire path or just the filename is retrieved.
@@ -41,7 +41,7 @@ void write_file(const std::string& fname, const std::string& data);
 
 bool file_exists(const std::string& fname);
 std::string find_file(const std::string& name);
-		
+
 }
 
 #endif

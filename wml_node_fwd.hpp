@@ -21,7 +21,7 @@ namespace wml
 class node;
 typedef boost::shared_ptr<node> node_ptr;
 typedef boost::shared_ptr<const node> const_node_ptr;
-		
+
 }
 
 #endif

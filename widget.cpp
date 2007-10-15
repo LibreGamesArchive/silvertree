@@ -77,5 +77,5 @@ void widget::draw() const
 		handle_draw();
 	}
 }
-		
+
 }

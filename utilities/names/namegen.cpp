@@ -36,7 +36,7 @@ float phoneme::transition_prob(const phoneme_ptr p) const {
 	}
 	return 0;
 }
-		
+
 
 
 const phoneme_ptr phoneme::transition() const {
@@ -76,8 +76,8 @@ void typography::gen_transitions(const std::vector<phoneme_ptr>& starts,
 			(*j)->set_transition((*k), ranfu());
 		}
 	}
-}	
-		
+}
+
 void typography::normalise_phones(const std::vector<phoneme_ptr>& p) {
 	for(const_iterator i = p.begin(); i != p.end(); ++i) {
 		(*i)->normalise();
@@ -111,11 +111,11 @@ void typography::add_qualifiers(phoneme_ptr p, typo_ptr t,
 	}
 }
 
-typo_ptr typography::generate_random(const std::vector<std::string>& vowels, 
+typo_ptr typography::generate_random(const std::vector<std::string>& vowels,
 				     const std::vector<std::string>& consonants,
 				     const std::vector<std::string>& non_initials,
 				     const std::vector<std::string>& non_medials,
-				     const std::vector<std::string>& non_finals) 
+				     const std::vector<std::string>& non_finals)
 {
 	typo_ptr ret(new typography());
 	std::vector<phoneme_ptr> v_phones;
@@ -166,7 +166,7 @@ std::string typography::generate_word(int length) const {
 		int index = raniu(static_cast<int>(phones_.size()));
 		p = phones_.at(index);
 	} while(non_initials_.find(p) != non_initials_.end());
-       
+
 	std::string ret = p->rep();
 
 	/* generate medials */
@@ -197,7 +197,7 @@ std::string typography::generate_word(int length) const {
 std::string read_file(const std::string& filename) {
 	std::ifstream file(filename.c_str(), std::ios_base::binary);
 
-	if(!file.is_open()) 
+	if(!file.is_open())
 	{
 		std::cerr << "Error opening file: "<<filename<<"\n";
 		exit(2);
@@ -205,7 +205,7 @@ std::string read_file(const std::string& filename) {
 
 	std::stringstream ss;
 	ss << file.rdbuf();
-	
+
 	file.close();
 	return ss.str();
 }
@@ -237,7 +237,7 @@ std::vector< std::string > split(std::string const &val, const std::string& deli
 }
 
 
-void read_clusters(const std::string& filename, 
+void read_clusters(const std::string& filename,
 		   std::vector<std::string>& vowels,
 		   std::vector<std::string>& consonants,
 		   std::vector<std::string>& non_initials,
@@ -296,7 +296,7 @@ void read_clusters(const std::string& filename,
 			}
 		}
 		if(!is_vowel && !is_consonant) {
-			std::cerr << "Warning: cluster is neither vowel nor consonant at " 
+			std::cerr << "Warning: cluster is neither vowel nor consonant at "
 				  << filename << ":" << line_count << "\n";
 			break;
 		}
@@ -308,7 +308,7 @@ void read_clusters(const std::string& filename,
 		if(verbose) {
 			std::cout << "Cluster: "<<words.front()<< " ";
 		}
-		
+
 		if(is_vowel) {
 			if(verbose) {
 				std::cout << "(vowel) ";
@@ -347,10 +347,10 @@ void read_clusters(const std::string& filename,
 
 void write_typography(const std::string& filename, namegen::typo_ptr t) {
 	std::ofstream out(filename.c_str(), std::ios_base::binary);
-	
+
 
 	for(namegen::typography::const_iterator i = t->begin_phones();
-	    i != t->end_phones(); ++i) 
+	    i != t->end_phones(); ++i)
 	{
 		for(namegen::typography::const_iterator j = t->begin_phones();
 		    j != t->end_phones(); ++j) {
@@ -380,7 +380,7 @@ namegen::typo_ptr read_typography(const std::string& cluster_file, const std::st
 		}
 		phones[words[0]][words[1]] = static_cast<float>(atof(words[2].c_str()));
 	}
-	
+
 	std::vector<std::string> vowels;
 	std::vector<std::string> consonants;
 	std::vector<std::string> non_initials;
@@ -423,7 +423,7 @@ namegen::typo_ptr make_language(const std::string& cluster_file,
 		std::cout << "Constructing language\n";
 	}
 
-	read_clusters(cluster_file, vowels, consonants, 
+	read_clusters(cluster_file, vowels, consonants,
 		      non_initials, non_medials, non_finals);
 
 	int vsize = static_cast<int>(vowels.size()) - num_vowels;
@@ -482,7 +482,7 @@ int main(int argc, char **argv) {
 	if(argc > 6) {
 		num_consonants = atoi(argv[6]);
 	}
-	
+
 	namegen::typo_ptr t;
 
 	if(file_exists(argv[2])) {
@@ -541,6 +541,6 @@ int main(int argc, char **argv) {
 	if(!file_exists(argv[2])) {
 		write_typography(argv[2], t);
 	}
-	
+
 	return 0;
 }

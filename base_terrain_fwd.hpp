@@ -21,7 +21,7 @@ namespace hex
 class base_terrain;
 typedef boost::shared_ptr<base_terrain> base_terrain_ptr;
 typedef boost::shared_ptr<const base_terrain> const_base_terrain_ptr;
-		
+
 }
 
 #endif

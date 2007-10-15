@@ -42,7 +42,7 @@ private:
 
 typedef boost::shared_ptr<material> material_ptr;
 typedef boost::shared_ptr<const material> const_material_ptr;
-		
+
 }
 
 #endif

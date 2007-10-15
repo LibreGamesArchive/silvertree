@@ -66,7 +66,7 @@ private:
 	int default_cost_;
 	std::string battle_style_;
 };
-		
+
 }
 
 #endif

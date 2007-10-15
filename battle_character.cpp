@@ -356,7 +356,7 @@ bool battle_character::can_attack(const battle_character& c,
 		std::vector<const hex::tile*> line;
 		if(!hex::line_of_sight(map_,loc,c.loc(),&line,range,draw)) {
 			return false;
-		} 
+		}
 		foreach(const hex::tile* t, line) {
 			foreach(const battle_character_ptr& d, chars) {
 				if(this == d.get() || &c == d.get()) continue;
@@ -490,7 +490,7 @@ bool battle_character::move(hex::DIRECTION dir)
 		move_.erase(i+1,move_.end());
 		return true;
 	}
-	
+
 	const int cost = move_cost(move_.back(),loc);
 	if(cost == -1 ||
 	   planned_move_cost() + cost > battle::movement_duration()) {

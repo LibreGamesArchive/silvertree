@@ -129,7 +129,7 @@ private:
 	void get_possible_moves_internal(move_map& locs, const std::vector<battle_character_ptr>& chars, route& r, int max_distance) const;
 
 	virtual void do_turn(battle& b) = 0;
-	
+
 	character_ptr const char_;
 	const party& party_;
 	hex::location loc_;
@@ -142,7 +142,7 @@ private:
 	int adjust_damage(int damage) const;
 	route move_;
 	GLfloat time_in_move_;
-	
+
 	const hex::gamemap& map_;
 
 	const GLfloat* highlight_;

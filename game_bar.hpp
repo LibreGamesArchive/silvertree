@@ -15,7 +15,7 @@ namespace game_dialogs {
 class game_bar : public gui::framed_dialog {
 public:
 	game_bar(int x, int y, int w, int h, game_logic::party_ptr pty,
-		 game_logic::world *wp) 
+		 game_logic::world *wp)
 		: gui::framed_dialog(x,y,w,h) {
 		construct_interface(pty, wp);
 	}
@@ -50,7 +50,7 @@ class game_bar_portrait_set : public gui::dialog {
 public:
 	game_bar_portrait_set(game_logic::party_ptr pty, int w, int h,
 	                      std::vector<gui::const_widget_ptr>* char_rects=NULL)
-		: dialog(0,0,w,h), pty_(pty) 
+		: dialog(0,0,w,h), pty_(pty)
 	{
 		construct_interface(char_rects);
 	}
@@ -70,7 +70,7 @@ private:
 	void inner_draw() const;
 	void construct_interface();
 	mutable SDL_Rect p_dims_;
-  
+
 	gui::widget_ptr portrait_;
 	game_logic::character_ptr ch_;
 	game_logic::party_ptr pty_;
@@ -82,7 +82,7 @@ public:
 	// more functionality later
 private:
 	void option_selected(int opt);
-	
+
 	game_logic::world *wp_;
 };
 

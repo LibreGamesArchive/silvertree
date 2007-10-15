@@ -32,7 +32,7 @@ public:
 
 	static const_model_ptr get_model(const std::string& key);
 	struct bone;
-		
+
 	struct vertex {
 		vertex() : uvmap_valid(false), bone_num(-1) {}
 		boost::array<GLfloat,3> point;
@@ -76,7 +76,7 @@ private:
 	std::vector<face> faces_;
 	std::vector<bone> bones_;
 };
-		
+
 }
 
 #endif

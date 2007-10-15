@@ -12,9 +12,9 @@
 
 #ifdef SDL_VERSION
 void print_sdl_version(std::string txt, const SDL_version *version) {
-  std::cout << txt << " : " << 
+  std::cout << txt << " : " <<
     static_cast<int>(version->major) << "." <<
-    static_cast<int>(version->minor) << "." << 
+    static_cast<int>(version->minor) << "." <<
     static_cast<int>(version->patch) << "\n";
 }
 #endif
@@ -98,9 +98,9 @@ void status_gl(int detailed) {
   comp_version_minor = 0;
 #endif
 
-  printf("OpenGL compiled version: %d.%d\n", 
+  printf("OpenGL compiled version: %d.%d\n",
 	 comp_version_major, comp_version_minor);
-  
+
   if(detailed) {
     const char *vendor = (const char *)glGetString(GL_VENDOR);
     const char *renderer = (const char *)glGetString(GL_RENDERER);
@@ -146,9 +146,9 @@ void status_glu(int detailed) {
   comp_version_major = 2;
   comp_version_minor = 0;
 #endif
-  printf("GLU compiled version: %d.%d\n", 
+  printf("GLU compiled version: %d.%d\n",
 	 comp_version_major, comp_version_minor);
-  
+
   if(detailed) {
     char *extensions = strdup((const char *)gluGetString(GLU_EXTENSIONS));
     char *ext; int count;

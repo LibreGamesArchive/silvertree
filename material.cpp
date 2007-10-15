@@ -50,5 +50,5 @@ void material::set_as_current_material() const
 	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,specular_.data());
 	tex_.set_as_current_texture();
 }
-		
+
 }

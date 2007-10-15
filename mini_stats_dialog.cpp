@@ -11,7 +11,7 @@ namespace game_dialogs {
 
 mini_stats_dialog::mini_stats_dialog(game_logic::battle_character_ptr ch, int w, int h)
 	: framed_dialog(0,0,w,h), ch_(ch)
-{ 
+{
   construct_interface();
 }
 
@@ -27,13 +27,13 @@ void mini_stats_dialog::finish_draw() const {
 	glPopMatrix();
 }
 
-void mini_stats_dialog::construct_interface() 
+void mini_stats_dialog::construct_interface()
 {
 	game_logic::character& rch = ch_->get_character();
-	
+
 	std::string portrait_file = rch.portrait();
 	if(!portrait_file.empty()) {
-		gui::widget_ptr portrait = 
+		gui::widget_ptr portrait =
 			gui::widget_ptr(new gui::image_widget(portrait_file, width()/2, height()));
 		add_widget(portrait, dialog::MOVE_RIGHT);
 	} else {

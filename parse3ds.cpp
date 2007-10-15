@@ -84,7 +84,7 @@ chunk read_chunk(const char*& i1, const char* i2) {
 				  << " bytes in input\n";
 		throw graphics::parse3ds_error();
 	}
-	
+
 	res.beg = i1;
 	i1 = res.end = i1 + size;
 	return res;
@@ -434,7 +434,7 @@ void parse_keyframer(chunk& c)
 		}
 	}
 }
-		
+
 }
 
 namespace graphics
@@ -476,7 +476,7 @@ model_ptr parse3ds(const char* i1, const char* i2)
 	std::cerr << "made model...\n";
 	return res;
 }
-		
+
 }
 
 #if 0
@@ -487,7 +487,7 @@ int main()
 		std::cerr << "could not read 3ds file\n";
 		return 0;
 	}
-		
+
 	const char* d = data.c_str();
 	try {
 		graphics::parse3ds(d,d+data.size());

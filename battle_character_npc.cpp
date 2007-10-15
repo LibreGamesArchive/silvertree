@@ -135,5 +135,5 @@ void battle_character_npc::do_turn(battle& b)
 
 	set_time_until_next_move(1);
 }
-		
+
 }

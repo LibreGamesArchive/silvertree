@@ -29,7 +29,7 @@ private:
 	void do_turn(battle& b);
 	bool is_human() const;
 };
-		
+
 }
 
 #endif

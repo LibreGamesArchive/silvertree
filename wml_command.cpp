@@ -46,7 +46,7 @@ class debug_console_command : public wml_command {
 public:
 	explicit debug_console_command(wml::const_node_ptr node)
 	{}
-	
+
 };
 
 class debug_command : public wml_command {
@@ -215,7 +215,7 @@ class battle_command : public wml_command {
 				generate_battle_map(world.map(), *battle_loc);
 		party_ptr pc_party(pc_party_.execute(info).convert_to<party>());
 		party_ptr npc_party(npc_party_.execute(info).convert_to<party>());
-		
+
 		std::vector<battle_character_ptr> chars;
 
 		variant pc_chars = pc_chars_.execute(info);

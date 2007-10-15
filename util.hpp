@@ -21,7 +21,7 @@ bool is_odd(T n) { return ((n > 0 ? n : -n)%2) == 1; }
 
 template<typename T>
 bool is_even(T n) { return !is_odd(n); }
-	
+
 }
 
 #endif

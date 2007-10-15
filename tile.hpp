@@ -119,7 +119,7 @@ public:
 			return a->texture_ < b->texture_;
 		}
 	};
-	
+
 private:
 	void do_draw() const;
 	void init(int height, const_base_terrain_ptr terrain,
@@ -146,7 +146,7 @@ private:
 			  red(1), green(1), blue(1), init(false)
 		{
 		}
-		
+
 		GLfloat x, y, height;
 		GLfloat red, green, blue;
 		GLfloat normal[3];

@@ -84,7 +84,7 @@ T get_attr(const_node_ptr ptr, const std::string& key,
 	if(!ptr) {
 		return default_value;
 	}
-	
+
 	try {
 		return boost::lexical_cast<T>((*ptr)[key]);
 	} catch(boost::bad_lexical_cast&) {

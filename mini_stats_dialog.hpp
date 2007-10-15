@@ -14,7 +14,7 @@ public:
 	mini_stats_dialog(game_logic::battle_character_ptr ch, int w=100, int h=100);
 	void set_loc(int x, int y) {}
 protected:
-	void construct_interface();		
+	void construct_interface();
 private:
 	void prepare_draw() const;
 	void finish_draw() const;

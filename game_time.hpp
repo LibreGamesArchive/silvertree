@@ -56,7 +56,7 @@ bool operator>=(const game_time& t1, const game_time& t2);
 
 int operator-(const game_time& t1, const game_time& t2);
 game_time operator+(const game_time& t, int mins);
-		
+
 }
 
 #endif

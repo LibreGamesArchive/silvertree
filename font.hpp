@@ -38,18 +38,18 @@ std::string format_text(const std::string& text, int font_size, int width);
 void render_multiline_text(const std::string& text, int font_size,
                     const SDL_Color& color, std::vector<texture>& res,
 					int *width=NULL, int *height=NULL);
-void get_text_size(const std::string& text, int font_size, 
+void get_text_size(const std::string& text, int font_size,
 		   int *width = NULL, int *height =NULL);
 
-texture render_complex_text(const std::string& text, int font_size, 
-			    const SDL_Color& text_color, 
-			    const SDL_Color& caret_fg, const SDL_Color& caret_bg, 
+texture render_complex_text(const std::string& text, int font_size,
+			    const SDL_Color& text_color,
+			    const SDL_Color& caret_fg, const SDL_Color& caret_bg,
 			    bool opaque_caret,
-			    const SDL_Color& selection_fg, const SDL_Color& selection_bg, 
+			    const SDL_Color& selection_fg, const SDL_Color& selection_bg,
 			    bool opaque_selection,
 			    int caret, int selection_start, int selection_end);
 }
-		
+
 }
 
 #endif

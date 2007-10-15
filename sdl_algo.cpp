@@ -89,7 +89,7 @@ SDL_Rect get_non_transparent_rect(surface surf)
 
 	assert(surf->format->BitsPerPixel == 32);
 	const Uint32 amask = surf->format->Amask;
-	
+
 	surface_lock lock(surf);
 	const Uint32* data = lock.pixels();
 	const Uint32* end_data = data + surf->w*surf->h;
@@ -102,7 +102,7 @@ SDL_Rect get_non_transparent_rect(surface surf)
 	}
 
 	const Uint32 first_row = std::min<int>((data - lock.pixels())/surf->w,surf->h-1);
-	
+
 	const Uint32* data_rev = end_data-1;
 	while(data_rev > data) {
 		if((*data_rev)&amask) {
@@ -143,7 +143,7 @@ SDL_Rect get_non_transparent_rect(surface surf)
 			right = i - beg;
 		}
 	}
-	
+
 	SDL_Rect rect = {left, first_row, (right - left)+1, (last_row - first_row)+1};
 	return rect;
 }

@@ -51,7 +51,7 @@ private:
 	mutable boost::shared_ptr<world> world_;
 	const hex::gamemap& map_;
 };
-		
+
 }
 
 #endif

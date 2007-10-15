@@ -6,9 +6,9 @@
 
 namespace gui {
 
-skinned_widget::skinned_widget() 
-	: state_(0),	 
-	  have_real_dim_(false), have_real_loc_(false), nested_draw_(false), 
+skinned_widget::skinned_widget()
+	: state_(0),
+	  have_real_dim_(false), have_real_loc_(false), nested_draw_(false),
 	  inner_(new delegate_widget(this)) { }
 
 void skinned_widget::set_state(int state) const
@@ -20,11 +20,11 @@ void skinned_widget::set_state(int state) const
 	if(state < 0) {
 		state_ = 0;
 	}
-	
+
 	// ugly magic necessary to allow both switching state in redraw
 	// and automatic repositioning on frame change
 	skinned_widget *non_const_this = const_cast<skinned_widget *>(this);
-	
+
 	if(have_real_loc_) {
 		non_const_this->set_loc(real_dims_.x, real_dims_.y);
 	} else {
@@ -38,7 +38,7 @@ void skinned_widget::set_state(int state) const
 
 }
 
-int skinned_widget::add_skin(const std::string &name, int state) 
+int skinned_widget::add_skin(const std::string &name, int state)
 {
 	int ret;
 
@@ -93,7 +93,7 @@ void skinned_widget::remove_skin(int state) {
 		return;
 	}
 	frames_.erase(frames_.end());
-	
+
 	for(std::set<int>::reverse_iterator i = cancelled_frames_.rbegin();
 	    i != cancelled_frames_.rend(); ++i) {
 		if(*i != frames_.size()-1) {
@@ -104,7 +104,7 @@ void skinned_widget::remove_skin(int state) {
 	}
 }
 
-bool skinned_widget::valid_frame() const 
+bool skinned_widget::valid_frame() const
 {
 	if(state_ < 0 || state_ >= frames_.size()) {
 		return false;
@@ -121,7 +121,7 @@ void skinned_widget::handle_draw() const
 		inner_draw();
 		return;
 	}
-		
+
 	prepare_draw();
 
 	if(!valid_frame()) {
@@ -139,12 +139,12 @@ void skinned_widget::handle_draw() const
 	finish_draw();
 }
 
-void skinned_widget::set_dim(int w, int h) 
+void skinned_widget::set_dim(int w, int h)
 {
 	have_real_dim_ = true;
 	real_dims_.w = w;
 	real_dims_.h = h;
-	
+
 	if(!valid_frame()) {
 		inner_set_dim(w,h);
 		return;
@@ -158,7 +158,7 @@ void skinned_widget::inner_set_dim(int w, int h) {
 	widget::set_dim(w,h);
 }
 
-void skinned_widget::set_loc(int x, int y) 
+void skinned_widget::set_loc(int x, int y)
 {
 	have_real_loc_ = true;
 	real_dims_.x = x;
@@ -173,7 +173,7 @@ void skinned_widget::set_loc(int x, int y)
 	inner_set_loc(frames_[state_]->x(), frames_[state_]->y());
 }
 
-void skinned_widget::inner_set_loc(int x, int y) 
+void skinned_widget::inner_set_loc(int x, int y)
 {
 	widget::set_loc(x,y);
 }
@@ -182,15 +182,15 @@ bool skinned_widget::hit_me(const SDL_Event &e) {
 	switch(e.type) {
 	case SDL_MOUSEBUTTONUP:
 	case SDL_MOUSEBUTTONDOWN:
-		if(e.button.x >  x() && e.button.y > y() && 
-		   e.button.x < x() + width() && e.button.y < y() + height()) 
+		if(e.button.x >  x() && e.button.y > y() &&
+		   e.button.x < x() + width() && e.button.y < y() + height())
 		{
 			return true;
 		}
 		return false;
 	case SDL_MOUSEMOTION:
-		if(e.motion.x >  x() && e.motion.y > y() && 
-		   e.motion.x < x() + width() && e.motion.y < y() + height()) 
+		if(e.motion.x >  x() && e.motion.y > y() &&
+		   e.motion.x < x() + width() && e.motion.y < y() + height())
 		{
 			return true;
 		}
@@ -201,7 +201,7 @@ bool skinned_widget::hit_me(const SDL_Event &e) {
 }
 
 
-void button_widget::do_click() 
+void button_widget::do_click()
 {
 	// NB heuristic since finding mouse pos is hard
 	const int start = SDL_GetTicks();
@@ -214,7 +214,7 @@ void button_widget::do_click()
 	}
 }
 
-bool button_widget::handle_event(const SDL_Event &e) 
+bool button_widget::handle_event(const SDL_Event &e)
 {
 	if(state() == DISABLED) {
 		return false;
@@ -253,7 +253,7 @@ bool button_widget::handle_event(const SDL_Event &e)
 		break;
 	case SDL_KEYDOWN:
 		if(has_hotkey_) {
-			if(e.key.keysym.sym == hotkey_.sym && 
+			if(e.key.keysym.sym == hotkey_.sym &&
 			   e.key.keysym.mod == hotkey_.mod) {
 				set_state(CLICKED);
 				claimed = true;
@@ -272,15 +272,15 @@ bool button_widget::handle_event(const SDL_Event &e)
 	default:
 		break;
 	}
-	
+
 	return claimed;
-}	   
+}
 
 bool button_widget::is_enabled() const
 {
 	return state() != DISABLED;
 }
-void button_widget::set_enabled(bool enabled) 
+void button_widget::set_enabled(bool enabled)
 {
 	if(is_enabled() == enabled) {
 		return;
@@ -293,7 +293,7 @@ void button_widget::set_enabled(bool enabled)
 }
 
 
-void scrolled_container::add_widget(widget_ptr p) 
+void scrolled_container::add_widget(widget_ptr p)
 {
 	p->set_loc(0,0);
 	widgets_.push_back(p);
@@ -303,7 +303,7 @@ void scrolled_container::remove_widget(widget_ptr p) {
 	widgets_.erase(std::find(widgets_.begin(), widgets_.end(), p));
 }
 
-void scrolled_container::handle_draw() const 
+void scrolled_container::handle_draw() const
 {
 	SDL_Rect self = { x(), y(), width(), height() };
 	graphics::push_clip(self);
@@ -330,7 +330,7 @@ void scrolled_container::handle_draw() const
 	glPopMatrix();
 }
 
-void scrolled_container::scroll(int dir) 
+void scrolled_container::scroll(int dir)
 {
 	set_offset(offset_ + dir);
 }
@@ -361,7 +361,7 @@ void scrolled_container::move_event(SDL_Event *ep, int dx, int dy) {
 	}
 }
 
-bool scrolled_container::handle_event(const SDL_Event &e) 
+bool scrolled_container::handle_event(const SDL_Event &e)
 {
 	bool claimed = false;
 	SDL_Event ev = e;
@@ -404,15 +404,15 @@ void scroll_button::prepare_draw() const {
 	}
 
 	button_widget::prepare_draw();
-}		
+}
 
-void scroll_button::clicked() 
+void scroll_button::clicked()
 {
 	cont_->scroll(amt_);
 }
 
 void menu_option::construct_interface(const std::string& text, const std::string& frame,
-				      const SDL_Color& color, int font_size) 
+				      const SDL_Color& color, int font_size)
 {
 	label_.reset(new label(text, color, font_size));
 	label_ = frame_manager::make_frame(label_, frame);
@@ -420,29 +420,29 @@ void menu_option::construct_interface(const std::string& text, const std::string
 	//set_dim(label_->width(), label_->height());
 }
 
-void menu_option::inner_set_loc(int nx, int ny) 
+void menu_option::inner_set_loc(int nx, int ny)
 {
 	skinned_widget::inner_set_loc(nx,ny);
 	label_->set_loc(x(), y());
 }
 
-void menu_option::inner_set_dim(int nw, int nh) 
+void menu_option::inner_set_dim(int nw, int nh)
 {
 	skinned_widget::inner_set_dim(nw,nh);
 	label_->set_dim(width(), height());
 }
 
-void menu_option::inner_draw() const 
+void menu_option::inner_draw() const
 {
 	label_->draw();
 }
 
-void menu_widget::add_option(const std::string& opt, int state) 
+void menu_widget::add_option(const std::string& opt, int state)
 {
-	menu_option_ptr opt_widget(new menu_option(opt, option_text_frame_, 
+	menu_option_ptr opt_widget(new menu_option(opt, option_text_frame_,
 						   color_, font_size_));
 	options_[state] = opt_widget;
-	for(std::map<int,std::string>::iterator i = option_skins_.begin(); 
+	for(std::map<int,std::string>::iterator i = option_skins_.begin();
 	    i != option_skins_.end(); ++i) {
 		opt_widget->add_skin(i->second, i->first);
 	}
@@ -484,7 +484,7 @@ void menu_widget::set_option_enabled(int opt, bool enabled) {
 	}
 }
 
-int menu_widget::find_option(const SDL_Event &e) 
+int menu_widget::find_option(const SDL_Event &e)
 {
 	const static int INT16_HIGH_BIT = 1 << (sizeof(Uint16)*8-1);
 	const static int INT16_CAP = INT16_HIGH_BIT - 1;
@@ -530,7 +530,7 @@ int menu_widget::find_option(const SDL_Event &e)
 	return -1;
 }
 
-void menu_widget::update_key_selection(const SDL_Event &e) 
+void menu_widget::update_key_selection(const SDL_Event &e)
 {
 	switch(e.type) {
 	case SDL_MOUSEMOTION:
@@ -615,7 +615,7 @@ void popup_menu_widget::set_enabled(bool enabled) {
 		set_state(NORMAL);
 	} else {
 		set_state(DISABLED);
-	} 
+	}
 }
 
 void popup_menu_widget::rebuild_options() {
@@ -630,20 +630,20 @@ void popup_menu_widget::rebuild_options() {
 
 	switch(alignment_) {
 	case RIGHT:
-		option_frame_->set_loc(x() - (option_frame_->width() - width()), 
+		option_frame_->set_loc(x() - (option_frame_->width() - width()),
 				       y() - option_frame_->height());
 		break;
 	case LEFT:
 		option_frame_->set_loc(x(), y() - option_frame_->height());
 		break;
 	case CENTER:
-		option_frame_->set_loc(x() - (option_frame_->width() - width())/2, 
+		option_frame_->set_loc(x() - (option_frame_->width() - width())/2,
 				       y() - option_frame_->height());
 		break;
 	}
 }
-		
-void popup_menu_widget::finish_draw() const 
+
+void popup_menu_widget::finish_draw() const
 {
 	if(popped_out_ && option_frame_) {
 		option_frame_->draw();
@@ -651,7 +651,7 @@ void popup_menu_widget::finish_draw() const
 	menu_widget::finish_draw();
 }
 
-void popup_menu_widget::get_options_loc(int *x, int *y) 
+void popup_menu_widget::get_options_loc(int *x, int *y)
 {
 	if(option_frame_) {
 		*x = option_frame_->x();
@@ -662,7 +662,7 @@ void popup_menu_widget::get_options_loc(int *x, int *y)
 	}
 }
 
-bool popup_menu_widget::grab_option_event(const SDL_Event& e) 
+bool popup_menu_widget::grab_option_event(const SDL_Event& e)
 {
 	update_key_selection(e);
 	int selected = find_option(e);
@@ -695,7 +695,7 @@ bool popup_menu_widget::grab_option_event(const SDL_Event& e)
 	if(can_select) {
 		switch(e.type) {
 		case SDL_MOUSEBUTTONDOWN:
-			if(get_option(selected)->state() != menu_option::DISABLED) { 
+			if(get_option(selected)->state() != menu_option::DISABLED) {
 				opt_ready_ = selected;
 			}
 			break;
@@ -704,7 +704,7 @@ bool popup_menu_widget::grab_option_event(const SDL_Event& e)
 				option_selected(selected);
 				set_state(NORMAL);
 				popped_out_ = false;
-			} 
+			}
 			opt_ready_ = -1;
 			break;
 		case SDL_KEYDOWN:
@@ -747,7 +747,7 @@ bool popup_menu_widget::grab_option_event(const SDL_Event& e)
 	return grab;
 }
 
-bool popup_menu_widget::handle_event(const SDL_Event& e) 
+bool popup_menu_widget::handle_event(const SDL_Event& e)
 {
 	if(state() == DISABLED) {
 		return false;
@@ -802,7 +802,7 @@ bool popup_menu_widget::handle_event(const SDL_Event& e)
 			} else {
 				set_state(DEPRESSED);
 			}
-		} 
+		}
 		break;
 	case SDL_KEYDOWN:
 		if(has_hotkey() && e.key.keysym.sym == hotkey().sym && e.key.keysym.mod == hotkey().mod) {
@@ -825,7 +825,7 @@ bool popup_menu_widget::handle_event(const SDL_Event& e)
 		break;
 	}
 	return claimed;
-	   
+
 }
 
 void rollin_menu_widget::rebuild_options() {
@@ -842,7 +842,7 @@ void rollin_menu_widget::rebuild_options() {
 	set_option_frame(option_frame);
 }
 
-bool rollin_menu_widget::handle_event(const SDL_Event& e) 
+bool rollin_menu_widget::handle_event(const SDL_Event& e)
 {
 	if(state() == DISABLED) {
 		return false;
@@ -850,7 +850,7 @@ bool rollin_menu_widget::handle_event(const SDL_Event& e)
 	if(popped_out() && grab_option_event(e)) {
 		return true;
 	}
-	
+
 	bool claimed = false;
 
 	switch(e.type) {
@@ -909,7 +909,7 @@ void framed_dialog::handle_draw() const
 }
 
 void framed_dialog::handle_draw_children() const {
-	for(dialog::child_iterator i = begin_children(); i != end_children(); ++i) 
+	for(dialog::child_iterator i = begin_children(); i != end_children(); ++i)
 	{
 		(*i)->draw();
 	}
@@ -929,12 +929,12 @@ void framed_dialog::inner_draw() const {
 }
 
 
-void framed_dialog::set_dim(int w, int h) 
+void framed_dialog::set_dim(int w, int h)
 {
 	if(!frame_) {
 		inner_set_dim(w,h);
 		return;
-	} 
+	}
 	if(nested_set_dim_) {
 		inner_set_dim(w,h);
 	} else {
@@ -953,12 +953,12 @@ void framed_dialog::inner_set_dim(int w, int h) {
 	dialog::set_dim(w,h);
 }
 
-void framed_dialog::set_loc(int x, int y) 
+void framed_dialog::set_loc(int x, int y)
 {
 	if(!frame_) {
 		inner_set_loc(x,y);
 		return;
-	} 
+	}
 	if(nested_set_loc_) {
 		inner_set_loc(x,y);
 	} else {
@@ -977,7 +977,7 @@ void framed_dialog::inner_set_loc(int x, int y) {
 	dialog::set_loc(x,y);
 }
 
-void phantom_dialog::adapt_size() 
+void phantom_dialog::adapt_size()
 {
 	int dlg_w = width();
 	int dlg_h = height();
@@ -1000,27 +1000,27 @@ void phantom_dialog::adapt_size()
 	}
 }
 
-dialog& phantom_dialog::add_widget(widget_ptr w, MOVE_DIRECTION dir) 
+dialog& phantom_dialog::add_widget(widget_ptr w, MOVE_DIRECTION dir)
 {
 	dialog& ret = dialog::add_widget(w, dir);
 	adapt_size();
 	return ret;
 }
 
-dialog& phantom_dialog::add_widget(widget_ptr w, int x, int y, MOVE_DIRECTION dir) 
+dialog& phantom_dialog::add_widget(widget_ptr w, int x, int y, MOVE_DIRECTION dir)
 {
 	dialog& ret = dialog::add_widget(w, x, y, dir);
 	adapt_size();
 	return ret;
 }
 
-void phantom_dialog::remove_widget(widget_ptr w) 
+void phantom_dialog::remove_widget(widget_ptr w)
 {
 	dialog::remove_widget(w);
 	adapt_size();
 }
 
-void phantom_dialog::replace_widget(widget_ptr w_old, widget_ptr w_new) 
+void phantom_dialog::replace_widget(widget_ptr w_old, widget_ptr w_new)
 {
 	dialog::replace_widget(w_old, w_new);
 	adapt_size();

@@ -444,7 +444,7 @@ struct simple_variant
 
 private:
     enum size_type { size = sizeof(T) > sizeof(T*) ? sizeof(T) : sizeof(T*) };
-    simple_variant &operator =(simple_variant const &); 
+    simple_variant &operator =(simple_variant const &);
     bool const is_rvalue;
     aligned_storage<size> data;
 };
@@ -748,7 +748,7 @@ deref(auto_any_t cur, type2type<T, C> *)
 //   std::list<int> int_list(/*stuff*/);
 //   BOOST_FOREACH(int &i, int_list)
 //   {
-//       /* 
+//       /*
 //        * loop body goes here.
 //        * i is a reference to the int in int_list.
 //        */

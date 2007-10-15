@@ -21,7 +21,7 @@ namespace graphics
 model_ptr parse3ds(const char* i1, const char* i2);
 
 struct parse3ds_error {};
-		
+
 }
 
 #endif

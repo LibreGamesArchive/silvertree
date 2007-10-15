@@ -42,14 +42,14 @@ protected:
 	void set_position(const GLfloat* buf) {
 		std::copy(buf,buf+3,position_buffer());
 	}
-	
+
 private:
 	point point_;
 };
 
 typedef boost::shared_ptr<map_object> map_object_ptr;
 typedef boost::shared_ptr<const map_object> const_map_object_ptr;
-		
+
 }
 
 #endif

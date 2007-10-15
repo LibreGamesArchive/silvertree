@@ -21,7 +21,7 @@ namespace graphics {
 
 class frame_skipper {
 public:
-	frame_skipper(int rate=50, bool maxfps=false) 
+	frame_skipper(int rate=50, bool maxfps=false)
 		: maxfps_(maxfps), frame_time_(1000/rate),
 		  last_(0), accum_(0)  {
 		last_ = SDL_GetTicks();
@@ -62,7 +62,7 @@ inline void frame_skipper::reset() {
 
 class frame_rate_tracker {
 public:
-	frame_rate_tracker() 
+	frame_rate_tracker()
 		: last_tick_(0), last_frames_(0), frames_(0),
 		  fps_(50), msg_up_to_date_(false)
 	{

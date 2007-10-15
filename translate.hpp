@@ -19,7 +19,7 @@ namespace i18n {
 
 void add_translation(const std::string& from, const std::string& to);
 const std::string& translate(const std::string& from);
-		
+
 }
 
 #endif

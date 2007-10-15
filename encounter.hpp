@@ -21,7 +21,7 @@ namespace game_logic
 
 void handle_encounter(party_ptr p1, party_ptr p2,
                       const hex::gamemap& map);
-		
+
 }
 
 #endif

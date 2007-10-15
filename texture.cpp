@@ -65,47 +65,47 @@ namespace {
 		++n;
 		return n;
 	}
-	
+
 	bool is_npot_allowed()
     {
-    	static bool once = false;
-    	static bool npot = true;
-    	if (once) return npot;
-    	once = true;
+	static bool once = false;
+	static bool npot = true;
+	if (once) return npot;
+	once = true;
 
-    	const char *supported = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
-    	const char *version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
-    	const char *vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+	const char *supported = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
+	const char *version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+	const char *vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
 
-    	std::cerr << "OpenGL version: " << version << "\n";
-    	std::cerr << "OpenGL vendor: " << vendor << "\n";
-    	std::cerr << "OpenGL extensions: " << supported << "\n";
+	std::cerr << "OpenGL version: " << version << "\n";
+	std::cerr << "OpenGL vendor: " << vendor << "\n";
+	std::cerr << "OpenGL extensions: " << supported << "\n";
 
-    	// OpenGL >= 2.0 drivers must support NPOT textures
-    	bool version_2 = (version[0] >= '2');
-    	npot = version_2;
-    	// directly test for NPOT extension
-    	if (std::strstr(supported, "GL_ARB_texture_non_power_of_two")) npot = true;
+	// OpenGL >= 2.0 drivers must support NPOT textures
+	bool version_2 = (version[0] >= '2');
+	npot = version_2;
+	// directly test for NPOT extension
+	if (std::strstr(supported, "GL_ARB_texture_non_power_of_two")) npot = true;
 
-    	if (npot) {
-    		// Use some heuristic to make sure it is HW accelerated. Might need some
-    		// more work.
-    		if (std::strstr(vendor, "NVIDIA Corporation")) {
-    			if (!std::strstr(supported, "NV_fragment_program2") ||
-    				!std::strstr(supported, "NV_vertex_program3")) {
-    					npot = false;
+	if (npot) {
+		// Use some heuristic to make sure it is HW accelerated. Might need some
+		// more work.
+		if (std::strstr(vendor, "NVIDIA Corporation")) {
+			if (!std::strstr(supported, "NV_fragment_program2") ||
+				!std::strstr(supported, "NV_vertex_program3")) {
+					npot = false;
 				}
 			} else if (std::strstr(vendor, "ATI Technologies")) {
 					// TODO: Investigation note: my ATI card works fine for npot textures as long
 					// as mipmapping is enabled. otherwise it runs slowly. Work out why. --David
-    				//if (!std::strstr(supported, "GL_ARB_texture_non_power_of_two"))
-    					npot = false;
-    		}
-    	}
-    	if(!npot) {
+				//if (!std::strstr(supported, "GL_ARB_texture_non_power_of_two"))
+					npot = false;
+		}
+	}
+	if(!npot) {
 		std::cerr << "Using only pot textures\n";
 	}
-    	return npot;
+	return npot;
     }
 
 	std::string mipmap_type_to_string(GLenum type) {
@@ -137,7 +137,7 @@ texture::manager::manager() {
 	if(preference_mipmapping()) {
 		std::cerr << "Mipmapping enabled: MIN "
 			  << mipmap_type_to_string(preference_mipmap_min())
-			  << " MAX " 
+			  << " MAX "
 			  << mipmap_type_to_string(preference_mipmap_max())
 			  << "\n";
 	} else {
