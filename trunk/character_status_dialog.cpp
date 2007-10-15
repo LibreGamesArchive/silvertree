@@ -114,7 +114,7 @@ void character_status_dialog::init()
 		  add_col(lb.create(formatter() << c->vision())).
 		  add_col(lb.create(""));
 
-	const std::string optional_stats[] = {"track", "heal", "haggle"};
+	const std::string optional_stats[] = {"track", "heal", "haggle", "charisma"};
 	for(int n = 0; n != sizeof(optional_stats)/sizeof(*optional_stats); ++n) {
 		const int val = c->stat(optional_stats[n]);
 		if(val) {
