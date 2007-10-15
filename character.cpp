@@ -214,7 +214,7 @@ const std::string AgilityAttribute = "agility";
 const std::string EnduranceAttribute = "endurance";
 const std::string IntelligenceAttribute = "intelligence";
 const std::string PerceptionAttribute = "perception";
-const std::string PersonaAttribute = "will";
+const std::string WillAttribute = "will";
 
 const std::string MaxHitpointsStat = "max_hitpoints";
 const std::string InitiativeStat = "initiative";
@@ -652,3 +652,4 @@ variant character::color() const
 }
 
 }
+
