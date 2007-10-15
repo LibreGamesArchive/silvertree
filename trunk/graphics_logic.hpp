@@ -19,7 +19,7 @@ namespace graphics {
 
 GLfloat calculate_rotation(GLfloat rotate1, GLfloat rotate2,
                            GLfloat ratio);
-		
+
 }
 
 #endif

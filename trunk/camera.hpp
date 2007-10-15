@@ -85,7 +85,7 @@ private:
 
 	GLfloat rotate_radians() const;
 	void enforce_limits();
-	
+
 	const gamemap& map_;
 
 	int width_, height_;
@@ -113,7 +113,7 @@ private:
 
 	mutable bool moved_since_last_check_;
 };
-		
+
 }
 
 #endif

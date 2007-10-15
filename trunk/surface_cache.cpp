@@ -46,7 +46,7 @@ surface get(const std::string& key)
 		return surf;
 	}
 }
-		
+
 }
-		
+
 }

@@ -79,7 +79,7 @@ bool parse_arg(const std::string& arg)
 		std::cerr << "unrecognized argument: '" << arg << "'\n";
 		return false;
 	}
-	
+
 	return true;
 }
 

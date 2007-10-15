@@ -30,7 +30,7 @@ void draw_hollow_rect(const SDL_Rect& rect, const SDL_Color& color,
 int screen_width();
 int screen_height();
 
-void coords_to_screen(GLdouble sx, GLdouble sy, GLdouble sz, 
+void coords_to_screen(GLdouble sx, GLdouble sy, GLdouble sz,
 		      GLdouble* dx, GLdouble* dy, GLdouble* dz);
 void push_clip(const SDL_Rect& rect);
 void pop_clip();

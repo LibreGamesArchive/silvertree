@@ -26,7 +26,7 @@ namespace {
 
 const int HoursInDay = 24;
 const int MinutesInHour = 60;
-		
+
 }
 
 game_time::game_time() : minutes_since_epoch_(-1)

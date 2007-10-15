@@ -68,7 +68,7 @@ int main()
 	std::string::const_iterator i1 = test.begin();
 	std::string::const_iterator i2 = test.end();
 	TOKEN_TYPE types[] = {TOKEN_LPARENS, TOKEN_IDENTIFIER,
-	                      TOKEN_WHITESPACE, TOKEN_OPERATOR, 
+	                      TOKEN_WHITESPACE, TOKEN_OPERATOR,
 						  TOKEN_WHITESPACE, TOKEN_INTEGER,
 						  TOKEN_WHITESPACE, TOKEN_OPERATOR,
 						  TOKEN_WHITESPACE, TOKEN_LPARENS,
@@ -82,7 +82,7 @@ int main()
 		token t = get_token(i1,i2);
 		assert(std::string(t.begin,t.end) == tokens[n]);
 		assert(t.type == types[n]);
-		
+
 	}
 }
 

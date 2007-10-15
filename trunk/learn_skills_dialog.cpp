@@ -49,7 +49,7 @@ gui::grid_ptr learn_skills_dialog::get_grid_for_skill(const_skill_ptr s)
 	boost::shared_ptr<skill_dialog> child(new skill_dialog(char_, s));
 	children_.push_back(child);
 	g->add_col(child);
-	
+
 	std::vector<const_skill_ptr> children;
 	get_skills_derived_from(s->name(), &children);
 	grid_ptr child_grid(new grid(1));

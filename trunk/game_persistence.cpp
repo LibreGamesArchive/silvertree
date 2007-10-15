@@ -23,7 +23,7 @@ public:
 	friend class persistence_ok_button;
 	friend class persistence_cancel_button;
 
-	persistence_dialog(game_logic::world *wp, const std::string& dir) 
+	persistence_dialog(game_logic::world *wp, const std::string& dir)
 		: dialog(0,0,graphics::screen_width(), graphics::screen_height()),
 		  wp_(wp), dir_(dir), was_cancelled_(false)
 	{
@@ -44,11 +44,11 @@ private:
 
 class persistence_ok_button: public gui::labelled_button_widget {
 public:
-	persistence_ok_button(persistence_dialog* dlg, 
-			   const std::string& skin_prefix) 
-		: dialog_(dlg) 
+	persistence_ok_button(persistence_dialog* dlg,
+			   const std::string& skin_prefix)
+		: dialog_(dlg)
 	{
-		
+
 		add_skin(skin_prefix + "-ok-button-skin-normal", gui::button_widget::NORMAL);
 		add_skin(skin_prefix + "-ok-button-skin-highlighted", gui::button_widget::HIGHLIGHTED);
 		add_skin(skin_prefix + "-ok-button-skin-clicked", gui::button_widget::CLICKED);
@@ -64,10 +64,10 @@ private:
 };
 
 class persistence_cancel_button: public gui::labelled_button_widget {
-public:	
-	persistence_cancel_button(persistence_dialog* dlg, 
-				  const std::string& skin_prefix) 
-		: dialog_(dlg) 
+public:
+	persistence_cancel_button(persistence_dialog* dlg,
+				  const std::string& skin_prefix)
+		: dialog_(dlg)
 	{
 		add_skin(skin_prefix + "-cancel-button-skin-normal", gui::button_widget::NORMAL);
 		add_skin(skin_prefix + "-cancel-button-skin-highlighted", gui::button_widget::HIGHLIGHTED);
@@ -85,10 +85,10 @@ private:
 
 class save_dialog: public persistence_dialog {
 public:
-	save_dialog(game_logic::world *wp, 
-		    const std::string& dir=sys::get_saves_dir(), 
-		    const std::string& txt = "") 
-		: persistence_dialog(wp, dir) 
+	save_dialog(game_logic::world *wp,
+		    const std::string& dir=sys::get_saves_dir(),
+		    const std::string& txt = "")
+		: persistence_dialog(wp, dir)
 	{
 		construct_interface(dir, txt);
 	}
@@ -104,15 +104,15 @@ class load_dialog_item;
 class load_dialog: public persistence_dialog {
 public:
 	friend class load_dialog_item;
-	load_dialog(game_logic::world *wp, 
+	load_dialog(game_logic::world *wp,
 		    const std::string& dir = sys::get_saves_dir(),
-		    const std::string& txt = "") 
-		: persistence_dialog(wp, dir) 
+		    const std::string& txt = "")
+		: persistence_dialog(wp, dir)
 	{
 		construct_interface(dir, txt);
 	}
-	bool has_selected_file() 
-	{ 
+	bool has_selected_file()
+	{
 		return persistence_dialog::has_selected_file() && !selected_.empty();
 	}
 protected:
@@ -127,7 +127,7 @@ private:
 class load_dialog_item : public gui::labelled_button_widget {
 public:
 	load_dialog_item(load_dialog *dlg) : dlg_(dlg) {}
-	void clicked() 
+	void clicked()
 	{
 		dlg_->selected_ = label_text();
 	}
@@ -135,13 +135,13 @@ private:
 	load_dialog *dlg_;
 };
 
-void persistence_dialog::handle_draw() const 
+void persistence_dialog::handle_draw() const
 {
 	wp_->draw();
 	handle_draw_children();
 }
 
-bool persistence_dialog::handle_event(const SDL_Event& e) 
+bool persistence_dialog::handle_event(const SDL_Event& e)
 {
 	return handle_event_children(e);
 }
@@ -190,7 +190,7 @@ void save_dialog::construct_interface(const std::string& dir, const std::string&
 void load_dialog::construct_interface(const std::string& dir, const std::string& filename)
 {
 
-	gui::framed_dialog_ptr inner(new gui::framed_dialog(0,0, graphics::screen_width()/2, 
+	gui::framed_dialog_ptr inner(new gui::framed_dialog(0,0, graphics::screen_width()/2,
 							    graphics::screen_height()/2));
 	inner->set_frame(gui::frame_manager::make_frame(inner, "load-dialog-frame"));
 	inner->set_padding(0);
@@ -240,7 +240,7 @@ void load_dialog::construct_interface(const std::string& dir, const std::string&
 }
 
 
-void do_save(const std::string& filename) 
+void do_save(const std::string& filename)
 {
 	std::string data;
 	assert(!game_logic::world::current_world_stack().empty());
@@ -251,18 +251,18 @@ void do_save(const std::string& filename)
 	sys::write_file(filename, data);
 }
 
-void silent_save(const std::string& filename) 
+void silent_save(const std::string& filename)
 {
 	do_save(filename);
 }
 
-bool save(const std::string& start_filename, game_logic::world *wp) 
+bool save(const std::string& start_filename, game_logic::world *wp)
 {
 	// save the game
 	save_dialog s(wp, sys::get_saves_dir(), start_filename);
 	s.show_modal();
 
-	if(!s.has_selected_file()) 
+	if(!s.has_selected_file())
 	{
 		return false;
 	}
@@ -274,14 +274,14 @@ void do_load(const std::string& filename)
 {
 	throw game_logic::world::new_game_exception(filename);
 }
-	
 
-void silent_load(const std::string& filename) 
+
+void silent_load(const std::string& filename)
 {
 	do_load(filename);
 }
 
-bool load(const std::string& start_filename, game_logic::world *wp) 
+bool load(const std::string& start_filename, game_logic::world *wp)
 {
 	std::cout << "Loading game\n";
 	load_dialog l(wp, sys::get_saves_dir(), start_filename);

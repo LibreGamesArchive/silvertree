@@ -28,7 +28,7 @@ EditPartyDialog::EditPartyDialog(wml::node_ptr party, QWidget* parent)
 	foreach(const wml::const_node_ptr& gen, generators) {
 		ui_.characterGeneratorComboBox->addItem(QString((*gen)["description"].c_str()));
 	}
-	
+
 	wml::node_vector members = wml::child_nodes(party_, "character");
 	foreach(wml::node_ptr member, members) {
 		ui_.membersListWidget->addItem(QString((*member)["description"].c_str()));

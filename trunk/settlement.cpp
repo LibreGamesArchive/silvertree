@@ -78,7 +78,7 @@ void settlement::draw() const
 			continue;
 		}
 		GLfloat pos[3] = {tile::translate_x(loc), tile::translate_y(loc),
-	  	       tile::translate_height(map_.get_tile(loc).height())};
+		       tile::translate_height(map_.get_tile(loc).height())};
 		glPushMatrix();
 		glTranslatef(pos[0],pos[1],pos[2]);
 		model_->draw();

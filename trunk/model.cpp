@@ -25,7 +25,7 @@
 
 namespace
 {
-std::map<std::string,graphics::const_model_ptr> model_cache;	
+std::map<std::string,graphics::const_model_ptr> model_cache;
 const std::string ark_header = "ArkModel";
 }
 
@@ -46,7 +46,7 @@ const_model_ptr model::get_model(const std::string& key)
 	}
 
 	model_ptr res;
-	
+
 	if(data.size() > ark_header.size() &&
 	   !memcmp(data.data(), ark_header.data(), ark_header.size())) {
 		res = parseark(data.c_str(),data.c_str()+data.size());
@@ -181,7 +181,7 @@ boost::array<GLfloat,3> model::face_normal(const model::face& f, const model::ve
 			res[m] += val[m];
 		}
 	}
-	
+
 	return res;
 }
 
@@ -292,7 +292,7 @@ void mult_matrix(const GLfloat* matrix, GLfloat* vec)
 	vec[1] = res[1];
 	vec[2] = res[2];
 }
-		
+
 }
 
 void model::draw_face(const face& f, bool& in_triangles) const

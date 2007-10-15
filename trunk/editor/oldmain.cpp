@@ -165,7 +165,7 @@ int main(int argc, char** argv)
 
 	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-	
+
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -305,7 +305,7 @@ int main(int argc, char** argv)
 		}
 
 		SDL_GL_SwapBuffers();
-		
+
 		SDL_Event event;
 		while(SDL_PollEvent(&event)) {
 			switch(event.type) {

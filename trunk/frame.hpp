@@ -126,7 +126,7 @@ public:
 	void set_attr(const std::string& name, const std::string& value);
 	int get_int_attr(const std::string& name, const key_mapper_ptr& keys, int deflt) const;
 	int get_int_attr(const std::string& name, const key_mapper_ptr& keys, int deflt, int min, int max) const;
-	std::string get_string_attr(const std::string& name, const key_mapper_ptr& keys, 
+	std::string get_string_attr(const std::string& name, const key_mapper_ptr& keys,
 				    const std::string& deflt) const;
 	bool get_bool_attr(const std::string& name, const key_mapper_ptr& keys, bool deflt) const;
 protected:

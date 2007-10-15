@@ -133,7 +133,7 @@ private:
 	graphics::particle_system particle_system_;
 	boost::scoped_ptr<battle_missile> missile_;
 };
-		
+
 }
 
 #endif

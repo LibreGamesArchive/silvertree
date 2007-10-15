@@ -52,9 +52,9 @@ std::string& label::current_text() {
 	return text_;
 }
 
-void label::set_fixed_width(bool fixed_width) 
-{ 
-	fixed_width_ = fixed_width; 
+void label::set_fixed_width(bool fixed_width)
+{
+	fixed_width_ = fixed_width;
 	reformat_text();
 	recalculate_texture();
 }
@@ -71,7 +71,7 @@ void label::inner_set_dim(int w, int h) {
 	widget::set_dim(w, h);
 }
 
-void label::reformat_text() 
+void label::reformat_text()
 {
 	if(fixed_width_) {
 		formatted_ = graphics::font::format_text(text_, size_, width());
@@ -99,17 +99,17 @@ dialog_label::dialog_label(const std::string& text, const SDL_Color& color, int 
 	recalculate_texture();
 }
 
-void dialog_label::set_progress(int progress) 
+void dialog_label::set_progress(int progress)
 {
-	progress_ = progress; 
+	progress_ = progress;
 	recalculate_texture();
 }
 
-void dialog_label::recalculate_texture() 
+void dialog_label::recalculate_texture()
 {
 	label::recalculate_texture();
 	stages_ = current_text().size();
-	int prog = progress_; 
+	int prog = progress_;
 	if(prog < 0) prog = 0;
 	if(prog > stages_) prog = stages_;
 	std::string txt = current_text().substr(0, prog);

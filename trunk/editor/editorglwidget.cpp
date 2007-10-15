@@ -101,7 +101,7 @@ void EditorGLWidget::setParties(party_map* parties) {
 	    i != parties_->end(); ++i) {
 		GLfloat pos[3];
 		getAvatarPos(i->first, pos);
-		
+
 		avatar_[i->first] = hex::map_avatar::create(i->second,pos);
 	}
 }
@@ -166,7 +166,7 @@ void EditorGLWidget::setEditParties() {
 	current_party_ = hex::location();
 }
 
-void EditorGLWidget::initializeGL() 
+void EditorGLWidget::initializeGL()
 {
 	GLfloat material_specular[] = {1.0,1.0,1.0,1.0};
 	GLfloat material_shininess[] = {1000.0};
@@ -198,7 +198,7 @@ void EditorGLWidget::initializeGL()
 
 	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-	
+
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -248,7 +248,7 @@ void EditorGLWidget::paintGL()
 				}
 
 				const hex::tile& t = map_->get_tile(locs[n]);
-				
+
 				if(!selected_.valid() || t.height() > high) {
 					selected_ = locs[n];
 					high = t.height();

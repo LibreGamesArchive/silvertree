@@ -17,7 +17,7 @@ public:
 	void set_volume_world_space(GLfloat bsphere);
 	/* frustum filling the given space in clip space */
 	void set_volume_clip_space(GLfloat xmin, GLfloat xmax,
-				   GLfloat ymin, GLfloat ymax, 
+				   GLfloat ymin, GLfloat ymax,
 				   GLfloat zmin, GLfloat zmax);
 	/* class init per frame */
 	static void initialize();

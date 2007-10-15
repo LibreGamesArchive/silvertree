@@ -69,14 +69,14 @@ namespace hex
 	// function which returns the direction we'd have to go in the furthest
 	// to go from a to b
 	DIRECTION get_main_direction(const location& a, const location& b);
-	
+
 	unsigned int distance_between(const location& a, const location& b);
 
 	inline bool operator==(const location& a, const location& b)
 	{
 		return a.x() == b.x() && a.y() == b.y();
 	}
-	
+
 	inline bool operator!=(const location& a, const location& b)
 	{
 		return !(a == b);

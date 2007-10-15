@@ -36,14 +36,14 @@ GLfloat MaxTilt = 0.0;
 const GLfloat PI = 3.14159265;
 
 camera* cur_camera = NULL;
-		
+
 }
 
 camera* camera::current_camera()
 {
 	return cur_camera;
 }
-		
+
 camera::camera(const gamemap& m)
    : map_(m), width_(graphics::screen_width()), height_(graphics::screen_height()),
      translatex_(0.0), translatey_(0.0),
@@ -155,7 +155,7 @@ GLuint camera::finish_selection(std::vector<GLuint>* items)
 
 		itor += names;
 	}
-	
+
 	return res;
 }
 

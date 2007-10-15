@@ -21,7 +21,7 @@ namespace gui {
 void set_tooltip(const boost::shared_ptr<std::string>& str);
 void remove_tooltip(const boost::shared_ptr<std::string>& str);
 void draw_tooltip();
-		
+
 }
 
 #endif

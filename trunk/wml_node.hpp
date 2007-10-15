@@ -30,7 +30,7 @@ public:
 	{}
 
 	const std::string& name() const { return name_; }
-		
+
 	const std::string& operator[](const std::string& key) const;
 	const std::string& attr(const std::string& key) const;
 	void set_attr(const std::string& key, const std::string& value);

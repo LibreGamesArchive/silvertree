@@ -86,7 +86,7 @@ void character_equip_dialog::implement_equipment_change(int index)
 {
 	remove_widget(modify_char_widget_);
 	modify_char_widget_.reset();
-	
+
 	if(index == -1) {
 		equipment_change_ = -1;
 		return;
@@ -138,7 +138,7 @@ void character_equip_dialog::init()
 	           MOVE_RIGHT);
 
 	add_widget(ptr(new label(c->description(), color, 28)));
-	
+
 	const int sz = 22;
 	label_factory lb(color, sz);
 

@@ -120,7 +120,7 @@ void character_generator::generate(character& c, wml::const_node_ptr node) const
 		}
 	}
 
-	
+
 	wml::const_node_ptr attr[] = { node_ ? node_->get_child("attributes") : wml::const_node_ptr(),
 	                               node ? node->get_child("attributes") : wml::const_node_ptr()};
 	for(int n = 0; n != sizeof(attr)/sizeof(*attr); ++n) {
@@ -165,7 +165,7 @@ void character_generator::generate(character& c, wml::const_node_ptr node) const
 			c.skills_.pop_back();
 		}
 	}
-	
+
 	READ_ATTR(hitpoints, c.max_hitpoints());
 	c.calculate_moves();
 }

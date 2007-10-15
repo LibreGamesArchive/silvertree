@@ -45,7 +45,7 @@ private:
 	std::vector<hex::location> wander_between_;
 	const_formula_ptr next_destination_;
 };
-		
+
 }
 
 #endif

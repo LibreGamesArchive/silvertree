@@ -21,7 +21,7 @@ namespace graphics
 model_ptr parseark(const char* i1, const char* i2);
 
 struct parseark_error {};
-		
+
 }
 
 #endif

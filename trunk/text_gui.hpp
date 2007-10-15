@@ -27,13 +27,13 @@ public:
 	typedef std::vector<Uint32>::const_iterator const_iterator;
 	typedef std::vector<Uint32>::reverse_iterator reverse_iterator;
 	typedef std::vector<Uint32>::const_reverse_iterator const_reverse_iterator;
-	
-	editable_text(const std::string& text) 
+
+	editable_text(const std::string& text)
 		: mark_set_(false), text_()
-	{ 
+	{
 		text_ = utf8_to_utf32(text);
 		caret_ = text.size();
-		enter_text_mode(); 
+		enter_text_mode();
 	}
 	virtual ~editable_text() { leave_text_mode(); }
 	void set_text(const std::string& text) { text_ = utf8_to_utf32(text); }
@@ -63,24 +63,24 @@ public:
 	void insert(Uint32 letter);
 	void undo();
 	void redo();
-private:	
+private:
 	iterator itor_from_int(const int i)
-	{ 
-		iterator r= text_.begin(); 
-		std::advance(r, i); 
-		return r; 
+	{
+		iterator r= text_.begin();
+		std::advance(r, i);
+		return r;
 	}
-	int int_from_itor(iterator r) { 
-		return std::distance(text_.begin(), r); 
+	int int_from_itor(iterator r) {
+		return std::distance(text_.begin(), r);
 	}
-	const_iterator itor_from_int(const int i) const 
-	{ 
-		const_iterator r= text_.begin(); 
-		std::advance(r, i); 
-		return r; 
+	const_iterator itor_from_int(const int i) const
+	{
+		const_iterator r= text_.begin();
+		std::advance(r, i);
+		return r;
 	}
-	int int_from_itor(const_iterator r) const { 
-		return std::distance(text_.begin(), r); 
+	int int_from_itor(const_iterator r) const {
+		return std::distance(text_.begin(), r);
 	}
 
 	struct edit_state {
@@ -103,7 +103,7 @@ typedef boost::shared_ptr<editable_text> editable_text_ptr;
 class sym_equal_p {
 public:
 	bool operator() (const SDL_keysym& s1, const SDL_keysym& s2) const {
-		/* do this because sym.unicode is not the 
+		/* do this because sym.unicode is not the
 		   same for press and release events */
 		if(s1.sym == s2.sym) {
 			return s1.mod < s2.mod;
@@ -152,7 +152,7 @@ public:
 	logical_key key(const SDL_keysym& sym) const;
 private:
 	std::map<SDL_keysym,logical_key,sym_equal_p> bindings_;
-};	
+};
 
 typedef boost::shared_ptr<key_table> key_table_ptr;
 
@@ -225,13 +225,13 @@ public:
 
 	const static int DEFAULT_REPEAT_RATE = 50; /* ms */
 	const static int DEFAULT_REPEAT_DELAY = 200;
-	const static bool DEFAULT_REPEAT_ENABLED = true; 
+	const static bool DEFAULT_REPEAT_ENABLED = true;
 
-	key_editor(int table, editable_text_ptr buf, 
+	key_editor(int table, editable_text_ptr buf,
 		   const key_filter_ptr filter = key_filter_ptr(new null_filter()))
 		: buf_(buf), kt_(get_key_table(table)),
 		  repeat_rate_(DEFAULT_REPEAT_RATE),
-		  repeat_delay_(DEFAULT_REPEAT_DELAY), 
+		  repeat_delay_(DEFAULT_REPEAT_DELAY),
 		  repeat_enabled_(DEFAULT_REPEAT_ENABLED),
 		  filter_(filter)
 	{
@@ -254,7 +254,7 @@ public:
 	Uint32 get_key_repeat_delay() { return repeat_delay_; }
 private:
 	void fill_function_table();
-	
+
 	editable_text_ptr buf_;
 	/* the key table to use to interpret special keys */
 	key_table_ptr kt_;
@@ -289,7 +289,7 @@ public:
 
 	text_box(const std::string& initial_text = "",
 		 const text::key_filter_ptr filter = text::key_filter_ptr(new text::null_filter()),
-		 int font_size =14, 
+		 int font_size =14,
 		 int key_table = DEFAULT_KEYTABLE,
 		 const SDL_Color& color = graphics::color_white(),
 		 const SDL_Color& caret_fg = graphics::color_black(),
@@ -297,8 +297,8 @@ public:
 		 const SDL_Color& selection_fg = graphics::color_white(),
 		 const SDL_Color& selection_bg = graphics::color_blue(),
 		 bool opaque_caret = true,
-		 bool opaque_selection = true) 
-		: edit_(new text::editable_text(initial_text)), 
+		 bool opaque_selection = true)
+		: edit_(new text::editable_text(initial_text)),
 		  font_size_(font_size), color_(color),
 		  caret_fg_(caret_fg), caret_bg_(caret_bg),
 		  selection_fg_(selection_fg), selection_bg_(selection_bg),

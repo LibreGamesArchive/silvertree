@@ -29,7 +29,7 @@ namespace hex
 namespace {
 
 std::map<std::string,base_terrain_ptr> terrains;
-		
+
 }
 
 const_base_terrain_ptr base_terrain::get(const std::string& id)
@@ -61,7 +61,7 @@ int prandom(const location& loc, int height)
 	const unsigned int random = a*b*c + a*b + b*c + a*c + a + b + c;
 	return random;
 }
-		
+
 }
 
 graphics::texture base_terrain::generate_texture(
@@ -70,7 +70,7 @@ graphics::texture base_terrain::generate_texture(
 	if(textures_.empty()) {
 		return graphics::texture();
 	}
-	
+
 	const unsigned int index = prandom(loc,height)%textures_.size();
 
 	graphics::surface surf(
@@ -143,7 +143,7 @@ void base_terrain::add_terrain(wml::const_node_ptr node)
 	terrains.insert(std::pair<std::string,base_terrain_ptr>(
 							ptr->id_,ptr));
 	std::cerr << "loaded terrain '" << ptr->id_ << "'\n";
-	                     
+
 }
 
 base_terrain::base_terrain(wml::const_node_ptr node)
@@ -160,5 +160,5 @@ base_terrain::base_terrain(wml::const_node_ptr node)
 	textures_ = util::split((*node)["textures"]);
 	models_ = util::split((*node)["models"]);
 }
-		
+
 }

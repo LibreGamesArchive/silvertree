@@ -21,7 +21,7 @@ namespace keyboard
 hex::DIRECTION dir(hex::DIRECTION orientation);
 bool run();
 bool pass();
-		
+
 }
 
 #endif

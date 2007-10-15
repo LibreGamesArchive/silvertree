@@ -8,8 +8,8 @@
 
 namespace gui {
 namespace frame_manager {
- 
-frame::frame(widget_ptr base, fb_ptr builder, key_mapper_ptr keys) 
+
+frame::frame(widget_ptr base, fb_ptr builder, key_mapper_ptr keys)
 	: base_(base), basic_(true), builder_(builder), keys_(keys)
 {
 	border_l_ = 0;
@@ -27,7 +27,7 @@ frame::frame(widget_ptr base, fb_ptr builder, key_mapper_ptr keys)
 	calculate_dim();
 	rebuild_frame();
 }
-				  
+
 void frame::handle_draw() const
 {
 	if(basic_) {
@@ -40,7 +40,7 @@ void frame::handle_draw() const
 		base_->draw();
 		graphics::draw_hollow_rect(rect, fg_);
 		return;
-	} 
+	}
 
 	for(std::vector<fdo_ptr>::const_iterator i = predraw_.begin(); i != predraw_.end(); ++i) {
 		(*i)->draw();
@@ -76,7 +76,7 @@ bool frame::handle_event(const SDL_Event &e)
 	return base_->process_event(e);
 }
 
-void frame::set_loc(int x, int y) 
+void frame::set_loc(int x, int y)
 {
 	const int bx = x+border_l_;
 	const int by = y+border_t_;
@@ -103,7 +103,7 @@ void frame::set_dim(int w, int h)
 
 void frame::calculate_dim()
 {
-	widget::set_dim(base_->width() + border_width(), 
+	widget::set_dim(base_->width() + border_width(),
 			base_->height() + border_height());
 }
 

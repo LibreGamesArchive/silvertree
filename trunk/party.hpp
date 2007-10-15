@@ -33,7 +33,7 @@ namespace game_logic
 {
 
 class world;
-		
+
 class party : public formula_callable
 {
 public:
@@ -69,7 +69,7 @@ public:
 
 	const std::set<hex::location>& get_visible_locs() const;
 	void get_visible_parties(std::vector<const_party_ptr>& parties) const;
-	
+
 	int vision() const;
 	int track() const;
 	int heal() const;
@@ -126,7 +126,7 @@ protected:
 	                  const hex::location& dst) const;
 	const hex::gamemap& map() const;
 	virtual void set_value(const std::string& key, const variant& value);
-	
+
 private:
 	int aggregate_stat_max(const std::string& stat) const;
 

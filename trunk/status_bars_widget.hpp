@@ -11,7 +11,7 @@ namespace game_dialogs {
 
 class status_bars_widget: public gui::widget {
 public:
-	status_bars_widget(const game_logic::battle& b, const game_logic::battle_character_ptr ch) 
+	status_bars_widget(const game_logic::battle& b, const game_logic::battle_character_ptr ch)
 		: hitpoints_(-1), old_hitpoints_(-1), max_hitpoints_(-1), old_max_hitpoints_(-1),
 		  cur_move_time_(-HUGE_VALF), prev_move_time_(-HUGE_VALF), ch_(ch), b_(b) {}
 private:

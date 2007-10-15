@@ -55,7 +55,7 @@ font_ptr get_font(int size)
 	if(!fonts_initialized) {
 		return font_ptr();
 	}
-	
+
 	const font_map::iterator i = fonts.find(size);
 	if(i != fonts.end()) {
 		return i->second;
@@ -70,7 +70,7 @@ font_ptr get_font(int size)
 		return new_font;
 	}
 }
-		
+
 }
 
 manager::manager()
@@ -137,7 +137,7 @@ texture render_text(const std::string& text, int font_size,
 #endif
 	}
 
-	
+
 	surface res(SDL_CreateRGBSurface(SDL_SWSURFACE,width,height,
 					 32,SURFACE_MASK));
 	int y = 0;
@@ -233,13 +233,13 @@ inline void chunk(int start, int end, const SDL_Color& fg, const SDL_Color& bg, 
 }
 
 /* This does not handle newlines */
-texture render_complex_text(const std::string& text, int font_size, 
-			    const SDL_Color& text_color, 
-			    const SDL_Color& caret_fg, const SDL_Color& caret_bg, 
+texture render_complex_text(const std::string& text, int font_size,
+			    const SDL_Color& text_color,
+			    const SDL_Color& caret_fg, const SDL_Color& caret_bg,
 			    bool opaque_caret,
-			    const SDL_Color& selection_fg, const SDL_Color& selection_bg, 
+			    const SDL_Color& selection_fg, const SDL_Color& selection_bg,
 			    bool opaque_selection,
-			    int caret, int selection_start, int selection_end) 
+			    int caret, int selection_start, int selection_end)
 {
 	std::vector<chunk_t> chunks;
 	const std::string used_text = text + " ";
@@ -249,7 +249,7 @@ texture render_complex_text(const std::string& text, int font_size,
 	if(!font) {
 		return texture();
 	}
-	
+
 	if(caret < 0) {
 		if(selection_start < 0) {
 			/* no selection, no caret */
@@ -294,14 +294,14 @@ texture render_complex_text(const std::string& text, int font_size,
 	/* now we have a correctly constructed chunks array, but missing positions */
 	std::string text_so_far;
 	int w = 0;
-	
+
 	foreach(chunk_t& c, chunks) {
 		c.end = c.end < max_idx ? c.end : max_idx;
 		const int len = c.end - c.start + 1; /* points are inclusive */
 		std::string chunk_text = used_text.substr(c.start, len);
 		c.x = w;
 		c.y = 0;
-		/* do it like this to get correct kerning (the _only_ way in 
+		/* do it like this to get correct kerning (the _only_ way in
 		   any released version of SDL_ttf) */
 		text_so_far.append(chunk_text);
 		int junk;
@@ -324,11 +324,11 @@ texture render_complex_text(const std::string& text, int font_size,
 			SDL_BlitSurface(surf.get(), NULL, res.get(), &r);
 		}
 	}
-	
+
 	return texture::get_no_cache(res, 1 << texture::NO_MIPMAP);
 }
 
-void get_text_size(const std::string& text, int font_size, int *w, int *h) 
+void get_text_size(const std::string& text, int font_size, int *w, int *h)
 {
 	const font_ptr font(get_font(font_size));
 	TTF_SizeUTF8(font.get(), text.c_str(), w ,h);
@@ -357,7 +357,7 @@ void render_multiline_text(const std::string& text, int font_size,
 		}
 	}
 }
-		
+
 } //end namespace font
 
 } //end namespace graphics

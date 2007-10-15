@@ -26,7 +26,7 @@
 namespace gui {
 
 dialog::dialog(int x, int y, int w, int h)
-  : opened_(false), clear_bg_(true), padding_(10), 
+  : opened_(false), clear_bg_(true), padding_(10),
     add_x_(0), add_y_(0)
 {
 	set_loc(x,y);
@@ -63,7 +63,7 @@ void dialog::remove_widget(widget_ptr w)
 	               widgets_.end());
 }
 
-void dialog::replace_widget(widget_ptr w_old, widget_ptr w_new) 
+void dialog::replace_widget(widget_ptr w_old, widget_ptr w_new)
 {
 	int x = w_old->x();
 	int y = w_old->y();
@@ -160,5 +160,5 @@ bool dialog::handle_event(const SDL_Event& event)
 	return claimed;
 }
 
-		
+
 }

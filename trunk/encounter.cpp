@@ -103,5 +103,5 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		}
 	}
 }
-		
+
 }

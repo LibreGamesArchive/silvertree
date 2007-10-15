@@ -35,14 +35,14 @@ public:
 		       bool starts_conversation = true);
 	bool has_options() const { return NULL == options_; }
 	int selected() const { return selected_; }
-	void set_fade_in_rate(int rate) { fade_in_rate_ = rate; } 
+	void set_fade_in_rate(int rate) { fade_in_rate_ = rate; }
 	void show_modal();
 protected:
 	void handle_draw() const;
 	bool handle_event(const SDL_Event &event);
 	void construct_interface();
 	int find_option(int x, int y);
-	frame_ptr make_option_frame(int opt, widget_ptr base, 
+	frame_ptr make_option_frame(int opt, widget_ptr base,
 				    frame_manager::key_mapper_ptr keys);
 	frame_ptr make_option_frame(int opt, widget_ptr base);
 private:

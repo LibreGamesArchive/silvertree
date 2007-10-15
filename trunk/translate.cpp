@@ -37,5 +37,5 @@ const std::string& translate(const std::string& from)
 		return from;
 	}
 }
-		
+
 }

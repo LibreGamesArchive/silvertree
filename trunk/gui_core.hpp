@@ -106,7 +106,7 @@ public:
 protected:
 	void inner_draw() const {
 		glPushMatrix();
-		glTranslatef(x()+(width() - label_->width())/2, 
+		glTranslatef(x()+(width() - label_->width())/2,
 			     y()+(height()- label_->height())/2, 0);
 		label_->draw();
 		glPopMatrix();
@@ -150,7 +150,7 @@ typedef boost::shared_ptr<scrolled_container> scrolled_container_ptr;
 
 class scroll_button: public button_widget {
 public:
-	scroll_button(scrolled_container_ptr cont, int amount_per_click) 
+	scroll_button(scrolled_container_ptr cont, int amount_per_click)
 		: cont_(cont), amt_(amount_per_click) {}
 protected:
 	void prepare_draw() const;
@@ -164,7 +164,7 @@ class menu_option : public skinned_widget {
 public:
 	enum STATE { NORMAL, HIGHLIGHTED, CLICKED, DISABLED };
 	menu_option(const std::string& text, const std::string& frame,
-		    const SDL_Color& color, int font_size) 
+		    const SDL_Color& color, int font_size)
 	{
 		construct_interface(text, frame, color, font_size);
 	}
@@ -185,7 +185,7 @@ public:
 	typedef std::map<int,menu_option_ptr>::const_iterator const_iterator;
 	typedef std::map<int,menu_option_ptr>::iterator iterator;
 
-	menu_widget(const std::string& option_text_frame, const SDL_Color& color, int font_size) 
+	menu_widget(const std::string& option_text_frame, const SDL_Color& color, int font_size)
 		: option_text_frame_(option_text_frame), font_size_(font_size),
 		  color_(color), key_selection_(-1) {}
 	virtual ~menu_widget() {}
@@ -234,10 +234,10 @@ class popup_menu_widget : public menu_widget {
 public:
 	enum ALIGN { LEFT, CENTER, RIGHT };
 	enum STATE { NORMAL=0, HIGHLIGHTED, DEPRESSED, DEPRESSED_HIGHLIGHTED, CLICKED, DISABLED };
-	
-	popup_menu_widget(const std::string& option_text_frame_name, const SDL_Color& color, int font_size, 
-			  const std::string& option_frame_name, 
-			  const std::string& option_set_frame_name) 
+
+	popup_menu_widget(const std::string& option_text_frame_name, const SDL_Color& color, int font_size,
+			  const std::string& option_frame_name,
+			  const std::string& option_set_frame_name)
 		: menu_widget(option_text_frame_name, color, font_size),
 		  popped_out_(false), ready_(false), opt_ready_(-1), alignment_(LEFT),
 		  option_frame_name_(option_frame_name),
@@ -270,9 +270,9 @@ public:
 	enum STATE { NORMAL=0, ROLLED_OVER, DISABLED };
 
 	rollin_menu_widget(const std::string& option_text_frame_name, const SDL_Color& color, int font_size,
-			   const std::string& option_frame_name, 
+			   const std::string& option_frame_name,
 			   const std::string& option_set_frame_name)
-		: popup_menu_widget(option_text_frame_name, color, font_size, 
+		: popup_menu_widget(option_text_frame_name, color, font_size,
 				    option_frame_name, option_set_frame_name) {}
 protected:
 	void rebuild_options();
@@ -282,8 +282,8 @@ private:
 
 class framed_dialog: public dialog {
 public:
-	framed_dialog(int x, int y, int w, int h) 
-		: dialog(x,y,w,h), 
+	framed_dialog(int x, int y, int w, int h)
+		: dialog(x,y,w,h),
 		  nested_draw_(false), nested_set_dim_(false), nested_set_loc_(false) {}
 	virtual ~framed_dialog() {}
 

@@ -48,7 +48,7 @@ item_ptr item::create_item(const wml::const_node_ptr& node)
 	std::string output;
 	wml::write(node, output);
 	std::cerr << "create item: {{{" << output << "}}}\n";
-	
+
 	ITEM_TYPE type = ITEM_NONE;
 	const std::string& attr_type = wml::get_str(node, "type");
 	const std::string& type_str = attr_type.empty() ? node->name() : attr_type;

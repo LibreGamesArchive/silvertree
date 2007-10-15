@@ -228,5 +228,5 @@ model_ptr parseark(const char* i1, const char* i2)
 	std::cerr << "loaded model with " << faces.size() << "," << bones.size() << "\n";
 	return model_ptr(new graphics::model(faces, bones));
 }
-		
+
 }

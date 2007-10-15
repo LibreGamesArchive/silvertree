@@ -31,7 +31,7 @@ public:
 private:
 	void init();
 	int price(const game_logic::const_item_ptr& i) const;
-	game_logic::party& party_; 
+	game_logic::party& party_;
 	int cost_;
 	std::vector<game_logic::const_item_ptr> items_;
 };

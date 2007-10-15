@@ -88,7 +88,7 @@ public:
 	void draw() const;
 
 	void quit() { done_ = true; quit_ = true; }
-	
+
 	void add_chat_label(gui::label_ptr label, const_character_ptr ch, int delay);
 private:
 	party_ptr get_pc_party() const;
@@ -129,10 +129,10 @@ private:
 	settlement_map settlements_;
 
 	party_ptr focus_;
-	
+
 	mutable hex::camera camera_;
 	mutable hex::camera_controller camera_controller_;
-	
+
 	mutable hex::location current_loc_;
 	mutable std::vector<const hex::tile*> tiles_;
 	mutable hex::tile::features_cache features_cache_;
@@ -177,7 +177,7 @@ private:
 	};
 	mutable std::vector<chat_label> chat_labels_;
 };
-		
+
 }
 
 #endif

@@ -5,7 +5,7 @@ namespace hex {
 
 GLfloat frustum::comb_[16];
 
-void frustum::initialize() 
+void frustum::initialize()
 {
 	GLfloat proj[16], mod[16];
 	glGetFloatv(GL_PROJECTION_MATRIX, proj);
@@ -49,7 +49,7 @@ void frustum::set_volume_clip_space(GLfloat xmin, GLfloat xmax,
 void frustum::set_volume_world_space(GLfloat radius)
 {
 	camera *cam = camera::current_camera();
-	
+
 	GLfloat wcpos[4], cpos[4], dpos[4], wdpos[4];
 	cpos[0] = -cam->get_pan_x() - radius;
 	cpos[1] = -cam->get_pan_y() - radius;

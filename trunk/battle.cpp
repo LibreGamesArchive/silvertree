@@ -43,7 +43,7 @@ bool battle_char_less(const const_battle_character_ptr& c1,
 {
 	return c1->ready_to_move_at() < c2->ready_to_move_at();
 }
-		
+
 }
 
 battle::battle(const std::vector<battle_character_ptr>& chars,
@@ -53,7 +53,7 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
 	 move_done_(false), turn_done_(false),
 	 camera_(battle_map), camera_controller_(camera_),
 	 result_(ONGOING), keyed_selection_(0),
-         current_time_(0), sub_time_(0.0), 
+         current_time_(0), sub_time_(0.0),
          skippy_(50, preference_maxfps()),
          tracked_tile_(NULL)
 {
@@ -278,7 +278,7 @@ battle_character_ptr battle::selected_char()
 {
 	using hex::tile;
 	battle_character_ptr ret;
-	
+
 	ret = mouse_selected_char();
 	if(ret) {
 		return ret;
@@ -291,9 +291,9 @@ battle_character_ptr battle::selected_char()
 	while(keyed_selection_ < 0) {
 		keyed_selection_ += targets_.size();
 	}
-	
+
 	keyed_selection_ = keyed_selection_%targets_.size();
-	
+
 	std::set<hex::location>::const_iterator i = targets_.begin();
 	std::advance(i,keyed_selection_);
 	foreach(const battle_character_ptr& c, chars_) {
@@ -301,7 +301,7 @@ battle_character_ptr battle::selected_char()
 			return c;
 		}
 	}
-	
+
 	return battle_character_ptr();
 }
 
@@ -432,7 +432,7 @@ void battle::draw(gui::slider* slider)
 		graphics::blit_texture(text,order_x,order_y);
 		order_y += 20;
 	}
-	
+
 	if(slider) {
 		slider->draw();
 	}
@@ -472,7 +472,7 @@ void battle::draw(gui::slider* slider)
 		w->draw();
 	}
 
-	for(std::map<battle_character_ptr, game_dialogs::mini_stats_dialog_ptr>::iterator i = 
+	for(std::map<battle_character_ptr, game_dialogs::mini_stats_dialog_ptr>::iterator i =
 		    stats_dialogs_.begin();
 	    i != stats_dialogs_.end(); ++i) {
 		i->second->draw();
@@ -488,7 +488,7 @@ void battle::draw_route(const battle_character::route& r)
 	if(r.size() <= 1) {
 		return;
 	}
-	
+
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 
@@ -629,7 +629,7 @@ battle::attack_stats battle::get_attack_stats(
 							"%\nCritical damage: " <<
 							stats.damage_critical;
 		}
-						
+
 	}
 
 	return stats;
@@ -691,9 +691,9 @@ void battle::attack_character(battle_character& attacker,
 		}
 		animation_frame(0.1 * elapsed_time/anim_time);
 		defender.set_highlight(NULL);
-	} 
+	}
 	end_animation();
-	
+
 	missile_.reset();
 	attacker.end_attack();
 	attacker.end_facing_change();
@@ -879,7 +879,7 @@ void battle::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
 				target_mod(**focus_, loc, *current_move_);
 			}
 		}
-	} 
+	}
 }
 
 bool battle::stats_dialogs_process_event(const SDL_Event& e) {
@@ -912,9 +912,9 @@ bool battle::stats_dialogs_process_event(const SDL_Event& e) {
 			if(target_char) {
 				grabbed = true;
 				clear = false;
-				
+
 				game_dialogs::mini_stats_dialog_ptr ptr;
-				
+
 				std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
 					stats_dialogs_.find(target_char);
 				if(i == stats_dialogs_.end()) {
@@ -949,20 +949,20 @@ bool battle::stats_dialogs_process_event(const SDL_Event& e) {
 	return grabbed;
 }
 
-void battle::handle_time_cost_popup() 
+void battle::handle_time_cost_popup()
 {
 	battle_character_ptr attacker = *focus_;
 	battle_character_ptr defender = selected_char();
-		
+
 	if(highlight_moves_ ) {
 		const battle_character::move_map::const_iterator move = moves_.find(selected_loc());
 		if(move != moves_.end()) {
 			int cost = attacker->route_cost(move->second);
 			time_cost_widget_->set_tracker(&hex_tracker_);
 			time_cost_widget_->set_time_cost(cost);
-			time_cost_widget_->set_visible(true);	
+			time_cost_widget_->set_visible(true);
 			return;
-		}			
+		}
 	} else if(highlight_targets_) {
 		assert(current_move_);
 		if(current_move_->can_attack()) {
@@ -984,7 +984,7 @@ void battle::handle_time_cost_popup()
 			}
 		}
 	}
-	
+
 	time_cost_widget_->clear_tracker();
 	time_cost_widget_->set_visible(false);
 }

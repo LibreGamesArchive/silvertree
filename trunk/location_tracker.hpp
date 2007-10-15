@@ -86,7 +86,7 @@ inline void location_tracker::update() {
 	    it != vertices_.end(); ++it) {
 		GLdouble v[3];
 
-		gluProject((*it)[0], (*it)[1], (*it)[2], 
+		gluProject((*it)[0], (*it)[1], (*it)[2],
 			   model, proj, view, v, v+1, v+2);
 
 		if(v[0] < box_[0]) {

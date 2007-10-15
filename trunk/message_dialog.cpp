@@ -23,20 +23,20 @@ message_dialog::message_dialog(const game_logic::world& world,
 			       const game_logic::character& npc,
 			       const std::string& msg,
 			       const std::vector<std::string>* options,
-			       bool starts_conversation) 
-	: dialog(0,0,graphics::screen_width(),graphics::screen_height()), 
-	  msg_(msg), options_(options), world_(world), pc_(pc), npc_(npc), 
+			       bool starts_conversation)
+	: dialog(0,0,graphics::screen_width(),graphics::screen_height()),
+	  msg_(msg), options_(options), world_(world), pc_(pc), npc_(npc),
 	  fade_in_rate_(30), starts_conversation_(starts_conversation)
 {
-	
+
 	selected_ = -1;
 	set_clear_bg(false);
 	construct_interface();
 }
 
-frame_ptr message_dialog::make_option_frame(int option, widget_ptr widget, frame_manager::key_mapper_ptr keys) 
+frame_ptr message_dialog::make_option_frame(int option, widget_ptr widget, frame_manager::key_mapper_ptr keys)
 {
-	frame_ptr ret = 
+	frame_ptr ret =
 		frame_manager::make_frame(widget, option == selected_ ? "dialog-option-selected" : "dialog-option",
 					  keys);
 	ret->set_fg(option == selected_ ? graphics::color_white() : graphics::color_black());
@@ -44,15 +44,15 @@ frame_ptr message_dialog::make_option_frame(int option, widget_ptr widget, frame
 	return ret;
 }
 
-frame_ptr message_dialog::make_option_frame(int option, widget_ptr widget) 
+frame_ptr message_dialog::make_option_frame(int option, widget_ptr widget)
 {
-	frame_ptr ret = 
+	frame_ptr ret =
 		frame_manager::make_frame(widget, option == selected_ ? "dialog-option-selected" : "dialog-option");
 	ret->set_fg(option == selected_ ? graphics::color_white() : graphics::color_black());
 	ret->set_bg(graphics::color_black());
 	return ret;
 }
-	
+
 void message_dialog::construct_interface()
 {
 	SDL_Color color = graphics::color_white();
@@ -86,11 +86,11 @@ void message_dialog::construct_interface()
 
 	if(!npcname.empty()) {
 		widget_ptr portrait(new image_widget(npcname, 205, 205));
-		portrait = frame_manager::make_frame(portrait,"dialog-npc-portrait"); 
+		portrait = frame_manager::make_frame(portrait,"dialog-npc-portrait");
 		add_widget(portrait, dialog::MOVE_RIGHT);
 	}
 
-	if(options_) {		
+	if(options_) {
 		const std::string pcname = pc_.portrait();
 		int left_offset = 0;
 
@@ -129,9 +129,9 @@ void message_dialog::construct_interface()
 			dialog_label_ptr option_label_inner(new dialog_label(option_text_s.str(), color, 18));
 			option_label_inner->set_fixed_width(true);
 			dialog_labels_.push_back(option_label_inner);
-			frame_ptr option_frame = 
+			frame_ptr option_frame =
 				make_option_frame(option, option_label_inner);
-			
+
 			option_frame->set_dim(s_width - s_width/4 - left_offset, 0);
 			option_frame->set_visible(false);
 			option_frames_.push_back(option_frame);
@@ -155,8 +155,8 @@ void message_dialog::construct_interface()
 		}
 	}
 }
-	
-void message_dialog::handle_draw() const 
+
+void message_dialog::handle_draw() const
 {
 	world_.draw();
 
@@ -171,7 +171,7 @@ int message_dialog::find_option(int x, int y) {
 	const int cx = x - option_box_->x();
 	const int cy = y - option_box_->y();
 	foreach(frame_ptr option, option_frames_) {
-		if(cx > option->x() && 
+		if(cx > option->x() &&
 		   cy > option->y() &&
 		   cx < option->x() + option->width() &&
 		   cy < option->y() + option->height()) {
@@ -185,7 +185,7 @@ int message_dialog::find_option(int x, int y) {
 	return opt_num;
 }
 
-void message_dialog::show_modal() 
+void message_dialog::show_modal()
 {
 	fade_in();
 	if(options_ != NULL) {
@@ -194,7 +194,7 @@ void message_dialog::show_modal()
 			selected_ = 0;
 			update_option(0);
 		}
-	} 
+	}
 	dialog::show_modal();
 }
 
@@ -213,7 +213,7 @@ void message_dialog::ensure_fade_over() {
 	}
 }
 
-void message_dialog::fade_in() 
+void message_dialog::fade_in()
 {
 	bool done = false;
 	int count = 0;
@@ -245,8 +245,8 @@ void message_dialog::fade_in()
 				switch(event.type) {
 				case SDL_KEYDOWN:
 					switch(event.key.keysym.sym) {
-					case SDLK_1: case SDLK_2: case SDLK_3: 
-					case SDLK_4: case SDLK_5: case SDLK_6: 
+					case SDLK_1: case SDLK_2: case SDLK_3:
+					case SDLK_4: case SDLK_5: case SDLK_6:
 					case SDLK_7: case SDLK_8: case SDLK_9:
 						SDL_PushEvent(&event);
 						break;
@@ -267,15 +267,15 @@ void message_dialog::fade_in()
 		dlabel->set_progress(max);
 		++count;
 	}
-}	
+}
 
 void message_dialog::update_option(int option) {
 	const int label_index = option + 1;
 	if(option != -1) {
 		frame_ptr w_old = option_frames_[option];
-		frame_ptr w_new = 
+		frame_ptr w_new =
 			make_option_frame(option, dialog_labels_[label_index], w_old->get_keys());
-		
+
 		option_frames_[option] = w_new;
 		option_box_->replace_widget(w_old, w_new);
 	}
@@ -320,7 +320,7 @@ bool message_dialog::handle_event(const SDL_Event& event) {
 				if(options_->size() > 9) {
 					selected_ = 9;
 					close();
-				} 
+				}
 				break;
 			}
 		} else {

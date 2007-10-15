@@ -32,7 +32,7 @@ void prepare_raster()
 	if(fb == NULL) {
 		return;
 	}
-	
+
 	glViewport(0,0,fb->w,fb->h);
 	glShadeModel(GL_FLAT);
 	glMatrixMode(GL_PROJECTION);
@@ -62,7 +62,7 @@ void blit_texture(const texture& tex, int x, int y, GLfloat rotate)
 	w /= 2;
 
 	glPushMatrix();
-	
+
 	glTranslatef(x+w,y+h,0.0);
 	glRotatef(rotate,0.0,0.0,1.0);
 
@@ -90,7 +90,7 @@ void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate
 
 	const int w_odd = w % 2;
 	const int h_odd = h % 2;
-	 
+
 	w /= 2;
 	h /= 2;
 	glPushMatrix();
@@ -122,7 +122,7 @@ void draw_rect(const SDL_Rect& r, const SDL_Color& color,
 
 void draw_hollow_rect(const SDL_Rect& r, const SDL_Color& color,
 		      unsigned char alpha) {
-	
+
 	glDisable(GL_TEXTURE_2D);
 	glBegin(GL_LINE_LOOP);
 	glColor4ub(color.r, color.g, color.b, alpha);
@@ -135,7 +135,7 @@ void draw_hollow_rect(const SDL_Rect& r, const SDL_Color& color,
 	glEnable(GL_TEXTURE_2D);
 }
 
-void coords_to_screen(GLdouble sx, GLdouble sy, GLdouble sz, 
+void coords_to_screen(GLdouble sx, GLdouble sy, GLdouble sz,
 		      GLdouble* dx, GLdouble* dy, GLdouble* dz) {
 	GLdouble model[16], proj[16];
 	GLint view[4];
@@ -146,15 +146,15 @@ void coords_to_screen(GLdouble sx, GLdouble sy, GLdouble sz,
 
 	gluProject(sx, sy, sz, model, proj, view, dx, dy, dz);
 }
-  
-void push_clip(const SDL_Rect& r) 
+
+void push_clip(const SDL_Rect& r)
 {
 	const bool was_enabled_clip = glIsEnabled(GL_SCISSOR_TEST);
 	bool should_enable_clip = true;
 
 	GLdouble x, y ,z;
 	coords_to_screen(0, graphics::screen_height(), 0, &x, &y, &z);
-	
+
 	SDL_Rect s = r;
 	s.x += static_cast<Sint16>(x);
 	s.y -= static_cast<Sint16>(y);
@@ -163,7 +163,7 @@ void push_clip(const SDL_Rect& r)
 		should_enable_clip = false;
 	}
 
-	
+
 	boost::shared_array<GLint> box(new GLint[4]);
 
 	if(was_enabled_clip) {

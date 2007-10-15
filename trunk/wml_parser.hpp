@@ -26,7 +26,7 @@ struct parse_error {
 };
 
 node_ptr parse_wml(const std::string& doc);
-		
+
 }
 
 #endif

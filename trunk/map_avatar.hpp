@@ -42,7 +42,7 @@ private:
 	std::string image_;
 	GLfloat rotate_;
 };
-		
+
 }
 
 #endif

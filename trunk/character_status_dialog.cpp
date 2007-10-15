@@ -87,7 +87,7 @@ void character_status_dialog::init()
 	           MOVE_RIGHT);
 
 	add_widget(ptr(new label(c->description(), color, 28)));
-	
+
 	const int sz = 22;
 	label_factory lb(color, sz);
 
@@ -163,7 +163,7 @@ void character_status_dialog::init()
 				  add_col(ptr(new label(formatter() << "(" << percent << "%)",color,sz)));
 		}
 	}
-	
+
 	grid->set_col_width(0,120).set_col_width(1,40).set_col_width(2,60).
 		  set_align(1,grid::ALIGN_RIGHT).set_align(2,grid::ALIGN_RIGHT);
 	add_widget(grid, MOVE_RIGHT);
