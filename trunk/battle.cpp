@@ -581,10 +581,10 @@ battle::attack_stats battle::get_attack_stats(
 	static const std::string InitiativeStat = "initiative";
 	static const std::string StaminaUsedStat = "stamina_used";
 	attack_stats stats;
-	stats.attack = ch.stat_mod_height(AttackStat,height_diff) +
-	    move.get_stat(AttackStat,attacker);
-	stats.defense = defender.defense(
-	                  attacker.get_character().damage_type());
+	stats.attack = std::max<int>(ch.stat_mod_height(AttackStat,height_diff) +
+	    move.get_stat(AttackStat,attacker), 1);
+	stats.defense = std::max<int>(defender.defense(
+	                  attacker.get_character().damage_type()), 0);
 	stats.damage = ch.stat_mod_height(DamageStat,height_diff) +
 	                  move.get_stat(DamageStat,attacker);
 	stats.damage_critical = stats.damage;
