@@ -271,6 +271,7 @@ class party_chat_command : public wml_command {
 		const int delay = delay_.execute(info).as_int();
 		variant var = text_->execute(info);
 		const SDL_Color col = {0xFF, 0xFF, 0xFF, 0xFF};
+		std::cerr << "ADD CHAT LABEL: '" << var.as_string() << "'\n";
 		world.add_chat_label(gui::label::create(var.as_string(), col), c, delay);
 	}
 public:

@@ -21,10 +21,17 @@ namespace game_dialogs {
 
 SDL_Rect game_bar::character_rect(int index) const
 {
-	assert(index >= 0 && index < char_rects_.size());
+	assert(index >= 0);
+	if(index >= char_rects_.size()) {
+		SDL_Rect res = {0, 0, 0, 0};
+		return res;
+	}
 	assert(portrait_set_);
 	gui::const_widget_ptr w = char_rects_[index];
-	SDL_Rect res = { x() + portrait_set_->x() + w->x(), y() + w->y(), w->width(), w->height() };
+	SDL_Rect res = { x() + portrait_set_->x(), y(), w->width(), w->height() };
+	for(int n = 0; n < index; ++n) {
+		res.x += char_rects_[index]->width();
+	}
 	return res;
 }
 
@@ -95,7 +102,7 @@ void game_bar_party_button::clicked()
 	party_status_dialog(pty_).show_modal();
 }
 
-void game_bar_portrait_set::build_scrolly(std::vector<gui::const_widget_ptr>* char_rects) const
+void game_bar_portrait_set::build_scrolly() const
 {
 	int count = 0;
 	scrolly_->clear();
@@ -106,19 +113,19 @@ void game_bar_portrait_set::build_scrolly(std::vector<gui::const_widget_ptr>* ch
 		w = gui::frame_manager::make_frame(w, "game-bar-portrait-frame");
 		w->set_dim(w->width(), height());
 		scrolly_->add_widget(w);
-		if(char_rects) {
-			char_rects->push_back(w);
+		if(char_rects_) {
+			char_rects_->push_back(w);
 		}
 		++count;
 	}
 }
 
-void game_bar_portrait_set::construct_interface(std::vector<gui::const_widget_ptr>* char_rects)
+void game_bar_portrait_set::construct_interface()
 {
 	set_padding(0);
 
 	scrolly_.reset(new gui::scrolled_container());
-	build_scrolly(char_rects);
+	build_scrolly();
 
 	gui::button_widget_ptr left_button(new gui::scroll_button(scrolly_, -1));
 	gui::button_widget_ptr right_button(new gui::scroll_button(scrolly_, 1));

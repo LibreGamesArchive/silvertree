@@ -49,17 +49,18 @@ private:
 class game_bar_portrait_set : public gui::dialog {
 public:
 	game_bar_portrait_set(game_logic::party_ptr pty, int w, int h,
-	                      std::vector<gui::const_widget_ptr>* char_rects=NULL)
-		: dialog(0,0,w,h), pty_(pty)
+	                      std::vector<gui::const_widget_ptr>* char_rects)
+		: dialog(0,0,w,h), pty_(pty), char_rects_(char_rects)
 	{
-		construct_interface(char_rects);
+		construct_interface();
 	}
 private:
 	void handle_draw() const;
-	void construct_interface(std::vector<gui::const_widget_ptr>* char_rects=NULL);
-	void build_scrolly(std::vector<gui::const_widget_ptr>* char_rects=NULL) const;
+	void construct_interface();
+	void build_scrolly() const;
 	game_logic::party_ptr pty_;
 	mutable gui::scrolled_container_ptr scrolly_;
+	mutable std::vector<gui::const_widget_ptr>* char_rects_;
 };
 
 class game_bar_portrait_button : public gui::rollin_menu_widget {
