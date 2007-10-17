@@ -782,6 +782,10 @@ void world::play()
 		if(!active_party) {
 			const bool accel = keys[SDLK_SPACE] || !script_.empty();
 			subtime_ += game_speed * (accel ? 2.0 : 1.0);
+			if(keys[SDLK_SPACE] && (keys[SDLK_LSHIFT] || keys[SDLK_RSHIFT])) {
+				subtime_ = 1.0;
+			}
+
 			if(subtime_ >= 1.0) {
 				++time_;
 				subtime_ = 0.0;
