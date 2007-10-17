@@ -695,7 +695,6 @@ void world::play()
 		}
 		party::TURN_RESULT party_result = party::TURN_COMPLETE;
 		while(active_party && party_result == party::TURN_COMPLETE) {
-			party_map::iterator itor = find_party(active_party);
 			hex::location start_loc = active_party->loc();
 
 			if(script_.empty() || active_party->has_script()) {
@@ -705,10 +704,6 @@ void world::play()
 			}
 
 			if(party_result != party::TURN_STILL_THINKING) {
-				if(itor != parties_.end()) {
-					parties_.erase(itor);
-				}
-
 				if(start_loc != active_party->loc()) {
 					party_map_range range = parties_.equal_range(
 						active_party->loc());
@@ -735,6 +730,16 @@ void world::play()
 						skippy.reset();
 						fps_track_.reset();
 					}
+				}
+
+				//find the party in the map and erase it.
+				std::pair<party_map::iterator,party_map::iterator> loc_range = parties_.equal_range(start_loc);
+				while(loc_range.first != loc_range.second) {
+					if(loc_range.first->second == active_party) {
+						parties_.erase(loc_range.first);
+						break;
+					}
+					++loc_range.first;
 				}
 
 				if(active_party->is_destroyed() == false) {
@@ -970,6 +975,10 @@ void world::add_event_handler(const std::string& event, const event_handler& han
 
 party_ptr world::get_pc_party() const
 {
+	if(focus_ && focus_->is_human_controlled()) {
+		return focus_;
+	}
+	
 	for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
 		if(i->second->is_human_controlled()) {
 			return i->second;
@@ -1022,8 +1031,13 @@ variant world::get_value(const std::string& key) const
 void world::add_chat_label(gui::label_ptr label, const_character_ptr ch, int delay)
 {
 	party_ptr pc = get_pc_party();
-	if(!game_bar_ || !pc) {
-		std::cerr << "failed\n";
+	if(!pc) {
+		std::cerr << "failed to get pc party\n";
+		return;
+	}
+
+	if(!game_bar_) {
+		std::cerr << "failed to find game bar\n";
 		return;
 	}
 
