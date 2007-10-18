@@ -119,6 +119,7 @@ public:
 	}
 
 	void pass(int minutes=1);
+	void finish_move();
 
 protected:
 	void move(hex::DIRECTION dir);

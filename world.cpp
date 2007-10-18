@@ -693,8 +693,13 @@ void world::play()
 		if(!active_party) {
 			active_party = get_party_ready_to_move();
 		}
+
 		party::TURN_RESULT party_result = party::TURN_COMPLETE;
 		while(active_party && party_result == party::TURN_COMPLETE) {
+			if(active_party->loc() != active_party->previous_loc()) {
+				active_party->finish_move();
+			}
+
 			hex::location start_loc = active_party->loc();
 
 			if(script_.empty() || active_party->has_script()) {
