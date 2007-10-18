@@ -50,6 +50,8 @@ filter="pc.money > 1000"
 
 Some inputs may also be lists. A list contains multiple inputs in a sequence. For instance, a party contains an input called 'members' which is a list of all the members of the party, each of which is itself a character input, which contains all the characters attributes -- strength, endurance, etc.
 
+List elements may be referenced by using this notation: pc.members.0, party.members.1 etc.
+
 A list can be operated on by several functions. For instance,
 
 size(list): number of items in the list
@@ -71,3 +73,5 @@ max(list) and min(list): evaluates to the maximum or minimum item in the list (w
 EXAMPLE: max(map(pc.members, strength)) -- finds the strength of the strongest character in the party
 
 choose(list, formula): evaluates 'formula' for each item in the list. Will evaluate to the item which 'formula' gave the highest value. EXAMPLE: to give back the character with the highest strength, choose(pc.members, strength). Note that this is different to max(map(pc.members, strength)) because choose will return the actual character. max+map will return the character's strength, not the character themselves. This is very useful for finding a character with the highest or lowest of a certain attribute.
+
+sort(list, formula): evaluates to a list sorted according to the comparison 'formula' for each item 'a' and its successor 'b'. For instance, sorting characters according to initiative would be done by sort(pc.members, a.initiative > b.initiative).
