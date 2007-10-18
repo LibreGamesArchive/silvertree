@@ -280,6 +280,14 @@ void party::pass(int minutes)
 	}
 }
 
+void party::finish_move()
+{
+	if(loc() != previous_loc()) {
+		world_->fire_event("end_move", *this);
+		previous_loc_ = loc_;
+	}
+}
+
 int party::movement_cost(const hex::location& src,
                          const hex::location& dst) const
 {
