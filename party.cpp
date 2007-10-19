@@ -61,7 +61,11 @@ party::party(wml::const_node_ptr node, world& gameworld)
 		const std::string& copies = i.first->second->attr("copies");
 		int ncopies = 1;
 		if(!copies.empty()) {
-			ncopies = boost::lexical_cast<int>(copies);
+			try {
+				ncopies = boost::lexical_cast<int>(copies);
+			} catch(...) {
+				std::cerr << "Could not convert '" << ncopies << "' to integer in specification of copies of a party\n";
+			}
 		}
 
 		while(ncopies-- > 0) {
