@@ -228,14 +228,36 @@ variant variant::operator-() const
 
 bool variant::operator==(const variant& v) const
 {
-	if(type_ == TYPE_STRING) {
-		v.must_be(TYPE_STRING);
+	v.must_be(type_);
+	switch(type_) {
+	case TYPE_STRING: {
 		return string_->str == v.string_->str;
 	}
 
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	return int_value_ == v.int_value_;
+	case TYPE_INT: {
+		return int_value_ == v.int_value_;
+	}
+
+	case TYPE_LIST: {
+		if(num_elements() != v.num_elements()) {
+			return false;
+		}
+
+		for(int n = 0; n != num_elements(); ++n) {
+			if((*this)[n] != v[n]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	case TYPE_CALLABLE: {
+		return callable_ == v.callable_;
+	}
+	}
+
+	assert(false);
 }
 
 bool variant::operator!=(const variant& v) const
