@@ -205,15 +205,23 @@ void gamemap::adjust_height(const hex::location& loc, int adjust)
 		if(is_loc_on_map(locs[n])) {
 			tile& adj_tile = get_tile(locs[n]);
 			DIRECTION dir = static_cast<DIRECTION>(n-1);
+			DIRECTION adj_dir = static_cast<DIRECTION>((dir+3)%6);
 			const int height_diff = main_tile.height() - adj_tile.height();
 			if(height_diff > cliff_height) {
 				main_tile.set_cliff(dir,&adj_tile);
 				main_tile.set_neighbour(dir,NULL);
-				DIRECTION adj_dir = static_cast<DIRECTION>((dir+3)%6);
+				adj_tile.set_cliff(adj_dir,NULL);
 				adj_tile.set_neighbour(adj_dir,NULL);
 			} else if(height_diff >= -cliff_height) {
 				main_tile.set_neighbour(dir,&adj_tile);
 				main_tile.set_cliff(dir,NULL);
+				adj_tile.set_neighbour(adj_dir,&main_tile);
+				adj_tile.set_cliff(adj_dir,NULL);
+			} else {
+				main_tile.set_cliff(adj_dir, NULL);
+				main_tile.set_neighbour(adj_dir, NULL);
+				adj_tile.set_cliff(adj_dir, &main_tile);
+				adj_tile.set_neighbour(adj_dir, NULL);
 			}
 		}
 	}
