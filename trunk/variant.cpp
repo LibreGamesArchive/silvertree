@@ -228,7 +228,10 @@ variant variant::operator-() const
 
 bool variant::operator==(const variant& v) const
 {
-	v.must_be(type_);
+	if(type_ != v.type_) {
+		return false;
+	}
+
 	switch(type_) {
 	case TYPE_STRING: {
 		return string_->str == v.string_->str;
