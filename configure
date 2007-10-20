@@ -578,7 +578,7 @@ PACKAGE_VERSION='0.2'
 PACKAGE_STRING='silvertree-rpg 0.2'
 PACKAGE_BUGREPORT='dave@whitevine.net'
 
-ac_unique_file="main.cpp"
+ac_unique_file="src/main.cpp"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -8883,7 +8883,7 @@ fi
 
 ac_config_headers="$ac_config_headers config.h"
 
-ac_config_files="$ac_config_files Makefile editor/Makefile utilities/Makefile utilities/names/Makefile utilities/versions/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/editor/Makefile utilities/Makefile utilities/names/Makefile utilities/versions/Makefile"
 
 
 
@@ -9481,7 +9481,8 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "editor/Makefile") CONFIG_FILES="$CONFIG_FILES editor/Makefile" ;;
+    "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "src/editor/Makefile") CONFIG_FILES="$CONFIG_FILES src/editor/Makefile" ;;
     "utilities/Makefile") CONFIG_FILES="$CONFIG_FILES utilities/Makefile" ;;
     "utilities/names/Makefile") CONFIG_FILES="$CONFIG_FILES utilities/names/Makefile" ;;
     "utilities/versions/Makefile") CONFIG_FILES="$CONFIG_FILES utilities/versions/Makefile" ;;
@@ -10309,3 +10310,4 @@ if test "$no_create" != yes; then
   # would make configure fail if this is the last instruction.
   $ac_cs_success || { (exit 1); exit 1; }
 fi
+
