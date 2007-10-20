@@ -293,7 +293,7 @@
      <item>
       <widget class="QLabel" name="label_12" >
        <property name="text" >
-        <string>Persona:</string>
+        <string>Will:</string>
        </property>
       </widget>
      </item>
@@ -329,7 +329,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="personaLineEdit" >
+   <widget class="QLineEdit" name="willLineEdit" >
     <property name="geometry" >
      <rect>
       <x>90</x>
