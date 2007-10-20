@@ -65,7 +65,7 @@ EditPartyDialog::EditPartyDialog(wml::node_ptr party, QWidget* parent)
 	QApplication::connect(ui_.enduranceLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(changeStats(const QString&)));
 	QApplication::connect(ui_.intelligenceLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(changeStats(const QString&)));
 	QApplication::connect(ui_.perceptionLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(changeStats(const QString&)));
-	QApplication::connect(ui_.personaLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(changeStats(const QString&)));
+	QApplication::connect(ui_.willLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(changeStats(const QString&)));
 }
 
 void EditPartyDialog::writeParty()
@@ -207,7 +207,7 @@ void EditPartyDialog::loadCharacterStats()
 			ui_.enduranceLineEdit->setText(QString(attr->attr("endurance").c_str()));
 			ui_.intelligenceLineEdit->setText(QString(attr->attr("intelligence").c_str()));
 			ui_.perceptionLineEdit->setText(QString(attr->attr("perception").c_str()));
-			ui_.personaLineEdit->setText(QString(attr->attr("persona").c_str()));
+			ui_.willLineEdit->setText(QString(attr->attr("will").c_str()));
 		}
 	}
 }
@@ -236,5 +236,5 @@ void EditPartyDialog::writeCharacterStats()
 	attr->set_or_erase_attr("endurance", ui_.enduranceLineEdit->text().toAscii().data());
 	attr->set_or_erase_attr("intelligence", ui_.intelligenceLineEdit->text().toAscii().data());
 	attr->set_or_erase_attr("perception", ui_.perceptionLineEdit->text().toAscii().data());
-	attr->set_or_erase_attr("persona", ui_.personaLineEdit->text().toAscii().data());
+	attr->set_or_erase_attr("will", ui_.willLineEdit->text().toAscii().data());
 }
