@@ -21,21 +21,21 @@ libdir = ARGUMENTS.get("libdir", "")
 
 import glob
 
-sources = glob.glob("*.cpp")
-sources += ["xml/xml.c"]
+sources = glob.glob("src/*.cpp")
+sources += ["src/xml/xml.c"]
 
 name = "game"
 if editor:
-    sources.remove("main.cpp")
-    editor_sources = glob.glob("editor/*.cpp")
-    editor_sources.remove("editor/oldmain.cpp")
-    editor_uis = glob.glob("editor/*.ui")
+    sources.remove("src/main.cpp")
+    editor_sources = glob.glob("src/editor/*.cpp")
+    editor_sources.remove("src/editor/oldmain.cpp")
+    editor_uis = glob.glob("src/editor/*.ui")
     editor_mocables = Split("""
-        editor/editorglwidget.hpp
-        editor/editormainwindow.hpp
-        editor/terrainhandler.hpp
-        editor/editpartydialog.hpp
-        editor/editwmldialog.hpp
+        src/editor/editorglwidget.hpp
+        src/editor/editormainwindow.hpp
+        src/editor/terrainhandler.hpp
+        src/editor/editpartydialog.hpp
+        src/editor/editwmldialog.hpp
      """)
     
     sources.extend(editor_sources)

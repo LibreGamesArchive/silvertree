@@ -1,7 +1,7 @@
 AC_PREREQ([2.61])
 AC_INIT([silvertree-rpg], [0.2], [dave@whitevine.net])
 AC_LANG([C++])
-AC_CONFIG_SRCDIR([main.cpp])
+AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([foreign])
 AC_PROG_MAKE_SET
@@ -58,8 +58,9 @@ AM_CONDITIONAL([WANT_EDITOR], [test x$have_qt = xyes])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
-Makefile 
-editor/Makefile 
+Makefile
+src/Makefile
+src/editor/Makefile 
 utilities/Makefile 
 utilities/names/Makefile 
 utilities/versions/Makefile
