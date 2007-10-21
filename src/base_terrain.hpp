@@ -52,6 +52,8 @@ public:
 
 	const std::string& battle_style() const { return battle_style_; }
 
+	int overlap_priority() const { return overlap_priority_; }
+
 private:
 	explicit base_terrain(wml::const_node_ptr node);
 

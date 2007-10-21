@@ -67,9 +67,17 @@ public:
 	void draw_grid() const;
 	void draw_highlight() const;
 
-	static GLfloat translate_x(const location& loc) {
+	static GLfloat translate_x(GLfloat x) {
 		const GLfloat XRatio = 0.86602540378443427;
-		return static_cast<GLfloat>(loc.x())*XRatio;
+		return x*XRatio;
+	}
+
+	static GLfloat translate_x(const location& loc) {
+		return translate_x(static_cast<GLfloat>(loc.x()));
+	}
+
+	static GLfloat translate_y(GLfloat y) {
+		return y + ((static_cast<int>(y)%2) == 0 ? 0.0 : 0.5);
 	}
 
 	static GLfloat translate_y(const location& loc) {
@@ -120,6 +128,21 @@ public:
 		}
 	};
 
+	struct point {
+		point() : x(0), y(0), height(0),
+			  red(1), green(1), blue(1), init(false)
+		{
+		}
+
+		GLfloat x, y, height;
+		GLfloat red, green, blue;
+		GLfloat normal[3];
+		bool init;
+	};
+
+	const point& center() const { return center_; }
+	const point* corners() const { return corners_; }
+
 private:
 	void do_draw() const;
 	void init(int height, const_base_terrain_ptr terrain,
@@ -140,18 +163,6 @@ private:
 	mutable std::vector<graphics::texture> cliff_textures_;
 
 	mutable graphics::location_tracker* active_tracker_;
-
-	struct point {
-		point() : x(0), y(0), height(0),
-			  red(1), green(1), blue(1), init(false)
-		{
-		}
-
-		GLfloat x, y, height;
-		GLfloat red, green, blue;
-		GLfloat normal[3];
-		bool init;
-	};
 
 	point center_;
 	point corners_[6];

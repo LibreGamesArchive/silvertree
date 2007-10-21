@@ -68,6 +68,7 @@ am_libsilvertree_a_OBJECTS = base_terrain.$(OBJEXT) \
 	game_persistence.$(OBJEXT) game_time.$(OBJEXT) \
 	global_game_state.$(OBJEXT) graphics_logic.$(OBJEXT) \
 	grid_widget.$(OBJEXT) gui_core.$(OBJEXT) \
+	initiative_bar.$(OBJEXT) \
 	image_widget.$(OBJEXT) item.$(OBJEXT) \
 	item_display_dialog.$(OBJEXT) keyboard.$(OBJEXT) \
 	label.$(OBJEXT) learn_skills_dialog.$(OBJEXT) \
@@ -88,7 +89,8 @@ am_libsilvertree_a_OBJECTS = base_terrain.$(OBJEXT) \
 	tracks.$(OBJEXT) translate.$(OBJEXT) unicode.$(OBJEXT) \
 	variant.$(OBJEXT) widget.$(OBJEXT) wml_command.$(OBJEXT) \
 	wml_node.$(OBJEXT) wml_parser.$(OBJEXT) wml_utils.$(OBJEXT) \
-	wml_writer.$(OBJEXT) world.$(OBJEXT) xml.$(OBJEXT)
+	wml_writer.$(OBJEXT) world.$(OBJEXT) xml.$(OBJEXT) \
+	zoom_map_generator.$(OBJEXT)
 libsilvertree_a_OBJECTS = $(am_libsilvertree_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -305,6 +307,8 @@ grid_widget.hpp \
 gui_core.hpp \
 image_widget_fwd.hpp \
 image_widget.hpp \
+initiative_bar.hpp \
+initiative_bar_fwd.hpp \
 item_display_dialog.hpp \
 item_fwd.hpp \
 item.hpp \
@@ -374,6 +378,7 @@ wml_writer.hpp \
 world_fwd.hpp \
 world.hpp \
 xml/xml.h \
+zoom_map_generator.hpp \
 \
 base_terrain.cpp \
 battle_character.cpp \
@@ -415,6 +420,7 @@ graphics_logic.cpp \
 grid_widget.cpp \
 gui_core.cpp \
 image_widget.cpp \
+initiative_bar.cpp \
 item.cpp \
 item_display_dialog.cpp \
 keyboard.cpp \
@@ -465,7 +471,8 @@ wml_parser.cpp \
 wml_utils.cpp \
 wml_writer.cpp \
 world.cpp \
-xml/xml.c
+xml/xml.c \
+zoom_map_generator.cpp
 
 all: all-recursive
 
@@ -580,6 +587,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_widget.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gui_core.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/image_widget.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/initiative_bar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item_display_dialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/keyboard.Po@am__quote@
@@ -632,6 +640,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wml_writer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/world.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xml.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/zoom_map_generator.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
