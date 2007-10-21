@@ -132,10 +132,15 @@ void EditorMainWindow::saveRequested() {
 		scenario_->add_child(i->second);
 	}
 
+	if(scenario_->has_attr("map")) {
+		sys::write_file((*scenario_)["map"], map_->write());
+	} else {
+		scenario_->set_attr("map_data", map_->write());
+	}
+
 	std::string scenarioData;
 	wml::write(scenario_, scenarioData);
 	sys::write_file(fname_, scenarioData);
-	sys::write_file((*scenario_)["map"], map_->write());
 }
 
 void EditorMainWindow::zoominRequested() {
@@ -211,14 +216,34 @@ void EditorMainWindow::redo() {
 }
 
 bool EditorMainWindow::openScenario(const char *file) {
-	fname_ = file;
 	wml::node_ptr old_scenario = scenario_;
-	scenario_ = wml::parse_wml(sys::read_file(file));
+
+	if(file) {
+		fname_ = file;
+		scenario_ = wml::parse_wml(sys::read_file(file));
+	} else {
+		fname_ = "";
+		scenario_ = wml::parse_wml(
+"[scenario]"
+"map_data=\""
+"0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h\n"
+"0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h\n"
+"0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h\n"
+"0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h\n"
+"0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h\n"
+"0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h\n"
+"0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h\n"
+"0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h\n"
+"0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h\n"
+"0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h, 0 h\"\n"
+"[/scenario]");
+	}
+
 	if(!scenario_) {
 		return false;
 	}
 
-	if(!openMap((*scenario_)["map"].c_str())) {
+	if(!openMap(scenario_)) {
 		scenario_ = old_scenario;
 		return false;
 	}
@@ -234,20 +259,23 @@ bool EditorMainWindow::openScenario(const char *file) {
 	return true;
 }
 
-bool EditorMainWindow::openMap(const char *file) {
-	const int fd = open(file,O_RDONLY);
-	if(fd < 0) {
-		return false;
-	}
-	struct stat fileinfo;
-	fstat(fd,&fileinfo);
-
+bool EditorMainWindow::openMap(wml::const_node_ptr node) {
 	std::string mapdata;
+	if(node->has_attr("map_data")) {
+		mapdata = (*node)["map_data"];
+	} else {
+		const int fd = open((*node)["map"].c_str(),O_RDONLY);
+		if(fd < 0) {
+			return false;
+		}
+		struct stat fileinfo;
+		fstat(fd,&fileinfo);
 
-	std::vector<char> filebuf(fileinfo.st_size);
-	read(fd,&filebuf[0],fileinfo.st_size);
-	mapdata.assign(filebuf.begin(),filebuf.end());
-	::close(fd);
+		std::vector<char> filebuf(fileinfo.st_size);
+		read(fd,&filebuf[0],fileinfo.st_size);
+		mapdata.assign(filebuf.begin(),filebuf.end());
+		::close(fd);
+	}
 
 	map_ = new hex::gamemap(mapdata);
 	camera_ = new hex::camera(*map_);
