@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 {
 	QApplication app(argc, argv);
 
-	if(argc != 2) {
+	if(argc > 2) {
 		std::cerr << "usage: " << argv[0] << " [<mapname>]\n";
 		return 0;
 	}
@@ -115,7 +115,10 @@ int main(int argc, char** argv)
 	mainWindow->show();
 	if (argc == 2) {
 		mainWindow->openScenario(argv[1]);
+	} else {
+		mainWindow->openScenario(NULL);
 	}
+
 	app.exec();
 	return 0;
 }

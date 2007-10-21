@@ -15,7 +15,7 @@ class EditorMainWindow : public QMainWindow
 	public:
 		EditorMainWindow(QWidget *parent = 0);
 		bool openScenario(const char* file);
-		bool openMap(const char *file);
+		bool openMap(wml::const_node_ptr node);
 
 	public slots:
 		void openRequested();
