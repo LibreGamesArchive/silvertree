@@ -49,13 +49,22 @@ void initiative_bar::handle_draw() const
 
 	const int min_pos = y() + ImageSize/2;
 	const int max_pos = y() + height() - ImageSize/2;
+
+	const GLfloat time_scale = max_time - current_time_;
+	const SDL_Rect scale_rect = {x() + width()/2, min_pos, 1, max_pos - min_pos};
+	graphics::draw_rect(scale_rect, graphics::color_white(), 127);
+	for(double time = 0.0; time <= max_time - current_time_; time += 5.0) {
+		const SDL_Rect tick_rect = { x() + width()/2 - 3, static_cast<int>(min_pos + (time/time_scale)*(max_pos-min_pos)), 7, 1};
+
+		graphics::draw_rect(tick_rect, graphics::color_white(), 127);
+	}
+
 	foreach(const game_logic::const_battle_character_ptr& bc, chars_) {
 		const game_logic::character& ch = bc->get_character();
 		const std::string& image = ch.portrait().empty() ? ch.image() : ch.portrait();
 		graphics::texture tex(graphics::texture::get(image));
 
 		const GLfloat time = bc->ready_to_move_at() + (bc.get() == focus_ ? add_focus_ : 0.0) - current_time_;
-		const GLfloat time_scale = max_time - current_time_;
 		const int pos = static_cast<int>(min_pos + (time/time_scale)*(max_pos-min_pos));
 
 		//the pc characters get drawn on the left, enemies on the right
