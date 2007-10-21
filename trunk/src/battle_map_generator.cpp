@@ -20,6 +20,7 @@
 #include "terrain_feature.hpp"
 #include "tile.hpp"
 #include "tile_logic.hpp"
+#include "zoom_map_generator.hpp"
 
 namespace game_logic
 {
@@ -64,6 +65,7 @@ void calculate_route(const hex::location& src, const hex::location& dst,
 boost::shared_ptr<hex::gamemap> generate_battle_map(
            const hex::gamemap& world_map, const hex::location& loc)
 {
+	return hex::generate_zoom_map(world_map, hex::location(loc.x()-2,loc.y()-2), hex::location(5,5), hex::location(50,50), 1.0, 0.0);
 	hex::location adj[6];
 	get_adjacent_tiles(loc,adj);
 

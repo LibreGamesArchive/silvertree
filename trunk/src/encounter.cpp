@@ -46,7 +46,7 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 	std::vector<battle_character_ptr> chars;
 	for(std::vector<character_ptr>::const_iterator i =
 	    p1->members().begin(); i != p1->members().end(); ++i) {
-		hex::location loc(2 + i - p1->members().begin(),2);
+		hex::location loc(22 + i - p1->members().begin(),22);
 		chars.push_back(battle_character::make_battle_character(
 		                    *i,*p1,loc,hex::NORTH,*battle_map,
 							p1->game_world().current_time()));
@@ -55,7 +55,7 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 
 	for(std::vector<character_ptr>::const_iterator i =
 	    p2->members().begin(); i != p2->members().end(); ++i) {
-		hex::location loc(2 + i - p2->members().begin(),8);
+		hex::location loc(22 + i - p2->members().begin(),28);
 		chars.push_back(battle_character::make_battle_character(
 		                    *i,*p2,loc,hex::NORTH,*battle_map,
 							p2->game_world().current_time()));
