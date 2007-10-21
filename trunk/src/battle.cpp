@@ -251,6 +251,7 @@ void battle::player_turn(battle_character& c)
 	current_move_.reset();
 	remove_widget(menu_);
 	menu_.reset();
+	initiative_bar_->focus_character(NULL);
 }
 
 void battle::remove_widget(gui::const_widget_ptr w)
@@ -397,7 +398,6 @@ void battle::draw(gui::slider* slider)
 
 
 	glDisable(GL_LIGHTING);
-	//map_.draw_grid();
 
 	//draw possible attacks
 	if(highlight_moves_ && selected_hex.valid()) {
