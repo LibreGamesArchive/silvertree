@@ -25,6 +25,7 @@
 #include "camera_controller.hpp"
 #include "frame_rate_utils.hpp"
 #include "gamemap.hpp"
+#include "initiative_bar_fwd.hpp"
 #include "location_tracker.hpp"
 #include "mini_stats_dialog.hpp"
 #include "particle_system.hpp"
@@ -110,9 +111,6 @@ private:
 	hex::camera camera_;
 	hex::camera_controller camera_controller_;
 
-	void generate_movement_order();
-	std::vector<graphics::texture> movement_order_;
-
 	enum BATTLE_RESULT { ONGOING, PLAYER_WIN, PLAYER_LOSE, QUIT };
 	BATTLE_RESULT result_;
 
@@ -132,6 +130,8 @@ private:
 	game_dialogs::time_cost_widget_ptr time_cost_widget_;
 	graphics::particle_system particle_system_;
 	boost::scoped_ptr<battle_missile> missile_;
+
+	gui::initiative_bar_ptr initiative_bar_;
 };
 
 }

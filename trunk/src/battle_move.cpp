@@ -15,7 +15,7 @@ const_battle_move_ptr battle_move::standard_move()
 	res->name_ = "move";
 	res->category_ = "move";
 	res->moves_ = 2;
-	res->min_moves_ = 0;
+	res->min_moves_ = 1;
 	res->can_attack_ = true;
 	res->must_attack_ = false;
 	return res;
