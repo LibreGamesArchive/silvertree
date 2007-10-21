@@ -71,6 +71,8 @@ void draw_time_bars(GLfloat time, GLfloat accounted_time, GLfloat start, GLfloat
 			   const SDL_Color& main_color, const SDL_Color& accounted_color,
 			   GLUquadric *quad)
 {
+	//for the moment, the character time bars are removed in favor of the single initiative bar.
+	return;
 	if(time == 0.0) {
 		return;
 	}
