@@ -20,6 +20,7 @@
 #include "formatter.hpp"
 #include "font.hpp"
 #include "foreach.hpp"
+#include "initiative_bar.hpp"
 #include "keyboard.hpp"
 #include "label.hpp"
 #include "model.hpp"
@@ -55,7 +56,8 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
 	 result_(ONGOING), keyed_selection_(0),
          current_time_(0), sub_time_(0.0),
          skippy_(50, preference_maxfps()),
-         tracked_tile_(NULL)
+         tracked_tile_(NULL),
+		 initiative_bar_(new gui::initiative_bar)
 {
 	srand(SDL_GetTicks());
 
@@ -63,18 +65,37 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
 	    i != chars_.end(); ++i) {
 		gui::widget_ptr w(new game_dialogs::status_bars_widget(*this, *i));
 		widgets_.push_back(w);
+
+		initiative_bar_->add_character(*i);
 	}
 	time_cost_widget_.reset(new game_dialogs::time_cost_widget(*this));
 	widgets_.push_back(time_cost_widget_);
+
+	initiative_bar_->set_loc(graphics::screen_width() - 100, 50);
+	initiative_bar_->set_dim(30, graphics::screen_height()/2);
+
+	widgets_.push_back(initiative_bar_);
 }
 
 void battle::play()
 {
 	while(result_ == ONGOING) {
 		std::sort(chars_.begin(),chars_.end(),battle_char_less);
-		generate_movement_order();
 		focus_ = chars_.begin();
-		current_time_ = (*focus_)->ready_to_move_at();
+
+		// Update the initiative bar, moving the game time forward, until
+		// someone is ready to move.
+		while(current_time_ < (*focus_)->ready_to_move_at()) {
+			sub_time_ = 0.0;
+			while(sub_time_ < 1.0) {
+				initiative_bar_->set_current_time(current_time_ + sub_time_);
+				animation_frame(0.1);
+			}
+
+			++current_time_;
+		}
+
+		initiative_bar_->set_current_time(current_time_);
 		sub_time_ = 0.0;
 		(*focus_)->play_turn(*this);
 	}
@@ -108,6 +129,14 @@ void battle::player_turn(battle_character& c)
 	highlight_targets_ = false;
 
 	while(!turn_done_ && result_ == ONGOING) {
+		if(!highlight_moves_ && !highlight_targets_) {
+			const_battle_move_ptr move = menu_->highlighted_move();
+			if(move) {
+				std::cerr << "highlighted move: " << move->name() << ": " << move->min_moves() << "\n";
+				initiative_bar_->focus_character(focus_->get(), move->min_moves() > 0 ? 0 : move->get_stat("initiative", **focus_));
+			}
+		}
+
 		if(!skippy_.skip_frame()) {
 			draw();
 		}
@@ -171,7 +200,7 @@ void battle::player_turn(battle_character& c)
 				case SDL_MOUSEBUTTONDOWN:
 					handle_mouse_button_down(event.button);
 					break;
-			        case SDL_MOUSEMOTION:
+			    case SDL_MOUSEMOTION:
 					handle_time_cost_popup();
 					break;
 			}
@@ -209,6 +238,7 @@ void battle::player_turn(battle_character& c)
 
 					(*focus_)->use_energy(current_move_->energy_required());
 					(*focus_)->set_time_until_next_move(current_move_->get_stat("initiative",**focus_));
+					initiative_bar_->focus_character(NULL);
 					turn_done_ = true;
 				}
 			}
@@ -426,13 +456,6 @@ void battle::draw(gui::slider* slider)
 
 	graphics::prepare_raster();
 
-	int order_x = 800;
-	int order_y = 50;
-	foreach(const graphics::texture& text, movement_order_) {
-		graphics::blit_texture(text,order_x,order_y);
-		order_y += 20;
-	}
-
 	if(slider) {
 		slider->draw();
 	}
@@ -552,9 +575,12 @@ void battle::move_character(battle_character& c, const battle_character::route& 
 	const GLfloat time = c.begin_move(r);
 
 	for(GLfloat t = 0; t < time; t += 0.1) {
+		initiative_bar_->focus_character(&c, t);
 		c.set_movement_time(t);
 		animation_frame(0.1);
 	}
+
+	initiative_bar_->focus_character(&c, 0.0);
 
 	c.end_move();
 	end_animation();
@@ -678,6 +704,8 @@ void battle::attack_character(battle_character& attacker,
 
 	begin_animation();
 	for(GLfloat t = 0.0; t < anim_time; t += 0.1) {
+		std::cerr << "set init: " << (t*(elapsed_time/anim_time)) << "\n";
+		initiative_bar_->focus_character(&attacker, t*(elapsed_time/anim_time));
 		if(missile_.get()) {
 			missile_->update();
 		}
@@ -699,6 +727,8 @@ void battle::attack_character(battle_character& attacker,
 	attacker.end_facing_change();
 	defender.end_facing_change();
 
+	std::cerr << "time until next: " << stats.time_taken << "\n";
+	initiative_bar_->focus_character(&attacker, 0.0);
 	attacker.set_time_until_next_move(stats.time_taken);
 	(*focus_)->use_energy(attack_move.energy_required());
 
@@ -736,6 +766,8 @@ void battle::handle_dead_character(const battle_character& c)
 	}
 
 	elapse_time(0.0, 50);
+
+	initiative_bar_->remove_character(&c);
 
 	for(std::vector<battle_character_ptr>::iterator i = chars_.begin();
 	    i != chars_.end(); ++i) {
@@ -958,10 +990,13 @@ void battle::handle_time_cost_popup()
 		const battle_character::move_map::const_iterator move = moves_.find(selected_loc());
 		if(move != moves_.end()) {
 			int cost = attacker->route_cost(move->second);
+			initiative_bar_->focus_character(attacker.get(), cost);
 			time_cost_widget_->set_tracker(&hex_tracker_);
 			time_cost_widget_->set_time_cost(cost);
 			time_cost_widget_->set_visible(true);
 			return;
+		} else {
+			initiative_bar_->focus_character(attacker.get(), 0);
 		}
 	} else if(highlight_targets_) {
 		assert(current_move_);
@@ -970,6 +1005,7 @@ void battle::handle_time_cost_popup()
 			attack_stats stats = get_attack_stats(*attacker, *defender, *current_move_);
 			time_cost_widget_->set_tracker(&(defender->loc_tracker()));
 			time_cost_widget_->set_time_cost(stats.time_taken);
+			initiative_bar_->focus_character(attacker.get(), stats.time_taken);
 			time_cost_widget_->set_visible(true);
 			return;
 		} else {
@@ -978,7 +1014,9 @@ void battle::handle_time_cost_popup()
 			if(map_.is_loc_on_map(loc)) {
 				/* move cost */
 				time_cost_widget_->set_tracker(&hex_tracker_);
-				time_cost_widget_->set_time_cost(current_move_->get_stat("initiative",*attacker));
+				const int cost = current_move_->get_stat("initiative",*attacker);
+				time_cost_widget_->set_time_cost(cost);
+				initiative_bar_->focus_character(attacker.get(), cost);
 				time_cost_widget_->set_visible(true);
 				return;
 			}
@@ -1034,20 +1072,6 @@ bool battle::enter_target_mode()
 	}
 	highlight_targets_ = targets_.empty() == false;
 	return highlight_targets_;
-}
-
-void battle::generate_movement_order()
-{
-	const SDL_Color red = {0xFF,0x00,0x00,0xFF};
-	const SDL_Color green = {0x00,0xFF,0x00,0xFF};
-	movement_order_.clear();
-	const int now = chars_.front()->ready_to_move_at();
-	foreach(const battle_character_ptr& c, chars_) {
-		std::ostringstream str;
-		str << c->get_character().description() << ": "
-		    << (c->ready_to_move_at()-now);
-		movement_order_.push_back(graphics::font::render_text(str.str(),20,c->is_human_controlled() ? green : red));
-	}
 }
 
 const_battle_character_ptr battle::is_engaged(

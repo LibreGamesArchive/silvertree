@@ -58,7 +58,17 @@ battle_menu::battle_menu(const game_logic::battle& b,
 
 game_logic::const_battle_move_ptr battle_menu::selected_move() const
 {
-	if(!selection_made_ || !grid_) {
+	if(!selection_made_) {
+		return game_logic::const_battle_move_ptr();
+	}
+
+	return highlighted_move();
+
+}
+
+game_logic::const_battle_move_ptr battle_menu::highlighted_move() const
+{
+	if(!grid_) {
 		return game_logic::const_battle_move_ptr();
 	}
 
