@@ -503,7 +503,6 @@ void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 
 void EditorGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	std::cerr << "move: " << (int)event->button() << "," << (int)event->buttons() << "\n";
 	mousex_ = event->x();
 	mousey_ = event->y();
 	setFocus(Qt::MouseFocusReason);
