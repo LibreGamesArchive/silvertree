@@ -156,12 +156,20 @@ void EditorMainWindow::deriveMap() {
 		fname_.clear();
 		parties_.clear();
 		ui.editorGLWidget->setParties(&parties_);
-		ui.editorGLWidget->setMap(dialog.result().get());
 		map_ = dialog.result();
+
+		camera_ = new hex::camera(*map_);
+		camera_->allow_keyboard_panning();
 
 		camera_->set_pan_y(-(map_->size().y()-1));
 		ui.horizontalScrollBar->setMaximum(map_->size().x());
 		ui.verticalScrollBar->setMaximum(map_->size().y());
+
+		ui.editorGLWidget->setMap(map_.get());
+		ui.editorGLWidget->setCamera(camera_);
+		ui.editorGLWidget->setEnabled(true);
+	
+		ui.action_Save->setEnabled(true);
 	}
 }
 
