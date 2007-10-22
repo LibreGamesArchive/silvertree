@@ -5,7 +5,7 @@ opts = Options("options.cache")
 opts.AddOptions(
     ("QTDIR", "Root directory of Qt's installation.", "/usr/"),
     ("SDLDIR", "Root directory of SDL's installation.", "/usr/"),
-    ("BOOSTDIR", "Root directory of boost installation.", "/usr/"),
+    ("BOOSTDIR", "Root directory of boost installation.", "/usr/include"),
     ("BOOSTLIBS", "Directory where boost libs are located.", "/usr/lib"),
     ("BOOST_SUFFIX", "Suffix of the boost regex library.", ""),
     EnumOption("Build", "Build variant: debug or release", "release", ["debug", "release"], ignorecase=1)
@@ -29,7 +29,7 @@ Additional options:
 Help(opts.GenerateHelpText(env))
 
 print "Configuring for " + env["PLATFORM"] + " platform..."
-if env["PLATFORM"] == "posix":
+if env["PLATFORM"] == "posix" or env["PLATFORM"] == "darwin":
     env.ParseConfig("sdl-config --cflags --libs")
 if env["PLATFORM"] == "win32":
     env.AppendUnique(CCFLAGS = ["-D_GNU_SOURCE"])
@@ -44,8 +44,8 @@ if env["PLATFORM"] == "win32":
 else:
     conf.CheckLibWithHeader("GL", "GL/gl.h", "C") or Exit()
     conf.CheckLibWithHeader("GLU", "GL/glu.h", "C") or Exit()
-if env["PLATFORM"] != "win32":
-    # SDL checks on windows don't work because SDL declares main() in SDL.h and assumes
+if env["PLATFORM"] != "win32" and env["PLATFORM"] != "darwin":
+    # SDL checks on windows and Mac don't work because SDL declares main() in SDL.h and assumes
     # int main(int,char**) while checks use int main(void)
     conf.CheckLibWithHeader("SDL", "SDL_config.h", "C", autoadd = False) or Exit()
     conf.CheckLibWithHeader("SDL_image", "SDL_image.h", "C") or Exit()
