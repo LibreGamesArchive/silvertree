@@ -1,0 +1,16 @@
+Import("env")
+
+import glob
+from os.path import join
+from os.path import basename
+abspath_sources = glob.glob(join(GetLaunchDir(), "src", "*.cpp"))
+sources = map(basename, abspath_sources)
+sources += ["xml/xml.c"]
+sources.remove("main.cpp")
+lib_silvertree = env.StaticLibrary("libsilvertree", sources)
+silvertree = env.Program("silvertreerpg", ["main.cpp", lib_silvertree])
+
+Export("lib_silvertree")
+editor = SConscript("editor/SConscript")
+silvertree_and_editor = (silvertree, editor)
+Return("silvertree_and_editor")

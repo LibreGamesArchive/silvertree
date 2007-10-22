@@ -1,0 +1,29 @@
+Import("editor_env")
+Import("lib_silvertree")
+
+if editor_env["HaveQt"]:
+    import glob
+    from os.path import join
+    from os.path import basename
+    abspath_sources = glob.glob(join(GetLaunchDir(), "src", "editor", "*.cpp"))
+    editor_sources = map(basename, abspath_sources)
+    editor_sources.remove("oldmain.cpp")
+    abspath_uis = glob.glob(join(GetLaunchDir(), "src", "editor", "*.ui"))
+    editor_uis = map(basename, abspath_uis)
+    editor_mocables = Split("""
+        editorglwidget.hpp
+        editormainwindow.hpp
+        terrainhandler.hpp
+        editpartydialog.hpp
+        editwmldialog.hpp
+        derivemapdialog.hpp
+    """)
+    editor_env.Uic4(editor_uis)
+    for mocable in editor_mocables: # Moc4 doesn't handle lists properly
+        editor_env.Moc4(mocable)
+    editor = editor_env.Program("silvertreeedit", editor_sources + [lib_silvertree])
+else:
+    print "Couldn't find Qt. Editor cannot be built."
+    editor = None
+
+Return("editor")

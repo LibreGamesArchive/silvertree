@@ -1,4 +1,5 @@
 # vi: syntax=python
+from os.path import join
 
 opts = Options("options.cache")
 opts.AddOptions(
@@ -6,7 +7,8 @@ opts.AddOptions(
     ("SDLDIR", "Root directory of SDL's installation.", "/usr/"),
     ("BOOSTDIR", "Root directory of boost installation.", "/usr/"),
     ("BOOSTLIBS", "Directory where boost libs are located.", "/usr/lib"),
-    ("BOOST_SUFFIX", "Suffix of the boost regex library.", "")
+    ("BOOST_SUFFIX", "Suffix of the boost regex library.", ""),
+    EnumOption("Build", "Build variant: debug or release", "release", ["debug", "release"], ignorecase=1)
 )
 
 env = Environment(tools = [], toolpath = ["scons"], options = opts)
@@ -26,13 +28,13 @@ Additional options:
 """)
 Help(opts.GenerateHelpText(env))
 
+print "Configuring for " + env["PLATFORM"] + " platform..."
 if env["PLATFORM"] == "posix":
     env.ParseConfig("sdl-config --cflags --libs")
 if env["PLATFORM"] == "win32":
     env.AppendUnique(CCFLAGS = ["-D_GNU_SOURCE"])
     env.AppendUnique(LIBS = Split("mingw32 SDLmain SDL SDL_image SDL_ttf"))
     env.AppendUnique(LINKFLAGS = ["-mwindows", "-s"])
-from os.path import join
 env.AppendUnique(CPPPATH = [join(env["SDLDIR"], "include/SDL")], LIBPATH = [join(env["SDLDIR"], "lib")])
 env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
 conf = env.Configure()
@@ -55,9 +57,6 @@ else:
     conf.CheckLibWithHeader("boost_regex-mt", "boost/regex.hpp", "C++") or Exit()
 conf.Finish()
 
-if "gcc" in env["TOOLS"]:
-    env.Append(CCFLAGS = Split("-ggdb -Wall -Wno-sign-compare -Wno-switch -Wno-switch-enum"))
-
 editor_env = env.Clone()
 try:
     editor_env.Tool("qt4")
@@ -72,41 +71,37 @@ if env["PLATFORM"] == "win32":
     QtLibSuffix = "4"
 else:
     QtLibSuffix = ""
-HaveQt = editor_conf.CheckLibWithHeader("QtCore" + QtLibSuffix, "QtGlobal", "C++", autoadd = False) and \
+editor_env["HaveQt"] = editor_conf.CheckLibWithHeader("QtCore" + QtLibSuffix, "QtGlobal", "C++", autoadd = False) and \
          editor_conf.CheckLibWithHeader("QtGui" + QtLibSuffix, "QApplication", "C++", autoadd = False) and \
          editor_conf.CheckLibWithHeader("QtOpenGL" + QtLibSuffix, "QGLWidget", "C++", autoadd = False)
 editor_conf.Finish()
 
-import glob
-sources = glob.glob("src/*.cpp")
-sources += ["src/xml/xml.c"]
-sources.remove(join("src", "main.cpp"))
-lib_silvertree = env.StaticLibrary("src/libsilvertree", sources)
-silvertree = env.Program("silvertreerpg", ["src/main.cpp", lib_silvertree])
-env.Default(silvertree)
-
-if HaveQt:
-    editor_sources = glob.glob("src/editor/*.cpp")
-    editor_sources.remove(join("src", join("editor", "oldmain.cpp")))
-    editor_uis = glob.glob("src/editor/*.ui")
-    editor_mocables = Split("""
-        src/editor/editorglwidget.hpp
-        src/editor/editormainwindow.hpp
-        src/editor/terrainhandler.hpp
-        src/editor/editpartydialog.hpp
-        src/editor/editwmldialog.hpp
-     """)
-    editor_env.Uic4(editor_uis)
-    for mocable in editor_mocables: # Moc4 doesn't handle lists properly
-        editor_env.Moc4(mocable)
-    editor = editor_env.Program("silvertreeedit", editor_sources + [lib_silvertree])
-    editor_env.Alias("editor", editor)
-else:
-    print "Couldn't find Qt. Editor cannot be built."
+if "gcc" in env["TOOLS"]:
+    ccflags = Split("-Wall -Wno-sign-compare -Wno-switch -Wno-switch-enum")
+    linkflags = []
+    if env["Build"] == "release":
+        ccflags.append("-O2")
+        linkflags.append("-s")
+    if env["Build"] == "debug":
+        ccflags.append("-ggdb")
+    env.AppendUnique(CCFLAGS = ccflags, LINKFLAGS = linkflags)
+    editor_env.AppendUnique(CCFLAGS = ccflags, LINKFLAGS = linkflags)
 
 namegen = env.Program("utilities/names/namegen", "utilities/names/namegen.cpp")
 Alias("namegen", namegen)
 
 env.Program("version_finder", "utilities/versions/version_finder.cpp")
+
+Export("env")
+Export("editor_env")
+silvertree, editor = SConscript("src/SConscript", build_dir = join("build", env["Build"]))
+
+if env["Build"] == "debug":
+    ExecutableSuffix = "-debug"
+else:
+    ExecutableSuffix = ""
+env.Default(env.Alias("silvertreerpg", env.InstallAs("./silvertreerpg" + ExecutableSuffix, silvertree)))
+if editor:
+    editor_env.Alias("editor", editor_env.InstallAs("./silvertreeedit" + ExecutableSuffix, editor))
 
 SConsignFile("sconsign")
