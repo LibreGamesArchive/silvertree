@@ -67,7 +67,6 @@ EditorGLWidget::EditorGLWidget(QWidget *parent)
 	radius_ = 0;
 	mousex_ = 0;
 	mousey_ = 0;
-	map_ = 0;
 	camera_ = 0;
 
 	parties_ = NULL;
@@ -79,7 +78,7 @@ EditorGLWidget::EditorGLWidget(QWidget *parent)
 	timer_.start(1000/25);
 }
 
-void EditorGLWidget::setMap(hex::gamemap *map) {
+void EditorGLWidget::setMap(boost::shared_ptr<hex::gamemap> map) {
 	map_ = map;
 }
 
