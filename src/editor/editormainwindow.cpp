@@ -11,21 +11,23 @@
 #include "../base_terrain.hpp"
 #include "../terrain_feature.hpp"
 #include "../filesystem.hpp"
+#include "../formatter.hpp"
 #include "../wml_parser.hpp"
 #include "../wml_utils.hpp"
 #include "../wml_writer.hpp"
+#include "derivemapdialog.hpp"
 #include "editormainwindow.hpp"
 #include "terrainhandler.hpp"
 
 EditorMainWindow::EditorMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
-	map_ = 0;
 	camera_ = 0;
 
 	ui.setupUi(this);
 	QApplication::connect(ui.action_Open, SIGNAL(triggered()), this, SLOT(openRequested()));
 	QApplication::connect(ui.action_Save, SIGNAL(triggered()), this, SLOT(saveRequested()));
+	QApplication::connect(ui.actionDerive_map, SIGNAL(triggered()), this, SLOT(deriveMap()));
 	QApplication::connect(ui.action_Quit, SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
 	QApplication::connect(ui.actionZoom_In, SIGNAL(triggered()), this, SLOT(zoominRequested()));
 	QApplication::connect(ui.actionZoom_Out, SIGNAL(triggered()), this, SLOT(zoomoutRequested()));
@@ -141,6 +143,26 @@ void EditorMainWindow::saveRequested() {
 	std::string scenarioData;
 	wml::write(scenario_, scenarioData);
 	sys::write_file(fname_, scenarioData);
+}
+
+void EditorMainWindow::deriveMap() {
+	DeriveMapDialog dialog(*map_);
+	dialog.exec();
+	if(dialog.result()) {
+		scenario_ = wml::parse_wml(formatter() <<
+"[scenario]\n"
+"map_data=\"" << dialog.result()->write() << "\"\n"
+"[/scenario]");
+		fname_.clear();
+		parties_.clear();
+		ui.editorGLWidget->setParties(&parties_);
+		ui.editorGLWidget->setMap(dialog.result().get());
+		map_ = dialog.result();
+
+		camera_->set_pan_y(-(map_->size().y()-1));
+		ui.horizontalScrollBar->setMaximum(map_->size().x());
+		ui.verticalScrollBar->setMaximum(map_->size().y());
+	}
 }
 
 void EditorMainWindow::zoominRequested() {
@@ -277,7 +299,7 @@ bool EditorMainWindow::openMap(wml::const_node_ptr node) {
 		::close(fd);
 	}
 
-	map_ = new hex::gamemap(mapdata);
+	map_.reset(new hex::gamemap(mapdata));
 	camera_ = new hex::camera(*map_);
 	camera_->allow_keyboard_panning();
 
@@ -285,7 +307,7 @@ bool EditorMainWindow::openMap(wml::const_node_ptr node) {
 	ui.horizontalScrollBar->setMaximum(map_->size().x());
 	ui.verticalScrollBar->setMaximum(map_->size().y());
 
-	ui.editorGLWidget->setMap(map_);
+	ui.editorGLWidget->setMap(map_.get());
 	ui.editorGLWidget->setCamera(camera_);
 	ui.editorGLWidget->setEnabled(true);
 

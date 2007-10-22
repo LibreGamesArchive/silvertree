@@ -21,7 +21,7 @@ namespace hex
 
 boost::shared_ptr<gamemap> generate_zoom_map(
     const gamemap& input, const location& top_left, const location& src_dim,
-	const location& dim, double height_scale, double height_randomness);
+	const location& dim, double height_scale, double randomness);
 
 }
 
