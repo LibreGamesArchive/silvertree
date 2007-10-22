@@ -18,6 +18,7 @@
 #include <iostream>
 #include <set>
 #include <sstream>
+#include <fstream>
 #include <stack>
 #include <vector>
 
@@ -76,25 +77,23 @@ int main(int argc, char** argv)
 	wml::node_ptr game_cfg;
 
 	{
-		const int fd = open("data/terrain.cfg",O_RDONLY);
-		if(fd < 0) {
-			std::cerr << "could not open map\n";
-			return -1;
-		}
+		std::ifstream file("data/terrain.cfg");
+		if(!file.is_open())
+			{
+				std::cerr << "could not open map\n";
+				exit(2);
+			}
 
-		struct stat fileinfo;
-		fstat(fd,&fileinfo);
-
-		std::vector<char> filebuf(fileinfo.st_size);
-		read(fd,&filebuf[0],fileinfo.st_size);
-		std::string doc(filebuf.begin(),filebuf.end());
+		std::stringstream ss;
+		ss << file.rdbuf();
+		file.close();
+		std::string doc(ss.str());
 		try {
 			game_cfg = wml::parse_wml(doc);
 		} catch(...) {
 			std::cerr << "error parsing WML...\n";
 			return -1;
 		}
-		close(fd);
 	}
 
 
