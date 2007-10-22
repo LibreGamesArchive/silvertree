@@ -97,9 +97,9 @@ Export("editor_env")
 silvertree, editor = SConscript("src/SConscript", build_dir = join("build", env["Build"]))
 
 if env["Build"] == "debug":
-    ExecutableSuffix = "-debug"
+    ExecutableSuffix = "-debug" + env["PROGSUFFIX"]
 else:
-    ExecutableSuffix = ""
+    ExecutableSuffix = env["PROGSUFFIX"]
 env.Default(env.Alias("silvertreerpg", env.InstallAs("./silvertreerpg" + ExecutableSuffix, silvertree)))
 if editor:
     editor_env.Alias("editor", editor_env.InstallAs("./silvertreeedit" + ExecutableSuffix, editor))

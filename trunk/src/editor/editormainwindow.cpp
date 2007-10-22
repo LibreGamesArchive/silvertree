@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include <QtGui/QFileDialog>
 #include <QtGui/QScrollBar>
@@ -294,17 +296,14 @@ bool EditorMainWindow::openMap(wml::const_node_ptr node) {
 	if(node->has_attr("map_data")) {
 		mapdata = (*node)["map_data"];
 	} else {
-		const int fd = open((*node)["map"].c_str(),O_RDONLY);
-		if(fd < 0) {
+		std::ifstream file((*node)["map"].c_str());
+		if(!file.is_open()) {
 			return false;
 		}
-		struct stat fileinfo;
-		fstat(fd,&fileinfo);
-
-		std::vector<char> filebuf(fileinfo.st_size);
-		read(fd,&filebuf[0],fileinfo.st_size);
-		mapdata.assign(filebuf.begin(),filebuf.end());
-		::close(fd);
+		std::stringstream ss;
+		ss << file.rdbuf();
+		file.close();
+		mapdata = ss.str();
 	}
 
 	map_.reset(new hex::gamemap(mapdata));
