@@ -131,6 +131,7 @@ wml_writer.hpp \
 world_fwd.hpp \
 world.hpp \
 xml/xml.h \
+zoom_map_generator.hpp \
 \
 base_terrain.cpp \
 battle_character.cpp \
@@ -223,4 +224,5 @@ wml_parser.cpp \
 wml_utils.cpp \
 wml_writer.cpp \
 world.cpp \
-xml/xml.c
+xml/xml.c \
+zoom_map_generator.cpp
