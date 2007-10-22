@@ -19,9 +19,11 @@ EditPartyDialog::EditPartyDialog(wml::node_ptr party, QWidget* parent)
 	if(!generators_node) {
 		generators_node = wml::parse_wml(sys::read_file("data/character_generators.cfg"));
 		if(generators_node) {
-			generators = wml::child_nodes(generators_node, "character");
+			generators = wml::child_nodes(generators_node, "character_generator");
 		}
 	}
+
+	std::cerr << "generators: " << generators.size() << "\n";
 
 	ui_.setupUi(this);
 
@@ -103,7 +105,7 @@ void EditPartyDialog::addMember()
 		return;
 	}
 
-	wml::node_ptr c = wml::deep_copy(generators.front());
+	wml::node_ptr c = wml::deep_copy(generators.front(), "character");
 	party_->add_child(c);
 	ui_.membersListWidget->addItem(QString((*c)["description"].c_str()));
 	ui_.membersListWidget->setCurrentRow(ui_.membersListWidget->count()-1);
@@ -153,7 +155,7 @@ void EditPartyDialog::changeGenerator(int index)
 
 		for(wml::node::const_all_child_iterator i = generator->begin_children();
 		    i != generator->end_children(); ++i) {
-			member->add_child(wml::deep_copy(*i));
+			member->add_child(wml::deep_copy(*i, "character"));
 		}
 
 		assert(ui_.membersListWidget->currentItem());
