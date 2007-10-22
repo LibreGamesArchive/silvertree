@@ -165,7 +165,7 @@ void EditorMainWindow::deriveMap() {
 		ui.horizontalScrollBar->setMaximum(map_->size().x());
 		ui.verticalScrollBar->setMaximum(map_->size().y());
 
-		ui.editorGLWidget->setMap(map_.get());
+		ui.editorGLWidget->setMap(map_);
 		ui.editorGLWidget->setCamera(camera_);
 		ui.editorGLWidget->setEnabled(true);
 	
@@ -315,7 +315,7 @@ bool EditorMainWindow::openMap(wml::const_node_ptr node) {
 	ui.horizontalScrollBar->setMaximum(map_->size().x());
 	ui.verticalScrollBar->setMaximum(map_->size().y());
 
-	ui.editorGLWidget->setMap(map_.get());
+	ui.editorGLWidget->setMap(map_);
 	ui.editorGLWidget->setCamera(camera_);
 	ui.editorGLWidget->setEnabled(true);
 

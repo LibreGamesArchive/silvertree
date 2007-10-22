@@ -21,6 +21,8 @@
 #include <set>
 #include <stack>
 
+#include "boost/shared_ptr.hpp"
+
 #include "../map_avatar.hpp"
 #include "../camera.hpp"
 #include "../gamemap.hpp"
@@ -38,7 +40,7 @@ class EditorGLWidget : public QGLWidget
 	typedef std::map<hex::location,hex::map_avatar_ptr> avatar_map;
 	public:
 		EditorGLWidget(QWidget *parent = 0);
-		void setMap(hex::gamemap *map);
+		void setMap(boost::shared_ptr<hex::gamemap> map);
 		void setCamera(hex::camera *camera);
 		void setParties(party_map* parties);
 		void undo();
@@ -68,7 +70,7 @@ class EditorGLWidget : public QGLWidget
 
 	private:
 		void getAvatarPos(const hex::location& loc, GLfloat* pos);
-		hex::gamemap *map_;
+		boost::shared_ptr<hex::gamemap> map_;
 		hex::camera *camera_;
 		hex::location selected_;
 		bool show_grid_;
