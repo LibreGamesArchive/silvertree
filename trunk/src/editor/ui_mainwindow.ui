@@ -61,14 +61,6 @@
      <height>27</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_File" >
-    <property name="title" >
-     <string>&amp;File</string>
-    </property>
-    <addaction name="action_Open" />
-    <addaction name="action_Save" />
-    <addaction name="action_Quit" />
-   </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
      <string>Edit</string>
@@ -82,6 +74,15 @@
     </property>
     <addaction name="actionZoom_In" />
     <addaction name="actionZoom_Out" />
+   </widget>
+   <widget class="QMenu" name="menu_File" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_Open" />
+    <addaction name="action_Save" />
+    <addaction name="actionDerive_map" />
+    <addaction name="action_Quit" />
    </widget>
    <addaction name="menu_File" />
    <addaction name="menuEdit" />
@@ -198,6 +199,11 @@
    </property>
    <property name="shortcut" >
     <string/>
+   </property>
+  </action>
+  <action name="actionDerive_map" >
+   <property name="text" >
+    <string>Derive map...</string>
    </property>
   </action>
  </widget>

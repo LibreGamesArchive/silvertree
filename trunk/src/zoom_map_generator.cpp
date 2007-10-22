@@ -18,7 +18,7 @@ GLfloat distance_between_points(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2)
 
 boost::shared_ptr<gamemap> generate_zoom_map(
     const gamemap& map, const location& top_left, const location& src_dim,
-	const location& dim, double height_scale, double height_randomness)
+	const location& dim, double height_scale, double randomness)
 {
 	std::cerr << "zoom map: " << top_left.x() << ", " << top_left.y() << "\n";
 	std::vector<GLfloat> heights;
@@ -31,7 +31,7 @@ boost::shared_ptr<gamemap> generate_zoom_map(
 			GLfloat ytmp = ypos;
 			GLfloat xtmp = xpos;
 
-			const tile* src_tile = map.closest_tile(&xtmp, &ytmp);
+			const tile* src_tile = map.closest_tile(&xtmp, &ytmp, false);
 			assert(src_tile);
 
 			std::vector<tile::point> closest_points;
@@ -51,7 +51,6 @@ boost::shared_ptr<gamemap> generate_zoom_map(
 
 				const tile::point& p = src_tile->corners()[n];
 				const GLfloat distance = distance_between_points(xpos, ypos, p.x, p.y);
-				std::cerr << "DISTANCE: " << distance << "\n";
 				if(distance < max_distance) {
 					*max_point = p;
 				}
@@ -92,7 +91,7 @@ boost::shared_ptr<gamemap> generate_zoom_map(
 				const tile& t = map.get_tile(closest_loc);
 				if(t.terrain()->overlap_priority() > src_tile->terrain()->overlap_priority()) {
 					const GLfloat distance = distance_between_points(xpos, ypos, tile::translate_x(src_tile->loc()), tile::translate_y(src_tile->loc()));
-					const GLfloat chance_replace = distance/(distance + closest_distance);
+					const GLfloat chance_replace = (distance/(distance + closest_distance))*randomness;
 					if((rand()%100) < chance_replace*100.0) {
 						src_tile = &t;
 					}

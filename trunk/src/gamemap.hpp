@@ -28,6 +28,7 @@ class gamemap
 public:
 	explicit gamemap(const std::string& data);
 	gamemap(const std::vector<tile>& tiles, const location& dim);
+	void copy_from(const gamemap& m);
 
 	std::string write() const;
 
@@ -36,7 +37,7 @@ public:
 	tile& get_tile(const location& loc);
 	bool is_loc_on_map(const location& loc) const;
 
-	const tile* closest_tile(GLfloat* x, GLfloat* y) const;
+	const tile* closest_tile(GLfloat* x, GLfloat* y, bool return_null_outside_border=true) const;
 
 	struct parse_error {
 		parse_error(const std::string& msg)
@@ -54,6 +55,8 @@ public:
 	void set_feature(const hex::location& loc, const std::string& feature_id);
 
 private:
+	gamemap(const gamemap&);
+	void operator=(const gamemap&);
 
 	void parse(const std::string& data);
 	void init_tiles();

@@ -20,6 +20,7 @@ class EditorMainWindow : public QMainWindow
 	public slots:
 		void openRequested();
 		void saveRequested();
+		void deriveMap();
 		void zoominRequested();
 		void zoomoutRequested();
 		void horzScroll(int value);
@@ -39,7 +40,7 @@ class EditorMainWindow : public QMainWindow
 	private:
 		Ui::MainWindow ui;
 		hex::camera *camera_;
-		hex::gamemap *map_;
+		boost::shared_ptr<hex::gamemap> map_;
 		wml::node_ptr scenario_;
 		bool opened_;
 		std::map<hex::location,wml::node_ptr> parties_;

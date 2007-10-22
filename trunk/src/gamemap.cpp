@@ -40,6 +40,15 @@ gamemap::gamemap(const std::vector<tile>& tiles,
 	init_tiles();
 }
 
+void gamemap::copy_from(const gamemap& m)
+{
+	map_ = m.map_;
+	dim_ = m.dim_;
+
+	assert(dim_.x()*dim_.y() == map_.size());
+	init_tiles();
+}
+
 const tile& gamemap::get_tile(const location& loc) const
 {
 	const unsigned int index = loc.y()*dim_.x() + loc.x();
@@ -60,7 +69,7 @@ bool gamemap::is_loc_on_map(const location& loc) const
 	       loc.x() < dim_.x() && loc.y() < dim_.y();
 }
 
-const tile* gamemap::closest_tile(GLfloat* xloc, GLfloat* yloc) const
+const tile* gamemap::closest_tile(GLfloat* xloc, GLfloat* yloc, bool return_null_outside_border) const
 {
 	GLfloat& x = *xloc;
 	GLfloat& y = *yloc;
@@ -82,6 +91,24 @@ const tile* gamemap::closest_tile(GLfloat* xloc, GLfloat* yloc) const
 	if(y - yint > 0.5) {
 		y += 1.0;
 		++yint;
+	}
+
+	if(!return_null_outside_border) {
+		if(xint < 0) {
+			xint = 0;
+		}
+
+		if(xint >= dim_.x()) {
+			xint = dim_.x()-1;
+		}
+
+		if(yint < 0) {
+			yint = 0;
+		}
+
+		if(yint >= dim_.y()) {
+			yint = dim_.y()-1;
+		}
 	}
 
 	if(xint < 0 || yint < 0 || xint >= dim_.x() || yint >= dim_.y()) {

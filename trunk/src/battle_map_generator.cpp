@@ -65,7 +65,7 @@ void calculate_route(const hex::location& src, const hex::location& dst,
 boost::shared_ptr<hex::gamemap> generate_battle_map(
            const hex::gamemap& world_map, const hex::location& loc)
 {
-	return hex::generate_zoom_map(world_map, hex::location(loc.x()-2,loc.y()-2), hex::location(5,5), hex::location(50,50), 1.0, 0.0);
+	return hex::generate_zoom_map(world_map, hex::location(loc.x()-2,loc.y()-2), hex::location(5,5), hex::location(50,50), 1.0, 1.0);
 	hex::location adj[6];
 	get_adjacent_tiles(loc,adj);
 

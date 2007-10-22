@@ -28,6 +28,10 @@ public:
 		return stream_.str();
 	}
 
+	const char* c_str() {
+		return str().c_str();
+	}
+
 	operator std::string() {
 		return stream_.str();
 	}
