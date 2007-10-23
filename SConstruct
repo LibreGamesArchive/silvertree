@@ -8,7 +8,9 @@ opts.AddOptions(
     ("BOOSTDIR", "Root directory of boost installation.", "/usr/include"),
     ("BOOSTLIBS", "Directory where boost libs are located.", "/usr/lib"),
     ("BOOST_SUFFIX", "Suffix of the boost regex library.", ""),
-    EnumOption("Build", "Build variant: debug or release", "release", ["debug", "release"], ignorecase=1)
+    EnumOption("Build", "Build variant: debug or release", "release", ["debug", "release"], ignorecase=1),
+    ("EXTRA_FLAGS_RELEASE", "Extra compiler/linker flags to use in release build variant.(e.g. \"-O3 -march=prescott\")", ""),
+    ("EXTRA_FLAGS_DEBUG", "Extra compiler/linker flags to use in debug build variant.", "")
 )
 
 env = Environment(tools = [], toolpath = ["scons"], options = opts)
@@ -86,6 +88,9 @@ if "gcc" in env["TOOLS"]:
         ccflags.append("-ggdb")
     env.AppendUnique(CCFLAGS = ccflags, LINKFLAGS = linkflags)
     editor_env.AppendUnique(CCFLAGS = ccflags, LINKFLAGS = linkflags)
+
+env.MergeFlags(env["EXTRA_FLAGS_" + env["Build"].upper()], unique=0)
+editor_env.MergeFlags(env["EXTRA_FLAGS_" + env["Build"].upper()], unique=0)
 
 namegen = env.Program("utilities/names/namegen", "utilities/names/namegen.cpp")
 Alias("namegen", namegen)
