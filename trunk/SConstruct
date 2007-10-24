@@ -4,6 +4,7 @@ from os.path import join
 opts = Options("options.cache")
 opts.AddOptions(
     ("QTDIR", "Root directory of Qt's installation.", "/usr/"),
+    EnumOption("GL_IMPL_MAC", "Mac-specific: OpenGL implementation to be used: Mesa 3D or Apple.", "mesa", ["mesa", "apple"], ignorecase=1),
     ("SDLDIR", "Root directory of SDL's installation.", "/usr/"),
     ("BOOSTDIR", "Root directory of boost installation.", "/usr/include"),
     ("BOOSTLIBS", "Directory where boost libs are located.", "/usr/lib"),
@@ -31,6 +32,12 @@ Additional options:
 Help(opts.GenerateHelpText(env))
 
 print "Configuring for " + env["PLATFORM"] + " platform..."
+if env["PLATFORM"] == "darwin":
+    env.AppendUnique(LIBPATH = ["/sw/lib"])
+    if env["GL_IMPL_MAC"] == "mesa":
+        env.AppendUnique(LIBPATH = ["/sw/lib/mesa"], CPPPATH = ["/sw/include/mesa"])
+    if env["GL_IMPL_MAC"] == "apple":
+        env.AppendUnique(FRAMEWORKS = ["OpenGL"], CPPPATH = ["/System/Library/Frameworks/OpenGL.framework/Headers"])
 if env["PLATFORM"] == "posix" or env["PLATFORM"] == "darwin":
     env.ParseConfig("sdl-config --cflags --libs")
 if env["PLATFORM"] == "win32":
