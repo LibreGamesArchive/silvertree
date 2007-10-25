@@ -38,6 +38,12 @@ You can of course merge functions together. For instance, to make sun light pure
 
 sun_light=if(hour >= 6 and hour <= 18, rgb(100,100,100), rgb(0,0,0))
 
+The 'transition' function is used to map a value from one scale to another.
+
+transition(value, min1, min2, max1, max2)
+
+For instance, a healer that charges 1 trinka per percent of health restored would have a healing_cost=(hitpoints, max_hitpoints, 0, 0, 100) (we're of course inverting the scale in the process in this example.)
+
 = Objects and Lists =
 
 It is also possible for formulas to have 'objects' as inputs. An object is an input that contains other values. For instance, a party is an input. When an 'encounter' event is fired, the input to all formulas in the event handler contains 'pc' which is an object referring to the character's party, and 'npc', which is an object referring to the NPC party the PC has encountered.
