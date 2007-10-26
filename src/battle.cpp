@@ -20,6 +20,7 @@
 #include "formatter.hpp"
 #include "font.hpp"
 #include "foreach.hpp"
+#include "frustum.hpp"
 #include "initiative_bar.hpp"
 #include "keyboard.hpp"
 #include "label.hpp"
@@ -141,6 +142,7 @@ void battle::player_turn(battle_character& c)
 			draw();
 		}
 
+		bool mouse_moved = false;
 		SDL_Event event;
 		while(SDL_PollEvent(&event)) {
 			if(stats_dialogs_process_event(event)) {
@@ -201,9 +203,13 @@ void battle::player_turn(battle_character& c)
 					handle_mouse_button_down(event.button);
 					break;
 			    case SDL_MOUSEMOTION:
-					handle_time_cost_popup();
+					mouse_moved = true;
 					break;
 			}
+		}
+
+		if(mouse_moved) {
+			handle_time_cost_popup();
 		}
 
 		camera_controller_.keyboard_control();
@@ -272,11 +278,10 @@ hex::location battle::selected_loc()
 
 	using hex::tile;
 	camera_controller_.prepare_selection();
-	const std::vector<tile>& tiles = map_.tiles();
 	GLuint select_name = 0;
-	foreach(const tile& t, tiles) {
+	foreach(const tile* t, tiles_) {
 		glLoadName(select_name++);
-		t.draw();
+		t->draw();
 	}
 
 	select_name = camera_controller_.finish_selection();
@@ -284,10 +289,10 @@ hex::location battle::selected_loc()
 		return hex::location();
 	}
 
-	tracked_tile_ = &(tiles[select_name]);
+	tracked_tile_ = tiles_[select_name];
 	tracked_tile_->attach_tracker(&hex_tracker_);
 
-	return tiles[select_name].loc();
+	return tiles_[select_name]->loc();
 }
 
 battle_character_ptr battle::mouse_selected_char() {
@@ -338,6 +343,7 @@ battle_character_ptr battle::selected_char()
 
 void battle::draw(gui::slider* slider)
 {
+	std::cerr << "drawing " << SDL_GetTicks() << "\n";
 	using hex::tile;
 	using hex::location;
 
@@ -372,30 +378,34 @@ void battle::draw(gui::slider* slider)
 	}
 
 	camera_.prepare_frame();
+	if(focus_ != chars_.end() && current_focus_ != (*focus_)->loc() || camera_.moved_since_last_check()) {
+		rebuild_visible_tiles();
+	}
 
 	tile::setup_drawing();
-	const std::vector<tile>& tiles = map_.tiles();
-	foreach(const tile& t, tiles) {
-		const bool dim = highlight_moves_ && moves_.count(t.loc()) == 0
-		        || highlight_targets_ && targets_.count(t.loc()) == 0;
+	foreach(const tile* t, tiles_) {
+		const bool dim = highlight_moves_ && moves_.count(t->loc()) == 0
+		        || highlight_targets_ && targets_.count(t->loc()) == 0;
 		if(dim) {
 			glEnable(GL_LIGHT2);
 			glDisable(GL_LIGHT0);
 		}
-		t.draw();
-		t.draw_model();
+		t->draw();
+		t->draw_model();
 		if(dim) {
 			glEnable(GL_LIGHT0);
 			glDisable(GL_LIGHT2);
 		}
 	}
 
-	tile::finish_drawing();
-
-	foreach(const tile& t, tiles) {
-		t.draw_cliffs();
+	foreach(const tile* t, tiles_) {
+		t->draw_cliffs();
 	}
 
+	hex::tile::draw_features(&tiles_[0], &tiles_[0] + tiles_.size(),
+				 features_cache_);
+
+	tile::finish_drawing();
 
 	glDisable(GL_LIGHTING);
 
@@ -501,6 +511,7 @@ void battle::draw(gui::slider* slider)
 		i->second->draw();
 	}
 
+	std::cerr << "draw done...\n";
 
 	SDL_GL_SwapBuffers();
 	SDL_Delay(1);
@@ -984,7 +995,6 @@ bool battle::stats_dialogs_process_event(const SDL_Event& e) {
 void battle::handle_time_cost_popup()
 {
 	battle_character_ptr attacker = *focus_;
-	battle_character_ptr defender = selected_char();
 
 	if(highlight_moves_ ) {
 		const battle_character::move_map::const_iterator move = moves_.find(selected_loc());
@@ -999,6 +1009,7 @@ void battle::handle_time_cost_popup()
 			initiative_bar_->focus_character(attacker.get(), 0);
 		}
 	} else if(highlight_targets_) {
+		battle_character_ptr defender = selected_char();
 		assert(current_move_);
 		if(current_move_->can_attack()) {
 			/* attack cost */
@@ -1090,6 +1101,83 @@ const_battle_character_ptr battle::is_engaged(
 	}
 
 	return const_battle_character_ptr();
+}
+
+namespace {
+hex::frustum view_volume;
+}
+
+void battle::rebuild_visible_tiles()
+{
+	std::cerr << "rebuild visible tiles\n";
+	tiles_.clear();
+	hex::frustum::initialize();
+	view_volume.set_volume_clip_space(-1, 1, -1, 1, -1, 1);
+	const hex::location& loc = (*focus_)->loc();
+	current_focus_ = loc;
+
+	hex::location hex_dir[6];
+	hex::get_adjacent_tiles(loc, hex_dir);
+	int core_radius = 1;
+	bool done = false;
+	while(!done) {
+		for(int n = 0; n != 6; ++n) {
+			hex_dir[n] = hex::tile_in_direction(hex_dir[n], static_cast<hex::DIRECTION>(n));
+			if(!map_.is_loc_on_map(hex_dir[n])) {
+				done = true;
+				break;
+			}
+
+			const hex::tile& t = map_.get_tile(hex_dir[n]);
+			if(!view_volume.intersects(t)) {
+				done = true;
+				break;
+			}
+		}
+
+		++core_radius;
+	}
+
+	done = false;
+	std::vector<hex::location> hexes;
+	for(int radius = 0; !done; ++radius) {
+		hexes.clear();
+		hex::get_tile_ring(loc, radius, hexes);
+		done = true;
+		foreach(const hex::location& location, hexes) {
+			if(!map_.is_loc_on_map(location)) {
+				continue;
+			}
+
+			const hex::tile& t = map_.get_tile(location);
+			if(radius >= core_radius && !view_volume.intersects(t)) {
+				//see if this tile has a cliff which is visible, in which case ew should draw it
+				const hex::tile* cliffs[6];
+				const int num_cliffs = t.neighbour_cliffs(cliffs);
+				bool found = false;
+				for(int n = 0; n != num_cliffs; ++n) {
+					if(view_volume.intersects(*cliffs[n])) {
+						found = true;
+						break;
+					}
+				}
+
+				if(!found) {
+					continue;
+				}
+			} else {
+				done = false;
+			}
+
+			tiles_.push_back(&t);
+			tiles_.back()->load_texture();
+		}
+	}
+
+	std::sort(tiles_.begin(), tiles_.end(), hex::tile::compare_texture());
+
+	hex::tile::initialize_features_cache(
+		&tiles_[0], &tiles_[0] + tiles_.size(), &features_cache_);
 }
 
 }

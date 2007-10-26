@@ -99,7 +99,12 @@ private:
 	std::vector<battle_character_ptr> chars_;
 	std::vector<battle_character_ptr>::iterator focus_;
 	const hex::gamemap& map_;
+
+	void rebuild_visible_tiles();
+	std::vector<const hex::tile*> tiles_;
+	hex::location current_focus_;
 	battle_character::move_map moves_;
+	hex::tile::features_cache features_cache_;
 	bool highlight_moves_;
 	bool enter_attack_mode();
 	bool enter_target_mode();

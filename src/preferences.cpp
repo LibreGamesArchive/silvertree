@@ -20,6 +20,7 @@ int screen_width = 1024;
 int screen_height = 768;
 bool fullscreen = false;
 std::string save_file;
+std::string scenario_file = "data/scenario.cfg";
 
 GLenum mipmap_arg_to_type(const std::string& arg) {
 	if(arg == "l") {
@@ -75,6 +76,8 @@ bool parse_arg(const std::string& arg)
 		}
 	} else if(util::string_starts_with(arg, "--save=")) {
 		save_file = sys::get_saves_dir() + "/" + util::strip_string_prefix(arg, "--save=");
+	} else if(util::string_starts_with(arg, "--scenario=")) {
+		scenario_file = util::strip_string_prefix(arg, "--scenario=");
 	} else {
 		std::cerr << "unrecognized argument: '" << arg << "'\n";
 		return false;
@@ -125,6 +128,11 @@ unsigned int preference_fullscreen()
 const std::string& preference_save_file()
 {
 	return save_file;
+}
+
+const std::string& preference_scenario_file()
+{
+	return scenario_file;
 }
 
 bool parse_args(int argc, char** argv)
