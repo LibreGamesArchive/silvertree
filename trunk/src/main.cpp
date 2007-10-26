@@ -161,7 +161,7 @@ extern "C" int main(int argc, char** argv)
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
 	wml::node_ptr scenario_cfg;
-	std::string save_file = "data/scenario.cfg";
+	std::string save_file = preference_scenario_file();
 
 	if(!preference_save_file().empty() && sys::file_exists(preference_save_file())) {
 		save_file = preference_save_file();
