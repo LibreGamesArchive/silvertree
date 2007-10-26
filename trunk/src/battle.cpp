@@ -906,7 +906,7 @@ void battle::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
 			}
 		} else if(highlight_targets_) {
 			hex::location loc = selected_loc();
-			if(map_.is_loc_on_map(loc)) {
+			if(map_.is_loc_on_map(loc) && targets_.count(loc)) {
 				turn_done_ = true;
 				target_mod(**focus_, loc, *current_move_);
 			}
