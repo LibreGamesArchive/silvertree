@@ -76,6 +76,8 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
 	initiative_bar_->set_dim(30, graphics::screen_height()/2);
 
 	widgets_.push_back(initiative_bar_);
+
+	std::sort(chars_.begin(), chars_.end(), battle_char_less);
 }
 
 void battle::play()
@@ -347,12 +349,14 @@ void battle::draw(gui::slider* slider)
 	using hex::tile;
 	using hex::location;
 
-	if(focus_ != chars_.end()) {
-		GLfloat pos[3];
-		GLfloat rotate;
-		(*focus_)->get_pos(pos, &rotate);
-		camera_.set_pan(pos);
+	if(focus_ == chars_.end()) {
+		focus_ = chars_.begin();
 	}
+
+	GLfloat pos[3];
+	GLfloat rotate;
+	(*focus_)->get_pos(pos, &rotate);
+	camera_.set_pan(pos);
 
 	battle_character::move_map::const_iterator selected_move = moves_.end();
 	hex::location selected_hex;

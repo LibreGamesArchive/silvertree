@@ -80,9 +80,13 @@ public:
 	int current_time() const { return current_time_; }
 	GLfloat animation_time() const { return sub_time_; }
 	const battle_character_ptr active_character() const { return *focus_; }
+
+	hex::camera& camera() { return camera_; }
+	const hex::camera& camera() const { return camera_; }
+
+	void draw(gui::slider* slider=NULL);
 private:
 	void remove_widget(gui::const_widget_ptr w);
-	void draw(gui::slider* slider=NULL);
 	void draw_route(const battle_character::route& r);
 	hex::location selected_loc();
 	battle_character_ptr selected_char();
