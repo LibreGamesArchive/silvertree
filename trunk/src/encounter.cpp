@@ -39,20 +39,21 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		return;
 	}
 
-	const GLfloat q = 0.9;
 	//zoom in to the battle
 	graphics::frame_skipper skippy(50, preference_maxfps());
 	const GLfloat start_zoom = p1->game_world().camera().zoom();
+	graphics::texture framebuffer = graphics::texture::get_frame_buffer();
 	for(int n = 0; n != 100 && p1->game_world().camera().zoom() < p1->game_world().camera().max_zoom(); ++n) {
 		if(skippy.skip_frame()) {
 			continue;
 		}
 
 		p1->game_world().camera().zoom_in();
+		p1->game_world().camera().zoom_in();
 		p1->game_world().draw();
-		glAccum(GL_MULT, q);
-		glAccum(GL_ACCUM, 1.0 - q);
-		glAccum(GL_RETURN, 1.0);
+		glColor4f(1.0,1.0,1.0,0.8);
+		graphics::blit_texture(framebuffer, 0, 0, graphics::screen_width(), -graphics::screen_height());
+		framebuffer = graphics::texture::get_frame_buffer();
 		SDL_GL_SwapBuffers();
 	}
 
@@ -86,15 +87,23 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 
 	const GLfloat target_zoom = b.camera().zoom();
 	b.camera().set_zoom(b.camera().min_zoom());
+	skippy.reset();
 	while(b.camera().zoom() < target_zoom) {
 		if(skippy.skip_frame()) {
 			continue;
 		}
 
 		b.camera().zoom_in();
-		b.draw(NULL);
+		b.camera().zoom_in();
+		b.draw(NULL, false);
+		glColor4f(1.0,1.0,1.0,0.8);
+		graphics::blit_texture(framebuffer, 0, 0, graphics::screen_width(), -graphics::screen_height());
+		framebuffer = graphics::texture::get_frame_buffer();
 		SDL_GL_SwapBuffers();
 	}
+
+	//free up the space taken by the frame buffer texture
+	framebuffer = graphics::texture();
 
 	b.play();
 

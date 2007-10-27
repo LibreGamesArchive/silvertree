@@ -11,6 +11,7 @@
    See the COPYING file for more details.
 */
 #include "preferences.hpp"
+#include "raster.hpp"
 #include "surface_cache.hpp"
 #include "texture.hpp"
 #include <GL/gl.h>
@@ -192,7 +193,7 @@ texture::texture(const key& surfs, options_type options)
 		SDL_BlitSurface(i->get(),NULL,s.get(),NULL);
 	}
 
-	id_ = boost::shared_ptr<ID>(new ID(get_texture_id()));
+	id_.reset(new ID(get_texture_id()));
 
 	glBindTexture(GL_TEXTURE_2D,id_->id);
 	if(preference_mipmapping() && !options[NO_MIPMAP]) {
@@ -227,6 +228,35 @@ void texture::set_as_current_texture() const
 	glBindTexture(GL_TEXTURE_2D,id_->id);
 	width_multiplier = ratio_w_;
 	height_multiplier = ratio_h_;
+}
+
+texture texture::get_frame_buffer()
+{
+	texture t;
+	t.id_.reset(new ID(get_texture_id()));
+	int width = screen_width();
+	int height = screen_height();
+
+	int actual_width = width;
+	int actual_height = height;
+	t.ratio_w_ = 1.0;
+	t.ratio_h_ = 1.0;
+
+	if(!npot_allowed) {
+		actual_width = actual_height =
+		   std::max(next_power_of_2(actual_width),
+		            next_power_of_2(actual_height));
+		t.ratio_w_ = GLfloat(width)/GLfloat(actual_width);
+		t.ratio_h_ = GLfloat(height)/GLfloat(actual_height);
+	}
+
+	t.width_ = actual_width;
+	t.height_ = actual_height;
+
+	t.set_as_current_texture();
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, actual_width, actual_height, 0);
+
+	return t;
 }
 
 texture texture::get(const std::string& str, options_type options)

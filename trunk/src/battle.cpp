@@ -142,6 +142,8 @@ void battle::player_turn(battle_character& c)
 
 		if(!skippy_.skip_frame()) {
 			draw();
+			SDL_GL_SwapBuffers();
+			SDL_Delay(1);
 		}
 
 		bool mouse_moved = false;
@@ -343,7 +345,7 @@ battle_character_ptr battle::selected_char()
 	return battle_character_ptr();
 }
 
-void battle::draw(gui::slider* slider)
+void battle::draw(gui::slider* slider, bool draw_widgets)
 {
 	std::cerr << "drawing " << SDL_GetTicks() << "\n";
 	using hex::tile;
@@ -469,6 +471,9 @@ void battle::draw(gui::slider* slider)
 	particle_system_.draw();
 
 	graphics::prepare_raster();
+	if(!draw_widgets) {
+		return;
+	}
 
 	if(slider) {
 		slider->draw();
@@ -514,11 +519,7 @@ void battle::draw(gui::slider* slider)
 	    i != stats_dialogs_.end(); ++i) {
 		i->second->draw();
 	}
-
 	std::cerr << "draw done...\n";
-
-	SDL_GL_SwapBuffers();
-	SDL_Delay(1);
 }
 
 void battle::draw_route(const battle_character::route& r)
@@ -554,6 +555,8 @@ void battle::animation_frame(float t) {
 
 	if(!skippy_.skip_frame()) {
 		draw();
+		SDL_GL_SwapBuffers();
+		SDL_Delay(1);
 	}
 	/* do this to ensure key tables are updated */
 	SDL_Event e;

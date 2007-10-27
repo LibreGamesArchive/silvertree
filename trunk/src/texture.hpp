@@ -46,6 +46,7 @@ public:
 	void set_as_current_texture() const;
 	bool valid() const { return id_; }
 
+	static texture get_frame_buffer();
 	static texture get(const std::string& str, options_type options=options_type());
 	static texture get(const key& k, options_type options=options_type());
 	static texture get(const surface& surf, options_type options=options_type());

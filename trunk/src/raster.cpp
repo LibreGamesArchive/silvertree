@@ -95,7 +95,7 @@ void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate
 	h /= 2;
 	glPushMatrix();
 	tex.set_as_current_texture();
-	glTranslatef(x+w,y+h,0.0);
+	glTranslatef(x+abs(w),y+abs(h),0.0);
 	glRotatef(rotate,0.0,0.0,1.0);
 	glBegin(GL_QUADS);
 	graphics::texture::set_coord(0.0,0.0);
