@@ -282,6 +282,7 @@ void character::get_inputs(std::vector<formula_input>* inputs) const
 	inputs->push_back(formula_input("max_hitpoints", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("hp", FORMULA_READ_WRITE));
 	inputs->push_back(formula_input("hitpoints", FORMULA_READ_WRITE));
+	inputs->push_back(formula_input("skills", FORMULA_READ_WRITE));
 	inputs->push_back(formula_input("strength", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("agility", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("endurance", FORMULA_READ_ONLY));
@@ -314,6 +315,13 @@ variant character::get_value(const std::string& key) const
 		return variant(max_hitpoints());
 	} else if(key == "hp" || key == "hitpoints") {
 		return variant(hitpoints());
+	} else if(key == "skills") {
+		std::vector<variant> skills;
+		foreach(const const_skill_ptr& sk, skills_) {
+			skills.push_back(variant(sk->name()));
+		}
+
+		return variant(&skills);
 	}
 
 	return variant(base_stat(key));
@@ -324,6 +332,17 @@ void character::set_value(const std::string& key, const variant& value)
 	if(key == "hitpoints" || key == "hp") {
 		hitpoints_ = value.as_int();
 		std::cerr << "modify hitpoints to: " << hitpoints_ << "\n";
+	} else if (key == "skills") {
+		std::vector<const_skill_ptr> new_skills;
+		for(int n = 0; n != value.num_elements(); ++n) {
+			new_skills.push_back(skill::get_skill(value[n].as_string()));
+			if(!new_skills.back()) {
+				std::cerr << "unrecognized skill '" << value[n].as_string() << "'\n";
+				new_skills.pop_back();
+			}
+		}
+
+		skills_.swap(new_skills);
 	} else {
 		formula_callable::set_value(key, value);
 	}
