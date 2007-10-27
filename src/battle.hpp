@@ -84,7 +84,7 @@ public:
 	hex::camera& camera() { return camera_; }
 	const hex::camera& camera() const { return camera_; }
 
-	void draw(gui::slider* slider=NULL);
+	void draw(gui::slider* slider=NULL, bool draw_widgets=true);
 private:
 	void remove_widget(gui::const_widget_ptr w);
 	void draw_route(const battle_character::route& r);
