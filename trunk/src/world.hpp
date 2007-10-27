@@ -67,6 +67,7 @@ public:
 	void advance_time_until(const game_time& t) { time_ = t; }
 	const GLfloat& subtime() const { return subtime_; }
 
+	hex::camera& camera() { return camera_; }
 	const hex::camera& camera() const { return camera_; }
 
 	void get_parties_at(const hex::location& loc, std::vector<const_party_ptr>& chars) const;

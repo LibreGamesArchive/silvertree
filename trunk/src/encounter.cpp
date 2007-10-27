@@ -18,6 +18,7 @@
 #include "encounter.hpp"
 #include "foreach.hpp"
 #include "post_battle_dialog.hpp"
+#include "preferences.hpp"
 #include "world.hpp"
 
 #include <iostream>
@@ -38,6 +39,25 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		return;
 	}
 
+	const GLfloat q = 0.9;
+	//zoom in to the battle
+	graphics::frame_skipper skippy(50, preference_maxfps());
+	const GLfloat start_zoom = p1->game_world().camera().zoom();
+	for(int n = 0; n != 100 && p1->game_world().camera().zoom() < p1->game_world().camera().max_zoom(); ++n) {
+		if(skippy.skip_frame()) {
+			continue;
+		}
+
+		p1->game_world().camera().zoom_in();
+		p1->game_world().draw();
+		glAccum(GL_MULT, q);
+		glAccum(GL_ACCUM, 1.0 - q);
+		glAccum(GL_RETURN, 1.0);
+		SDL_GL_SwapBuffers();
+	}
+
+	p1->game_world().camera().set_zoom(start_zoom);
+
 	boost::shared_ptr<hex::gamemap> battle_map =
 	            generate_battle_map(map,p1->loc());
 
@@ -46,7 +66,7 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 	std::vector<battle_character_ptr> chars;
 	for(std::vector<character_ptr>::const_iterator i =
 	    p1->members().begin(); i != p1->members().end(); ++i) {
-		hex::location loc(22 + i - p1->members().begin(),22);
+		hex::location loc(44 + i - p1->members().begin(),44);
 		chars.push_back(battle_character::make_battle_character(
 		                    *i,*p1,loc,hex::NORTH,*battle_map,
 							p1->game_world().current_time()));
@@ -55,7 +75,7 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 
 	for(std::vector<character_ptr>::const_iterator i =
 	    p2->members().begin(); i != p2->members().end(); ++i) {
-		hex::location loc(22 + i - p2->members().begin(),28);
+		hex::location loc(44 + i - p2->members().begin(),56);
 		chars.push_back(battle_character::make_battle_character(
 		                    *i,*p2,loc,hex::NORTH,*battle_map,
 							p2->game_world().current_time()));
@@ -63,6 +83,19 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 	}
 
 	battle b(chars,*battle_map);
+
+	const GLfloat target_zoom = b.camera().zoom();
+	b.camera().set_zoom(b.camera().min_zoom());
+	while(b.camera().zoom() < target_zoom) {
+		if(skippy.skip_frame()) {
+			continue;
+		}
+
+		b.camera().zoom_in();
+		b.draw(NULL);
+		SDL_GL_SwapBuffers();
+	}
+
 	b.play();
 
 	if(p1->is_destroyed() || p2->is_destroyed()) {

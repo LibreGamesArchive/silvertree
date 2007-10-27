@@ -252,6 +252,16 @@ void camera::zoom_out()
 	moved_since_last_check_ = true;
 }
 
+GLfloat camera::max_zoom() const
+{
+	return MaxZoom;
+}
+
+GLfloat camera::min_zoom() const
+{
+	return MinZoom;
+}
+
 DIRECTION camera::direction() const
 {
 	switch(dir_) {

@@ -57,6 +57,9 @@ public:
 	void zoom_in();
 	void zoom_out();
 	GLfloat zoom() const { return zoom_; }
+	void set_zoom(GLfloat zoom) { zoom_ = zoom; }
+	GLfloat max_zoom() const;
+	GLfloat min_zoom() const;
 
 	DIRECTION direction() const;
 
