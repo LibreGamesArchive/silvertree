@@ -33,6 +33,9 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		return;
 	}
 
+	if(p2->is_human_controlled())
+		std::swap(p1, p2);
+
 	p2->encounter(*p1, "encounter");
 
 	if(!p1->is_enemy(*p2)) {
@@ -69,16 +72,16 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 	    p1->members().begin(); i != p1->members().end(); ++i) {
 		hex::location loc(44 + i - p1->members().begin(),44);
 		chars.push_back(battle_character::make_battle_character(
-		                    *i,*p1,loc,hex::NORTH,*battle_map,
+		                    *i,*p1,loc,hex::SOUTH,*battle_map,
 							p1->game_world().current_time()));
 		xp1 += (*i)->level()*10;
 	}
 
 	for(std::vector<character_ptr>::const_iterator i =
 	    p2->members().begin(); i != p2->members().end(); ++i) {
-		hex::location loc(44 + i - p2->members().begin(),56);
+		hex::location loc(44 + i - p2->members().begin(),50);
 		chars.push_back(battle_character::make_battle_character(
-		                    *i,*p2,loc,hex::NORTH,*battle_map,
+		                    *i,*p2,loc,hex::SOUTH,*battle_map,
 							p2->game_world().current_time()));
 		xp2 += (*i)->level()*10;
 	}
