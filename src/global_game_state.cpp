@@ -59,7 +59,12 @@ global_game_state& global_game_state::get()
 
 void global_game_state::reset()
 {
-	variables.clear();
+	//clean out everything except the tmp variable, if present
+	variable_map tmp_var;
+	if(variables.count("tmp")) {
+		tmp_var["tmp"] = variables["tmp"];
+	}
+	variables.swap(tmp_var);
 }
 
 void global_game_state::init(wml::const_node_ptr node)
