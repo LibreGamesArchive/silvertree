@@ -491,6 +491,24 @@ private:
 	}
 };
 
+class distance_function : public function_expression {
+public:
+	explicit distance_function(const args_list& args)
+	    : function_expression(args, 2, 2)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		const hex::location* loc1 = args()[0]->evaluate(variables).try_convert<hex::location>();
+		const hex::location* loc2 = args()[1]->evaluate(variables).try_convert<hex::location>();
+		if(!loc1 || !loc2) {
+			std::cerr << "ERROR: non-loc passed to distance\n";
+			return variant();
+		}
+
+		return variant(hex::distance_between(*loc1, *loc2));
+	}
+};
+
 expression_ptr create_function(const std::string& fn,
                                const std::vector<expression_ptr>& args)
 {
@@ -525,6 +543,8 @@ expression_ptr create_function(const std::string& fn,
 		return expression_ptr(new color_transition_function(args));
 	} else if(fn == "loc") {
 		return expression_ptr(new loc_function(args));
+	} else if(fn == "distance") {
+		return expression_ptr(new distance_function(args));
 	} else if(fn == "size") {
 		return expression_ptr(new size_function(args));
 	} else {
@@ -617,6 +637,7 @@ private:
 		case GTE: return left >= right ? variant(1) : variant(0);
 		case LT:  return left < right ? variant(1) : variant(0);
 		case GT:  return left > right ? variant(1) : variant(0);
+		case MOD: return left % right;
 		case DICE:return variant(dice_roll(left.as_int(), right.as_int()));
 		default: assert(false);
 		}
@@ -631,7 +652,7 @@ private:
 	}
 
 	enum OP { AND, OR, NEQ, LTE, GTE, GT='>', LT='<', EQ='=',
-	          ADD='+', SUB='-', MUL='*', DIV='/', DICE='d', POW='^' };
+	          ADD='+', SUB='-', MUL='*', DIV='/', DICE='d', POW='^', MOD='%' };
 
 	OP op_;
 	expression_ptr left_, right_;
@@ -760,6 +781,7 @@ int operator_precedence(const token& t)
 	static std::map<std::string,int> precedence_map;
 	if(precedence_map.empty()) {
 		int n = 0;
+		precedence_map["not"] = ++n;
 		precedence_map["where"] = ++n;
 		precedence_map["or"]    = ++n;
 		precedence_map["and"]   = ++n;
@@ -773,6 +795,7 @@ int operator_precedence(const token& t)
 		precedence_map["-"]     = n;
 		precedence_map["*"]     = ++n;
 		precedence_map["/"]     = ++n;
+		precedence_map["%"]     = ++n;
 		precedence_map["^"]     = ++n;
 		precedence_map["d"]     = ++n;
 		precedence_map["."]     = ++n;
@@ -967,6 +990,20 @@ formula_ptr formula::create_string_formula(const std::string& str)
 	formula_ptr res(new formula());
 	res->expr_.reset(new string_expression(str));
 	return res;
+}
+
+formula_ptr formula::create_optional_formula(const std::string& str)
+{
+	if(str.empty()) {
+		return formula_ptr();
+	}
+
+	try {
+		return formula_ptr(new formula(str));
+	} catch(...) {
+		std::cerr << "ERROR parsing optional formula: '" << str << "'\n";
+		return formula_ptr();
+	}
 }
 
 formula::formula(const std::string& str) : str_(str)

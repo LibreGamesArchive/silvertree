@@ -213,6 +213,17 @@ variant variant::operator/(const variant& v) const
 	return variant(int_value_ / v.int_value_);
 }
 
+variant variant::operator%(const variant& v) const
+{
+	must_be(TYPE_INT);
+	v.must_be(TYPE_INT);
+	if(v.int_value_ == 0) {
+		throw type_error(formatter() << "divide (mod) by zero error");
+	}
+
+	return variant(int_value_ % v.int_value_);
+}
+
 variant variant::operator^(const variant& v) const
 {
 	must_be(TYPE_INT);

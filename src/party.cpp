@@ -575,6 +575,8 @@ void party::get_inputs(std::vector<formula_input>* inputs) const
 	inputs->push_back(formula_input("id", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("unique_id", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("loc", FORMULA_READ_WRITE));
+	inputs->push_back(formula_input("x", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("y", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("previous", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("members", FORMULA_READ_WRITE));
 	inputs->push_back(formula_input("leader", FORMULA_READ_ONLY));
@@ -603,6 +605,10 @@ variant party::get_value(const std::string& key) const
 		return variant(id_);
 	} else if(key == "loc") {
 		return variant(new hex::location(loc_));
+	} else if(key == "x") {
+		return variant(loc_.x());
+	} else if(key == "y") {
+		return variant(loc_.y());
 	} else if(key == "previous") {
 		return variant(new hex::location(previous_loc_));
 	} else if(key == "members") {

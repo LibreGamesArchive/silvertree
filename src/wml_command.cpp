@@ -5,6 +5,7 @@
 #include "battle_character.hpp"
 #include "battle_map_generator.hpp"
 #include "character_status_dialog.hpp"
+#include "encounter.hpp"
 #include "foreach.hpp"
 #include "formula.hpp"
 #include "label.hpp"
@@ -120,6 +121,14 @@ public:
 			}
 		}
 
+		//for convenience, commands need not be put inside a 'then' tag
+		for(wml::node::const_all_child_iterator i = node->begin_children();
+		    i != node->end_children(); ++i) {
+			if((*i)->name() != "then" && (*i)->name() != "else") {
+				then_.push_back(wml_command::create(*i));
+			}
+		}
+
 		wml::const_node_ptr else_branch = node->get_child("else");
 		if(else_branch) {
 			for(wml::node::const_all_child_iterator i = else_branch->begin_children();
@@ -211,33 +220,29 @@ class battle_command : public wml_command {
 	const_wml_command_ptr onvictory_, ondefeat_;
 	void do_execute(const formula_callable& info, world& world) const {
 		const hex::location_ptr battle_loc(loc_.execute(info).convert_to<hex::location>());
-		boost::shared_ptr<hex::gamemap> battle_map =
-				generate_battle_map(world.map(), *battle_loc);
+		variant pc_chars = pc_chars_.execute(info);
+		variant npc_chars = npc_chars_.execute(info);
+
+		std::vector<character_ptr> pc_chars_vector, npc_chars_vector;
+		for(int n = 0; n != pc_chars.num_elements(); ++n) {
+			character* c = pc_chars[n].try_convert<character>();
+			if(c) {
+				pc_chars_vector.push_back(c);
+			}
+		}
+
+		for(int n = 0; n != npc_chars.num_elements(); ++n) {
+			character* c = npc_chars[n].try_convert<character>();
+			if(c) {
+				npc_chars_vector.push_back(c);
+			}
+		}
+		
 		party_ptr pc_party(pc_party_.execute(info).convert_to<party>());
 		party_ptr npc_party(npc_party_.execute(info).convert_to<party>());
 
-		std::vector<battle_character_ptr> chars;
+		const bool victory = play_battle(pc_party, npc_party, pc_chars_vector, npc_chars_vector, *battle_loc);
 
-		variant pc_chars = pc_chars_.execute(info);
-		for(int n = 0; n != pc_chars.num_elements(); ++n) {
-			character_ptr c(pc_chars[n].convert_to<character>());
-			hex::location loc(2 + n, 2);
-			chars.push_back(battle_character::make_battle_character(
-							c, *pc_party, loc, hex::NORTH, *battle_map, world.current_time()));
-		}
-
-		variant npc_chars = npc_chars_.execute(info);
-		for(int n = 0; n != npc_chars.num_elements(); ++n) {
-			character_ptr c(npc_chars[n].convert_to<character>());
-			hex::location loc(2 + n, 8);
-			chars.push_back(battle_character::make_battle_character(
-							c, *npc_party, loc, hex::NORTH, *battle_map, world.current_time()));
-		}
-
-		battle b(chars, *battle_map);
-		b.play();
-
-		const bool victory = npc_party->is_destroyed();
 		if(victory && onvictory_) {
 			onvictory_->execute(info, world);
 		}
@@ -284,37 +289,50 @@ public:
 
 class dialog_command : public wml_command {
 	formula pc_formula_, npc_formula_;
+	const_formula_ptr condition_;
 	const_formula_ptr text_;
 	std::vector<std::string> options_;
 	std::vector<const_formula_ptr> option_conditions_;
 	std::vector<std::vector<const_wml_command_ptr> > consequences_;
 	void do_execute(const formula_callable& info, world& world) const {
+		if(condition_) {
+			variant res = condition_->execute(info);
+			if(!res.as_bool()) {
+				return;
+			}
+		}
+
 		std::cerr << "pc: " << pc_formula_.str() << "\n";
-		const formula_callable* pc = pc_formula_.execute(info).as_callable();
+		const variant pc = pc_formula_.execute(info);
 		std::cerr << "npc: " << npc_formula_.str() << "\n";
-		const formula_callable* npc = npc_formula_.execute(info).as_callable();
+		const variant npc = npc_formula_.execute(info);
 		std::cerr << "done\n";
 
 		const character* pc_char = NULL;
 		const character* npc_char = NULL;
-		const party* pc_party = dynamic_cast<const party*>(pc);
-		const party* npc_party = dynamic_cast<const party*>(npc);
+		const party* pc_party = pc.try_convert<const party>();
+		const party* npc_party = npc.try_convert<const party>();
+
+		std::string pc_image, npc_image;
 
 		if(pc_party) {
 			pc_char = pc_party->begin_members()->get();
 		} else {
-			pc_char = dynamic_cast<const character*>(pc);
+			pc_char = pc.try_convert<const character>();
+		}
+
+		if(pc_char) {
+			pc_image = pc_char->portrait();
 		}
 
 		if(npc_party) {
 			npc_char = npc_party->begin_members()->get();
 		} else {
-			npc_char = dynamic_cast<const character*>(npc);
+			npc_char = npc.try_convert<const character>();
 		}
 
-		if(!pc_char || !npc_char) {
-			std::cerr << "Could not calculate characters in dialog\n";
-			return;
+		if(npc_char) {
+			npc_image = npc_char->portrait();
 		}
 
 		std::map<int,int> options_map_;
@@ -326,7 +344,7 @@ class dialog_command : public wml_command {
 			}
 		}
 
-		gui::message_dialog dialog(world, *pc_char, *npc_char, text_->execute(info).as_string(),
+		gui::message_dialog dialog(world, pc_image, npc_image, text_->execute(info).as_string(),
 		                           options.empty() ? NULL : &options,
 								   false);
 		dialog.show_modal();
@@ -344,6 +362,7 @@ public:
 	explicit dialog_command(wml::const_node_ptr node)
 	   : pc_formula_(wml::get_str(node, "pc", "pc")),
 		 npc_formula_(wml::get_str(node, "npc", "npc")),
+		 condition_(formula::create_optional_formula(wml::get_str(node, "condition"))),
 		 text_(formula::create_string_formula(wml::get_str(node, "text")))
 	{
 		wml::node::const_child_range options = node->get_child_range("option");
@@ -424,6 +443,31 @@ public:
 	{}
 };
 
+class fire_event_command : public wml_command
+{
+	std::string event_;
+	std::map<std::string, const_formula_ptr> params_;
+	void do_execute(const formula_callable& info, world& world) const {
+		map_formula_callable_ptr callable(new map_formula_callable(&info));
+		for(std::map<std::string, const_formula_ptr>::const_iterator i = params_.begin(); i != params_.end(); ++i) {
+			callable->add(i->first, i->second->execute(info));
+		}
+
+		world.fire_event(event_, *callable);
+	}
+
+public:
+	explicit fire_event_command(wml::const_node_ptr node)
+	    : event_(node->attr("event"))
+	{
+		for(wml::node::const_attr_iterator i = node->begin_attr(); i != node->end_attr(); ++i) {
+			if(i->first != "event") {
+				params_[i->first].reset(new formula(i->second));
+			}
+		}
+	}
+};
+
 class null_command : public wml_command
 {
 	void do_execute(const formula_callable& info, world& world) const {
@@ -459,6 +503,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	DEFINE_COMMAND(party);
 	DEFINE_COMMAND(quit);
 	DEFINE_COMMAND(character_status_dialog);
+	DEFINE_COMMAND(fire_event);
 	} catch(...) {
 		std::string str;
 		wml::write(node, str);

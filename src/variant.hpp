@@ -69,6 +69,7 @@ public:
 	variant operator*(const variant&) const;
 	variant operator/(const variant&) const;
 	variant operator^(const variant&) const;
+	variant operator%(const variant&) const;
 	variant operator-() const;
 
 	bool operator==(const variant&) const;

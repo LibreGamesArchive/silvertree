@@ -63,7 +63,7 @@ EditorGLWidget::EditorGLWidget(QWidget *parent)
 	: QGLWidget(parent)
 {
 	setMouseTracking(true);
-	show_grid_ = true;
+	show_grid_ = false;
 	radius_ = 0;
 	mousex_ = 0;
 	mousey_ = 0;
@@ -475,15 +475,23 @@ void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 				}
 			} else {
 				wml::node_ptr& p = (*parties_)[selected_];
-				if(!p) {
-					p.reset(new wml::node("party"));
+				bool new_party = p.get() == NULL;
+				if(new_party) {
+					if(party_clipboard_) {
+						p = wml::deep_copy(party_clipboard_);
+					} else {
+						p.reset(new wml::node("party"));
+					}
+
 					p->set_attr("x",formatter() << selected_.x());
 					p->set_attr("y",formatter() << selected_.y());
 				}
 				EditPartyDialog d(p);
 				d.exec();
-				if(!p->get_child("character")) {
+				if(!p->get_child("character") || new_party && d.cancelled()) {
 					parties_->erase(selected_);
+				} else {
+					party_clipboard_ = wml::deep_copy(p);
 				}
 				setParties(parties_);
 			}

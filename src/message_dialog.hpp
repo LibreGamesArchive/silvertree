@@ -28,8 +28,8 @@ namespace gui {
 class message_dialog: public dialog {
 public:
 	message_dialog(const game_logic::world& world,
-	           const game_logic::character& pc,
-		       const game_logic::character& npc,
+	           const std::string& pc_image,
+			   const std::string& npc_image,
 		       const std::string& msg,
 		       const std::vector<std::string>* options=NULL,
 		       bool starts_conversation = true);
@@ -53,8 +53,8 @@ private:
 	const std::string& msg_;
 	const std::vector<std::string>* options_;
 	const game_logic::world& world_;
-	const game_logic::character& pc_;
-	const game_logic::character& npc_;
+	std::string pc_portrait_name_;
+	std::string npc_portrait_name_;
 	std::vector<frame_ptr> option_frames_;
 	std::vector<boost::shared_ptr<dialog_label> > dialog_labels_;
 	widget_ptr pc_portrait_;

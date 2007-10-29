@@ -19,13 +19,14 @@
 namespace gui {
 
 message_dialog::message_dialog(const game_logic::world& world,
-				   const game_logic::character& pc,
-			       const game_logic::character& npc,
+                   const std::string& pc_portrait,
+                   const std::string& npc_portrait,
 			       const std::string& msg,
 			       const std::vector<std::string>* options,
 			       bool starts_conversation)
 	: dialog(0,0,graphics::screen_width(),graphics::screen_height()),
-	  msg_(msg), options_(options), world_(world), pc_(pc), npc_(npc),
+	  msg_(msg), options_(options), world_(world),
+	  pc_portrait_name_(pc_portrait), npc_portrait_name_(npc_portrait),
 	  fade_in_rate_(30), starts_conversation_(starts_conversation)
 {
 
@@ -63,8 +64,6 @@ void message_dialog::construct_interface()
 	dialog_labels_.clear();
 	option_frames_.clear();
 
-	const std::string npcname = npc_.portrait();
-
 	set_padding(0);
 	dialog_label_ptr msg_label_inner(new dialog_label(msg_, color, 18));
 	msg_label_inner->set_fixed_width(true);
@@ -72,7 +71,7 @@ void message_dialog::construct_interface()
 	widget_ptr msg_label = frame_manager::make_frame(msg_label_inner, "dialog-message");
 	{
 		int right_offset = 200;
-		if(npcname.empty()) {
+		if(npc_portrait_name_.empty()) {
 			right_offset /= 2;
 		}
 		/* with fixed width, y height is calculated */
@@ -84,19 +83,18 @@ void message_dialog::construct_interface()
 		set_cursor(cursor_x(), cursor_y()-10);
 	}
 
-	if(!npcname.empty()) {
-		widget_ptr portrait(new image_widget(npcname, 205, 205));
+	if(!npc_portrait_name_.empty()) {
+		widget_ptr portrait(new image_widget(npc_portrait_name_, 205, 205));
 		portrait = frame_manager::make_frame(portrait,"dialog-npc-portrait");
 		add_widget(portrait, dialog::MOVE_RIGHT);
 	}
 
 	if(options_) {
-		const std::string pcname = pc_.portrait();
 		int left_offset = 0;
 
 		set_cursor(s_width/8, s_height*7/8 - 205);
-		if(!pcname.empty()) {
-			pc_portrait_ = widget_ptr(new image_widget(pcname, 205, 205));
+		if(!pc_portrait_name_.empty()) {
+			pc_portrait_ = widget_ptr(new image_widget(pc_portrait_name_, 205, 205));
 			frame_ptr pc_frame = frame_manager::make_frame(pc_portrait_, "dialog-pc-portrait");
 			pc_portrait_ = pc_frame;
 			if(starts_conversation_) {
