@@ -12,6 +12,7 @@ class EditPartyDialog : public QDialog
 
 public:
 	EditPartyDialog(wml::node_ptr party, QWidget *parent = 0);
+	bool cancelled() const { return cancelled_; }
 
 public slots:
 	void writeParty();
@@ -28,6 +29,7 @@ private:
 	void writeCharacterStats();
 	Ui::EditPartyDialog ui_;
 	wml::node_ptr party_, backup_;
+	bool cancelled_;
 };
 
 

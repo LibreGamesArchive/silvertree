@@ -776,7 +776,7 @@ void world::play()
 				}
 
 				active_party = get_party_ready_to_move();
-				if(active_party && active_party->is_human_controlled()) {
+				if(!focus_ && active_party && active_party->is_human_controlled()) {
 					focus_ = active_party;
 				}
 			}
@@ -1017,6 +1017,7 @@ void world::get_inputs(std::vector<formula_input>* inputs) const
 	inputs->push_back(formula_input("time", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("pc", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("parties", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("focus", FORMULA_READ_WRITE));
 }
 
 variant world::get_value(const std::string& key) const
@@ -1032,9 +1033,23 @@ variant world::get_value(const std::string& key) const
 		}
 
 		return variant(&parties);
+	} else if(key == "focus") {
+		return variant(focus_.get());
 	} else {
 		return variant();
 	}
+}
+
+void world::set_value(const std::string& key, const variant& value)
+{
+	if(key == "focus") {
+		party* p = value.try_convert<party>();
+		if(p) {
+			focus_ = p;
+		}
+	}
+
+	std::cerr << "unrecognized world value being set: '" << key << "'\n";
 }
 
 void world::add_chat_label(gui::label_ptr label, const_character_ptr ch, int delay)

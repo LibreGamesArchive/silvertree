@@ -90,6 +90,7 @@ class EditorGLWidget : public QGLWidget
 		QTimer timer_;
 		QMap<int,bool> keys_;
 		party_map* parties_;
+		wml::node_ptr party_clipboard_;
 		avatar_map avatar_;
 };
 

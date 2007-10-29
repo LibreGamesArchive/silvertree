@@ -42,73 +42,20 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		return;
 	}
 
-	//zoom in to the battle
-	graphics::frame_skipper skippy(50, preference_maxfps());
-	const GLfloat start_zoom = p1->game_world().camera().zoom();
-	graphics::texture framebuffer = graphics::texture::get_frame_buffer();
-	for(int n = 0; n != 100 && p1->game_world().camera().zoom() < p1->game_world().camera().max_zoom(); ++n) {
-		if(skippy.skip_frame()) {
-			continue;
-		}
-
-		p1->game_world().camera().zoom_in();
-		p1->game_world().camera().zoom_in();
-		p1->game_world().draw();
-		glColor4f(1.0,1.0,1.0,0.8);
-		graphics::blit_texture(framebuffer, 0, 0, graphics::screen_width(), -graphics::screen_height());
-		framebuffer = graphics::texture::get_frame_buffer();
-		SDL_GL_SwapBuffers();
-	}
-
-	p1->game_world().camera().set_zoom(start_zoom);
-
-	boost::shared_ptr<hex::gamemap> battle_map =
-	            generate_battle_map(map,p1->loc());
-
 	int xp1 = 0, xp2 = 0;
 
 	std::vector<battle_character_ptr> chars;
 	for(std::vector<character_ptr>::const_iterator i =
 	    p1->members().begin(); i != p1->members().end(); ++i) {
-		hex::location loc(44 + i - p1->members().begin(),44);
-		chars.push_back(battle_character::make_battle_character(
-		                    *i,*p1,loc,hex::SOUTH,*battle_map,
-							p1->game_world().current_time()));
 		xp1 += (*i)->level()*10;
 	}
 
 	for(std::vector<character_ptr>::const_iterator i =
 	    p2->members().begin(); i != p2->members().end(); ++i) {
-		hex::location loc(44 + i - p2->members().begin(),50);
-		chars.push_back(battle_character::make_battle_character(
-		                    *i,*p2,loc,hex::SOUTH,*battle_map,
-							p2->game_world().current_time()));
 		xp2 += (*i)->level()*10;
 	}
 
-	battle b(chars,*battle_map);
-
-	const GLfloat target_zoom = b.camera().zoom();
-	b.camera().set_zoom(b.camera().min_zoom());
-	skippy.reset();
-	while(b.camera().zoom() < target_zoom) {
-		if(skippy.skip_frame()) {
-			continue;
-		}
-
-		b.camera().zoom_in();
-		b.camera().zoom_in();
-		b.draw(NULL, false);
-		glColor4f(1.0,1.0,1.0,0.8);
-		graphics::blit_texture(framebuffer, 0, 0, graphics::screen_width(), -graphics::screen_height());
-		framebuffer = graphics::texture::get_frame_buffer();
-		SDL_GL_SwapBuffers();
-	}
-
-	//free up the space taken by the frame buffer texture
-	framebuffer = graphics::texture();
-
-	b.play();
+	play_battle(p1, p2, p1->members(), p2->members(), p2->loc());
 
 	if(p1->is_destroyed() || p2->is_destroyed()) {
 		if(p1->is_destroyed()) {
@@ -147,6 +94,74 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 			}
 		}
 	}
+}
+
+bool play_battle(party_ptr p1, party_ptr p2, const std::vector<character_ptr>& c1, const std::vector<character_ptr>& c2, const hex::location& loc)
+{
+	//zoom in to the battle
+	graphics::frame_skipper skippy(50, preference_maxfps());
+	const GLfloat start_zoom = p1->game_world().camera().zoom();
+	graphics::texture framebuffer = graphics::texture::get_frame_buffer();
+	for(int n = 0; n != 100 && p1->game_world().camera().zoom() < p1->game_world().camera().max_zoom(); ++n) {
+		if(skippy.skip_frame()) {
+			continue;
+		}
+
+		p1->game_world().camera().zoom_in();
+		p1->game_world().camera().zoom_in();
+		p1->game_world().draw();
+		glColor4f(1.0,1.0,1.0,0.8);
+		graphics::blit_texture(framebuffer, 0, 0, graphics::screen_width(), -graphics::screen_height());
+		framebuffer = graphics::texture::get_frame_buffer();
+		SDL_GL_SwapBuffers();
+	}
+
+	boost::shared_ptr<hex::gamemap> battle_map =
+	            generate_battle_map(p1->game_world().map(),loc);
+	
+	std::cerr << "generate map at " << loc.x() << "," << loc.y() << "\n";
+
+	std::vector<battle_character_ptr> chars;
+	for(std::vector<character_ptr>::const_iterator i = c1.begin(); i != c1.end(); ++i) {
+		hex::location loc(44 + i - c1.begin(),47);
+		chars.push_back(battle_character::make_battle_character(
+		                    *i,*p1,loc,hex::SOUTH,*battle_map,
+							p1->game_world().current_time()));
+	}
+
+	for(std::vector<character_ptr>::const_iterator i = c2.begin(); i != c2.end(); ++i) {
+		hex::location loc(44 + i - c2.begin(),53);
+		chars.push_back(battle_character::make_battle_character(
+		                    *i,*p2,loc,hex::SOUTH,*battle_map,
+							p2->game_world().current_time()));
+	}
+
+	p1->game_world().camera().set_zoom(start_zoom);
+
+	battle b(chars,*battle_map);
+
+	const GLfloat target_zoom = b.camera().zoom();
+	b.camera().set_zoom(b.camera().min_zoom());
+	skippy.reset();
+	while(b.camera().zoom() < target_zoom) {
+		if(skippy.skip_frame()) {
+			continue;
+		}
+
+		b.camera().zoom_in();
+		b.camera().zoom_in();
+		b.draw(NULL, false);
+		glColor4f(1.0,1.0,1.0,0.8);
+		graphics::blit_texture(framebuffer, 0, 0, graphics::screen_width(), -graphics::screen_height());
+		framebuffer = graphics::texture::get_frame_buffer();
+		SDL_GL_SwapBuffers();
+	}
+
+	//free up the space taken by the frame buffer texture
+	framebuffer = graphics::texture();
+
+	b.play();
+	return p2->is_destroyed();
 }
 
 }

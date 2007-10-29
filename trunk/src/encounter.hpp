@@ -21,6 +21,7 @@ namespace game_logic
 
 void handle_encounter(party_ptr p1, party_ptr p2,
                       const hex::gamemap& map);
+bool play_battle(party_ptr p1, party_ptr p2, const std::vector<character_ptr>& c1, const std::vector<character_ptr>& c2, const hex::location& loc);
 
 }
 

@@ -14,7 +14,7 @@ std::vector<wml::const_node_ptr> generators;
 }
 
 EditPartyDialog::EditPartyDialog(wml::node_ptr party, QWidget* parent)
-  : QDialog(parent), party_(party), backup_(wml::deep_copy(party))
+  : QDialog(parent), party_(party), backup_(wml::deep_copy(party)), cancelled_(false)
 {
 	if(!generators_node) {
 		generators_node = wml::parse_wml(sys::read_file("data/character_generators.cfg"));
@@ -96,6 +96,7 @@ void EditPartyDialog::writeParty()
 void EditPartyDialog::revertParty()
 {
 	wml::copy_over(backup_,party_);
+	cancelled_ = true;
 }
 
 void EditPartyDialog::addMember()

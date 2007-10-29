@@ -284,7 +284,7 @@ void silent_load(const std::string& filename)
 bool load(const std::string& start_filename, game_logic::world *wp)
 {
 	std::cout << "Loading game\n";
-	load_dialog l(wp, sys::get_saves_dir(), start_filename);
+	save_dialog l(wp, sys::get_saves_dir(), start_filename);
 	l.show_modal();
 
 	if(!l.has_selected_file() || !sys::file_exists(l.selected_file()))
