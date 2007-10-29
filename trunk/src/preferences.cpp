@@ -78,6 +78,22 @@ bool parse_arg(const std::string& arg)
 		save_file = sys::get_saves_dir() + "/" + util::strip_string_prefix(arg, "--save=");
 	} else if(util::string_starts_with(arg, "--scenario=")) {
 		scenario_file = util::strip_string_prefix(arg, "--scenario=");
+	} else if(arg == "-h" || arg == "--help") {
+		std::cout << "usage:\n"
+			<< "  --fullscreen                   start the game in full screen mode.\n"
+			<< "  --windowed                     start the game in windowed mode.\n"
+			<< "  --height=<Y>                   set the screen height to 'Y'.\n"
+			<< "  --width=<X>                    set the screen width to 'X'.\n"
+			<< "  --maxfps                       run the game at the maximum fps possible.\n"
+			<< "  --mipmapmin={n,l,nn,nl,ln,ll}  \n"
+			<< "  --mipmapmax={n,l,nn,nl,ln,ll}  \n"
+			<< "  --disable-mipmapping           disable mipmapping.\n"
+			<< "  --nocombat                     debug mode where enemies don't initiate an attack.\n"
+			<< "  --save=<savefile>              load the save 'savefile'.\n"
+			<< "  --scenario=<scenario.cfg>      start the game with the given scenario file.\n"
+			<< "  -h, --help                     print this message and exits.\n"
+			;
+		return false;
 	} else {
 		std::cerr << "unrecognized argument: '" << arg << "'\n";
 		return false;
