@@ -159,7 +159,6 @@ party::TURN_RESULT npc_party::do_turn()
 		rest_ = false;
 	}
 
-	std::cerr << "from " << loc().x() << "," << loc().y() << " -> " << target.x() << "," << target.y() << "\n";
 	if(map().is_loc_on_map(target)) {
 		const int current_distance = hex::distance_between(loc(),target);
 		int best = -1;
@@ -171,7 +170,8 @@ party::TURN_RESULT npc_party::do_turn()
 				continue;
 			}
 
-			if(hex::distance_between(adj[n],target) > current_distance) {
+			const int distance = hex::distance_between(adj[n],target);
+			if(distance > current_distance) {
 				continue;
 			}
 
@@ -184,8 +184,8 @@ party::TURN_RESULT npc_party::do_turn()
 			}
 
 			const int cost = movement_cost(loc(),adj[n]);
-			if(cost != -1 && (best == -1 || cost < best)) {
-				best = movement_cost(loc(),adj[n]);
+			if(cost != -1 && (best == -1 || distance*1000 + cost < best)) {
+				best = distance*1000 + cost;
 				dir = hex::DIRECTION(n);
 			}
 		}
