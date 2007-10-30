@@ -106,6 +106,8 @@ void npc_party::set_value(const std::string& key, const variant& value)
 		current_destination_ = *loc;
 	} else if(key == "aggressive") {
 		aggressive_ = value.as_bool();
+	} else if(key == "rest") {
+		rest_ = value.as_bool();
 	}
 
 	return party::set_value(key, value);
@@ -171,7 +173,7 @@ party::TURN_RESULT npc_party::do_turn()
 			}
 
 			const int distance = hex::distance_between(adj[n],target);
-			if(distance > current_distance) {
+			if(distance >= current_distance) {
 				continue;
 			}
 
