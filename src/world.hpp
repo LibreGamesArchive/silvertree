@@ -70,6 +70,7 @@ public:
 	hex::camera& camera() { return camera_; }
 	const hex::camera& camera() const { return camera_; }
 
+	const_party_ptr get_party_at(const hex::location& loc) const;
 	void get_parties_at(const hex::location& loc, std::vector<const_party_ptr>& chars) const;
 
 	const_settlement_ptr settlement_at(const hex::location& loc) const;

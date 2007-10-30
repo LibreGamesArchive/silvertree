@@ -189,6 +189,10 @@ party::TURN_RESULT party::play_turn()
 				continue;
 			}
 
+			if(game_world().get_party_at(adj[n])) {
+				continue;
+			}
+
 			if(best == -1 || hex::distance_between(adj[n], dst) < hex::distance_between(adj[best], dst)) {
 				best = n;
 			}
