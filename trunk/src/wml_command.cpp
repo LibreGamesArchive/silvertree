@@ -139,6 +139,26 @@ public:
 	}
 };
 
+class while_command : public wml_command {
+	formula condition_;
+	std::vector<const_wml_command_ptr> commands_;
+	void do_execute(const formula_callable& info, world& world) const {
+		while(condition_.execute(info).as_bool()) {
+			foreach(const const_wml_command_ptr& cmd, commands_) {
+				cmd->execute(info, world);
+			}
+		}
+	}
+public:
+	explicit while_command(wml::const_node_ptr node) : condition_(node->attr("condition"))
+	{
+		for(wml::node::const_all_child_iterator i = node->begin_children();
+		    i != node->end_children(); ++i) {
+				commands_.push_back(wml_command::create(*i));
+		}
+	}
+};
+
 class scripted_moves_command : public wml_command {
 	formula filter_;
 	std::vector<hex::location> locs_;
@@ -190,7 +210,7 @@ class modify_objects_command : public wml_command {
 	}
 public:
 	explicit modify_objects_command(wml::const_node_ptr node)
-	   : object_finder_(node->attr("objects"))
+	   : object_finder_(node->attr("objects").empty() ? node->attr("object") : node->attr("objects"))
 	{
 		for(wml::node::const_attr_iterator i = node->begin_attr(); i != node->end_attr(); ++i) {
 			if(i->first != "objects") {
@@ -488,14 +508,22 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 		return const_wml_command_ptr(new cmd##_command(node)); \
 	}
 
+#define DEFINE_COMMAND_SYNONYM(cmd, synonym) \
+	if(node->name() == #synonym) { \
+		return const_wml_command_ptr(new cmd##_command(node)); \
+	}
+	
+
 	try {
 	DEFINE_COMMAND(debug);
 	DEFINE_COMMAND(debug_console);
 	DEFINE_COMMAND(destroy_party);
 	DEFINE_COMMAND(if);
+	DEFINE_COMMAND(while);
 	DEFINE_COMMAND(scripted_moves);
 	DEFINE_COMMAND(execute_script);
 	DEFINE_COMMAND(modify_objects);
+	DEFINE_COMMAND_SYNONYM(modify_objects, set);
 	DEFINE_COMMAND(battle);
 	DEFINE_COMMAND(party_chat);
 	DEFINE_COMMAND(dialog);
