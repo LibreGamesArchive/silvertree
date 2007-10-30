@@ -159,6 +159,7 @@ party::TURN_RESULT npc_party::do_turn()
 		rest_ = false;
 	}
 
+	std::cerr << "from " << loc().x() << "," << loc().y() << " -> " << target.x() << "," << target.y() << "\n";
 	if(map().is_loc_on_map(target)) {
 		const int current_distance = hex::distance_between(loc(),target);
 		int best = -1;
@@ -170,7 +171,7 @@ party::TURN_RESULT npc_party::do_turn()
 				continue;
 			}
 
-			if(hex::distance_between(adj[n],target) >= current_distance) {
+			if(hex::distance_between(adj[n],target) > current_distance) {
 				continue;
 			}
 

@@ -230,6 +230,16 @@ wml::node_ptr world::write() const
 	return res;
 }
 
+game_logic::const_party_ptr world::get_party_at(const hex::location& loc) const
+{
+	const_party_map_range range = parties_.equal_range(loc);
+	if(range.first != range.second) {
+		return range.first->second;
+	}
+	
+	return game_logic::const_party_ptr();
+}
+
 void world::get_parties_at(const hex::location& loc, std::vector<const_party_ptr>& chars) const
 {
 	const_party_map_range range = parties_.equal_range(loc);
