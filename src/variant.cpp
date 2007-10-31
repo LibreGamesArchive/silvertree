@@ -16,6 +16,7 @@
 namespace {
 std::string variant_type_to_string(variant::TYPE type) {
 	switch(type) {
+	case variant::TYPE_NULL: return "null";
 	case variant::TYPE_INT: return "int";
 	case variant::TYPE_CALLABLE: return "object";
 	case variant::TYPE_LIST: return "list";
@@ -73,6 +74,9 @@ void variant::release()
 		break;
 	}
 }
+
+variant::variant() : type_(TYPE_NULL), int_value_(0)
+{}
 
 variant::variant(int n) : type_(TYPE_INT), int_value_(n)
 {}
@@ -145,6 +149,8 @@ size_t variant::num_elements() const
 bool variant::as_bool() const
 {
 	switch(type_) {
+	case TYPE_NULL:
+		return false;
 	case TYPE_INT:
 		return int_value_ != 0;
 	case TYPE_CALLABLE:
@@ -183,58 +189,49 @@ variant variant::operator+(const variant& v) const
 		}
 	}
 
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	return variant(int_value_ + v.int_value_);
+	return variant(as_int() + v.as_int());
 }
 
 variant variant::operator-(const variant& v) const
 {
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	return variant(int_value_ - v.int_value_);
+	return variant(as_int() - v.as_int());
 }
 
 variant variant::operator*(const variant& v) const
 {
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	return variant(int_value_ * v.int_value_);
+	return variant(as_int() * v.as_int());
 }
 
 variant variant::operator/(const variant& v) const
 {
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	if(v.int_value_ == 0) {
+	const int numerator = as_int();
+	const int denominator = v.as_int();
+	if(denominator == 0) {
 		throw type_error(formatter() << "divide by zero error");
 	}
 
-	return variant(int_value_ / v.int_value_);
+	return variant(numerator/denominator);
 }
 
 variant variant::operator%(const variant& v) const
 {
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	if(v.int_value_ == 0) {
-		throw type_error(formatter() << "divide (mod) by zero error");
+	const int numerator = as_int();
+	const int denominator = v.as_int();
+	if(denominator == 0) {
+		throw type_error(formatter() << "divide by zero error");
 	}
 
-	return variant(int_value_ % v.int_value_);
+	return variant(numerator%denominator);
 }
 
 variant variant::operator^(const variant& v) const
 {
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	return variant(static_cast<int>(pow(int_value_, v.int_value_)));
+	return variant(static_cast<int>(pow(as_int(), v.as_int())));
 }
 
 variant variant::operator-() const
 {
-	must_be(TYPE_INT);
-	return variant(-int_value_);
+	return variant(-as_int());
 }
 
 bool variant::operator==(const variant& v) const
@@ -244,6 +241,10 @@ bool variant::operator==(const variant& v) const
 	}
 
 	switch(type_) {
+	case TYPE_NULL: {
+		return v.is_null();
+	}
+
 	case TYPE_STRING: {
 		return string_->str == v.string_->str;
 	}
@@ -281,30 +282,22 @@ bool variant::operator!=(const variant& v) const
 
 bool variant::operator<=(const variant& v) const
 {
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	return int_value_ <= v.int_value_;
+	return as_int() <= v.as_int();
 }
 
 bool variant::operator>=(const variant& v) const
 {
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	return int_value_ >= v.int_value_;
+	return as_int() >= v.as_int();
 }
 
 bool variant::operator<(const variant& v) const
 {
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	return int_value_ < v.int_value_;
+	return as_int() < v.as_int();
 }
 
 bool variant::operator>(const variant& v) const
 {
-	must_be(TYPE_INT);
-	v.must_be(TYPE_INT);
-	return int_value_ > v.int_value_;
+	return as_int() > v.as_int();
 }
 
 void variant::must_be(variant::TYPE t) const
@@ -317,6 +310,8 @@ void variant::must_be(variant::TYPE t) const
 void variant::serialize_to_string(std::string& str) const
 {
 	switch(type_) {
+	case TYPE_NULL:
+		str += "null()";
 	case TYPE_INT:
 		str += boost::lexical_cast<std::string>(int_value_);
 		break;
@@ -354,6 +349,8 @@ void variant::serialize_from_string(const std::string& str)
 std::string variant::string_cast() const
 {
 	switch(type_) {
+	case TYPE_NULL:
+		return "0";
 	case TYPE_INT:
 		return boost::lexical_cast<std::string>(int_value_);
 	case TYPE_CALLABLE:
@@ -387,6 +384,8 @@ std::string variant::to_debug_string(std::vector<const game_logic::formula_calla
 
 	std::ostringstream s;
 	switch(type_) {
+	case TYPE_NULL:
+		s << "(null)";
 	case TYPE_INT:
 		s << int_value_;
 		break;
