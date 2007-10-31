@@ -94,6 +94,10 @@ void battle::play()
 				initiative_bar_->set_current_time(current_time_ + sub_time_);
 				animation_frame(0.1);
 			}
+			// Check whether character modifications expired.
+			foreach(battle_character_ptr ch, chars_) {
+				ch->update_time(current_time_);
+			}
 
 			++current_time_;
 		}
