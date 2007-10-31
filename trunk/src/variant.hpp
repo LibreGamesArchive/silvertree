@@ -19,7 +19,8 @@ struct type_error {
 
 class variant {
 public:
-	explicit variant(int n=0);
+	variant();
+	explicit variant(int n);
 	explicit variant(const game_logic::formula_callable* callable);
 	explicit variant(std::vector<variant>* array);
 	explicit variant(const std::string& str);
@@ -30,8 +31,9 @@ public:
 	const variant& operator[](size_t n) const;
 	size_t num_elements() const;
 
+	bool is_null() const { return type_ == TYPE_NULL; }
 	bool is_int() const { return type_ == TYPE_INT; }
-	int as_int() const { must_be(TYPE_INT); return int_value_; }
+	int as_int() const { if(type_ == TYPE_NULL) { return 0; } must_be(TYPE_INT); return int_value_; }
 	bool as_bool() const;
 
 	bool is_list() const { return type_ == TYPE_LIST; }
@@ -85,7 +87,7 @@ public:
 	std::string string_cast() const;
 
 	std::string to_debug_string(std::vector<const game_logic::formula_callable*>* seen=NULL) const;
-	enum TYPE { TYPE_INT, TYPE_CALLABLE, TYPE_LIST, TYPE_STRING };
+	enum TYPE { TYPE_NULL, TYPE_INT, TYPE_CALLABLE, TYPE_LIST, TYPE_STRING };
 private:
 	void must_be(TYPE t) const;
 	TYPE type_;

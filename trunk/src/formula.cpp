@@ -509,6 +509,17 @@ private:
 	}
 };
 
+class null_function : public function_expression {
+public:
+	explicit null_function(const args_list& args)
+	    : function_expression(args, 0, 0)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		return variant();
+	}
+};
+
 expression_ptr create_function(const std::string& fn,
                                const std::vector<expression_ptr>& args)
 {
@@ -547,6 +558,8 @@ expression_ptr create_function(const std::string& fn,
 		return expression_ptr(new distance_function(args));
 	} else if(fn == "size") {
 		return expression_ptr(new size_function(args));
+	} else if(fn == "null") {
+		return expression_ptr(new null_function(args));
 	} else {
 		std::cerr << "no function '" << fn << "'\n";
 		throw formula_error();
