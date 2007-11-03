@@ -1,4 +1,23 @@
 
+def CheckOpenGL(context, libs = ["gl"]):
+    context.Message("Checking for OpenGL... ")
+    env = context.env
+    if env["PLATFORM"] == "win32":
+        libnames = { "gl" : "opengl32", "glu" : "glu32" }
+    else:
+        libnames = { "gl" : "GL", "glu" : "GLU" }
+    env.AppendUnique(LIBS = map(libnames.get, libs))
+    test_program = ""
+    for lib in libs:
+        test_program += "#include <GL/%s.h>\n" % lib
+    test_program += "int main()\n{}\n"
+    if context.TryLink(test_program, ".c"):
+        context.Result("yes")
+        return True
+    else:
+        context.Result("no")
+        return False
+
 def CheckSDL(context, sdl_lib = "SDL"):
     if sdl_lib == "SDL":
         context.Message("Checking for Simple DirectMedia Layer library... ")
@@ -18,8 +37,7 @@ def CheckSDL(context, sdl_lib = "SDL"):
         int main(int argc, char** argv)
         {
         }
-
-        """ % sdl_lib
+        \n""" % sdl_lib
     if context.TryLink(test_program, ".c"):
         context.Result("yes")
         return True
@@ -27,4 +45,34 @@ def CheckSDL(context, sdl_lib = "SDL"):
         context.Result("no")
         return False
 
-CustomChecks = { "CheckSDL" : CheckSDL }
+def CheckBoostLib(context, boost_lib):
+    env = context.env
+    env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
+    libname = "boost_" + boost_lib + env.get("BOOST_SUFFIX", "")
+    libs_backup = env["LIBS"]
+    env.AppendUnique(LIBS = libname)
+    test_program = """
+        #include <boost/%s.hpp>
+        int main()
+        {
+        }
+        \n""" % boost_lib
+    if context.TryLink(test_program, ".cpp"):
+        return True
+    else:
+        env.Replace(LIBS = libs_backup)
+        return False
+
+def CheckBoost(context, boost_lib):
+    context.Message("Checking for Boost %s library... " % boost_lib)
+    check_result = CheckBoostLib(context, boost_lib)
+    if not check_result and not context.env["BOOST_SUFFIX"]:
+        context.env["BOOST_SUFFIX"] = "-mt"
+        check_result = CheckBoostLib(context, boost_lib)
+    if check_result:
+        context.Result("yes")
+    else:
+        context.Result("no")
+    return check_result
+
+CustomChecks = { "CheckSDL" : CheckSDL, "CheckOpenGL" : CheckOpenGL, "CheckBoost" : CheckBoost }

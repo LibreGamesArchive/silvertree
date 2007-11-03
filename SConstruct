@@ -42,20 +42,11 @@ env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
 
 execfile("SConfigure")
 conf = env.Configure(custom_tests = CustomChecks)
-if env["PLATFORM"] == "win32":
-    conf.CheckLibWithHeader("opengl32", "GL/gl.h", "C") or Exit()
-    conf.CheckLibWithHeader("glu32", "GL/glu.h", "C") or Exit()
-else:
-    conf.CheckLibWithHeader("GL", "GL/gl.h", "C") or Exit()
-    conf.CheckLibWithHeader("GLU", "GL/glu.h", "C") or Exit()
-conf.CheckSDL() or Exit()
-conf.CheckSDL("SDL_image") or Exit()
-conf.CheckSDL("SDL_ttf") or Exit()
-if env["BOOST_SUFFIX"]:
-    conf.CheckLibWithHeader("boost_regex" + env["BOOST_SUFFIX"], "boost/regex.hpp", "C++") or Exit()
-else:
-    conf.CheckLibWithHeader("boost_regex", "boost/regex.hpp", "C++") or \
-    conf.CheckLibWithHeader("boost_regex-mt", "boost/regex.hpp", "C++") or Exit()
+conf.CheckOpenGL(["gl", "glu"]) and \
+conf.CheckSDL() and \
+conf.CheckSDL("SDL_image") and \
+conf.CheckSDL("SDL_ttf") and \
+conf.CheckBoost("regex") or Exit(1)
 conf.Finish()
 
 editor_env = env.Clone()
