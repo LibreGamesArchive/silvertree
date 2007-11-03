@@ -96,7 +96,7 @@ private:
 	void handle_time_cost_popup();
 	void begin_animation();
 	void end_animation();
-	void animation_frame(GLfloat t);
+	void animation_frame(GLfloat t, gui::slider* slider=NULL);
 	const_battle_character_ptr is_engaged(
 	       const battle_character& c) const;
 	void handle_dead_character(const battle_character& c);

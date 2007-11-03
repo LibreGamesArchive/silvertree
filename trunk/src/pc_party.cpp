@@ -13,6 +13,7 @@
 #include "foreach.hpp"
 #include "global_game_state.hpp"
 #include "keyboard.hpp"
+#include "pathfind.hpp"
 #include "pc_party.hpp"
 #include "tile_logic.hpp"
 #include "world.hpp"
@@ -32,6 +33,21 @@ wml::node_ptr pc_party::write() const
 	wml::node_ptr res = party::write();
 	res->set_attr("controller", "human");
 	return res;
+}
+
+void pc_party::set_destination(const hex::location& dst)
+{
+	path_.clear();
+	const bool adjacent_only = get_visible_locs().count(dst) && game_world().get_party_at(dst);
+	hex::find_path(loc(), dst, *this, &path_, 100000, adjacent_only);
+	if(path_.empty() == false && path_.back() == loc()) {
+		path_.pop_back();
+	}
+}
+
+const std::vector<hex::location>* pc_party::get_current_path() const
+{
+	return path_.empty() ? NULL : &path_;
 }
 
 void pc_party::encounter(party& p, const std::string& type)
@@ -61,6 +77,7 @@ party::TURN_RESULT pc_party::do_turn()
 	               game_world().camera().direction());
 
 	if(dir != hex::NULL_DIRECTION) {
+		path_.clear();
 		const hex::location dst = tile_in_direction(loc(),dir);
 		if(movement_cost(loc(),dst) >= 0) {
 			set_movement_mode(keyboard::run() ? RUN : WALK);
@@ -68,8 +85,35 @@ party::TURN_RESULT pc_party::do_turn()
 			return TURN_COMPLETE;
 		}
 	} else if(keyboard::pass()) {
+		path_.clear();
 		pass();
 		return TURN_COMPLETE;
+	}
+
+	if(!path_.empty()) {
+		if(path_.back() == loc()) {
+			path_.pop_back();
+		}
+
+		if(path_.size() > 1 && game_world().get_party_at(path_.back())) {
+			const hex::location loc = path_.back();
+			set_destination(path_.front());
+			if(path_.empty()) {
+				path_.push_back(loc);
+			}
+		}
+
+		if(!path_.empty()) {
+
+			const hex::DIRECTION dir = hex::get_adjacent_direction(loc(), path_.back());
+			if(dir == hex::NULL_DIRECTION) {
+				path_.clear();
+			} else {
+				move(dir);
+				path_.pop_back();
+			}
+			return TURN_COMPLETE;
+		}
 	}
 
 	return TURN_STILL_THINKING;

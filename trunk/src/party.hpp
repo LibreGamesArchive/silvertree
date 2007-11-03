@@ -26,6 +26,7 @@
 #include "item_fwd.hpp"
 #include "map_avatar.hpp"
 #include "party_fwd.hpp"
+#include "pathfind.hpp"
 #include "tile_logic.hpp"
 #include "wml_node.hpp"
 
@@ -34,13 +35,17 @@ namespace game_logic
 
 class world;
 
-class party : public formula_callable
+class party : public formula_callable, public hex::path_cost_calculator
 {
 public:
 	party(wml::const_node_ptr node, world& gameworld);
 	virtual ~party();
 
 	virtual wml::node_ptr write() const;
+	virtual void set_destination(const hex::location& loc) {}
+	virtual const std::vector<hex::location>* get_current_path() const {
+		return NULL;
+	}
 
 	static party_ptr create_party(
 					wml::const_node_ptr node,
@@ -125,6 +130,7 @@ protected:
 	void move(hex::DIRECTION dir);
 	int movement_cost(const hex::location& src,
 	                  const hex::location& dst) const;
+	bool allowed_to_move(const hex::location& loc) const;
 	const hex::gamemap& map() const;
 	virtual void set_value(const std::string& key, const variant& value);
 

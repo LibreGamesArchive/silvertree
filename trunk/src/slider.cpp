@@ -30,7 +30,7 @@ slider::slider(const SDL_Rect& rect, int attack, int defense,
 
 GLfloat slider::duration() const
 {
-	return (use_slider_ ? lead_time : 0.0) + 20.0/defense_;
+	return (use_slider_ ? lead_time : 0.0) + 50.0/defense_;
 }
 
 GLfloat slider::critical_section() const
@@ -71,6 +71,9 @@ void slider::draw()
 
 void slider::process()
 {
+	if(!use_slider_) {
+		return;
+	}
 	const GLfloat pos = time_ < lead_time ? 0.0 : (time_ - lead_time)/(duration() - lead_time);
 	SDL_Event event;
 	while(SDL_PollEvent(&event)) {
@@ -90,33 +93,22 @@ slider::RESULT slider::result() const
 		return result_;
 	}
 
-	int random = rand()%(attack_+defense_);
 	if(!use_slider_) {
-		if(random < defense_) {
-			return result_ = MISS;
-		} else {
-			random -= defense_;
-			if(random >= attack_ - attack_/5) {
-				return result_ = CRITICAL;
-			} else {
-				return result_ = HIT;
-			}
-		}
+		return YELLOW;
 	}
 
 	if(stopped_ < 0.0) {
 		if(time_ >= duration()) {
-			return result_ = FUMBLE;
+			return result_ = BLUE;
 		} else {
 			return PENDING;
 		}
 	} else if (stopped_ < hit_section) {
-		return result_ = random < defense_ ? MISS : HIT;
+		return result_ = YELLOW;
 	} else if (stopped_ < hit_section + critical_section()) {
-		return result_ = CRITICAL;
+		return result_ = RED;
 	} else {
-		random /= 2;
-		return result_ = random < defense_ ? MISS : FUMBLE;
+		return result_ = BLUE;
 	}
 }
 

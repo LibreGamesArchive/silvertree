@@ -92,6 +92,8 @@ public:
 	void quit() { done_ = true; quit_ = true; }
 
 	void add_chat_label(gui::label_ptr label, const_character_ptr ch, int delay);
+	void set_lighting() const;
+
 private:
 	party_ptr get_pc_party() const;
 	bool remove_party(party_ptr p);
@@ -110,8 +112,6 @@ private:
 
 	party_map::iterator find_party(const_party_ptr p);
 	party_ptr get_party_ready_to_move();
-
-	void set_lighting() const;
 
 	struct party_orderer
 	   : public std::binary_function<party_ptr,party_ptr,bool> {
@@ -179,6 +179,11 @@ private:
 		const_character_ptr character;
 	};
 	mutable std::vector<chat_label> chat_labels_;
+
+	const hex::location& get_selected_hex() const;
+	mutable hex::location selected_hex_;
+	mutable bool camera_moving_;
+	mutable bool selected_hex_up_to_date_;
 };
 
 }
