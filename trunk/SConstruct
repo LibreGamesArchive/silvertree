@@ -38,27 +38,19 @@ if env["PLATFORM"] == "darwin":
         env.AppendUnique(LIBPATH = ["/sw/lib/mesa"], CPPPATH = ["/sw/include/mesa"])
     if env["GL_IMPL_MAC"] == "apple":
         env.AppendUnique(FRAMEWORKS = ["OpenGL"], CPPPATH = ["/System/Library/Frameworks/OpenGL.framework/Headers"])
-if env["PLATFORM"] == "posix" or env["PLATFORM"] == "darwin":
-    env.ParseConfig("sdl-config --cflags --libs")
-if env["PLATFORM"] == "win32":
-    env.AppendUnique(CCFLAGS = ["-D_GNU_SOURCE"])
-    env.AppendUnique(LIBS = Split("mingw32 SDLmain SDL SDL_image SDL_ttf"))
-    env.AppendUnique(LINKFLAGS = ["-mwindows", "-s"])
-env.AppendUnique(CPPPATH = [join(env["SDLDIR"], "include/SDL")], LIBPATH = [join(env["SDLDIR"], "lib")])
 env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
-conf = env.Configure()
+
+execfile("SConfigure")
+conf = env.Configure(custom_tests = CustomChecks)
 if env["PLATFORM"] == "win32":
     conf.CheckLibWithHeader("opengl32", "GL/gl.h", "C") or Exit()
     conf.CheckLibWithHeader("glu32", "GL/glu.h", "C") or Exit()
 else:
     conf.CheckLibWithHeader("GL", "GL/gl.h", "C") or Exit()
     conf.CheckLibWithHeader("GLU", "GL/glu.h", "C") or Exit()
-if env["PLATFORM"] != "win32" and env["PLATFORM"] != "darwin":
-    # SDL checks on windows and Mac don't work because SDL declares main() in SDL.h and assumes
-    # int main(int,char**) while checks use int main(void)
-    conf.CheckLibWithHeader("SDL", "SDL_config.h", "C", autoadd = False) or Exit()
-    conf.CheckLibWithHeader("SDL_image", "SDL_image.h", "C") or Exit()
-    conf.CheckLibWithHeader("SDL_ttf", "SDL_ttf.h", "C") or Exit()
+conf.CheckSDL() or Exit()
+conf.CheckSDL("SDL_image") or Exit()
+conf.CheckSDL("SDL_ttf") or Exit()
 if env["BOOST_SUFFIX"]:
     conf.CheckLibWithHeader("boost_regex" + env["BOOST_SUFFIX"], "boost/regex.hpp", "C++") or Exit()
 else:
