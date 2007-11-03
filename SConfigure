@@ -1,0 +1,30 @@
+
+def CheckSDL(context, sdl_lib = "SDL"):
+    if sdl_lib == "SDL":
+        context.Message("Checking for Simple DirectMedia Layer library... ")
+        env = context.env
+        env.AppendUnique(CPPPATH = [join(env["SDLDIR"], "include/SDL")], LIBPATH = [join(env["SDLDIR"], "lib")])
+        if env["PLATFORM"] == "posix" or env["PLATFORM"] == "darwin":
+            env.ParseConfig("sdl-config --cflags --libs")
+        if env["PLATFORM"] == "win32":
+            env.AppendUnique(CCFLAGS = ["-D_GNU_SOURCE"])
+            env.AppendUnique(LIBS = Split("mingw32 SDLmain SDL SDL_image SDL_ttf"))
+            env.AppendUnique(LINKFLAGS = ["-mwindows", "-s"])
+    else:
+        context.Message("Checking for %s library... " % sdl_lib)
+        context.env.AppendUnique(LIBS = [sdl_lib])
+    test_program = """
+        #include <%s.h>
+        int main(int argc, char** argv)
+        {
+        }
+
+        """ % sdl_lib
+    if context.TryLink(test_program, ".c"):
+        context.Result("yes")
+        return True
+    else:
+        context.Result("no")
+        return False
+
+CustomChecks = { "CheckSDL" : CheckSDL }
