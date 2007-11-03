@@ -331,6 +331,12 @@ int party::movement_cost(const hex::location& src,
 	return res;
 }
 
+bool party::allowed_to_move(const hex::location& loc) const
+{
+	return map().is_loc_on_map(loc) &&
+	       (get_visible_locs().count(loc) == 0 || !world_->get_party_at(loc));
+}
+
 void party::apply_fatigue(const hex::location& src,
                           const hex::location& dst)
 {

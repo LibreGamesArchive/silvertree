@@ -10,6 +10,7 @@ bool parse_args(int argc, char** argv);
 bool preference_nocombat();
 bool preference_maxfps();
 bool preference_mipmapping();
+bool preference_sliders();
 
 GLenum preference_mipmap_min();
 GLenum preference_mipmap_max();

@@ -30,6 +30,7 @@
 #include "slider.hpp"
 #include "status_bars_widget.hpp"
 #include "surface_cache.hpp"
+#include "world.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <iostream>
@@ -351,7 +352,6 @@ battle_character_ptr battle::selected_char()
 
 void battle::draw(gui::slider* slider, bool draw_widgets)
 {
-	std::cerr << "drawing " << SDL_GetTicks() << "\n";
 	using hex::tile;
 	using hex::location;
 
@@ -391,6 +391,8 @@ void battle::draw(gui::slider* slider, bool draw_widgets)
 	if(focus_ != chars_.end() && current_focus_ != (*focus_)->loc() || camera_.moved_since_last_check()) {
 		rebuild_visible_tiles();
 	}
+
+	participants().front()->get_party().game_world().set_lighting();
 
 	tile::setup_drawing();
 	foreach(const tile* t, tiles_) {
@@ -523,7 +525,6 @@ void battle::draw(gui::slider* slider, bool draw_widgets)
 	    i != stats_dialogs_.end(); ++i) {
 		i->second->draw();
 	}
-	std::cerr << "draw done...\n";
 }
 
 void battle::draw_route(const battle_character::route& r)
@@ -554,13 +555,12 @@ void battle::begin_animation() {
 	time_cost_widget_->clear_tracker();
 }
 
-void battle::animation_frame(float t) {
+void battle::animation_frame(float t, gui::slider* slider) {
 	sub_time_ += t;
 
 	if(!skippy_.skip_frame()) {
-		draw();
+		draw(slider);
 		SDL_GL_SwapBuffers();
-		SDL_Delay(1);
 	}
 	/* do this to ensure key tables are updated */
 	SDL_Event e;
@@ -701,13 +701,18 @@ void battle::attack_character(battle_character& attacker,
 		  hex::get_main_direction(defender.loc(),attacker.loc()));
 	}
 
-	const int random = rand()%(stats.attack+stats.defense);
+	int random = rand()%(stats.attack+stats.defense);
+
+	const SDL_Rect slider_rect = {100, 650, 800, 100};
+	const bool use_slider = preference_sliders() && attacker.is_human();
+	bool applied_slider_result = false;
+	gui::slider slider(slider_rect, stats.attack, stats.defense, use_slider);
 
 	GLfloat highlight[] = {1.0,0.0,0.0,0.5};
 	const GLfloat elapsed_time = stats.time_taken;
-	const GLfloat anim_time = elapsed_time/5.0;
-	const GLfloat begin_hit = 0.4;
-	const GLfloat end_hit = 0.8;
+	const GLfloat anim_time = use_slider ? slider.duration() : elapsed_time/5.0;
+	GLfloat begin_hit = use_slider ? -1.0 : 0.4;
+	GLfloat end_hit = use_slider ? -1.0 : 0.8;
 	attacker.begin_attack(defender);
 
 	graphics::const_model_ptr missile;
@@ -725,8 +730,9 @@ void battle::attack_character(battle_character& attacker,
 	}
 
 	begin_animation();
-	for(GLfloat t = 0.0; t < anim_time; t += 0.1) {
-		std::cerr << "set init: " << (t*(elapsed_time/anim_time)) << "\n";
+	for(GLfloat t = 0.0; t < anim_time; t += 0.02) {
+		slider.process();
+		slider.set_time(t);
 		initiative_bar_->focus_character(&attacker, t*(elapsed_time/anim_time));
 		if(missile_.get()) {
 			missile_->update();
@@ -739,7 +745,19 @@ void battle::attack_character(battle_character& attacker,
 		   cur_time >= begin_hit && cur_time <= end_hit) {
 			defender.set_highlight(highlight);
 		}
-		animation_frame(0.1 * elapsed_time/anim_time);
+
+		if(use_slider && !applied_slider_result && slider.result() != gui::slider::PENDING) {
+			if(slider.result() == gui::slider::RED) {
+				random = 100;
+			} else if(slider.result() == gui::slider::BLUE) {
+				random /= 2;
+			}
+
+			begin_hit = t;
+			end_hit = t + 0.4;
+		}
+		
+		animation_frame(0.02 * elapsed_time/anim_time, &slider);
 		defender.set_highlight(NULL);
 	}
 	end_animation();

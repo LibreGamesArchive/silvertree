@@ -78,6 +78,7 @@ am_libsilvertree_a_OBJECTS = base_terrain.$(OBJEXT) \
 	parseark.$(OBJEXT) parsedae.$(OBJEXT) particle.$(OBJEXT) \
 	particle_emitter.$(OBJEXT) particle_system.$(OBJEXT) \
 	party.$(OBJEXT) party_status_dialog.$(OBJEXT) \
+	pathfind.$(OBJEXT) \
 	pc_party.$(OBJEXT) post_battle_dialog.$(OBJEXT) \
 	preferences.$(OBJEXT) raster.$(OBJEXT) sdl_algo.$(OBJEXT) \
 	settlement.$(OBJEXT) shop_dialog.$(OBJEXT) skill.$(OBJEXT) \
@@ -336,6 +337,7 @@ particle_system.hpp \
 party_fwd.hpp \
 party.hpp \
 party_status_dialog.hpp \
+pathfind.hpp \
 pc_party.hpp \
 post_battle_dialog.hpp \
 preferences.hpp \
@@ -440,6 +442,7 @@ particle_emitter.cpp \
 particle_system.cpp \
 party.cpp \
 party_status_dialog.cpp \
+pathfind.cpp \
 pc_party.cpp \
 post_battle_dialog.cpp \
 preferences.cpp \
@@ -608,6 +611,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/particle_system.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/party.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/party_status_dialog.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pathfind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pc_party.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/post_battle_dialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/preferences.Po@am__quote@

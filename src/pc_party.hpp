@@ -33,10 +33,13 @@ public:
 	void encounter(party& p, const std::string& type);
 
 	wml::node_ptr write() const;
+	void set_destination(const hex::location& loc);
+	const std::vector<hex::location>* get_current_path() const;
 private:
 	TURN_RESULT do_turn();
 
 	std::vector<const_party_ptr> seen_;
+	std::vector<hex::location> path_;
 };
 
 }

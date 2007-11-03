@@ -31,7 +31,7 @@ public:
 	void draw();
 	void process();
 
-	enum RESULT { PENDING, MISS, FUMBLE, HIT, CRITICAL };
+	enum RESULT { PENDING, BLUE, YELLOW, RED };
 	RESULT result() const;
 
 private:

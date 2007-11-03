@@ -89,6 +89,7 @@ particle_system.hpp \
 party_fwd.hpp \
 party.hpp \
 party_status_dialog.hpp \
+pathfind.hpp \
 pc_party.hpp \
 post_battle_dialog.hpp \
 preferences.hpp \
@@ -193,6 +194,7 @@ particle_emitter.cpp \
 particle_system.cpp \
 party.cpp \
 party_status_dialog.cpp \
+pathfind.cpp \
 pc_party.cpp \
 post_battle_dialog.cpp \
 preferences.cpp \

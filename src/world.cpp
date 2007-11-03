@@ -22,6 +22,7 @@
 #include "image_widget.hpp"
 #include "label.hpp"
 #include "party_status_dialog.hpp"
+#include "pathfind.hpp"
 #include "preferences.hpp"
 #include "raster.hpp"
 #include "settlement.hpp"
@@ -74,7 +75,8 @@ world::world(wml::const_node_ptr node)
 	  camera_controller_(camera_),
 	  time_(node), subtime_(0.0), tracks_(map_),
 	  border_tile_(wml::get_str(node, "border_tile")),
-	  done_(false), quit_(false)
+	  done_(false), quit_(false), camera_moving_(false),
+	  selected_hex_up_to_date_(false)
 {
 	show_grid_ = false;
 
@@ -400,44 +402,78 @@ void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 	track_info_grid_ = get_track_info();
 }
 
-
-void world::draw() const
+const hex::location& world::get_selected_hex() const
 {
-	const std::set<hex::location>& visible =
-		focus_->get_visible_locs();
+	if(camera_moving_) {
+		selected_hex_ = hex::location(-1, -1);
+		selected_hex_up_to_date_ = false;
+		return selected_hex_;
+	}
+
+	if(selected_hex_up_to_date_) {
+		return selected_hex_;
+	}
+
+	if(map_.is_loc_on_map(selected_hex_)) {
+		camera_controller_.prepare_selection();
+		glLoadName(0);
+		map_.get_tile(selected_hex_).draw();
+		if(camera_controller_.finish_selection() == 0) {
+			selected_hex_up_to_date_ = true;
+			return selected_hex_;
+		}
+		
+	}
 
 	camera_controller_.prepare_selection();
 	GLuint select_name = 0;
-	for(party_map::const_iterator i = parties_.begin();
-	    i != parties_.end(); ++i) {
-		if(visible.count(i->second->loc())) {
-			glLoadName(select_name);
-			i->second->draw();
-		}
-
+	foreach(const hex::tile* t, tiles_) {
+		glLoadName(select_name);
+		t->draw();
 		++select_name;
 	}
 
 	select_name = camera_controller_.finish_selection();
-	hex::location selected_loc;
-	party_map::const_iterator selected_party = parties_.end();
-	if(select_name != GLuint(-1)) {
-			party_map::const_iterator i = parties_.begin();
-			std::advance(i, select_name);
-			selected_loc = i->second->loc();
-			selected_party = i;
+	if(select_name == GLuint(-1)) {
+		selected_hex_ = hex::location(-1, -1);
+	} else {
+		selected_hex_ = tiles_[select_name]->loc();
 	}
 
-	if(focus_) {
-		GLfloat buf[3];
-		focus_->get_pos(buf);
-		camera_.set_pan(buf);
+	selected_hex_up_to_date_ = true;
+	return selected_hex_;
+}
+
+void world::draw() const
+{
+	assert(focus_);
+	const std::set<hex::location>& visible =
+		focus_->get_visible_locs();
+
+	hex::location selected_loc = get_selected_hex();
+	std::vector<hex::location> path;
+	party_map::const_iterator selected_party = parties_.end();
+	if(map_.is_loc_on_map(selected_loc)) {
+		const bool adjacent_only = visible.count(selected_loc) && parties_.count(selected_loc);
+		hex::find_path(focus_->loc(), selected_loc, *focus_, &path, 4000, adjacent_only);
 	}
+
+	if(path.empty() && focus_->get_current_path()) {
+		path = *focus_->get_current_path();
+	}
+
+	GLfloat pan_buf[3];
+	focus_->get_pos(pan_buf);
+	camera_.set_pan(pan_buf);
 
 	camera_.prepare_frame();
 	if(current_loc_ != focus_->loc() || camera_.moved_since_last_check()) {
+		camera_moving_ = true;
 		rebuild_drawing_caches(visible);
+	} else {
+		camera_moving_ = false;
 	}
+
 	set_lighting();
 
 	hex::tile::setup_drawing();
@@ -476,6 +512,14 @@ void world::draw() const
 		glDisable(GL_LIGHTING);
 		map_.get_tile(selected_loc).draw_highlight();
 		glEnable(GL_LIGHTING);
+	}
+
+	foreach(const hex::location& loc, path) {
+		if(map_.is_loc_on_map(loc)) {
+			glDisable(GL_LIGHTING);
+			map_.get_tile(loc).draw_highlight();
+			glEnable(GL_LIGHTING);
+		}
 	}
 
 	std::vector<const_party_ptr> enemies;
@@ -673,6 +717,14 @@ void world::play()
 				case SDL_QUIT:
 					done_ = true;
 					quit_ = true;
+					break;
+				case SDL_MOUSEMOTION:
+					selected_hex_up_to_date_ = false;
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					if(event.button.button == SDL_BUTTON_LEFT && focus_) {
+						focus_->set_destination(get_selected_hex());
+					}
 					break;
 				default:
 					break;
