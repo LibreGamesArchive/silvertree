@@ -328,8 +328,6 @@ void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 	view_volume.set_volume_clip_space(-1, 1, -1, 1, -1, 1);
 	tiles_.clear();
 	current_loc_ = focus_->loc();
-	std::cerr << "ZOOM: " << camera_.zoom() << "\n";
-	std::cerr << "TILT: " << camera_.tilt() << "\n";
 	int tiles_tried = 0;
 
 	//find the initial ring which is within view
@@ -352,8 +350,6 @@ void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 
 		++core_radius;
 	}
-
-	std::cerr << "core radius: " << core_radius << "\n";
 
 	done = false;
 	std::vector<hex::location> hexes;
@@ -391,8 +387,6 @@ void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 			tiles_.back()->load_texture();
 		}
 	}
-
-	std::cerr << "TILES: " << tiles_.size() << "/" << tiles_tried << "\n";
 
 	std::sort(tiles_.begin(),tiles_.end(), hex::tile::compare_texture());
 
@@ -455,7 +449,7 @@ void world::draw() const
 	party_map::const_iterator selected_party = parties_.end();
 	if(map_.is_loc_on_map(selected_loc)) {
 		const bool adjacent_only = visible.count(selected_loc) && parties_.count(selected_loc);
-		hex::find_path(focus_->loc(), selected_loc, *focus_, &path, 4000, adjacent_only);
+		hex::find_path(focus_->loc(), selected_loc, *focus_, &path, 500, adjacent_only);
 	}
 
 	if(path.empty() && focus_->get_current_path()) {
@@ -722,7 +716,8 @@ void world::play()
 					selected_hex_up_to_date_ = false;
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					if(event.button.button == SDL_BUTTON_LEFT && focus_) {
+					if(event.button.button == SDL_BUTTON_LEFT && focus_ &&
+					   event.button.y < game_bar_->y()) {
 						focus_->set_destination(get_selected_hex());
 					}
 					break;
@@ -907,7 +902,6 @@ gui::const_grid_ptr world::get_track_info() const
 	}
 
 	const int track = focus_->track();
-	std::cerr << "track ability: " << track << "\n";
 
 	const tracks::tracks_list& list = tracks_.get_tracks(focus_->loc(),time_);
 	if(list.empty()) {
@@ -921,7 +915,6 @@ gui::const_grid_ptr world::get_track_info() const
 			continue;
 		}
 
-		std::cerr << "visible: " << (info.visibility*track) << "\n";
 		if(info.visibility*track < 1000) {
 			continue;
 		}
