@@ -232,10 +232,10 @@ const std::string SkillPointsStat = "skill_points";
 
 int improvement_cost(int attr)
 {
-	if(attr < 12) {
-		return 1;
+	if(attr < 10) {
+		return 2;
 	} else {
-		return 1 + (attr-10)/2;
+		return 2 + (attr-8)/2;
 	}
 }
 
@@ -371,6 +371,11 @@ void character::calculate_moves()
 bool character::can_improve_attr(const std::string& str) const
 {
 	return improvement_cost(get_attr(str)) <= improvement_points();
+}
+
+int character::improve_attr_cost(const std::string& str) const
+{
+	return improvement_cost(get_attr(str));
 }
 
 void character::improve_attr(const std::string& str)

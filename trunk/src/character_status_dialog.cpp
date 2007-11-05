@@ -168,7 +168,7 @@ void character_status_dialog::init()
 		  set_align(1,grid::ALIGN_RIGHT).set_align(2,grid::ALIGN_RIGHT);
 	add_widget(grid, MOVE_RIGHT);
 
-	grid.reset(new gui::grid(4));
+	grid.reset(new gui::grid(5));
 	int index = 0;
 	foreach(const std::string& a, game_logic::character::attributes()) {
 		ptr improve(new label("", color, sz));
@@ -180,7 +180,8 @@ void character_status_dialog::init()
 		grid->add_col(ptr(new label(a, color, sz))).
 		      add_col(ptr(new label("", color, sz))).
 		      add_col(ptr(new label(formatter() << c->get_attr(a), color, sz))).
-		      add_col(improve);
+		      add_col(improve).
+			  add_col(ptr(new label(formatter() << "(" << i18n::translate("attr_cost") << " " << c->improve_attr_cost(a) << ")", color, sz)));
 		++index;
 	}
 

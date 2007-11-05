@@ -93,6 +93,7 @@ public:
 
 	int get_attr(const std::string& str) const;
 	bool can_improve_attr(const std::string& str) const;
+	int improve_attr_cost(const std::string& str) const;
 	void improve_attr(const std::string& str);
 	void learn_skill(const std::string& name);
 	bool has_skill(const std::string& name) const;
