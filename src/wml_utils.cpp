@@ -5,9 +5,14 @@ namespace wml {
 node_ptr deep_copy(const_node_ptr ptr, const std::string& name)
 {
 	node_ptr res(new node(name));
+	res->set_comment(ptr->get_comment());
 	for(node::const_attr_iterator i = ptr->begin_attr();
 	    i != ptr->end_attr(); ++i) {
 		res->set_attr(i->first,i->second);
+		const std::string& comment = ptr->get_attr_comment(i->first);
+		if(comment.empty() == false) {
+			res->set_attr_comment(i->first,comment);
+		}
 	}
 
 	for(node::const_all_child_iterator i = ptr->begin_children();
@@ -25,9 +30,17 @@ node_ptr deep_copy(const_node_ptr ptr)
 
 void merge_over(const_node_ptr src, node_ptr dst)
 {
+	if(src->get_comment().empty() == false) {
+		dst->set_comment(src->get_comment());
+	}
+
 	for(node::const_attr_iterator i = src->begin_attr();
 	    i != src->end_attr(); ++i) {
 		dst->set_attr(i->first,i->second);
+		const std::string& comment = src->get_attr_comment(i->first);
+		if(comment.empty() == false) {
+			dst->set_attr_comment(i->first,comment);
+		}
 	}
 
 	for(node::const_all_child_iterator i = src->begin_children();
