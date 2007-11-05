@@ -427,7 +427,19 @@ const hex::location& world::get_selected_hex() const
 		++select_name;
 	}
 
-	select_name = camera_controller_.finish_selection();
+	std::vector<GLuint> selection;
+
+	select_name = camera_.finish_selection(&selection);
+	if(selection.size() > 1) {
+		int high = -100000;
+		foreach(GLuint n, selection) {
+			if(tiles_[n]->height() > high) {
+				select_name = n;
+				high = tiles_[n]->height();
+			}
+		}
+	}
+
 	if(select_name == GLuint(-1)) {
 		selected_hex_ = hex::location(-1, -1);
 	} else {
