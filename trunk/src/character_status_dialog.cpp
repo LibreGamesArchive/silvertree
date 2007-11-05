@@ -190,9 +190,11 @@ void character_status_dialog::init()
 		      add_col(ptr(new label("", color, sz))).
 		      add_col(ptr(new label("", color, sz))).
 		      add_col(ptr(new label("", color, sz))).
+		      add_col(ptr(new label("", color, sz))).
 			  add_col(ptr(new label("Points", color, sz))).
 		      add_col(ptr(new label("", color, sz))).
 			  add_col(ptr(new label(formatter() << c->improvement_points(), color, sz))).
+		      add_col(ptr(new label("", color, sz))).
 		      add_col(ptr(new label("", color, sz)));
 	}
 
