@@ -33,6 +33,11 @@ settlement::settlement(const wml::const_node_ptr& node,
 		model_height_formula_.reset(new formula(model_height_formula));
 	}
 
+	const std::string& model_rotation_formula = node->attr("model_rotation");
+	if(model_rotation_formula.empty() == false) {
+		model_rotation_formula_.reset(new formula(model_rotation_formula));
+	}
+
 	const std::vector<wml::const_node_ptr> portals = wml::child_nodes(node, "portal");
 	foreach(const wml::const_node_ptr& portal, portals) {
 		hex::location loc1(wml::get_attr<int>(portal,"xdst"),
@@ -54,7 +59,11 @@ wml::node_ptr settlement::write() const
 	}
 
 	if(model_height_formula_) {
-		res->set_attr("model_height", model_height_formula_->str());
+		res->set_attr("model_rotation", model_height_formula_->str());
+	}
+
+	if(model_rotation_formula_) {
+		res->set_attr("model_height", model_rotation_formula_->str());
 	}
 	
 	typedef std::pair<hex::location, hex::location> LocPair;
@@ -104,6 +113,7 @@ void settlement::draw() const
 		const int res = model_height_formula_->execute(real_world_time_callable()).as_int();
 		height_adjust = res/1000.0;
 	}
+
 	typedef std::pair<hex::location,hex::location> loc_pair;
 	foreach(const loc_pair& portal, portals_) {
 		const hex::location& loc = portal.first;
@@ -114,6 +124,17 @@ void settlement::draw() const
 		       tile::translate_height(map_.get_tile(loc).height()) + height_adjust};
 		glPushMatrix();
 		glTranslatef(pos[0],pos[1],pos[2]);
+
+		if(model_rotation_formula_) {
+			const variant var = model_rotation_formula_->execute(real_world_time_callable());
+
+			int rotate[4] = {0,0,0,0};
+			for(int n = 0; n < 4 && n < var.num_elements(); ++n) {
+				rotate[n] = var[n].as_int();
+			}
+
+			glRotatef(rotate[0], rotate[1], rotate[2], rotate[3]);
+		}
 		model_->draw();
 		glPopMatrix();
 	}

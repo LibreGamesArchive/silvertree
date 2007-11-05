@@ -49,6 +49,7 @@ private:
 	std::map<hex::location, hex::location> portals_;
 	graphics::const_model_ptr model_;
 	const_formula_ptr model_height_formula_;
+	const_formula_ptr model_rotation_formula_;
 	wml::const_node_ptr wml_;
 	mutable boost::shared_ptr<world> world_;
 	const hex::gamemap& map_;
