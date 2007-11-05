@@ -12,6 +12,7 @@
 */
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
+#include <cmath>
 #include <iostream>
 #include <vector>
 
@@ -325,6 +326,20 @@ private:
 	}
 };
 
+class wave_function : public function_expression {
+public:
+	explicit wave_function(const args_list& args)
+	     : function_expression(args, 1, 1)
+	{}
+
+private:
+	variant execute(const formula_callable& variables) const {
+		const int value = args()[0]->evaluate(variables).as_int()%1000;
+		const double angle = 2.0*3.141592653589*(static_cast<double>(value)/1000.0);
+		return variant(static_cast<int>(sin(angle)*1000.0));
+	}
+};
+
 namespace {
 class variant_comparator : public formula_callable {
 	expression_ptr expr_;
@@ -534,6 +549,8 @@ expression_ptr create_function(const std::string& fn,
 		return expression_ptr(new max_function(args));
 	} else if(fn == "choose") {
 		return expression_ptr(new choose_element_function(args));
+	} else if(fn == "wave") {
+		return expression_ptr(new wave_function(args));
 	} else if(fn == "sort") {
 		return expression_ptr(new sort_function(args));
 	} else if(fn == "filter") {
