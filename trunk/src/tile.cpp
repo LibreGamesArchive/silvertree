@@ -97,8 +97,6 @@ void tile::initialize_features_cache(const tile** beg, const tile** end,
 
 		t.model_->get_materials(cache);
 	}
-
-	std::cerr << "got " << cache->size() << " materials\n";
 }
 
 void tile::draw_features(const tile** beg, const tile** end,

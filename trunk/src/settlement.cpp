@@ -28,6 +28,11 @@ settlement::settlement(const wml::const_node_ptr& node,
   : model_(graphics::model::get_model((*node)["model"])),
 	wml_(node), map_(map)
 {
+	const std::string& model_height_formula = node->attr("model_height");
+	if(model_height_formula.empty() == false) {
+		model_height_formula_.reset(new formula(model_height_formula));
+	}
+
 	const std::vector<wml::const_node_ptr> portals = wml::child_nodes(node, "portal");
 	foreach(const wml::const_node_ptr& portal, portals) {
 		hex::location loc1(wml::get_attr<int>(portal,"xdst"),
@@ -47,6 +52,11 @@ wml::node_ptr settlement::write() const
 	if(model_) {
 		res->set_attr("model", model_->id());
 	}
+
+	if(model_height_formula_) {
+		res->set_attr("model_height", model_height_formula_->str());
+	}
+	
 	typedef std::pair<hex::location, hex::location> LocPair;
 	foreach(const LocPair& locs, portals_) {
 		res->add_child(write_src_dst_location("portal", locs.first, locs.second));
@@ -68,9 +78,32 @@ bool settlement::has_entry_point(const hex::location& loc) const
 	return portals_.count(loc) != 0;
 }
 
+namespace {
+class real_world_time_callable : public formula_callable
+{
+	variant get_value(const std::string& key) const {
+		if(key == "ms") {
+			return variant(SDL_GetTicks());
+		} else {
+			return variant();
+		}
+	}
+
+	void get_inputs(std::vector<formula_input>* inputs) const {
+		inputs->push_back(formula_input("ms", FORMULA_READ_ONLY));
+	}
+};
+}
+
 void settlement::draw() const
 {
 	using hex::tile;
+
+	GLfloat height_adjust = 0.0;
+	if(model_height_formula_) {
+		const int res = model_height_formula_->execute(real_world_time_callable()).as_int();
+		height_adjust = res/1000.0;
+	}
 	typedef std::pair<hex::location,hex::location> loc_pair;
 	foreach(const loc_pair& portal, portals_) {
 		const hex::location& loc = portal.first;
@@ -78,7 +111,7 @@ void settlement::draw() const
 			continue;
 		}
 		GLfloat pos[3] = {tile::translate_x(loc), tile::translate_y(loc),
-		       tile::translate_height(map_.get_tile(loc).height())};
+		       tile::translate_height(map_.get_tile(loc).height()) + height_adjust};
 		glPushMatrix();
 		glTranslatef(pos[0],pos[1],pos[2]);
 		model_->draw();

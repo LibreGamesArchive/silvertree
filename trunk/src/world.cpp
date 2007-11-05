@@ -446,7 +446,7 @@ void world::draw() const
 
 	hex::location selected_loc = get_selected_hex();
 	std::vector<hex::location> path;
-	party_map::const_iterator selected_party = parties_.end();
+	const_party_ptr selected_party = get_party_at(selected_loc);
 	if(map_.is_loc_on_map(selected_loc)) {
 		const bool adjacent_only = visible.count(selected_loc) && parties_.count(selected_loc);
 		hex::find_path(focus_->loc(), selected_loc, *focus_, &path, 500, adjacent_only);
@@ -494,9 +494,9 @@ void world::draw() const
 		glEnable(GL_LIGHTING);
 	}
 
-	if(selected_party != parties_.end()) {
+	if(selected_party) {
 		std::vector<const hex::tile*> tiles;
-		hex::line_of_sight(map_,focus_->loc(),selected_party->second->loc(),&tiles);
+		hex::line_of_sight(map_,focus_->loc(),selected_party->loc(),&tiles);
 		foreach(const hex::tile* t, tiles) {
 			t->draw_highlight();
 		}
@@ -508,12 +508,19 @@ void world::draw() const
 		glEnable(GL_LIGHTING);
 	}
 
-	foreach(const hex::location& loc, path) {
-		if(map_.is_loc_on_map(loc)) {
-			glDisable(GL_LIGHTING);
-			map_.get_tile(loc).draw_highlight();
-			glEnable(GL_LIGHTING);
+	if(path.empty() == false) {
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
+		glBegin(GL_LINE_STRIP);
+		glColor4f(1.0,1.0,1.0,0.5);
+		foreach(const hex::location& loc, path) {
+			map_.get_tile(loc).draw_center();
 		}
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_LIGHTING);
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	std::vector<const_party_ptr> enemies;
@@ -602,8 +609,8 @@ void world::draw() const
 
 	blit_texture(compass_, 1024-compass_.height(),0,-camera_.current_rotation());
 
-	if(selected_party != parties_.end()) {
-		graphics::texture text = graphics::font::render_text(selected_party->second->status_text(), 20, white);
+	if(selected_party) {
+		graphics::texture text = graphics::font::render_text(selected_party->status_text(), 20, white);
 		graphics::blit_texture(text,1024 - 50 - text.width(),200);
 	}
 
@@ -806,7 +813,8 @@ void world::play()
 
 				if(active_party->is_destroyed() == false) {
 					std::map<hex::location,hex::location>::const_iterator exit = exits_.find(active_party->loc());
-					if(exit != exits_.end() && active_party->is_human_controlled()) {
+					if(script_.empty() && exit != exits_.end() && active_party->is_human_controlled()) {
+						std::cerr << "exiting through exit at " << active_party->loc().x() << "," << active_party->loc().y() << "\n";
 						active_party->set_loc(exit->second);
 						remove_party(active_party);
 						std::cerr << "returning from world...\n";

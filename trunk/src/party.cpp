@@ -148,6 +148,7 @@ void party::new_world(world& w, const hex::location& loc, hex::DIRECTION dir)
 {
 	world_ = &w;
 	loc_ = loc;
+	std::cerr << "entering world at " << loc.x() << "," << loc.y() << "\n";
 	arrive_at_ = game_world().current_time();
 	if(dir != hex::NULL_DIRECTION && movement_cost(loc_, hex::tile_in_direction(loc_, dir)) >= 0) {
 		hex::location dst = hex::tile_in_direction(loc_, dir);
@@ -455,8 +456,6 @@ const std::set<hex::location>& party::get_visible_locs() const
 		return visible_locs_;
 	}
 
-	const int start_ticks = SDL_GetTicks();
-
 	const int range = vision();
 
 	visible_locs_.insert(loc_);
@@ -473,9 +472,6 @@ const std::set<hex::location>& party::get_visible_locs() const
 			}
 		}
 	}
-
-	const int taken = SDL_GetTicks() - start_ticks;
-	std::cerr << "get_visible_locs(): " << taken << "\n";
 
 	return visible_locs_;
 }

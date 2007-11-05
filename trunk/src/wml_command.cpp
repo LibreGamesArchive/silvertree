@@ -213,7 +213,7 @@ public:
 	   : object_finder_(node->attr("objects").empty() ? node->attr("object") : node->attr("objects"))
 	{
 		for(wml::node::const_attr_iterator i = node->begin_attr(); i != node->end_attr(); ++i) {
-			if(i->first != "objects") {
+			if(i->first != "objects" && i->first != "object") {
 				modify_[i->first].reset(new formula(i->second));
 			}
 		}
