@@ -11,6 +11,7 @@
 #include "label.hpp"
 #include "message_dialog.hpp"
 #include "party.hpp"
+#include "post_battle_dialog.hpp"
 #include "shop_dialog.hpp"
 #include "wml_command.hpp"
 #include "wml_node.hpp"
@@ -488,6 +489,40 @@ public:
 	}
 };
 
+class award_command : public wml_command
+{
+	const_formula_ptr xp_, money_, party_;
+	void do_execute(const formula_callable& info, world& world) const {
+		party_ptr p(world.get_pc_party());
+		if(party_) {
+			p = party_->execute(info).try_convert<party>();
+		}
+
+		if(!p) {
+			return;
+		}
+
+		int xp = 0, money = 0;
+		if(xp_) {
+			xp = xp_->execute(info).as_int();
+		}
+
+		if(money_) {
+			money = money_->execute(info).as_int();
+		}
+
+		if(xp || money) {
+			game_dialogs::post_battle_dialog(p, xp, money).show();
+		}
+	}
+public:
+	explicit award_command(wml::const_node_ptr node)
+	  : xp_(formula::create_optional_formula(wml::get_str(node, "experience"))),
+		money_(formula::create_optional_formula(wml::get_str(node, "money"))),
+		party_(formula::create_optional_formula(wml::get_str(node, "party")))
+	{}
+};
+
 class null_command : public wml_command
 {
 	void do_execute(const formula_callable& info, world& world) const {
@@ -532,6 +567,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	DEFINE_COMMAND(quit);
 	DEFINE_COMMAND(character_status_dialog);
 	DEFINE_COMMAND(fire_event);
+	DEFINE_COMMAND(award);
 	} catch(...) {
 		std::string str;
 		wml::write(node, str);

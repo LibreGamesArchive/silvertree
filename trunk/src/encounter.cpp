@@ -50,10 +50,16 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 		xp1 += (*i)->level()*10;
 	}
 
+	assert(!p2->members().empty());
+	xp1 /= p2->members().size();
+
 	for(std::vector<character_ptr>::const_iterator i =
 	    p2->members().begin(); i != p2->members().end(); ++i) {
 		xp2 += (*i)->level()*10;
 	}
+
+	assert(!p1->members().empty());
+	xp2 /= p1->members().size();
 
 	play_battle(p1, p2, p1->members(), p2->members(), p2->loc());
 

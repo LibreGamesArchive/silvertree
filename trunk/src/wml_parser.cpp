@@ -233,6 +233,7 @@ node_ptr parse_wml(const std::string& doc)
 	node_ptr res;
 	std::stack<node_ptr> nodes;
 	std::string::const_iterator i = doc.begin();
+	std::string current_comment;
 	while(i != doc.end()) {
 		if(isspace(*i) || util::isnewline(*i)) {
 			++i;
@@ -289,6 +290,11 @@ node_ptr parse_wml(const std::string& doc)
 				}
 
 				node_ptr el(new node(element));
+				if(current_comment.empty() == false) {
+					el->set_comment(current_comment);
+					current_comment.clear();
+				}
+
 				if(prefix == "template") {
 					std::string::iterator template_name =
 					   std::find(element.begin(),element.end(),' ');
@@ -343,6 +349,11 @@ node_ptr parse_wml(const std::string& doc)
 			++i;
 			const std::string value = parse_value(i,doc.end());
 			nodes.top()->set_attr(name, value);
+
+			if(current_comment.empty() == false) {
+				nodes.top()->set_attr_comment(name, current_comment);
+				current_comment.clear();
+			}
 		} else if(*i == '@') {
 			++i;
 			std::string::const_iterator begin = i;
@@ -372,7 +383,9 @@ node_ptr parse_wml(const std::string& doc)
 				throw parse_error(formatter() << "unrecognized @ instruction: '" << name << "'");
 			}
 		} else if(*i == '#') {
+			std::string::const_iterator begin_comment = i;
 			skip_comment(i,doc.end());
+			current_comment.insert(current_comment.end(), begin_comment, i);
 		} else {
 			std::cerr << "unexpected chars: {{{" << &*i << "}}}\n";
 			throw parse_error("unexpected characters in wml document");

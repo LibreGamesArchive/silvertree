@@ -191,4 +191,29 @@ void node::erase_child(const boost::shared_ptr<node>& child_node)
 	}
 }
 
+void node::set_comment(const std::string& comment)
+{
+	comment_ = comment;
+}
+
+const std::string& node::get_comment() const
+{
+	return comment_;
+}
+
+void node::set_attr_comment(const std::string& name, const std::string& comment)
+{
+	attr_comments_[name] = comment;
+}
+
+const std::string& node::get_attr_comment(const std::string& name) const
+{
+	attr_map::const_iterator i = attr_comments_.find(name);
+	if(i != attr_comments_.end()) {
+		return i->second;
+	} else {
+		return empty_string;
+	}
+}
+
 }

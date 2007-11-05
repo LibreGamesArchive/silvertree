@@ -82,11 +82,20 @@ public:
 	void clear_children(const std::string& name);
 	void erase_child(const boost::shared_ptr<node>& child_node);
 
+	void set_comment(const std::string& comment);
+	const std::string& get_comment() const;
+	void set_attr_comment(const std::string& name, const std::string& comment);
+	const std::string& get_attr_comment(const std::string& name) const;
+
 private:
 	std::string name_;
 	attr_map attr_;
 	std::multimap<std::string,boost::shared_ptr<node> > childmap_;
 	std::vector<boost::shared_ptr<node> > children_;
+
+	//comment data
+	std::string comment_;
+	attr_map attr_comments_;
 };
 
 }

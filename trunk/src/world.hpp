@@ -94,8 +94,8 @@ public:
 	void add_chat_label(gui::label_ptr label, const_character_ptr ch, int delay);
 	void set_lighting() const;
 
-private:
 	party_ptr get_pc_party() const;
+private:
 	bool remove_party(party_ptr p);
 
 	bool show_grid_;
