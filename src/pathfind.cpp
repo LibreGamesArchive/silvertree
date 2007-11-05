@@ -17,12 +17,12 @@ path_cost_calculator::~path_cost_calculator()
 
 int path_cost_calculator::movement_cost(const location& a, const location& b) const
 {
-	return 100;
+	return 5;
 }
 
 int path_cost_calculator::estimated_cost(const location& a, const location& b) const
 {
-	return 100*distance_between(a,b);
+	return 5*distance_between(a,b);
 }
 
 bool path_cost_calculator::allowed_to_move(const location& a) const
@@ -52,9 +52,8 @@ struct partial_result_comparer : public std::binary_function<const_partial_resul
 
 }
 
-int find_path(const location& src, const location& dst, const path_cost_calculator& calc, std::vector<location>* result, int max_cost, bool adjacent_only)
+int find_path(const location& src, const location& dst, const path_cost_calculator& calc, std::vector<location>* result, int max_cost, bool adjacent_only, bool find_partial_result)
 {
-	const int start_ticks = SDL_GetTicks();
 	//sanity check to make sure the destination is reachable from
 	//an adjacent hex
 	if(!adjacent_only) {
@@ -73,10 +72,11 @@ int find_path(const location& src, const location& dst, const path_cost_calculat
 		}
 
 		if(!found) {
-			std::cerr << "infeasible_path: " << (SDL_GetTicks() - start_ticks) << "\n";
 			return -1;
 		}
 	}
+
+	const_partial_result_ptr best_partial_result;
 
 	std::set<location> closed;
 	std::priority_queue<partial_result_ptr, std::vector<partial_result_ptr>, partial_result_comparer> q;
@@ -89,12 +89,22 @@ int find_path(const location& src, const location& dst, const path_cost_calculat
 	while(!q.empty()) {
 		const const_partial_result_ptr r = q.top();
 		q.pop();
+
+		if(find_partial_result) {
+			if(!best_partial_result || r->estimated_cost < best_partial_result->estimated_cost) {
+				best_partial_result = r;
+			}
+
+			if(r->cost_incurred > max_cost) {
+				continue;
+			}
+		}
+
 		if(r->loc == dst) {
 			for(const_partial_result_ptr p = r; p; p = p->prev) {
 				result->push_back(p->loc);
 			}
 
-			std::cerr << "find_path: " << (SDL_GetTicks() - start_ticks) << "\n";
 			return r->cost_incurred;
 		}
 
@@ -118,8 +128,10 @@ int find_path(const location& src, const location& dst, const path_cost_calculat
 				continue;
 			}
 			const int estimated_cost = calc.estimated_cost(adj[n], dst);
-			if(r->cost_incurred + cost + estimated_cost > max_cost) {
-				continue;
+			if(find_partial_result == false) {
+				if(r->cost_incurred + cost + estimated_cost > max_cost) {
+					continue;
+				}
 			}
 
 			partial_result_ptr p(new partial_result);
@@ -133,7 +145,13 @@ int find_path(const location& src, const location& dst, const path_cost_calculat
 		closed.insert(r->loc);
 	}
 
-			std::cerr << "failed_path: " << (SDL_GetTicks() - start_ticks) << "\n";
+	if(best_partial_result) {
+		for(const_partial_result_ptr p = best_partial_result; p; p = p->prev) {
+			result->push_back(p->loc);
+		}
+
+	}
+
 	return -1;
 }
 

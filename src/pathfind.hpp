@@ -16,7 +16,7 @@ public:
 	virtual bool allowed_to_move(const location& a) const;
 };
 
-int find_path(const location& src, const location& dst, const path_cost_calculator& calc, std::vector<location>* result, int max_cost=10000, bool adjacent_only=false);
+int find_path(const location& src, const location& dst, const path_cost_calculator& calc, std::vector<location>* result, int max_cost=10000, bool adjacent_only=false, bool find_partial_result=false);
 
 }
 

@@ -73,6 +73,9 @@ void global_game_state::init(wml::const_node_ptr node)
 	wml::const_node_ptr var = node->get_child("variables");
 	if(var) {
 		for(wml::node::const_attr_iterator i = var->begin_attr(); i != var->end_attr(); ++i) {
+			if(i->second.empty()) {
+				continue;
+			}
 			variant v;
 			v.serialize_from_string(i->second);
 			variables[i->first] = v;
