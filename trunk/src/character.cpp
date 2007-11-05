@@ -202,7 +202,7 @@ int character::move_cost(hex::const_base_terrain_ptr terrain,
 	}
 
 	height_change = abs(height_change);
-	const int climb_cost = 100 + (height_change*100*2)/climbing();
+	const int climb_cost = 100 + (height_change*height_change*100)/climbing();
 
 	return (climb_cost*base_cost)/(speed()*100);
 }
