@@ -61,6 +61,10 @@ party::TURN_RESULT pc_party::do_turn()
 	std::vector<const_party_ptr> now_visible;
 	get_visible_parties(now_visible);
 	foreach(const_party_ptr& p, now_visible) {
+		if(p.get() == this) {
+			continue;
+		}
+
 		if(std::find(seen_.begin(), seen_.end(), p) == seen_.end()) {
 			map_formula_callable_ptr callable(new map_formula_callable);
 			callable->add("world", variant(&game_world()))
