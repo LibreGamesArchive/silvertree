@@ -42,6 +42,7 @@ const_battle_move_ptr battle_move::standard_pass()
 	res->min_moves_ = 0;
 	res->can_attack_ = false;
 	res->must_attack_ = false;
+	res->stats_["initiative"].reset(new formula("initiative/2"));
 	return res;
 }
 

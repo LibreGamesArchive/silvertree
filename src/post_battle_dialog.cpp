@@ -12,9 +12,16 @@
 namespace game_dialogs {
 
 post_battle_dialog::post_battle_dialog(game_logic::party_ptr p,
-                                       int xp, int money)
+                                       int xp, int money,
+									   const std::vector<game_logic::character_ptr>* chars)
     : dialog(0,0,graphics::screen_width(),graphics::screen_height()), party_(p), xp_(xp), money_(money)
 {
+	if(chars) {
+		chars_ = *chars;
+	} else {
+		chars_ = party_->members();
+	}
+
 	using namespace gui;
 	typedef widget_ptr ptr;
 	const SDL_Color color = {0xFF,0xFF,0,0xFF};
@@ -40,7 +47,7 @@ post_battle_dialog::post_battle_dialog(game_logic::party_ptr p,
 	add_widget(grid, 20, 20);
 
 	grid.reset(new gui::grid(2));
-	foreach(game_logic::character_ptr c, party_->members()) {
+	foreach(game_logic::character_ptr c, chars_) {
 		grid->add_col(ptr(new image_widget(c->portrait(),100,100)));
 
 		label_ptr level_label(lb.create(formatter() << c->level()));
@@ -75,7 +82,7 @@ bool post_battle_dialog::iterate()
 		--xp_;
 		xp_left_->set_text(formatter() << xp_);
 		int index = 0;
-		foreach(game_logic::character_ptr c, party_->members()) {
+		foreach(game_logic::character_ptr c, chars_) {
 			c->award_experience(1);
 			xp_required_[index]->set_text(formatter() <<
 			               (c->experience_required() - c->experience()));

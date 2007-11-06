@@ -564,7 +564,7 @@ int character::parry(const std::string& damage_type) const
 		}
 	}
 
-	return best;
+	return std::max(best,0);
 }
 
 void character::get_resistance(const std::string& damage_type,

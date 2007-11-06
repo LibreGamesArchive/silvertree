@@ -15,6 +15,7 @@
 
 #include <vector>
 
+#include "character_fwd.hpp"
 #include "dialog.hpp"
 #include "label.hpp"
 #include "party_fwd.hpp"
@@ -25,13 +26,14 @@ class post_battle_dialog : public gui::dialog
 {
 public:
 	post_battle_dialog(game_logic::party_ptr p,
-	                   int xp, int money);
+	                   int xp, int money, const std::vector<game_logic::character_ptr>* chars=NULL);
 
 	bool iterate();
 	void show();
 
 private:
 	game_logic::party_ptr party_;
+	std::vector<game_logic::character_ptr> chars_;
 	std::vector<gui::label_ptr> xp_required_;
 	std::vector<gui::label_ptr> level_;
 	gui::label_ptr money_label_;
