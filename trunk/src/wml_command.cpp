@@ -491,7 +491,7 @@ public:
 
 class award_command : public wml_command
 {
-	const_formula_ptr xp_, money_, party_;
+	const_formula_ptr xp_, money_, party_, chars_;
 	void do_execute(const formula_callable& info, world& world) const {
 		party_ptr p(world.get_pc_party());
 		if(party_) {
@@ -511,15 +511,33 @@ class award_command : public wml_command
 			money = money_->execute(info).as_int();
 		}
 
+		std::vector<character_ptr> chars;
+		if(chars_) {
+			variant c = chars_->execute(info);
+			for(int n = 0; n != c.num_elements(); ++n) {
+				chars.push_back(c[n].try_convert<character>());
+				if(!chars.back()) {
+					chars.pop_back();
+				}
+			}
+		} else {
+			chars = p->members();
+		}
+
+		if(chars.empty()) {
+			return;
+		}
+
 		if(xp || money) {
-			game_dialogs::post_battle_dialog(p, xp, money).show();
+			game_dialogs::post_battle_dialog(p, xp, money, &chars).show();
 		}
 	}
 public:
 	explicit award_command(wml::const_node_ptr node)
 	  : xp_(formula::create_optional_formula(wml::get_str(node, "experience"))),
 		money_(formula::create_optional_formula(wml::get_str(node, "money"))),
-		party_(formula::create_optional_formula(wml::get_str(node, "party")))
+		party_(formula::create_optional_formula(wml::get_str(node, "party"))),
+		chars_(formula::create_optional_formula(wml::get_str(node, "characters")))
 	{}
 };
 
