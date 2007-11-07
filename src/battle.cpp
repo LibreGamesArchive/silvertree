@@ -1024,6 +1024,9 @@ bool battle::stats_dialogs_process_event(const SDL_Event& e) {
 void battle::handle_time_cost_popup()
 {
 	battle_character_ptr attacker = *focus_;
+	assert(attacker);
+	assert(initiative_bar_);
+	assert(time_cost_widget_);
 
 	if(highlight_moves_ ) {
 		const battle_character::move_map::const_iterator move = moves_.find(selected_loc());
@@ -1040,7 +1043,7 @@ void battle::handle_time_cost_popup()
 	} else if(highlight_targets_) {
 		battle_character_ptr defender = selected_char();
 		assert(current_move_);
-		if(current_move_->can_attack()) {
+		if(current_move_->can_attack() && defender) {
 			/* attack cost */
 			attack_stats stats = get_attack_stats(*attacker, *defender, *current_move_);
 			time_cost_widget_->set_tracker(&(defender->loc_tracker()));
