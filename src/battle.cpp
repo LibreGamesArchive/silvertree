@@ -633,8 +633,8 @@ battle::attack_stats battle::get_attack_stats(
 	    move.get_stat(AttackStat,attacker), 1);
 	stats.defense = std::max<int>(defender.defense(
 	                  attacker.get_character().damage_type()), 0);
-	stats.damage = attacker.adjust_damage(ch.stat_mod_height(DamageStat,height_diff) +
-	                  move.get_stat(DamageStat,attacker));
+	stats.damage = std::max<int>(ch.stat_mod_height(DamageStat,height_diff/2) +
+	                  attacker.adjust_damage(move.get_stat(DamageStat,attacker)), 1);
 	stats.damage_critical = stats.damage;
 	stats.time_taken = ch.stat_mod_height(InitiativeStat,height_diff) +
 	                       move.get_stat(InitiativeStat,attacker);
