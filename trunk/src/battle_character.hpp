@@ -113,6 +113,7 @@ public:
 	int defense(const std::string& damage_type) const;
 	int defense_behind() const;
 	int stat(const std::string& s) const;
+	int adjust_damage(int damage) const;
 	int mod_stat(const std::string& s) const;
 	std::string status_text() const;
 
@@ -139,7 +140,6 @@ private:
 
 	int planned_move_cost() const;
 	int move_cost(const hex::location& a, const hex::location& b) const;
-	int adjust_damage(int damage) const;
 	route move_;
 	GLfloat time_in_move_;
 
