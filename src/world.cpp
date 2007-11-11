@@ -1090,6 +1090,7 @@ bool world::remove_party(party_ptr p)
 void world::get_inputs(std::vector<formula_input>* inputs) const
 {
 	inputs->push_back(formula_input("time", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("ticks", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("pc", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("parties", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("focus", FORMULA_READ_WRITE));
@@ -1099,6 +1100,8 @@ variant world::get_value(const std::string& key) const
 {
 	if(key == "time") {
 		return variant(new game_time(time_));
+	} else if(key == "ticks") {
+		return variant(SDL_GetTicks());
 	} else if(key == "pc") {
 		return variant(get_pc_party().get());
 	} else if(key == "parties") {
@@ -1140,9 +1143,23 @@ void world::add_chat_label(gui::label_ptr label, const_character_ptr ch, int del
 		return;
 	}
 
+	int most_recent = -1;
+	foreach(const chat_label& lb, chat_labels_) {
+		if(lb.character == ch && lb.started_at > most_recent) {
+			most_recent = lb.started_at;
+		}
+	}
+
+	if(most_recent != -1) {
+		const int earliest = most_recent + 3000;
+		const int ticks = SDL_GetTicks() + delay;
+		if(earliest > ticks) {
+			delay += earliest - ticks;
+		}
+	}
+
 	std::vector<character_ptr>::const_iterator ch_itor = std::find(pc->begin_members(), pc->end_members(), ch);
 	if(ch_itor == pc->end_members()) {
-		std::cerr << "not found..\n";
 		return;
 	}
 

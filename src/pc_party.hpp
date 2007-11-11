@@ -37,6 +37,7 @@ public:
 	const std::vector<hex::location>* get_current_path() const;
 private:
 	TURN_RESULT do_turn();
+	void enter_new_world(const world& w);
 
 	std::vector<const_party_ptr> seen_;
 	std::vector<hex::location> path_;

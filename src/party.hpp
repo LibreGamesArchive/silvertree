@@ -133,6 +133,7 @@ protected:
 	bool allowed_to_move(const hex::location& loc) const;
 	const hex::gamemap& map() const;
 	virtual void set_value(const std::string& key, const variant& value);
+	virtual void enter_new_world(const world& w) {}
 
 private:
 	int aggregate_stat_max(const std::string& stat) const;

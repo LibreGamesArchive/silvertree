@@ -154,6 +154,8 @@ void party::new_world(world& w, const hex::location& loc, hex::DIRECTION dir)
 		hex::location dst = hex::tile_in_direction(loc_, dir);
 		move(dir);
 	}
+
+	enter_new_world(w);
 }
 
 party_ptr party::create_party(wml::const_node_ptr node,

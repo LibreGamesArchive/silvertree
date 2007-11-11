@@ -123,4 +123,9 @@ party::TURN_RESULT pc_party::do_turn()
 	return TURN_STILL_THINKING;
 }
 
+void pc_party::enter_new_world(const world& w)
+{
+	path_.clear();
+}
+
 }

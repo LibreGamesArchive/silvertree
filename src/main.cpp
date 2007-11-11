@@ -149,8 +149,6 @@ extern "C" int main(int argc, char** argv)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_FOG);
 	glFogi(GL_FOG_MODE, GL_LINEAR);
-	glFogf(GL_FOG_START, 120.0f);
-	glFogf(GL_FOG_END, 160.0f);
 
 	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);

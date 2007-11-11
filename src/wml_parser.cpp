@@ -26,6 +26,7 @@
 #include "formatter.hpp"
 #include "string_utils.hpp"
 #include "wml_parser.hpp"
+#include "wml_utils.hpp"
 
 namespace wml
 {
@@ -228,7 +229,7 @@ void skip_comment(std::string::const_iterator& i1,
 
 }
 
-node_ptr parse_wml(const std::string& doc)
+node_ptr parse_wml(const std::string& doc, bool must_have_doc)
 {
 	node_ptr res;
 	std::stack<node_ptr> nodes;
@@ -261,9 +262,11 @@ node_ptr parse_wml(const std::string& doc)
 					element.erase(element.begin(),colon+1);
 				}
 
+				std::vector<wml::node_ptr> parents;
+
 				std::string::iterator begin_args =
 				   std::find(element.begin(),element.end(),'(');
-				if(prefix.empty() && begin_args != element.end()) {
+				if(prefix != "template" && begin_args != element.end()) {
 					std::string::iterator end_args =
 					  std::find(begin_args+1,element.end(),')');
 					std::string args_str(begin_args+1,end_args);
@@ -280,16 +283,23 @@ node_ptr parse_wml(const std::string& doc)
 
 					const wml::node_ptr el = t->second->call(args);
 					assert(el);
-					if(nodes.empty()) {
+					if(!prefix.empty()) {
+						parents.push_back(el);
+						element = prefix;
+						prefix.clear();
+					} else if(nodes.empty()) {
 						res = el;
+						continue;
 					} else {
 						nodes.top()->add_child(el);
+						continue;
 					}
-
-					continue;
 				}
 
 				node_ptr el(new node(element));
+				foreach(const wml::node_ptr& parent, parents) {
+					wml::merge_over(parent, el);
+				}
 				if(current_comment.empty() == false) {
 					el->set_comment(current_comment);
 					current_comment.clear();
@@ -362,7 +372,7 @@ node_ptr parse_wml(const std::string& doc)
 			}
 
 			std::string name(begin,i);
-			if(name == "import") {
+			if(name == "import" || name == "include") {
 				if(i == doc.end()) {
 					throw parse_error(formatter() << "unexpected document end while importing");
 				}
@@ -374,10 +384,13 @@ node_ptr parse_wml(const std::string& doc)
 				}
 
 				const std::string filename(begin,i);
-				if(nodes.empty()) {
+				if(nodes.empty() && name == "import") {
 					throw parse_error(formatter() << "@import statement at top level");
 				}
-				nodes.top()->add_child(parse_wml(sys::read_file("data/" + filename)));
+				wml::node_ptr node(parse_wml(sys::read_file("data/" + filename), name == "import"));
+				if(node) {
+					nodes.top()->add_child(node);
+				}
 
 			} else {
 				throw parse_error(formatter() << "unrecognized @ instruction: '" << name << "'");
@@ -392,7 +405,7 @@ node_ptr parse_wml(const std::string& doc)
 		}
 	}
 
-	if(!res) {
+	if(must_have_doc && !res) {
 		throw parse_error("empty wml document");
 	}
 
