@@ -93,6 +93,9 @@ void camera::prepare_frame()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+
+	glFogf(GL_FOG_START, 30.0f - zoom_);
+	glFogf(GL_FOG_END, 60.0f - zoom_);
 }
 
 void camera::prepare_selection(int mousex, int mousey)

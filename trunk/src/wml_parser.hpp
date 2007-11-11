@@ -25,7 +25,7 @@ struct parse_error {
 	std::string message;
 };
 
-node_ptr parse_wml(const std::string& doc);
+node_ptr parse_wml(const std::string& doc, bool must_have_doc=true);
 
 }
 
