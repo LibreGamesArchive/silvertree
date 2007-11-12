@@ -66,6 +66,20 @@ public:
 	{}
 };
 
+class stats_callable : public formula_callable
+{
+	const_character_ptr c_;
+	variant get_value(const std::string& stat) const {
+		return variant(c_->stat(stat));
+	}
+
+	void get_inputs(std::vector<formula_input>* inputs) const {
+	}
+public:
+	explicit stats_callable(const const_character_ptr& c) : c_(c)
+	{}
+};
+
 }
 
 const std::vector<std::string>& character::attributes()
@@ -288,6 +302,7 @@ void character::get_inputs(std::vector<formula_input>* inputs) const
 	inputs->push_back(formula_input("endurance", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("intelligence", FORMULA_READ_ONLY));
 	inputs->push_back(formula_input("will", FORMULA_READ_ONLY));
+	inputs->push_back(formula_input("stats", FORMULA_READ_ONLY));
 }
 
 variant character::get_value(const std::string& key) const
@@ -322,6 +337,8 @@ variant character::get_value(const std::string& key) const
 		}
 
 		return variant(&skills);
+	} else if(key == "stats") {
+		return variant(new stats_callable(this));
 	}
 
 	return variant(base_stat(key));
