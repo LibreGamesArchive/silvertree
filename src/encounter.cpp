@@ -38,6 +38,10 @@ void handle_encounter(party_ptr p1, party_ptr p2,
 
 	p2->encounter(*p1, "encounter");
 
+	if(p1->is_destroyed() || p2->is_destroyed()) {
+		return;
+	}
+
 	if(!p1->is_enemy(*p2)) {
 		return;
 	}

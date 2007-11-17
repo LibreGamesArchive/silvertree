@@ -13,7 +13,7 @@ namespace {
 
 bool nocombat = false;
 bool maxfps = false;
-bool sliders = false;
+bool sliders = true;
 
 bool mipmapping = true;
 GLenum mipmap_min = GL_NEAREST_MIPMAP_LINEAR, mipmap_max = GL_LINEAR;
@@ -59,6 +59,8 @@ bool parse_arg(const std::string& arg)
 		maxfps = true;
 	} else if(arg == "--sliders") {
 		sliders = true;
+	} else if(arg == "--nosliders") {
+		sliders = false;
 	} else if(arg == "--disable-mipmapping") {
 		mipmapping = false;
 	} else if(util::string_starts_with(arg, "--mipmapmin")) {
