@@ -23,7 +23,7 @@ namespace {
 
 slider::slider(const SDL_Rect& rect, int attack, int defense,
                bool use_slider)
- : rect_(rect), attack_(attack), defense_(defense),
+ : rect_(rect), attack_(attack), defense_(std::max<int>(4,defense)),
    time_(0.0), stopped_(-1.0),
    use_slider_(use_slider), result_(PENDING)
 {}
