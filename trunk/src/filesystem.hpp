@@ -15,9 +15,17 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept>
+#include <cerrno>
 
 namespace sys
 {
+
+class filesystem_error : public std::runtime_error
+{
+	public:
+	filesystem_error(const std::string& msg) : std::runtime_error(msg + std::string(strerror(errno)) + ".\n") {};
+};
 
 enum FILE_NAME_MODE { ENTIRE_FILE_PATH, FILE_NAME_ONLY };
 

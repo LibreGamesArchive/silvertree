@@ -506,8 +506,15 @@ bool file_exists(const std::string& name)
 
 std::string read_file(const std::string& name)
 {
+	if(name.empty())
+	{
+		std::cerr << "sys::read_file: ignored an attempt to open file \"\"(empty string).\n";
+		return name;
+	}
 	std::string fname = find_file(name);
 	std::ifstream file(fname.c_str(),std::ios_base::binary);
+	if(!file.is_open())
+		throw filesystem_error(std::string("sys::read_file: unable to open file " + name + " : "));
 	std::stringstream ss;
 	ss << file.rdbuf();
 	return ss.str();
