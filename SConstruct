@@ -1,5 +1,7 @@
-# vi: syntax=python
+# vi: syntax=python:et:ts=4
+
 from os.path import join
+from glob import glob
 
 opts = Options("options.cache")
 opts.AddOptions(
@@ -98,5 +100,11 @@ else:
 env.Default(env.Alias("silvertreerpg", env.InstallAs("./silvertreerpg" + ExecutableSuffix, silvertree)))
 if editor:
     editor_env.Alias("editor", editor_env.InstallAs("./silvertreeedit" + ExecutableSuffix, editor))
+
+bindistdir = env.Install("silvertree", \
+    [silvertree, editor] + Split("data images model-sources README LICENSE FreeSans.ttf") \
+    + map(glob, Split("*.dae *.3ds *.3d")))
+bindistzip = env.Zip("silvertree.zip", bindistdir)
+env.Alias("bindistzip", bindistzip)
 
 SConsignFile("sconsign")
