@@ -296,14 +296,7 @@ bool EditorMainWindow::openMap(wml::const_node_ptr node) {
 	if(node->has_attr("map_data")) {
 		mapdata = (*node)["map_data"];
 	} else {
-		std::ifstream file((*node)["map"].c_str());
-		if(!file.is_open()) {
-			return false;
-		}
-		std::stringstream ss;
-		ss << file.rdbuf();
-		file.close();
-		mapdata = ss.str();
+		mapdata = sys::read_file((*node)["map"].c_str());
 	}
 
 	map_.reset(new hex::gamemap(mapdata));

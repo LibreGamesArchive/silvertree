@@ -76,48 +76,39 @@ int main(int argc, char** argv)
 	graphics::texture::manager texture_manager;
 	wml::node_ptr game_cfg;
 
-	{
-		std::ifstream file("data/terrain.cfg");
-		if(!file.is_open())
-			{
-				std::cerr << "could not open map\n";
-				exit(2);
+	try {
+		game_cfg = wml::parse_wml(sys::read_file("data/terrain.cfg"));
+
+		wml::node::const_all_child_iterator cfg1 = game_cfg->begin_children();
+		wml::node::const_all_child_iterator cfg2 = game_cfg->end_children();
+		while(cfg1 != cfg2) {
+			if((*cfg1)->name() == "terrain") {
+				hex::base_terrain::add_terrain(*cfg1);
+			} else if((*cfg1)->name() == "terrain_feature") {
+				hex::terrain_feature::add_terrain(*cfg1);
 			}
 
-		std::stringstream ss;
-		ss << file.rdbuf();
-		file.close();
-		std::string doc(ss.str());
-		try {
-			game_cfg = wml::parse_wml(doc);
-		} catch(...) {
-			std::cerr << "error parsing WML...\n";
-			return -1;
-		}
-	}
-
-
-	wml::node::const_all_child_iterator cfg1 = game_cfg->begin_children();
-	wml::node::const_all_child_iterator cfg2 = game_cfg->end_children();
-	while(cfg1 != cfg2) {
-		if((*cfg1)->name() == "terrain") {
-			hex::base_terrain::add_terrain(*cfg1);
-		} else if((*cfg1)->name() == "terrain_feature") {
-			hex::terrain_feature::add_terrain(*cfg1);
+			++cfg1;
 		}
 
-		++cfg1;
+		EditorMainWindow *mainWindow = new EditorMainWindow();
+		mainWindow->resize(1024,768);
+		mainWindow->show();
+		if (argc == 2) {
+			mainWindow->openScenario(argv[1]);
+		} else {
+			mainWindow->openScenario(NULL);
+		}
+
+		app.exec();
+
+	} catch(const sys::filesystem_error& e) {
+		std::cerr << e.what();
+		return -1;
+	} catch(const wml::parse_error&) {
+		std::cerr << "error parsing WML...\n";
+		return -1;
 	}
 
-	EditorMainWindow *mainWindow = new EditorMainWindow();
-	mainWindow->resize(1024,768);
-	mainWindow->show();
-	if (argc == 2) {
-		mainWindow->openScenario(argv[1]);
-	} else {
-		mainWindow->openScenario(NULL);
-	}
-
-	app.exec();
 	return 0;
 }
