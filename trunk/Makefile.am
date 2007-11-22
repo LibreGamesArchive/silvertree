@@ -338,14 +338,20 @@ model-sources/sketchup/bridge.skp \
 model-sources/sketchup/cave-entrace.skp \
 model-sources/sketchup/tower.skp \
 \
+data/bandit-fort.cfg \
 data/big-cave.cfg \
 data/cave-small.cfg \
 data/character_generators.cfg \
+data/formulatest.cfg \
+data/fort.cfg \
+data/island.cfg \
 data/items.cfg \
+data/lighting.cfg \
 data/rules.cfg \
 data/scenario.cfg \
 data/skills.cfg \
 data/terrain.cfg \
+data/town-balmoro.cfg \
 data/town-felson.cfg \
 data/town-isolt.cfg \
 data/town-telfa.cfg \
