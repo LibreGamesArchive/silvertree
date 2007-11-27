@@ -16,7 +16,7 @@ opts.AddOptions(
     ("EXTRA_FLAGS_DEBUG", "Extra compiler/linker flags to use in debug build variant.", "")
 )
 
-env = Environment(tools = [], toolpath = ["scons"], options = opts)
+env = Environment(tools = ["zip"], toolpath = ["scons"], options = opts)
 if env["PLATFORM"] == "win32":
     env.Tool("mingw")
 else:
@@ -44,11 +44,14 @@ env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
 
 execfile("SConfigure")
 conf = env.Configure(custom_tests = CustomChecks)
+conf.CheckBoost("regex") or Exit(1)
+conf.Finish()
+namegen_env = env.Clone()
+conf = env.Configure(custom_tests = CustomChecks)
 conf.CheckOpenGL(["gl", "glu"]) and \
 conf.CheckSDL() and \
 conf.CheckSDL("SDL_image") and \
-conf.CheckSDL("SDL_ttf") and \
-conf.CheckBoost("regex") or Exit(1)
+conf.CheckSDL("SDL_ttf") or Exit(1)
 conf.Finish()
 
 editor_env = env.Clone()
@@ -84,7 +87,7 @@ if "gcc" in env["TOOLS"]:
 env.MergeFlags(env["EXTRA_FLAGS_" + env["Build"].upper()], unique=0)
 editor_env.MergeFlags(env["EXTRA_FLAGS_" + env["Build"].upper()], unique=0)
 
-namegen = env.Program("utilities/names/namegen", "utilities/names/namegen.cpp")
+namegen = namegen_env.Program("utilities/names/namegen", "utilities/names/namegen.cpp")
 Alias("namegen", namegen)
 
 env.Program("version_finder", "utilities/versions/version_finder.cpp")
