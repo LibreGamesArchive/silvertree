@@ -1,7 +1,3 @@
-#ifdef __WIN32__
-#include "stdafx.h"
-#endif
-
 #include <iostream>
 #include <sstream>
 #include <fstream>

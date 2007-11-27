@@ -50,7 +50,7 @@ def CheckBoostLib(context, boost_lib):
     env = context.env
     env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
     libname = "boost_" + boost_lib + env.get("BOOST_SUFFIX", "")
-    libs_backup = env["LIBS"]
+    libs_backup = env.get("LIBS", "")
     env.AppendUnique(LIBS = libname)
     test_program = """
         #include <boost/%s.hpp>
