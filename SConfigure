@@ -1,8 +1,19 @@
 # vi: syntax=python:et:ts=4
 
+def backup_env(env, vars):
+    backup = dict()
+    for var in vars:
+        backup[var] = env.get(var, [])
+    return backup
+
+def restore_env(env, backup):
+    for var in backup.keys():
+        env[var] = backup[var]
+
 def CheckOpenGL(context, libs = ["gl"]):
     context.Message("Checking for OpenGL... ")
     env = context.env
+    backup = backup_env(env, ["LIBS"])
     if env["PLATFORM"] == "win32":
         libnames = { "gl" : "opengl32", "glu" : "glu32" }
     else:
@@ -16,6 +27,7 @@ def CheckOpenGL(context, libs = ["gl"]):
         context.Result("yes")
         return True
     else:
+        restore_env(env, backup)
         context.Result("no")
         return False
 
@@ -48,10 +60,10 @@ def CheckSDL(context, sdl_lib = "SDL"):
 
 def CheckBoostLib(context, boost_lib):
     env = context.env
+    backup = backup_env(env, ["CPPPATH", "LIBPATH", "LIBS"])
     env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
     libname = "boost_" + boost_lib + env.get("BOOST_SUFFIX", "")
-    libs_backup = env.get("LIBS", "")
-    env.AppendUnique(LIBS = libname)
+    env.AppendUnique(LIBS = [libname])
     test_program = """
         #include <boost/%s.hpp>
         int main()
@@ -61,7 +73,7 @@ def CheckBoostLib(context, boost_lib):
     if context.TryLink(test_program, ".cpp"):
         return True
     else:
-        env.Replace(LIBS = libs_backup)
+        restore_env(env, backup)
         return False
 
 def CheckBoost(context, boost_lib):

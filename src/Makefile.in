@@ -68,8 +68,7 @@ am_libsilvertree_a_OBJECTS = base_terrain.$(OBJEXT) \
 	game_persistence.$(OBJEXT) game_time.$(OBJEXT) \
 	global_game_state.$(OBJEXT) graphics_logic.$(OBJEXT) \
 	grid_widget.$(OBJEXT) gui_core.$(OBJEXT) \
-	initiative_bar.$(OBJEXT) \
-	image_widget.$(OBJEXT) item.$(OBJEXT) \
+	image_widget.$(OBJEXT) initiative_bar.$(OBJEXT) item.$(OBJEXT) \
 	item_display_dialog.$(OBJEXT) keyboard.$(OBJEXT) \
 	label.$(OBJEXT) learn_skills_dialog.$(OBJEXT) \
 	map_avatar.$(OBJEXT) material.$(OBJEXT) \
@@ -78,20 +77,19 @@ am_libsilvertree_a_OBJECTS = base_terrain.$(OBJEXT) \
 	parseark.$(OBJEXT) parsedae.$(OBJEXT) particle.$(OBJEXT) \
 	particle_emitter.$(OBJEXT) particle_system.$(OBJEXT) \
 	party.$(OBJEXT) party_status_dialog.$(OBJEXT) \
-	pathfind.$(OBJEXT) \
-	pc_party.$(OBJEXT) post_battle_dialog.$(OBJEXT) \
-	preferences.$(OBJEXT) raster.$(OBJEXT) sdl_algo.$(OBJEXT) \
-	settlement.$(OBJEXT) shop_dialog.$(OBJEXT) skill.$(OBJEXT) \
-	skill_dialog.$(OBJEXT) slider.$(OBJEXT) \
-	status_bars_widget.$(OBJEXT) string_utils.$(OBJEXT) \
-	surface_cache.$(OBJEXT) surface.$(OBJEXT) \
-	terrain_feature.$(OBJEXT) text_gui.$(OBJEXT) texture.$(OBJEXT) \
-	tile.$(OBJEXT) tile_logic.$(OBJEXT) tooltip.$(OBJEXT) \
-	tracks.$(OBJEXT) translate.$(OBJEXT) unicode.$(OBJEXT) \
-	variant.$(OBJEXT) widget.$(OBJEXT) wml_command.$(OBJEXT) \
-	wml_node.$(OBJEXT) wml_parser.$(OBJEXT) wml_utils.$(OBJEXT) \
-	wml_writer.$(OBJEXT) world.$(OBJEXT) xml.$(OBJEXT) \
-	zoom_map_generator.$(OBJEXT)
+	pathfind.$(OBJEXT) pc_party.$(OBJEXT) \
+	post_battle_dialog.$(OBJEXT) preferences.$(OBJEXT) \
+	raster.$(OBJEXT) sdl_algo.$(OBJEXT) settlement.$(OBJEXT) \
+	shop_dialog.$(OBJEXT) skill.$(OBJEXT) skill_dialog.$(OBJEXT) \
+	slider.$(OBJEXT) status_bars_widget.$(OBJEXT) \
+	string_utils.$(OBJEXT) surface_cache.$(OBJEXT) \
+	surface.$(OBJEXT) terrain_feature.$(OBJEXT) text_gui.$(OBJEXT) \
+	texture.$(OBJEXT) tile.$(OBJEXT) tile_logic.$(OBJEXT) \
+	tooltip.$(OBJEXT) tracks.$(OBJEXT) translate.$(OBJEXT) \
+	unicode.$(OBJEXT) variant.$(OBJEXT) widget.$(OBJEXT) \
+	wml_command.$(OBJEXT) wml_node.$(OBJEXT) wml_parser.$(OBJEXT) \
+	wml_utils.$(OBJEXT) wml_writer.$(OBJEXT) world.$(OBJEXT) \
+	xml.$(OBJEXT) zoom_map_generator.$(OBJEXT)
 libsilvertree_a_OBJECTS = $(am_libsilvertree_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)

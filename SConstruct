@@ -5,6 +5,7 @@ from glob import glob
 
 opts = Options("options.cache")
 opts.AddOptions(
+    ("PREFIX", "Install prefix.", "/usr/local"),
     ("QTDIR", "Root directory of Qt's installation.", "/usr/"),
     EnumOption("GL_IMPL_MAC", "Mac-specific: OpenGL implementation to be used: Mesa 3D or Apple.", "mesa", ["mesa", "apple"], ignorecase=1),
     ("SDLDIR", "Root directory of SDL's installation.", "/usr/"),
@@ -104,9 +105,19 @@ env.Default(env.Alias("silvertreerpg", env.InstallAs("./silvertreerpg" + Executa
 if editor:
     editor_env.Alias("editor", editor_env.InstallAs("./silvertreeedit" + ExecutableSuffix, editor))
 
-bindistdir = env.Install("silvertree", \
-    [silvertree, editor] + Split("data images model-sources README LICENSE FreeSans.ttf") \
-    + map(glob, Split("*.dae *.3ds *.3d")))
+executables = [silvertree]
+if editor_env["HaveQt"]:
+    executables.append(editor)
+datafiles = Split("data images model-sources FreeSans.ttf") + map(glob, Split("*.dae *.3ds *.3d"))
+
+data_install_dir = join(env["PREFIX"], "share/silvertree-rpg")
+install_executables = Install(join(env["PREFIX"], "bin"), executables)
+install_data = Install(data_install_dir, datafiles)
+Alias("install", [install_executables, install_data])
+env.Replace(CPPDEFINES = { "HAVE_CONFIG_H" : None, "DATADIR" : '\\"' + data_install_dir + '\\"' })
+editor_env.Replace(CPPDEFINES = { "HAVE_CONFIG_H" : None, "DATADIR" : '\\"' + data_install_dir + '\\"' })
+
+bindistdir = env.Install("silvertree", Split("README LICENSE") + executables + datafiles)
 bindistzip = env.Zip("silvertree.zip", bindistdir)
 env.Alias("bindistzip", bindistzip)
 

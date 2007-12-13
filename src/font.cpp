@@ -21,6 +21,7 @@
 #include "foreach.hpp"
 #include "sdl_algo.hpp"
 #include "string_utils.hpp"
+#include "filesystem.hpp"
 
 //#ifdef __APPLE__
 #define SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
@@ -60,7 +61,7 @@ font_ptr get_font(int size)
 	if(i != fonts.end()) {
 		return i->second;
 	} else {
-		font_ptr new_font(TTF_OpenFont("FreeSans.ttf",size),
+		font_ptr new_font(TTF_OpenFont(sys::find_file("FreeSans.ttf").c_str(),size),
 		                  release_font());
 		if(!new_font) {
 			std::cerr << "ttf open failed: " << TTF_GetError() << "\n";
