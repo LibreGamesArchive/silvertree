@@ -113,9 +113,10 @@ datafiles = Split("data images model-sources FreeSans.ttf") + map(glob, Split("*
 data_install_dir = join(env["PREFIX"], "share/silvertree-rpg")
 install_executables = Install(join(env["PREFIX"], "bin"), executables)
 install_data = Install(data_install_dir, datafiles)
-Alias("install", [install_executables, install_data])
-env.Replace(CPPDEFINES = { "HAVE_CONFIG_H" : None, "DATADIR" : '\\"' + data_install_dir + '\\"' })
-editor_env.Replace(CPPDEFINES = { "HAVE_CONFIG_H" : None, "DATADIR" : '\\"' + data_install_dir + '\\"' })
+if not env["PLATFORM"] == "win32":
+    Alias("install", [install_executables, install_data])
+    env.Replace(CPPDEFINES = { "HAVE_CONFIG_H" : None, "DATADIR" : '\\"' + data_install_dir + '\\"' })
+    editor_env.Replace(CPPDEFINES = { "HAVE_CONFIG_H" : None, "DATADIR" : '\\"' + data_install_dir + '\\"' })
 
 bindistdir = env.Install("silvertree", Split("README LICENSE") + executables + datafiles)
 bindistzip = env.Zip("silvertree.zip", bindistdir)
