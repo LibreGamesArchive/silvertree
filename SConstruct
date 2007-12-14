@@ -45,7 +45,7 @@ env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
 
 execfile("SConfigure")
 conf = env.Configure(custom_tests = CustomChecks)
-conf.CheckBoost("regex") or Exit(1)
+conf.CheckBoost("regex", "1.20") or Exit(1)
 conf.Finish()
 namegen_env = env.Clone()
 conf = env.Configure(custom_tests = CustomChecks)
