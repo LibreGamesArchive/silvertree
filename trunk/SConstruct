@@ -50,7 +50,7 @@ conf.Finish()
 namegen_env = env.Clone()
 conf = env.Configure(custom_tests = CustomChecks)
 conf.CheckOpenGL(["gl", "glu"]) and \
-conf.CheckSDL() and \
+conf.CheckSDL(require_version = "1.2.10") and \
 conf.CheckSDL("SDL_image") and \
 conf.CheckSDL("SDL_ttf") or Exit(1)
 conf.Finish()
