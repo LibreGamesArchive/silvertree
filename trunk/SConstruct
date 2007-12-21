@@ -2,6 +2,9 @@
 
 from os.path import join
 from glob import glob
+import sys
+sys.path.append("./scons")
+from build_output import setup_build_output
 
 opts = Options("options.cache")
 opts.AddOptions(
@@ -14,7 +17,8 @@ opts.AddOptions(
     ("BOOST_SUFFIX", "Suffix of the boost regex library.", ""),
     EnumOption("Build", "Build variant: debug or release", "release", ["debug", "release"], ignorecase=1),
     ("EXTRA_FLAGS_RELEASE", "Extra compiler/linker flags to use in release build variant.(e.g. \"-O3 -march=prescott\")", ""),
-    ("EXTRA_FLAGS_DEBUG", "Extra compiler/linker flags to use in debug build variant.", "")
+    ("EXTRA_FLAGS_DEBUG", "Extra compiler/linker flags to use in debug build variant.", ""),
+    BoolOption("VERBOSE_BUILD_OUTPUT", "If true, SCons will display full command lines of commands it's running.", False),
 )
 
 env = Environment(tools = ["zip"], toolpath = ["scons"], options = opts)
@@ -121,5 +125,7 @@ if not env["PLATFORM"] == "win32":
 bindistdir = env.Install("silvertree", Split("README LICENSE") + executables + datafiles)
 bindistzip = env.Zip("silvertree.zip", bindistdir)
 env.Alias("bindistzip", bindistzip)
+
+setup_build_output([env, editor_env, namegen_env])
 
 SConsignFile("sconsign")

@@ -84,12 +84,17 @@ def CheckSDL(context, sdl_lib = "SDL", require_version = None):
 def CheckBoostLib(context, boost_lib, require_version = None):
     env = context.env
     backup = backup_env(env, ["CPPPATH", "LIBPATH", "LIBS"])
-    env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
+
+    boost_headers = { "regex" : "regex/config.hpp" }
+    header_name = boost_headers.get(boost_lib, boost_lib + ".hpp")
     libname = "boost_" + boost_lib + env.get("BOOST_SUFFIX", "")
+
+    env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
     env.AppendUnique(LIBS = [libname])
+
     test_program = """
-        #include <boost/%s.hpp>
-        \n""" % boost_lib
+        #include <boost/%s>
+        \n""" % header_name
     if require_version:
         version = require_version.split(".", 2)
         major = int(version[0])
