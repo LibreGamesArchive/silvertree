@@ -21,7 +21,7 @@ opts.AddOptions(
     BoolOption("VERBOSE_BUILD_OUTPUT", "If true, SCons will display full command lines of commands it's running.", False),
 )
 
-env = Environment(tools = ["zip"], toolpath = ["scons"], options = opts)
+env = Environment(tools = ["zip", "config_checks"], toolpath = ["scons"], options = opts)
 if env["PLATFORM"] == "win32":
     env.Tool("mingw")
 else:
@@ -45,14 +45,12 @@ if env["PLATFORM"] == "darwin":
         env.AppendUnique(LIBPATH = ["/sw/lib/mesa"], CPPPATH = ["/sw/include/mesa"])
     if env["GL_IMPL_MAC"] == "apple":
         env.AppendUnique(FRAMEWORKS = ["OpenGL"], CPPPATH = ["/System/Library/Frameworks/OpenGL.framework/Headers"])
-env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
 
-execfile("SConfigure")
-conf = env.Configure(custom_tests = CustomChecks)
+conf = env.Configure(custom_tests = env["config_checks"])
 conf.CheckBoost("regex", "1.20") or Exit(1)
 conf.Finish()
 namegen_env = env.Clone()
-conf = env.Configure(custom_tests = CustomChecks)
+conf = env.Configure(custom_tests = env["config_checks"])
 conf.CheckOpenGL(["gl", "glu"]) and \
 conf.CheckSDL(require_version = "1.2.10") and \
 conf.CheckSDL("SDL_image") and \

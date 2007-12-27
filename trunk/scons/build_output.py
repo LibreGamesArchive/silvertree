@@ -3,8 +3,8 @@
 def setup_build_output(envs):
     for env in envs:
         if not env["VERBOSE_BUILD_OUTPUT"]:
-            env["CCCOMSTR"]     = "Compiling C source: ${SOURCE.srcpath} --> ${TARGET.srcpath}"
-            env["CXXCOMSTR"]    = "Compiling C++ source: ${SOURCE.srcpath} --> ${TARGET.srcpath}"
+            env["CCCOMSTR"]     = "Compiling C source ${SOURCE.srcpath} ..."
+            env["CXXCOMSTR"]    = "Compiling C++ source ${SOURCE.srcpath} ..."
             env["ARCOMSTR"]     = "Creating static library ${TARGET.srcpath} ..."
             env["RANLIBCOMSTR"] = "Indexing ${TARGET.srcpath} ..."
             env["LINKCOMSTR"]   = "Linking binary ${TARGET.srcpath} ..."
