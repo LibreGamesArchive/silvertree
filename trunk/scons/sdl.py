@@ -1,5 +1,6 @@
 # vi: syntax=python:et:ts=4
 from os.path import join
+from SCons.Script import *
 
 def CheckSDL(context, sdl_lib = "SDL", require_version = None):
     if require_version:

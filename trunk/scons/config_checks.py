@@ -5,6 +5,7 @@ checks = Split("""
     gl
     sdl
     boost
+    qt4ng
 """)
 
 def exists(env):

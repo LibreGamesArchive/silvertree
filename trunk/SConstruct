@@ -9,7 +9,7 @@ from build_output import setup_build_output
 opts = Options("options.cache")
 opts.AddOptions(
     ("PREFIX", "Install prefix.", "/usr/local"),
-    ("QTDIR", "Root directory of Qt's installation.", "/usr/"),
+    ("QT4DIR", "Root directory of Qt's installation.", "/usr/"),
     EnumOption("GL_IMPL_MAC", "Mac-specific: OpenGL implementation to be used: Mesa 3D or Apple.", "mesa", ["mesa", "apple"], ignorecase=1),
     ("SDLDIR", "Root directory of SDL's installation.", "/usr/"),
     ("BOOSTDIR", "Root directory of boost installation.", "/usr/include"),
@@ -58,22 +58,10 @@ conf.CheckSDL("SDL_ttf") or Exit(1)
 conf.Finish()
 
 editor_env = env.Clone()
-try:
-    editor_env.Tool("qt4")
-    editor_env.EnableQt4Modules(["QtCore", "QtGui", "QtOpenGL"])
-    editor_env.Replace(QT4_UICIMPLSUFFIX=".hpp", QT4_UICDECLSUFFIX=".hpp",
-        QT4_UICIMPLPREFIX="", QT4_UICDECLPREFIX="", QT4_MOCHPREFIX="", QT4_MOCHSUFFIX=".moc",
-        QT4_AUTOSCAN=0)
-except:
-    pass
-editor_conf = editor_env.Configure()
-if env["PLATFORM"] == "win32":
-    QtLibSuffix = "4"
-else:
-    QtLibSuffix = ""
-editor_env["HaveQt"] = editor_conf.CheckLibWithHeader("QtCore" + QtLibSuffix, "QtGlobal", "C++", autoadd = False) and \
-         editor_conf.CheckLibWithHeader("QtGui" + QtLibSuffix, "QApplication", "C++", autoadd = False) and \
-         editor_conf.CheckLibWithHeader("QtOpenGL" + QtLibSuffix, "QGLWidget", "C++", autoadd = False)
+editor_env.Replace(QT4_UICDECLSUFFIX=".hpp", QT4_UICDECLPREFIX="", QT4_MOCIMPLPREFIX="", QT4_MOCIMPLSUFFIX=".moc")
+editor_conf = editor_env.Configure(custom_tests = editor_env["config_checks"])
+editor_env["HaveQt"] = editor_conf.CheckQt4Tools() and \
+                       editor_conf.CheckQt4Libs(["QtCore", "QtGui", "QtOpenGL"])
 editor_conf.Finish()
 
 if "gcc" in env["TOOLS"]:
