@@ -10,5 +10,5 @@ def setup_build_output(envs):
             env["LINKCOMSTR"]   = "Linking binary ${TARGET.srcpath} ..."
             env["INSTALLSTR"]   = "Installing $SOURCE as $TARGET ..."
 
-            env["QT4_MOCFROMHCOMSTR"] = "Moccing ${SOURCE.srcpath} ..."
+            env["QT4_MOCCOMSTR"] = "Moccing ${SOURCE.srcpath} ..."
             env["QT4_UICCOMSTR"]      = "Compiling user interface: ${SOURCE.srcpath} ..."
