@@ -3,7 +3,7 @@ from os.path import join
 from SCons.Script  import *
 from SCons.Builder import Builder
 from SCons.Action  import Action
-from SCons.Environment import BuilderWrapper
+from config_check_utils import *
 
 moc4builder = Builder(
                 action = Action("$QT4_MOCCOM", "$QT4_MOCCOMSTR"),
@@ -67,6 +67,7 @@ qt4libs = {
 def CheckQt4Tools(context, tools = ["moc", "uic"]):
     context.Message("Checking for Qt tools %s... " % ", ".join(tools))
     env = context.env
+    env_backup = backup_env(env, ["BUILDERS"])
     env.SetDefault(
         QT4_MOCCOM = "$QT4_MOC -o $TARGET $SOURCE",
         QT4_MOCIMPLPREFIX = "moc_",
@@ -79,10 +80,7 @@ def CheckQt4Tools(context, tools = ["moc", "uic"]):
     results = []
     for tool in tools:
         if tool not in qt4tools:
-            raise "Unknown tool %s." % tool
-        bindir = env.get("QT4DIR", "")
-        if bindir:
-            bindir = join(bindir, "bin")
+            raise KeyError("Unknown tool %s." % tool)
         tool_var = "QT4_" + tool.upper()
         if not env.has_key(tool_var):
             if env.has_key("QT4DIR"):
@@ -90,13 +88,14 @@ def CheckQt4Tools(context, tools = ["moc", "uic"]):
             else:
                 env[tool_var] = WhereIs(tool)
 
-        result = context.TryBuild(BuilderWrapper(env, qt4tools[tool][0]), qt4tools[tool][1])
+        builder_method_name = tool.capitalize() + "4"
+        env.Append(BUILDERS = { builder_method_name : qt4tools[tool][0] } )
+        result = context.TryBuild(eval("env.%s" % builder_method_name), qt4tools[tool][1])
         if not result:
+            restore_env(env, env_backup)
             context.Result("no")
             return False
 
-    for tool in tools:
-        env.Append(BUILDERS = { tool.capitalize() + "4" : qt4tools[tool][0] } )
     context.Result("yes")
     return True
 
@@ -107,7 +106,7 @@ def CheckQt4Libs(context, libs = ["QtCore", "QtGui"]):
         for lib in libs:
             env.ParseConfig("pkg-config --libs --cflags %s" % lib)
     if env["PLATFORM"] == "win32":
-        if not env.has_key("QT4DIR"): raise "QT4DIR MUST be specified on Windows."
+        if not env.has_key("QT4DIR"): raise KeyError("QT4DIR MUST be specified on Windows.")
         env.AppendUnique(CPPPATH = [join("$QT4DIR", "include")])
         for lib in libs:
             if lib == "QtOpenGL":

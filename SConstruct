@@ -9,6 +9,7 @@ from build_output import setup_build_output
 opts = Options("options.cache")
 opts.AddOptions(
     ("PREFIX", "Install prefix.", "/usr/local"),
+    ("STAGE_PREFIX", "Install stage prefix.", "$PREFIX"),
     ("QT4DIR", "Root directory of Qt's installation.", "/usr/"),
     EnumOption("GL_IMPL_MAC", "Mac-specific: OpenGL implementation to be used: Mesa 3D or Apple.", "mesa", ["mesa", "apple"], ignorecase=1),
     ("SDLDIR", "Root directory of SDL's installation.", "/usr/"),
@@ -101,8 +102,9 @@ if editor_env["HaveQt"]:
 datafiles = Split("data images model-sources FreeSans.ttf") + map(glob, Split("*.dae *.3ds *.3d"))
 
 data_install_dir = join(env["PREFIX"], "share/silvertree-rpg")
-install_executables = Install(join(env["PREFIX"], "bin"), executables)
-install_data = Install(data_install_dir, datafiles)
+data_stage_dir = join(env["STAGE_PREFIX"], "share/silvertree-rpg")
+install_executables = Install(join(env["STAGE_PREFIX"], "bin"), executables)
+install_data = Install(data_stage_dir, datafiles)
 if not env["PLATFORM"] == "win32":
     Alias("install", [install_executables, install_data])
     env.Replace(CPPDEFINES = { "HAVE_CONFIG_H" : None, "DATADIR" : '\\"' + data_install_dir + '\\"' })
