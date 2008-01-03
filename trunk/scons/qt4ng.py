@@ -65,9 +65,8 @@ qt4libs = {
     }
 
 def CheckQt4Tools(context, tools = ["moc", "uic"]):
-    context.Message("Checking for Qt tools %s... " % ", ".join(tools))
+    context.Message("Checking for Qt 4 tools %s... " % ", ".join(tools))
     env = context.env
-    env_backup = backup_env(env, ["BUILDERS"])
     env.SetDefault(
         QT4_MOCCOM = "$QT4_MOC -o $TARGET $SOURCE",
         QT4_MOCIMPLPREFIX = "moc_",
@@ -82,17 +81,19 @@ def CheckQt4Tools(context, tools = ["moc", "uic"]):
         if tool not in qt4tools:
             raise KeyError("Unknown tool %s." % tool)
         tool_var = "QT4_" + tool.upper()
+        if env.has_key("QT4DIR"):
+            qt_bin_dir = join(env["QT4DIR"], "bin")
+        else:
+            qt_bin_dir = ""
         if not env.has_key(tool_var):
-            if env.has_key("QT4DIR"):
-                env[tool_var] = WhereIs(tool, join(env["QT4DIR"], "bin"))
-            else:
-                env[tool_var] = WhereIs(tool)
+            env[tool_var] = WhereIs(tool + "-qt4", qt_bin_dir) or \
+                            WhereIs(tool + "4", qt_bin_dir) or \
+                            WhereIs(tool, qt_bin_dir)
 
         builder_method_name = tool.capitalize() + "4"
         env.Append(BUILDERS = { builder_method_name : qt4tools[tool][0] } )
         result = context.TryBuild(eval("env.%s" % builder_method_name), qt4tools[tool][1])
-        if not result:
-            restore_env(env, env_backup)
+        if not result or context.lastTarget.get_contents() == "":
             context.Result("no")
             return False
 
@@ -100,7 +101,7 @@ def CheckQt4Tools(context, tools = ["moc", "uic"]):
     return True
 
 def CheckQt4Libs(context, libs = ["QtCore", "QtGui"]):
-    context.Message("Checking for Qt libraries %s... " % ", ".join(libs))
+    context.Message("Checking for Qt 4 libraries %s... " % ", ".join(libs))
     env = context.env
     if env["PLATFORM"] != "win32":
         for lib in libs:
