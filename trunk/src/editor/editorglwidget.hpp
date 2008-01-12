@@ -15,6 +15,8 @@
 #ifndef EDITORGLWIDGET_HPP_INCLUDED
 #define EDITORGLWIDGET_HPP_INCLUDED
 
+#include <GL/glew.h>
+
 #include <QtCore/QTimer>
 #include <QtOpenGL/QGLWidget>
 

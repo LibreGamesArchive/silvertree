@@ -52,7 +52,7 @@ conf.CheckBoost("regex", "1.20") or Exit(1)
 conf.Finish()
 namegen_env = env.Clone()
 conf = env.Configure(custom_tests = env["config_checks"])
-conf.CheckOpenGL(["gl", "glu"]) and \
+conf.CheckGLEW() and \
 conf.CheckSDL(require_version = "1.2.10") and \
 conf.CheckSDL("SDL_image") and \
 conf.CheckSDL("SDL_ttf") or Exit(1)

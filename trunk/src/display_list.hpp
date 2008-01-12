@@ -13,7 +13,7 @@
 #ifndef DISPLAY_LIST_HPP_INCLUDED
 #define DISPLAY_LIST_HPP_INCLUDED
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 
 namespace graphics {
 

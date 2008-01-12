@@ -5,8 +5,7 @@
 #include <vector>
 #include <iostream>
 #include "boost/shared_array.hpp"
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/glew.h>
 
 #include "raster.hpp"
 

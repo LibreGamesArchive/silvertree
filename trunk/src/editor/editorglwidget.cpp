@@ -10,8 +10,7 @@
 
    See the COPYING file for more details.
 */
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/glew.h>
 
 #include <cmath>
 #include <iostream>

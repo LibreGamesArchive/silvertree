@@ -10,8 +10,7 @@
 
    See the COPYING file for more details.
 */
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/glew.h>
 #include <SDL.h>
 
 #include <cmath>
@@ -98,6 +97,12 @@ int main(int argc, char** argv)
 			mainWindow->openScenario(argv[1]);
 		} else {
 			mainWindow->openScenario(NULL);
+		}
+
+		GLenum glew_err = glewInit();
+		if (glew_err != GLEW_OK) {
+		std::cerr << "GLEW initialization failed: " << glewGetErrorString(glew_err) << std::endl;
+		return -1;
 		}
 
 		app.exec();

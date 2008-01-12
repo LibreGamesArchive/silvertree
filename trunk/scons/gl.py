@@ -23,5 +23,28 @@ def CheckOpenGL(context, libs = ["gl"]):
         context.Result("no")
         return False
 
+def CheckGLEW(context):
+    context.Message("Checking for OpenGL Extension Wrangler... ")
+    env = context.env
+    backup = backup_env(env, ["LIBS"])
+    if env["PLATFORM"] == "win32":
+        env.AppendUnique(LIBS = ["glew32", "glu32", "opengl32"])
+    else:
+        env.AppendUnique(LIBS = ["GLEW", "GLU", "GL"])
+    test_program = """
+        #include <GL/glew.h>
+        int main()
+        {
+            glewInit();
+        }
+"""
+    if context.TryLink(test_program, ".c"):
+        context.Result("yes")
+        return True
+    else:
+        restore_env(env, backup)
+        context.Result("no")
+        return False
+
 def get_checks():
-    return { "CheckOpenGL" : CheckOpenGL }
+    return { "CheckOpenGL" : CheckOpenGL, "CheckGLEW" : CheckGLEW }

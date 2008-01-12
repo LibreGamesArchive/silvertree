@@ -18,7 +18,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/array.hpp>
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 
 namespace hex
 {

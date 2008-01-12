@@ -14,7 +14,7 @@
 #include "gamemap.hpp"
 #include "raster.hpp"
 
-#include <GL/glu.h>
+#include <GL/glew.h>
 
 #include <cmath>
 #include <iostream>
