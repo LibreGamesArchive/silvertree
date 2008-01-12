@@ -1,7 +1,7 @@
 #ifndef PREFERENCES_HPP_INCLUDED
 #define PREFERENCES_HPP_INCLUDED
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 
 #include <string>
 

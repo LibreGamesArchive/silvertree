@@ -12,11 +12,11 @@
 */
 #include <iostream>
 
+#include <GL/glew.h>
+
 #include "foreach.hpp"
 #include "grid_widget.hpp"
 #include "raster.hpp"
-
-#include <GL/gl.h>
 
 namespace gui {
 

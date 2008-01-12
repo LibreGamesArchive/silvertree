@@ -1,4 +1,4 @@
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include "SDL.h"
 
 #include <boost/shared_ptr.hpp>
