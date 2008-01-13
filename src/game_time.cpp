@@ -26,57 +26,59 @@ namespace {
 
 const int HoursInDay = 24;
 const int MinutesInHour = 60;
+const int SecondsInMinute = 60;
 
 }
 
-game_time::game_time() : minutes_since_epoch_(-1)
+game_time::game_time() : seconds_since_epoch_(-1)
 {}
 
 game_time::game_time(wml::const_node_ptr node)
-   : minutes_since_epoch_(wml::get_attr<int>(node,"time"))
+   : seconds_since_epoch_(wml::get_attr<int>(node,"time"))
 {
-	if(minutes_since_epoch_ == 0) {
-		minutes_since_epoch_ =
-		    wml::get_attr<int>(node,"days")*HoursInDay*MinutesInHour +
-		    wml::get_attr<int>(node,"hours")*MinutesInHour +
-		    wml::get_attr<int>(node,"minutes");
+	if(seconds_since_epoch_ == 0) {
+		seconds_since_epoch_ =
+		    wml::get_attr<int>(node,"days")*HoursInDay*MinutesInHour*SecondsInMinute +
+		    wml::get_attr<int>(node,"hours")*MinutesInHour*SecondsInMinute +
+		    wml::get_attr<int>(node,"minutes")*SecondsInMinute +
+			wml::get_attr<int>(node,"seconds");
 	}
 }
 
 int game_time::day() const
 {
-	return minutes_since_epoch_/(HoursInDay*MinutesInHour);
+	return seconds_since_epoch_/(HoursInDay*MinutesInHour*SecondsInMinute);
 }
 
 int game_time::hour() const
 {
-	return (minutes_since_epoch_/MinutesInHour)%HoursInDay;
+	return (seconds_since_epoch_/(MinutesInHour*SecondsInMinute))%HoursInDay;
 }
 
 int game_time::minute() const
 {
-	return minutes_since_epoch_%MinutesInHour;
+	return (seconds_since_epoch_/SecondsInMinute)%MinutesInHour;
 }
 
 int game_time::since_epoch() const
 {
-	return minutes_since_epoch_;
+	return seconds_since_epoch_;
 }
 
 bool game_time::valid() const
 {
-	return minutes_since_epoch_ >= 0;
+	return seconds_since_epoch_ >= 0;
 }
 
 game_time& game_time::operator++()
 {
-	++minutes_since_epoch_;
+	++seconds_since_epoch_;
 	return *this;
 }
 
-game_time& game_time::operator+=(int mins)
+game_time& game_time::operator+=(int seconds)
 {
-	minutes_since_epoch_ += mins;
+	seconds_since_epoch_ += seconds;
 	return *this;
 }
 

@@ -262,7 +262,7 @@ void party::move(hex::DIRECTION dir)
 	const int cost = movement_cost(loc(),dst)/move_mode_;
 	apply_fatigue(loc(),dst);
 	departed_at_ = game_world().current_time();
-	arrive_at_ = game_world().current_time() + cost;
+	arrive_at_ = game_world().current_time() + cost*game_world().scale();
 	previous_loc_ = loc_;
 	loc_ = dst;
 	visible_locs_.clear();
@@ -270,14 +270,14 @@ void party::move(hex::DIRECTION dir)
 	world_->fire_event("begin_move", *this);
 }
 
-void party::pass(int minutes)
+void party::pass(int slices)
 {
 	last_facing_ = facing_;
 	previous_loc_ = loc_;
 	departed_at_ = game_world().current_time();
-	arrive_at_ = game_world().current_time() + minutes;
+	arrive_at_ = game_world().current_time() + slices*game_world().scale();
 	foreach(const character_ptr& c, members_) {
-		c->use_stamina(-minutes * 2);
+		c->use_stamina(-slices * 2);
 	}
 
 	const_formula_ptr heal_formula = formula_registry::get_stat_calculation("heal_amount");

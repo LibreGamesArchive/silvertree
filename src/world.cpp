@@ -72,7 +72,7 @@ const std::vector<const world*>& world::current_world_stack()
 world::world(wml::const_node_ptr node)
 	: compass_(graphics::texture::get(graphics::surface_cache::get("compass-rose.png"))),
 	  map_(get_map_data(node)), camera_(map_),
-	  camera_controller_(camera_),
+	  camera_controller_(camera_), scale_(wml::get_int(node, "scale", 1)),
 	  time_(node), subtime_(0.0), tracks_(map_),
 	  border_tile_(wml::get_str(node, "border_tile")),
 	  done_(false), quit_(false), camera_moving_(false),
@@ -863,13 +863,15 @@ void world::play()
 
 		if(!active_party) {
 			const bool accel = keys[SDLK_SPACE] || !script_.empty();
-			subtime_ += game_speed * (accel ? 2.0 : 1.0);
+			double increase = scale_ * game_speed * (accel ? 2.0 : 1.0);
 			if(keys[SDLK_SPACE] && (keys[SDLK_LSHIFT] || keys[SDLK_RSHIFT])) {
-				subtime_ = 1.0;
+				increase *= 4;
 			}
 
+			subtime_ += increase;
+
 			if(subtime_ >= 1.0) {
-				++time_;
+				time_ += static_cast<int>(subtime_);
 				subtime_ = 0.0;
 				fire_event("tick", *standard_callable);
 			}
