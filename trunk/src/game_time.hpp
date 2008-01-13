@@ -31,6 +31,7 @@ public:
 	int day() const;
 	int hour() const;
 	int minute() const;
+	int second() const;
 
 	int since_epoch() const;
 
@@ -44,7 +45,7 @@ public:
 private:
 	variant get_value(const std::string& key) const;
 	void get_inputs(std::vector<formula_input>* inputs) const;
-	int minutes_since_epoch_;
+	int seconds_since_epoch_;
 };
 
 bool operator==(const game_time& t1, const game_time& t2);

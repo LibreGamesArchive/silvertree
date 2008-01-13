@@ -63,6 +63,7 @@ public:
 	void set_script(const std::string& script) { script_ = script; }
 
 	const hex::gamemap& map() const { return map_; }
+	int scale() const { return scale_; }
 	const game_time& current_time() const { return time_; }
 	void advance_time_until(const game_time& t) { time_ = t; }
 	const GLfloat& subtime() const { return subtime_; }
@@ -146,6 +147,7 @@ private:
 	void set_value(const std::string& key, const variant& value);
 	void get_inputs(std::vector<formula_input>* inputs) const;
 
+	int scale_;
 	game_time time_;
 	GLfloat subtime_;
 	tracks tracks_;
