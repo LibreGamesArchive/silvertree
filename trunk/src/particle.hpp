@@ -1,7 +1,7 @@
 #ifndef PARTICLE_HPP_INCLUDED
 #define PARTICLE_HPP_INCLUDED
 
-#include <GL/glew.h>
+#include <GL/gl.h>
 
 namespace graphics {
 

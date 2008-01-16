@@ -662,7 +662,7 @@ battle::attack_stats battle::get_attack_stats(
 	}
 
 	if(description) {
-		const int chance_to_hit = (100*stats.attack)/(stats.defense+stats.attack);
+		const int chance_to_hit = std::min<int>(100, std::max<int>(0, stats.attack - stats.defense));
 		*description += formatter() << "Attack: " <<
 		                stats.attack << "\nDefense: " <<
 						stats.defense <<
@@ -671,7 +671,7 @@ battle::attack_stats battle::get_attack_stats(
 						"\nTime: " << stats.time_taken << "s";
 		if(stats.attack > stats.defense &&
 		   stats.damage_critical != stats.damage) {
-			const int chance_to_critical = (100*(stats.attack-stats.defense)/(stats.defense+stats.attack));
+			const int chance_to_critical = std::min<int>(100, std::max<int>(0, stats.attack/2 - stats.defense));
 			*description += formatter() << "Chance to critical: " <<
 			                chance_to_critical <<
 							"%\nCritical damage: " <<
@@ -701,7 +701,8 @@ void battle::attack_character(battle_character& attacker,
 		  hex::get_main_direction(defender.loc(),attacker.loc()));
 	}
 
-	int random = rand()%(stats.attack+stats.defense);
+	int random = rand()%100;
+	const int chance_to_hit = stats.attack - stats.defense;
 
 	const SDL_Rect slider_rect = {100, 650, 800, 100};
 	const bool use_slider = preference_sliders() && attacker.is_human();
@@ -741,16 +742,16 @@ void battle::attack_character(battle_character& attacker,
 		attacker.set_movement_time(cur_time);
 		defender.set_movement_time(cur_time);
 		attacker.set_attack_time(cur_time);
-		if(random > stats.defense &&
+		if(random > chance_to_hit &&
 		   cur_time >= begin_hit && cur_time <= end_hit) {
 			defender.set_highlight(highlight);
 		}
 
 		if(use_slider && !applied_slider_result && slider.result() != gui::slider::PENDING) {
 			if(slider.result() == gui::slider::RED) {
-				random = 100;
-			} else if(slider.result() == gui::slider::BLUE) {
 				random /= 2;
+			} else if(slider.result() == gui::slider::BLUE) {
+				random *= 2;
 			}
 
 			begin_hit = t;

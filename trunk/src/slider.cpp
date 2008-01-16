@@ -35,7 +35,7 @@ GLfloat slider::duration() const
 
 GLfloat slider::critical_section() const
 {
-	return GLfloat(attack_)*0.001;
+	return GLfloat(attack_)*0.01;
 }
 
 void slider::draw()
