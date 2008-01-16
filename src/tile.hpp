@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include <GL/glew.h>
+#include <GL/gl.h>
 
 #include "base_terrain_fwd.hpp"
 #include "location_tracker.hpp"

@@ -13,7 +13,7 @@
 #ifndef SLIDER_HPP_INCLUDED
 #define SLIDER_HPP_INCLUDED
 
-#include <GL/glew.h>
+#include <GL/gl.h>
 
 #include "SDL.h"
 

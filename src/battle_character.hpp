@@ -14,7 +14,7 @@
 #define BATTLE_CHARACTER_HPP_INCLUDED
 
 #include <boost/shared_ptr.hpp>
-#include <GL/glew.h>
+#include <GL/gl.h>
 
 #include <set>
 #include <vector>

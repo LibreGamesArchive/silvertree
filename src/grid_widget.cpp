@@ -12,7 +12,7 @@
 */
 #include <iostream>
 
-#include <GL/glew.h>
+#include <GL/gl.h>
 
 #include "foreach.hpp"
 #include "grid_widget.hpp"

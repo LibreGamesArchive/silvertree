@@ -15,7 +15,7 @@
 
 #include <string>
 #include <vector>
-#include <GL/glew.h>
+#include <GL/gl.h>
 
 #include "tile.hpp"
 #include "tile_logic.hpp"

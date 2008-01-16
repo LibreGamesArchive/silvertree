@@ -2,7 +2,7 @@
 #define MINI_STATS_DIALOG_HPP_INCLUDED
 
 #include "boost/shared_ptr.hpp"
-#include <GL/glew.h>
+#include <GL/gl.h>
 
 #include "battle_character.hpp"
 #include "gui_core.hpp"

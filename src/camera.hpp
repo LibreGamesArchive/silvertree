@@ -13,7 +13,7 @@
 #ifndef CAMERA_HPP_INCLUDED
 #define CAMERA_HPP_INCLUDED
 
-#include <GL/glew.h>
+#include <GL/gl.h>
 #include <vector>
 
 #include "tile_logic.hpp"
