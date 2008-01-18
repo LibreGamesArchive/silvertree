@@ -79,24 +79,36 @@ void camera_controller::event_control(SDL_Event &event)
 				cam_.zoom_out();
 			if(event.button.button == SDL_BUTTON_WHEELDOWN)
 				cam_.zoom_in();
-			if(event.button.button == SDL_BUTTON_MIDDLE) {
+			if(event.button.button == SDL_BUTTON_RIGHT) {
 				drag_x_ = event.button.x;
 				drag_y_ = event.button.y;
 			}
 			break;
 		case SDL_MOUSEMOTION:
-			// Allow tilting by holding the middle mouse button.
-			if(event.motion.state & SDL_BUTTON(2)) {
+			int middle_y = SDL_GetVideoSurface()->h / 2;
+			if(event.motion.state & SDL_BUTTON(3)) {
+				// Allow tilting by holding the right mouse button.
 				if (event.motion.yrel > 0)
 					cam_.tilt_up(event.motion.yrel * MouseLookSpeed);
 				if (event.motion.yrel < 0)
 					cam_.tilt_down(-event.motion.yrel * MouseLookSpeed);
+
+				// Allow rotating by holding the right mouse button.
+				// We rotate only after the mouse is moved quite far,
+				// and the direction depends on if the cursor is in the
+				// upper or lower screen half.
 				if (event.motion.x > drag_x_ + MouseRotateDistance) {
-					cam_.rotate_left();
+					if (event.motion.y > middle_y)
+						cam_.rotate_right();
+					else
+						cam_.rotate_left();
 					drag_x_ = event.motion.x;
 				}
 				if (event.motion.x < drag_x_ - MouseRotateDistance) {
-					cam_.rotate_right();
+					if (event.motion.y > middle_y)
+						cam_.rotate_left();
+					else
+						cam_.rotate_right();
 					drag_x_ = event.motion.x;
 				}
 			}
