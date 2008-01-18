@@ -231,16 +231,26 @@ void camera::rotate_right()
 	}
 }
 
+void camera::tilt_up(GLfloat speed)
+{
+	tilt_ += speed;
+	moved_since_last_check_ = true;
+}
+
 void camera::tilt_up()
 {
-	tilt_ += TiltSpeed;
+	camera::tilt_up(TiltSpeed);
+}
+
+void camera::tilt_down(GLfloat speed)
+{
+	tilt_ -= speed;
 	moved_since_last_check_ = true;
 }
 
 void camera::tilt_down()
 {
-	tilt_ -= TiltSpeed;
-	moved_since_last_check_ = true;
+	camera::tilt_down(TiltSpeed);
 }
 
 void camera::zoom_in()

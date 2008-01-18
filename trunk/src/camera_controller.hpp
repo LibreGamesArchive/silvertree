@@ -17,12 +17,14 @@ public:
 	}
 
 	void keyboard_control();
+	void event_control(SDL_Event &event);
 	void prepare_selection();
 	unsigned int finish_selection();
 
 private:
 	camera& cam_;
 	bool keyboard_pan_;
+	GLfloat drag_x_, drag_y_;
 };
 
 }

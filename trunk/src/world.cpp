@@ -743,6 +743,9 @@ void world::play()
 				default:
 					break;
 			}
+			// Allow the camera controller to react to events.
+			// TODO: Should not do this for events already consume above.
+			camera_controller_.event_control(event);
 		}
 
 		if(!script_.empty()) {
