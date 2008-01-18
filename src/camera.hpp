@@ -52,6 +52,8 @@ public:
 
 	void tilt_up();
 	void tilt_down();
+	void tilt_up(GLfloat speed);
+	void tilt_down(GLfloat speed);
 	GLfloat tilt() const { return tilt_; }
 
 	void zoom_in();
