@@ -89,8 +89,14 @@ void learn_skills_dialog::init()
 
 	const int Bottom = 700;
 
-	std::vector<const_skill_ptr> base_skills;
+	std::vector<const_skill_ptr> base_skills, hidden_skills;
 	get_skills_derived_from("", &base_skills);
+	get_skills_derived_from("hidden", &hidden_skills);
+	foreach(const_skill_ptr s, hidden_skills) {
+		if (char_->has_skill(s->name())) {
+			get_skills_derived_from(s->name(), &base_skills);
+		}
+	}
 	if(page_ >= base_skills.size()) {
 		page_ = 0;
 	}
