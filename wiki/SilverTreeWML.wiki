@@ -39,7 +39,24 @@ party_light_power: the intensity of the light that should come from the PC's par
 
 The lighting settings are actually all formulas. The game supports writing formulas for certain WML attributes that will be calculated when the game is run. See SilverTreeFormula.
 
-= Events =
+== Settlements ==
+{{{
+  [settlement]
+  file="data/fort.cfg"
+    [portal]
+    xsrc="1"
+    ysrc="1"
+    xdst="2"
+    ydst="2"
+    [/portal]    
+  [/settlement]
+}}}
+
+This creates a portal between the coordinates (1,1) on the current map and the coordinates (2,2) in the fort scenario. 
+
+Portals are two-way, so going to the coordinates (2,2) in the fort scenario will cause the player to leave the fort map.
+
+== Events ==
 
 The {{{[event]}}} tag is used to capture various events that occur in-game. Each event has a set of inputs passed to the event that all the formulas within the event can reference.
 
