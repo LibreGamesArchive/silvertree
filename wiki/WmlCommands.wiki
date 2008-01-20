@@ -19,6 +19,8 @@ Will destroy all the parties that match the given filter.
 
  * filter: The formula which each party is tested against. Those which evaluate to true will be destroyed.
 
+= dialog =
+ * npc: the character speaking. {{{npc="pc"}}} or {{{npc="npc"}}} may be used in events. Otherwise, {{{find(world.parties, id = 'vurgans')}}} or similar code is used.
 = if =
 
 Will evaluate the given condition. If it is true, all the commands within all children named {{{[then]}}} will be evaluated, otherwise all the commands within all children named {{{[else]}}} will be evaluated.
