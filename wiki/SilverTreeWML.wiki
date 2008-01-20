@@ -37,7 +37,7 @@ ambient_light: the color of ambient light to use when rendering the scenario
 
 sun_light: the color of sun light (directed light, depending on time of day) to use when rendering the scenario
 
-party_light; the color of the light that should come from the PC's party when rendering the scenario
+party_light: the color of the light that should come from the PC's party when rendering the scenario
 
 party_light_power: the intensity of the light that should come from the PC's party when rendering the scenario
 
