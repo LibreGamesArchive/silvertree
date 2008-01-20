@@ -1,3 +1,4 @@
+#labels WML
 = Introduction =
 
 This page documents possible WML commands that are available when an event is triggered.
@@ -24,20 +25,9 @@ Will evaluate the given condition. If it is true, all the commands within all ch
 
  * condition: The formula which is evaluated to decide between executing {{{[then]}}} or {{{[else]}}}
 
-= scripted_moves =
+= scripted_moves, execute_script =
 
-Will give a party a script of moves to execute. The party will move from location to location according to the script.
-
- * filter: filter which determines if a party is the party to apply the script to or not.
- * {{{[loc]}}}: a waypoint in the script. Contains 'x' and 'y' which are the location to move to.
-
-= execute_script =
-
-Will freeze all parties in the world, except those who have scripted moves set. Those which do have scripted moves set will move until they have completed their scripted moves. When all parties have completed their scripted moves, the event 'finish_script' will be generated, with the name of the script, and then play will continue as normal.
-
-Generally if you want to use a script to move some characters, and then when they have moved, say something, you would run the scripted_moves command, and then the execute_script command. Then you would catch finish_script and add the commands to make the characters speak.
-
- * script: The name of the script. This will be given to finish_script.
+See [ScriptedMoves]
 
 = modify_objects =
 
