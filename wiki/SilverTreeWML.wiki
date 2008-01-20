@@ -1,4 +1,5 @@
 #summary How to create adventures in SilverTree RPG
+#labels WML
 
 = Introduction =
 
@@ -76,7 +77,7 @@ event: the type of the event being caught. The events currently supported are,
  * tick: fired every minute. Takes the standard set of inputs.
  * encounter: fired whenever the PC party encounters an NPC party. Takes 'pc' and 'npc' as inputs. You can use an {{{[encounter]}}} tag inside an NPC party definition to define an event handler for this kind of event as a convenience.
  * win_battle: when a battle against the filtered party is won. Available inputs: 'npc', 'pc'.
- * finish_script: if there is a movement script running (a set of scripted movements created with the execute_script WML command) will be fired when the script finishes. Takes 'script', the name of the script as an input.
+ * finish_script: if there is a movement script running (a set of scripted movements created with the execute_script WML command) will be fired when the script finishes. Takes 'script', the name of the script as an input. See [ScriptedMoves] for more details.
 
 filter: a formula which runs on the event's input. The event handler will only be run if the filter evaluates to true.
 
