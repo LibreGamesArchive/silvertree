@@ -612,20 +612,6 @@ void tile::draw_cliffs() const
 		return;
 	}
 
-	int num_visible = 3;
-	const hex::DIRECTION* visible = cam->visible_cliffs(&num_visible);
-	bool found = false;
-	for(int n = 0; n != num_visible; ++n) {
-		if(cliffs_[visible[n]]) {
-			found = true;
-			break;
-		}
-	}
-
-	if(!found) {
-		return;
-	}
-
 	if(!terrain_) {
 		return;
 	}
@@ -638,8 +624,7 @@ void tile::draw_cliffs() const
 
 	cliff_texture.set_as_current_texture();
 
-	for(int j = 0; j != num_visible; ++j) {
-		const int n = visible[j];
+	for(int n = 0; n < 6; ++n) {
 		if(!cliffs_[n]) {
 			continue;
 		}
@@ -703,28 +688,13 @@ void tile::draw_cliff_transitions() const
 		return;
 	}
 
-	int num_visible = 3;
-	const hex::DIRECTION* visible = cam->visible_cliffs(&num_visible);
-	bool found = false;
-	for(int n = 0; n != num_visible; ++n) {
-		if(cliffs_[visible[n]]) {
-			found = true;
-			break;
-		}
-	}
-
-	if(!found) {
-		return;
-	}
-
 	if(!terrain_) {
 		return;
 	}
 
 	graphics::texture overlap_texture = terrain_->transition_texture(hex::NORTH);
 	overlap_texture.set_as_current_texture();
-	for(int j = 0; j != num_visible; ++j) {
-		const int n = visible[j];
+	for(int n = 0; n < 6; ++n) {
 		if(!cliffs_[n]) {
 			continue;
 		}
