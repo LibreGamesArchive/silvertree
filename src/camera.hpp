@@ -76,8 +76,6 @@ public:
 
 	bool is_moving() const;
 
-	const hex::DIRECTION* visible_cliffs(int* num) const;
-
 	void set_background_color(const GLfloat* col);
 
 	bool moved_since_last_check() const {
@@ -99,10 +97,6 @@ private:
 
 	GLfloat rotate_;
 	hex::DIRECTION dir_;
-
-	void update_visible_cliffs();
-	hex::DIRECTION visible_cliffs_[4];
-	int num_visible_cliffs_;
 
 	GLfloat target_rotation() const;
 	GLfloat need_to_rotate() const;
