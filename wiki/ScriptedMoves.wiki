@@ -8,7 +8,7 @@ Scripted moves allow you to move parties via WML.
 Generally if you want to use a script to move some characters, and then when they have moved, say something, you would run the scripted_moves command, and then the execute_script command. Then you would catch finish_script and add the commands to make the characters speak.
 
 
-= [scripted_moves] =
+== [scripted_moves] ==
 Will give a party a script of moves to execute. The party will move from location to location according to the script.
 
     * filter: filter which determines if a party is the party to apply the script to or not.
@@ -31,7 +31,7 @@ filter="id = 'vurgans'"
 
 This script will move Vurgans to the coordinates (42,48) and then to (42,42)
 
-= [execute_script] =
+== [execute_script] ==
 Will freeze all parties in the world, except those who have scripted moves set. Those which do have scripted moves set will move until they have completed their scripted moves. When all parties have completed their scripted moves, the event 'finish_script' will be generated, with the name of the script, and then play will continue as normal.
 
     * script: The name of the script. This will be given to finish_script. 
@@ -44,7 +44,7 @@ script="vurgans_breakup_fight"
 }}}
 
 
-= finish_script =
+== finish_script ==
 The finish_script event will be fired as soon as all units complete their moves.
 
 Sample:
