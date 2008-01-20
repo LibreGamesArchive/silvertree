@@ -1,4 +1,4 @@
-#summary Using [scripted_moves] [execute_script] and event=finish_script
+#summary Using [scripted_moves], [execute_script] and event=finish_script
 #labels WML
 
 = Scripted Moves =
