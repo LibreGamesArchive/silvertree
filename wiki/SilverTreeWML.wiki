@@ -59,28 +59,6 @@ Portals are two-way, so going to the coordinates (2,2) in the fort scenario will
 
 == Events ==
 
-The {{{[event]}}} tag is used to capture various events that occur in-game. Each event has a set of inputs passed to the event that all the formulas within the event can reference.
+See [Events]
 
-All events receive certain inputs:
-
- * world -- the game world the event takes place in.
- * var -- all game variables.
-
-{{{[event]}}} has three possible attributes:
-
-event: the type of the event being caught. The events currently supported are,
-
- * start: fired when a scenario starts (including when a game is loaded; use first_time_only if you only want it to be handled once)
- * begin_move: fired whenever a party starts moving. Takes the 'party' as input.
- * end_move: fired whenever a party completes a move. Takes the 'party' as input.
- * sight: fired when a party has line of sight with an npc. 'pc' and 'npc' are inputs.
- * tick: fired every minute. Takes the standard set of inputs.
- * encounter: fired whenever the PC party encounters an NPC party. Takes 'pc' and 'npc' as inputs. You can use an {{{[encounter]}}} tag inside an NPC party definition to define an event handler for this kind of event as a convenience.
- * win_battle: when a battle against the filtered party is won. Available inputs: 'npc', 'pc'.
- * finish_script: if there is a movement script running (a set of scripted movements created with the execute_script WML command) will be fired when the script finishes. Takes 'script', the name of the script as an input. See [ScriptedMoves] for more details.
-
-filter: a formula which runs on the event's input. The event handler will only be run if the filter evaluates to true.
-
-first_time_only: if set, the event handler will only be run once.
-
-An event should have one or more child elements which contain WmlCommands. Each of these commands will be executed when the event is triggered.
+For scripted moves, see [ScriptedMoves]
