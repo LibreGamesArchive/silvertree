@@ -30,10 +30,15 @@ map="path/to/map"
 In addition to the map attribute, which gives the file path of the map the scenario uses, scenarios have a few simple attributes, all of which are optional with reasonable defaults:
 
 hour/minute/second: the time of day the scenario starts at
+
 border_tile: the definition of the tile that will be used for tiles outside the map (height and terrain type, same format as map tiles are in)
+
 ambient_light: the color of ambient light to use when rendering the scenario
+
 sun_light: the color of sun light (directed light, depending on time of day) to use when rendering the scenario
+
 party_light; the color of the light that should come from the PC's party when rendering the scenario
+
 party_light_power: the intensity of the light that should come from the PC's party when rendering the scenario
 
 == Lighting and formulas ==
