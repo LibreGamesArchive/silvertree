@@ -50,6 +50,7 @@ script="vurgans_breakup_fight"
 
 == finish_script ==
 {{{event="finish_script"}}}
+
 The finish_script event will be fired as soon as all units complete their moves.
 
 Sample:
