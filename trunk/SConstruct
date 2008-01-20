@@ -11,7 +11,6 @@ opts.AddOptions(
     ("PREFIX", "Install prefix.", "/usr/local"),
     ("STAGE_PREFIX", "Install stage prefix.", "$PREFIX"),
     ("QT4DIR", "Root directory of Qt's installation.", "/usr/"),
-    EnumOption("GL_IMPL_MAC", "Mac-specific: OpenGL implementation to be used: Mesa 3D or Apple.", "mesa", ["mesa", "apple"], ignorecase=1),
     ("SDLDIR", "Root directory of SDL's installation.", "/usr/"),
     ("BOOSTDIR", "Root directory of boost installation.", "/usr/include"),
     ("BOOSTLIBS", "Directory where boost libs are located.", "/usr/lib"),
@@ -38,14 +37,6 @@ Type "scons" to build the game.
 Additional options:
 """)
 Help(opts.GenerateHelpText(env))
-
-print "Configuring for " + env["PLATFORM"] + " platform..."
-if env["PLATFORM"] == "darwin":
-    env.AppendUnique(LIBPATH = ["/sw/lib"])
-    if env["GL_IMPL_MAC"] == "mesa":
-        env.AppendUnique(LIBPATH = ["/sw/lib/mesa"], CPPPATH = ["/sw/include/mesa"])
-    if env["GL_IMPL_MAC"] == "apple":
-        env.AppendUnique(FRAMEWORKS = ["OpenGL"], CPPPATH = ["/System/Library/Frameworks/OpenGL.framework/Headers"])
 
 conf = env.Configure(custom_tests = env["config_checks"])
 conf.CheckBoost("regex", "1.20") or Exit(1)

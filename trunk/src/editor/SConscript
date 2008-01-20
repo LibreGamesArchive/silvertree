@@ -19,8 +19,7 @@ if editor_env["HaveQt"]:
         derivemapdialog.hpp
     """)
     editor_env.Uic4(editor_uis)
-    for mocable in editor_mocables: # Moc4 doesn't handle lists properly
-        editor_env.Moc4(mocable)
+    editor_env.Moc4(editor_mocables)
     editor = editor_env.Program("silvertreeedit", editor_sources + [lib_silvertree])
 else:
     print "Couldn't find Qt. Editor cannot be built."
