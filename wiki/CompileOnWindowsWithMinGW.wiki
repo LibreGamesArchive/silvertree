@@ -1,0 +1,28 @@
+#summary Compiling SilverTree on Windows with MinGW.
+
+= Dependencies =
+
+ * [http://downloads.sourceforge.net/mingw/MinGW-5.1.3.exe Minimalist GNU for Windows].
+ * [http://www.python.org/ftp/python/2.5.1/python-2.5.1.msi Python](needed by SCons).
+ * [http://downloads.sourceforge.net/scons/scons-0.97.win32.exe?modtime=1179416442&big_mirror=0  SCons].
+ * [http://trolltech.com/developer/downloads/qt/windows Qt4](needed by SilverTree editor).
+
+These are provided by [http://files.openomy.com/public/loonycyborg/silvertree_SDK-r1.zip SilverTree SDK]:
+
+ * SDL
+ * SDL_image
+ * SDL_ttf
+ * boost regex
+
+= Compiling SilverTree =
+
+ * Install MinGW
+ * Install Python
+ * Install SCons
+ * Check out a working copy as detailed [http://code.google.com/p/silvertree/source elsewhere].
+ * Unpack SilverTree SDK into working copy root.
+ * Run command prompt, cd to working copy root and run _scons_.
+
+== Compiling SilverTree editor ==
+ * Install Qt.
+ * run _scons QT4DIR=C:\path\to\qt editor_.
