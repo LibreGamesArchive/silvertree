@@ -17,7 +17,7 @@ These are provided by [http://files.openomy.com/public/loonycyborg/silvertree_SD
 = Compiling SilverTree =
 
  * Install MinGW; add C:\path\to\mingw\bin to _PATH_ environment variable
- * Install Python
+ * Install Python; add C:\path\to\python to _PATH_ environment variable
  * Install SCons
  * Check out a working copy as detailed [http://code.google.com/p/silvertree/source elsewhere].
  * Unpack SilverTree SDK into working copy root.
