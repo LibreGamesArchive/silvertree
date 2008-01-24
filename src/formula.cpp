@@ -535,6 +535,33 @@ private:
 	}
 };
 
+class remove_function : public function_expression {
+public:
+	explicit remove_function(const args_list& args)
+	    : function_expression(args, 2, 2)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		const variant list = args()[0]->evaluate(variables);
+		const variant remove = args()[1]->evaluate(variables);
+
+		std::vector<variant> res;
+		for(int n = 0; n != list.num_elements(); ++n) {
+			res.push_back(list[n]);
+		}
+
+		if(remove.is_list()) {
+			for(int n = 0; n != remove.num_elements(); ++n) {
+				res.erase(std::remove(res.begin(), res.end(), remove[n]), res.end());
+			}
+		} else {
+			res.erase(std::remove(res.begin(), res.end(), remove), res.end());
+		}
+
+		return variant(&res);
+	}
+};
+
 expression_ptr create_function(const std::string& fn,
                                const std::vector<expression_ptr>& args)
 {
@@ -577,6 +604,8 @@ expression_ptr create_function(const std::string& fn,
 		return expression_ptr(new size_function(args));
 	} else if(fn == "null") {
 		return expression_ptr(new null_function(args));
+	} else if(fn == "remove") {
+		return expression_ptr(new remove_function(args));
 	} else {
 		std::cerr << "no function '" << fn << "'\n";
 		throw formula_error();
