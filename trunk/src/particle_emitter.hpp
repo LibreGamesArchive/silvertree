@@ -1,7 +1,7 @@
 #ifndef PARTICLE_EMITTER_HPP_INCLUDED
 #define PARTICLE_EMITTER_HPP_INCLUDED
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 
 #include "formula.hpp"
 #include "particle_emitter_fwd.hpp"

@@ -15,7 +15,7 @@
 
 #include "texture.hpp"
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 
 namespace graphics
 {
