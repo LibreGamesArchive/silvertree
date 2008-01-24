@@ -10,8 +10,7 @@
 
    See the COPYING file for more details.
 */
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <GL/glew.h>
 #include <SDL.h>
 
 #include <cmath>
@@ -130,13 +129,13 @@ extern "C" int main(int argc, char** argv)
 
 	GLfloat dim_ambient[] = {0.5,0.5,0.5,1.0};
 	GLfloat dim_diffuse[] = {0.5,0.5,0.5,1.0};
-/*
-	GLenum gl_err = glewInit();
-	if (gl_err != GLEW_OK) {
-		std::cerr << "GLEW initialization failed: " << glGetErrorString(glew_err) << std::endl;
+
+	GLenum glew_err = glewInit();
+	if (glew_err != GLEW_OK) {
+		std::cerr << "GLEW initialization failed: " << glewGetErrorString(glew_err) << std::endl;
 		return -1;
 	}
-*/
+
 	//glMaterialfv(GL_FRONT,GL_SPECULAR,material_specular);
 	//glMaterialfv(GL_FRONT,GL_SHININESS,material_shininess);
 

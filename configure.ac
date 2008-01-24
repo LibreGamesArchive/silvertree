@@ -32,6 +32,9 @@ AX_CHECK_GLU
 AS_IF([test x$no_glu = xyes],
       AC_MSG_ERROR([**** GLU libraries not found!]))
 
+AC_CHECK_LIB([GLEW], [glewInit], [LIBS="-lGLEW $LIBS"],
+             AC_MSG_ERROR([**** GLEW not found !]))
+
 CXXFLAGS="$GL_CFLAGS $GLU_CFLAGS $CXXFLAGS"
 LIBS="$GL_LIBS $GLU_LIBS $LIBS"
 

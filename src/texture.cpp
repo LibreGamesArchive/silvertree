@@ -14,7 +14,7 @@
 #include "raster.hpp"
 #include "surface_cache.hpp"
 #include "texture.hpp"
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include <GL/glu.h>
 #include <map>
 #include <iostream>
@@ -200,7 +200,7 @@ texture::texture(const key& surfs, options_type options)
 
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, preference_mipmap_min());
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, preference_mipmap_max());
-//		if(GLEW_EXT_texture_filter_anisotropic)
+		if(GLEW_EXT_texture_filter_anisotropic)
 		{
 			GLfloat max_anisotropy;
 			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_anisotropy);

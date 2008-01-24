@@ -13,7 +13,7 @@
 #ifndef MODEL_HPP_INCLUDED
 #define MODEL_HPP_INCLUDED
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include <boost/array.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
