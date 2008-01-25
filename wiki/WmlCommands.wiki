@@ -3,13 +3,27 @@
 
 This page documents possible WML commands that are available when an event is triggered.
 
+Note: Tag names in parentheses may actually be called something else.
+
 = award=
 
-The award tag is used to give the player an award. (No documentation at this time)
+The award tag is used to give the player an award. 
+
+ * (party): party to give award to
+ * (chars): party characters to which the award is given
+ * experience: experience given
+ * (money): money given
 
 = battle =
 
-The battle tag is used to start a battle. (No documentation at this time)
+The battle tag is used to start a battle.
+ * loc: location of the battle (used to generate a random map)
+ * pc_party: player's party
+ * pc_chars: party members involved in this battle
+ * npc_party: enemy party
+ * npc_chars: enemy party members involved in this battle
+ * [on_victory]: all members of this tag will be executed if the player wins
+ * [on_defeat]: all members of this tag will be executed if the player loses
 
 = debug =
 
@@ -67,8 +81,11 @@ See [ScriptedMoves]
 
 = shop =
 
-Defines a shop where the player can buy items. (No documentation at this time)
+ * (pc): player party doing the shopping
+ * items: id's of all items sold in this shop
+ * cost: cost (in percent of the default) of all items
+
 
 = while =
 
-Creates a while loop. (No documentation at this time)
+ * (condition): condition for running the loop
