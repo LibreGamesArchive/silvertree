@@ -3,15 +3,23 @@
 
 This page documents possible WML commands that are available when an event is triggered.
 
-= debug_console =
+= award=
 
-Will suspend the game, and open a prompt on the game's terminal. On this prompt you can type in any formula and it will be evaluated in the context of the event, and the result displayed. This is, of course, entirely for debugging purposes and should not be used in user-facing scenarios.
+The award tag is used to give the player an award. (No documentation at this time)
+
+= battle =
+
+The battle tag is used to start a battle. (No documentation at this time)
 
 = debug =
 
 Will evaluate the string formula and output it to the console, with the word 'DEBUG' in front.
 
  * text: The text to output on the console.
+
+= debug_console =
+
+Will suspend the game, and open a prompt on the game's terminal. On this prompt you can type in any formula and it will be evaluated in the context of the event, and the result displayed. This is, of course, entirely for debugging purposes and should not be used in user-facing scenarios.
 
 = destroy_party =
 
@@ -21,22 +29,25 @@ Will destroy all the parties that match the given filter.
 
 = dialog =
  * npc: the character speaking. {{{npc="pc"}}} or {{{npc="npc"}}} may be used in events. Otherwise, {{{find(world.parties, id = 'vurgans')}}} or similar code is used.
+
+= execute_script =
+
+See [ScriptedMoves]
+
 = if =
 
 Will evaluate the given condition. If it is true, all the commands within all children named {{{[then]}}} will be evaluated, otherwise all the commands within all children named {{{[else]}}} will be evaluated.
 
  * condition: The formula which is evaluated to decide between executing {{{[then]}}} or {{{[else]}}}
 
-= scripted_moves, execute_script =
+= modify_objects, set=
 
-See [ScriptedMoves]
-
-= modify_objects =
-
-Will modify the objects given by 'objects'.
+Will modify the objects given by 'objects'. 
 
  * objects: Formula which evaluates to an object or a list of objects which will be modified
  * (all other attributes): the attribute to set, with the formula used to set it. Takes all inputs of the event plus 'object' which refers to the object being modified.
+
+('set' is an alias for 'modify_objects')
 
 = party_chat =
 
@@ -49,3 +60,15 @@ Displays a message from one of the characters in the PC party. This message will
 = quit =
 
 Ends the game.
+
+= scripted_moves =
+
+See [ScriptedMoves]
+
+= shop =
+
+Defines a shop where the player can buy items. (No documentation at this time)
+
+= while =
+
+Creates a while loop. (No documentation at this time)
