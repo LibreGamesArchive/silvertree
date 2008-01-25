@@ -22,8 +22,8 @@ The battle tag is used to start a battle.
  * pc_chars: party members involved in this battle
  * npc_party: enemy party
  * npc_chars: enemy party members involved in this battle
- * [on_victory]: all members of this tag will be executed if the player wins
- * [on_defeat]: all members of this tag will be executed if the player loses
+ * {{{[on_victory]}}}: all members of this tag will be executed if the player wins
+ * {{{[on_defeat]}}}: all members of this tag will be executed if the player loses
 
 = debug =
 
