@@ -60,18 +60,43 @@ const_model_ptr model::get_model(const std::string& key)
 	return res;
 }
 
-model::model(const std::vector<model::face>& faces) : faces_(faces)
+model::model(const std::vector<model::face>& faces) :
+	faces_(faces),
+	vertex_array(NULL),
+	normal_array(NULL),
+	texcoord_array(NULL),
+	element_array(NULL)
 {
 	//optimize();
 	init_normals();
+	update_arrays();
 }
 
 model::model(const std::vector<model::face>& faces,
              const std::vector<model::bone>& bones)
-  : faces_(faces), bones_(bones)
+  :
+	faces_(faces),
+	bones_(bones),
+	vertex_array(NULL),
+	normal_array(NULL),
+	texcoord_array(NULL),
+	element_array(NULL)
 {
 	//optimize();
 	init_normals();
+	update_arrays();
+}
+
+model::~model()
+{
+	if(vertex_array != NULL)
+		delete[] vertex_array;
+	if(normal_array != NULL)
+		delete[] normal_array;
+	if(texcoord_array != NULL)
+		delete[] texcoord_array;
+	if(element_array != NULL)
+		delete[] element_array;
 }
 
 namespace {
@@ -206,33 +231,6 @@ boost::array<GLfloat,3> model::face_normal(const model::face& f, int n) const
 	return res;
 }
 
-void model::draw() const
-{
-	bool in_triangles = false;
-	foreach(const face& f, faces_) {
-		f.mat->set_as_current_material();
-		draw_face(f, in_triangles);
-	}
-
-	if(in_triangles) {
-		glEnd();
-	}
-}
-
-void model::draw_material(const const_material_ptr& mat) const
-{
-	bool in_triangles = false;
-	foreach(const face& f, faces_) {
-		if(mat == f.mat) {
-			draw_face(f, in_triangles);
-		}
-	}
-
-	if(in_triangles) {
-		glEnd();
-	}
-}
-
 namespace {
 
 GLfloat deg_to_rad(GLfloat angle)
@@ -295,6 +293,7 @@ void mult_matrix(const GLfloat* matrix, GLfloat* vec)
 
 }
 
+/*
 void model::draw_face(const face& f, bool& in_triangles) const
 {
 	if(f.vertices.size() > 3) {
@@ -346,6 +345,82 @@ void model::draw_face(const face& f, bool& in_triangles) const
 	if(f.vertices.size() > 3) {
 		glEnd();
 	}
+}
+*/
+
+void model::update_arrays()
+{
+	unsigned int num_vertices = 0;
+	foreach(face& f, faces_) {
+		num_vertices += f.vertices.size();
+	}
+
+	if(vertex_array == NULL) {
+		vertex_array = new GLfloat[num_vertices*3];
+	}
+	if(normal_array == NULL) {
+		normal_array = new GLfloat[num_vertices*3];
+	}
+	if(texcoord_array == NULL) {
+		texcoord_array = new GLfloat[num_vertices*2];
+	}
+	if(element_array == NULL) {
+		element_array = new unsigned int[num_vertices];
+	}
+
+	std::map<vertex_ptr, unsigned int> added_vertices;
+	typedef std::map<vertex_ptr, unsigned int>::const_iterator added_vertex_iterator;
+
+	unsigned int current_vertex = 0;
+	unsigned int current_index = 0;
+
+	foreach(const face& f, faces_) {
+		foreach(const vertex_ptr& v, f.vertices) {
+			added_vertex_iterator added_vertex = added_vertices.find(v);
+			if(added_vertex == added_vertices.end()) {
+				GLvoid* vertex_pos = vertex_array + current_vertex * 3;
+				memcpy(vertex_pos, &(v->point), 3 * sizeof(GLfloat));
+				GLvoid* normal_pos = normal_array + current_vertex * 3;
+				memcpy(normal_pos, &(v->normal), 3 * sizeof(GLfloat));
+				GLvoid* texcoord_pos = texcoord_array + current_vertex * 2;
+				memcpy(texcoord_pos, &(v->uvmap), 2 * sizeof(GLfloat));
+				graphics::texture::set_coord_manual(((GLfloat*)texcoord_pos)[0], ((GLfloat*)texcoord_pos)[1]);
+				*(element_array + current_index) = current_vertex;
+				added_vertices[v] = current_vertex;
+				current_index++;
+				current_vertex++;
+			}
+			else {
+				*(element_array + current_index) = added_vertex->second;
+				current_index++;
+			}
+		}
+	}
+}
+
+void model::draw(const const_material_ptr& mat) const
+{
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glVertexPointer(3, GL_FLOAT, 0, vertex_array);
+	glNormalPointer(GL_FLOAT, 0, normal_array);
+	glTexCoordPointer(2, GL_FLOAT, 0, texcoord_array);
+
+	unsigned int* face_elements = element_array;
+	foreach(const face& f, faces_) {
+		unsigned int num_vertices = f.vertices.size();
+		if(!mat || (mat == f.mat)) {
+			f.mat->set_as_current_material();
+			glDrawElements(f.primitive_type, num_vertices, GL_UNSIGNED_INT, face_elements);
+		}
+		face_elements += num_vertices;
+	}
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 void model::get_materials(std::vector<const_material_ptr>* mats) const

@@ -305,13 +305,18 @@ void texture::set_current_texture(const key& k)
 	t.set_as_current_texture();
 }
 
+void texture::set_coord_manual(GLfloat& x, GLfloat& y)
+{
+	if(!npot_allowed) {
+		x*=width_multiplier;
+		y*=height_multiplier;
+	}
+}
+
 void texture::set_coord(GLfloat x, GLfloat y)
 {
-	if(npot_allowed) {
-		glTexCoord2f(x,y);
-	} else {
-		glTexCoord2f(x*width_multiplier,y*height_multiplier);
-	}
+	set_coord_manual(x,y);
+	glTexCoord2f(x,y);
 }
 
 texture::ID::~ID()
