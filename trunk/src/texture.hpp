@@ -54,6 +54,7 @@ public:
 	static texture get_no_cache(const surface& surf, options_type options=options_type());
 	static void set_current_texture(const key& k);
 	static void set_coord(GLfloat x, GLfloat y);
+	static void set_coord_manual(GLfloat& x, GLfloat& y);
 
 	unsigned int width() const { return width_; }
 	unsigned int height() const { return height_; }

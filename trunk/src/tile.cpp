@@ -112,7 +112,7 @@ void tile::draw_features(const tile** beg, const tile** end,
 				glPushMatrix();
 				glTranslatef(t.center_.x,t.center_.y,t.center_.height);
 				glRotatef(t.feature_->get_rotation(t.loc_,t.height_),0.0,0.0,1.0);
-				t.model_->draw_material(mat);
+				t.model_->draw(mat);
 				glPopMatrix();
 			}
 		}

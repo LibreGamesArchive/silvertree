@@ -44,7 +44,8 @@ public:
 	typedef boost::shared_ptr<vertex> vertex_ptr;
 
 	struct face {
-		face() {}
+		GLenum primitive_type;
+		face() { primitive_type = GL_TRIANGLES; }
 		std::vector<vertex_ptr> vertices;
 		std::string material_name;
 		const_material_ptr mat;
@@ -60,9 +61,9 @@ public:
 
 	explicit model(const std::vector<face>& faces);
 	model(const std::vector<face>& faces, const std::vector<bone>& bones);
+	~model();
 
-	void draw() const;
-	void draw_material(const const_material_ptr& mat) const;
+	void draw(const const_material_ptr& mat = const_material_ptr()) const;
 
 	void get_materials(std::vector<const_material_ptr>* mats) const;
 
@@ -72,9 +73,14 @@ private:
 	std::string id_;
 	boost::array<GLfloat,3> face_normal(const face& f, const vertex_ptr& v) const;
 	boost::array<GLfloat,3> face_normal(const face& f, int n) const;
-	void draw_face(const face& f, bool& in_triangles) const;
 	std::vector<face> faces_;
 	std::vector<bone> bones_;
+
+	void update_arrays();
+	GLfloat* vertex_array;
+	GLfloat* normal_array;
+	GLfloat* texcoord_array;
+	unsigned int* element_array;
 };
 
 }

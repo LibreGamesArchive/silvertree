@@ -129,6 +129,7 @@ void parse_mesh(const char*& i1, const char* i2, std::vector<graphics::model::fa
 						res.push_back(model::face());
 						model::face& f = res.back();
 						f.mat = mat;
+						f.primitive_type = GL_TRIANGLE_STRIP;
 						for(std::vector<unsigned int>::const_iterator i = t.begin();
 						    i != t.end(); ++i) {
 							if(*i < vertices.size()) {
