@@ -81,6 +81,8 @@ private:
 	GLfloat* normal_array;
 	GLfloat* texcoord_array;
 	unsigned int* element_array;
+	
+	GLuint vertex_buffer_objects[4];
 };
 
 }

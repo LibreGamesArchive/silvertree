@@ -97,6 +97,10 @@ model::~model()
 		delete[] texcoord_array;
 	if(element_array != NULL)
 		delete[] element_array;
+
+	if (GLEW_VERSION_1_5) {
+		glDeleteBuffers(4, vertex_buffer_objects);
+	}
 }
 
 namespace {
@@ -396,6 +400,23 @@ void model::update_arrays()
 			}
 		}
 	}
+
+	if (GLEW_VERSION_1_5) {
+		glGenBuffers(4, vertex_buffer_objects);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_objects[0]);
+		glBufferData(GL_ARRAY_BUFFER, current_vertex * 3 * sizeof(GLfloat), vertex_array, GL_STATIC_DRAW);
+		delete[] vertex_array; vertex_array = NULL;
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_objects[1]);
+		glBufferData(GL_ARRAY_BUFFER, current_vertex * 3 * sizeof(GLfloat), normal_array, GL_STATIC_DRAW);
+		delete[] normal_array; normal_array = NULL;
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_objects[2]);
+		glBufferData(GL_ARRAY_BUFFER, current_vertex * 2 * sizeof(GLfloat), texcoord_array, GL_STATIC_DRAW);
+		delete[] texcoord_array; texcoord_array = NULL;
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer_objects[3]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, current_index * sizeof(unsigned int), element_array, GL_STATIC_DRAW);
+		delete[] element_array; element_array = NULL;
+	}
 }
 
 void model::draw(const const_material_ptr& mat) const
@@ -404,10 +425,22 @@ void model::draw(const const_material_ptr& mat) const
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
+	if (GLEW_VERSION_1_5) {
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_objects[0]);
+	}
 	glVertexPointer(3, GL_FLOAT, 0, vertex_array);
+	if (GLEW_VERSION_1_5) {
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_objects[1]);
+	}
 	glNormalPointer(GL_FLOAT, 0, normal_array);
+	if (GLEW_VERSION_1_5) {
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_objects[2]);
+	}
 	glTexCoordPointer(2, GL_FLOAT, 0, texcoord_array);
 
+	if (GLEW_VERSION_1_5) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer_objects[3]);
+	}
 	unsigned int* face_elements = element_array;
 	foreach(const face& f, faces_) {
 		unsigned int num_vertices = f.vertices.size();
