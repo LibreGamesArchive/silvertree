@@ -42,7 +42,7 @@ Parties - Click on the map to add a party. Parties may consist of several units.
 
 Height - Left click to raise terrain, right-click to lower. Middle click does both.
 
-Picker - Right-click to copy a tile, left-click to paste it.
+Picker - Right-click to copy a tile, left-click to paste it. This takes _all_ the attributes of a tile, including the scenery on it.
 
 cobbles-snow _to_ cave - terrain types. Select, click on map to lay down.
 
