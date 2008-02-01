@@ -38,7 +38,7 @@ Zoom Out - Go farther
 ==Right Tool Bar==
 Use the keys 0 to 9 to select cursor area.
 
-Parties - Click on the map to add a party. Parties may consist of several units.
+Parties - Click on the map to add a party. Parties may consist of several units. See Also: SilverTreeWML
 
 Height - Left click to raise terrain, right-click to lower. Middle click does both.
 
