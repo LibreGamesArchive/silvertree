@@ -145,9 +145,9 @@ model_ptr parsedae(const char* i1, const char* i2)
 					vertex->point[0] = position_source->at(primitives[i*3 + position_offset]*3) * ScaleFactor;
 					vertex->point[1] = position_source->at(primitives[i*3 + position_offset]*3 + 1) * ScaleFactor;
 					vertex->point[2] = position_source->at(primitives[i*3 + position_offset]*3 + 2) * ScaleFactor;
-					vertex->normal[0] = normal_source->at(primitives[i*3 + normal_offset]*3);
-					vertex->normal[1] = normal_source->at(primitives[i*3 + normal_offset]*3 + 1);
-					vertex->normal[2] = normal_source->at(primitives[i*3 + normal_offset]*3 + 2);
+					vertex->normal[0] = -normal_source->at(primitives[i*3 + normal_offset]*3);
+					vertex->normal[1] = -normal_source->at(primitives[i*3 + normal_offset]*3 + 1);
+					vertex->normal[2] = -normal_source->at(primitives[i*3 + normal_offset]*3 + 2);
 					vertex->uvmap[0] = uvmap_source->at(primitives[i*3 + uvmap_offset]*2);
 					vertex->uvmap[1] = -uvmap_source->at(primitives[i*3 + uvmap_offset]*2 + 1);
 					vertex->uvmap_valid = true;

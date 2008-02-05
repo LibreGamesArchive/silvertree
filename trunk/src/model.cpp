@@ -68,7 +68,7 @@ model::model(const std::vector<model::face>& faces) :
 	element_array(NULL)
 {
 	//optimize();
-	init_normals();
+	//init_normals();
 	update_arrays();
 }
 
@@ -83,7 +83,7 @@ model::model(const std::vector<model::face>& faces,
 	element_array(NULL)
 {
 	//optimize();
-	init_normals();
+	//init_normals();
 	update_arrays();
 }
 
