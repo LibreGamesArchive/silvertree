@@ -81,9 +81,9 @@ void parse_mesh(const char*& i1, const char* i2, std::vector<graphics::model::fa
 				v->point[0] = *i++/100.0;
 				v->point[1] = *i++/100.0;
 				v->point[2] = *i++/100.0;
-				v->normal[0] = *i++/100.0;
-				v->normal[1] = *i++/100.0;
-				v->normal[2] = *i++/100.0;
+				v->normal[0] = -*i++/100.0;
+				v->normal[1] = -*i++/100.0;
+				v->normal[2] = -*i++/100.0;
 				v->uvmap[0] = *i++;
 				v->uvmap[1] = *i++;
 				v->uvmap_valid = true;
