@@ -158,7 +158,7 @@ void game_bar_portrait_set::construct_interface()
 }
 
 void game_bar_portrait_set::handle_draw() const {
-	if(pty_->members().size()-1 > scrolly_->max_offset()) {
+	if(pty_->members().size()-1 != scrolly_->max_offset()) {
 		build_scrolly();
 	}
 	handle_draw_children();
