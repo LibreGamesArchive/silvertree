@@ -215,6 +215,9 @@ void battle::player_turn(battle_character& c)
 					mouse_moved = true;
 					break;
 			}
+			// Allow the camera controller to react to events.
+			// TODO: Should not do this for events already consume above.
+			camera_controller_.event_control(event);
 		}
 
 		if(mouse_moved) {
