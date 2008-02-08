@@ -160,6 +160,8 @@ private:
 	int amt_;
 };
 
+typedef boost::shared_ptr<scroll_button> scroll_button_ptr;
+
 class menu_option : public skinned_widget {
 public:
 	enum STATE { NORMAL, HIGHLIGHTED, CLICKED, DISABLED };

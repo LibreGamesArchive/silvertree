@@ -52,13 +52,26 @@ public:
 		add_skin(skin_prefix + "-ok-button-skin-normal", gui::button_widget::NORMAL);
 		add_skin(skin_prefix + "-ok-button-skin-highlighted", gui::button_widget::HIGHLIGHTED);
 		add_skin(skin_prefix + "-ok-button-skin-clicked", gui::button_widget::CLICKED);
+		add_skin(skin_prefix + "-ok-button-skin-disabled", gui::button_widget::DISABLED);
 		set_label_text("Ok");
 		set_hotkey(SDLK_RETURN, KMOD_NONE);
+		set_state(DISABLED);
 	}
-	void clicked() {
+  
+	void inner_draw() const 
+	{
+		if(is_enabled() != dialog_->has_selected_file()) {
+			set_state(dialog_->has_selected_file() ? NORMAL : DISABLED);
+		}
+		gui::labelled_button_widget::inner_draw();
+	}
+
+	void clicked() 
+	{
 		dialog_->was_cancelled_ = false;
 		dialog_->close();
 	}
+
 private:
 	persistence_dialog* dialog_;
 };
@@ -91,6 +104,10 @@ public:
 		: persistence_dialog(wp, dir)
 	{
 		construct_interface(dir, txt);
+	}
+	bool has_selected_file() 
+	{
+		return persistence_dialog::has_selected_file() && !text_box_->text().empty();
 	}
 protected:
 	std::string do_selected_file() { return text_box_->text(); }
@@ -126,11 +143,22 @@ private:
 
 class load_dialog_item : public gui::labelled_button_widget {
 public:
+	enum STATE { NORMAL = 0, HIGHLIGHTED, CLICKED, SELECTED, DISABLED };
 	load_dialog_item(load_dialog *dlg) : dlg_(dlg) {}
 	void clicked()
 	{
 		dlg_->selected_ = label_text();
 	}
+
+	void inner_draw() const {
+		if(dlg_->selected_ == label_text() && state() == NORMAL) {
+			set_state(SELECTED);
+		} else if(dlg_->selected_ != label_text() && state() == SELECTED) {
+			set_state(NORMAL);
+		}
+		gui::labelled_button_widget::inner_draw();
+	}
+
 private:
 	load_dialog *dlg_;
 };
@@ -211,9 +239,10 @@ void load_dialog::construct_interface(const std::string& dir, const std::string&
 	foreach(std::string filename, files) {
 		gui::labelled_button_widget_ptr item(new load_dialog_item(this));
 		item->set_label_text(filename);
-		item->add_skin("load-dialog-item-skin-normal", gui::button_widget::NORMAL);
-		item->add_skin("load-dialog-item-skin-highlighted", gui::button_widget::HIGHLIGHTED);
-		item->add_skin("load-dialog-item-skin-clicked", gui::button_widget::CLICKED);
+		item->add_skin("load-dialog-item-skin-normal", load_dialog_item::NORMAL);
+		item->add_skin("load-dialog-item-skin-highlighted", load_dialog_item::HIGHLIGHTED);
+		item->add_skin("load-dialog-item-skin-clicked", load_dialog_item::CLICKED);
+		item->add_skin("load-dialog-item-skin-selected", load_dialog_item::SELECTED);
 		std::cout << "added file "<<filename<<" to the listing\n";
 		scrolly_->add_widget(item);
 	}
@@ -228,10 +257,22 @@ void load_dialog::construct_interface(const std::string& dir, const std::string&
 
 	box->set_dim(inner->width(), inner->height() - used_height);
 
+	gui::scroll_button_ptr up_scroll_button(new gui::scroll_button(scrolly_, -1));
+	up_scroll_button->add_skin("load-dialog-scroll-up-skin-normal", gui::button_widget::NORMAL);
+	up_scroll_button->add_skin("load-dialog-scroll-up-skin-highlighted", gui::button_widget::HIGHLIGHTED);
+	up_scroll_button->add_skin("load-dialog-scroll-up-skin-clicked", gui::button_widget::CLICKED);
+	up_scroll_button->add_skin("load-dialog-scroll-up-skin-disabled", gui::button_widget::DISABLED);
+
+	gui::scroll_button_ptr down_scroll_button(new gui::scroll_button(scrolly_, 1));
+	down_scroll_button->add_skin("load-dialog-scroll-down-skin-normal", gui::button_widget::NORMAL);
+	down_scroll_button->add_skin("load-dialog-scroll-down-skin-highlighted", gui::button_widget::HIGHLIGHTED);
+	down_scroll_button->add_skin("load-dialog-scroll-down-skin-clicked", gui::button_widget::CLICKED);
+	down_scroll_button->add_skin("load-dialog-scroll-down-skin-disabled", gui::button_widget::DISABLED);
+
 	inner->add_widget(box, dialog::MOVE_RIGHT);
-	inner->add_widget(gui::widget_ptr(new gui::scroll_button(scrolly_, -1)), dialog::MOVE_DOWN);
-	inner->add_widget(gui::widget_ptr(new gui::scroll_button(scrolly_, 1)), dialog::MOVE_DOWN);
 	inner->set_cursor(0, box->y() + box->height());
+	inner->add_widget(down_scroll_button, dialog::MOVE_RIGHT);
+	inner->add_widget(up_scroll_button, dialog::MOVE_RIGHT);
 	inner->add_widget(confirm_button, dialog::MOVE_RIGHT);
 	inner->add_widget(cancel_button, dialog::MOVE_RIGHT);
 
@@ -284,7 +325,7 @@ void silent_load(const std::string& filename)
 bool load(const std::string& start_filename, game_logic::world *wp)
 {
 	std::cout << "Loading game\n";
-	save_dialog l(wp, sys::get_saves_dir(), start_filename);
+	load_dialog l(wp, sys::get_saves_dir(), start_filename);
 	l.show_modal();
 
 	if(!l.has_selected_file() || !sys::file_exists(l.selected_file()))
