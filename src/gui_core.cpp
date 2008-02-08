@@ -21,6 +21,8 @@ void skinned_widget::set_state(int state) const
 		state_ = 0;
 	}
 
+	assert(state < frames_.size());
+
 	// ugly magic necessary to allow both switching state in redraw
 	// and automatic repositioning on frame change
 	skinned_widget *non_const_this = const_cast<skinned_widget *>(this);
@@ -366,7 +368,7 @@ bool scrolled_container::handle_event(const SDL_Event &e)
 	bool claimed = false;
 	SDL_Event ev = e;
 	move_event(&ev, x(), y());
-	const int max_widget = widgets_.size() - offset_;
+	const int max_widget = widgets_.size();
 	int widget = offset_;
 	int p_used = 0;
 	int max_p = axis() == HORIZONTAL ? width() : height();
