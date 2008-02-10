@@ -1,6 +1,6 @@
 #labels WML
 = Introduction =
- This page documents possible WML commands that are available when an event is triggered.
+This page documents possible WML commands that are available when an event is triggered.
 
 Note: Tag names in parentheses may actually be called something else.
 
