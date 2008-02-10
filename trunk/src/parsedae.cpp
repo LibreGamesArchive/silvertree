@@ -28,6 +28,8 @@
 #include <sstream>
 #include <map>
 
+#include <libgen.h>
+
 using std::vector;
 using std::map;
 using std::string;
@@ -255,7 +257,7 @@ const_material_ptr COLLADA::get_material(const TiXmlElement* material_element) c
 				image = (*(ids_.find(image->GetText()))).second;
 				image = image->FirstChildElement("init_from");
 				if(image) {
-					mat->set_texture(basename(image->GetText()));
+					mat->set_texture(basename((char*)image->GetText()));
 					have_texture = true;
 				}
 			}
