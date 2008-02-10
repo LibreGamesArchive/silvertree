@@ -1,17 +1,32 @@
 #labels Terrain
 cobbles-snow - snowy cobblestone path
+
 rock-brown-snow - rock partially covered with snow
+
 water-deep - impassably deep water
+
 cobbles - a nice cobblestone path
+
 wall - a brick wall you can not walk over
+
 dirt - dirt paths are a mainstay of medieval transportation
+
 forest - a dense forest you cannot walk through
+
 grass-dry - this grass is thirsty
+
 grass-green - this grass is nice and lush, and is the default terrain
+
 rock-brown-hole - rock with a cave
+
 rock-brown - common mountainside
+
 sand - common beach
+
 snow - a deep drift of snow
+
 cave - underground terrain
+
 void - 'edge of the map', impassible, use with caution
+
 water - a ford you can wade through
