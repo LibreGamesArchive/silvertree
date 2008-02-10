@@ -30,3 +30,6 @@ cave - underground terrain
 void - 'edge of the map', impassible, use with caution
 
 water - a ford you can wade through
+
+
+Please see The_Editor_Manual for model references and other assorted miscellanea. 
