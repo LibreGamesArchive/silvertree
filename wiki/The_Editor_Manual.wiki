@@ -44,7 +44,7 @@ Height - Left click to raise terrain, right-click to lower. Middle click does bo
 
 Picker - Right-click to copy a tile, left-click to paste it. This takes _all_ the attributes of a tile, including the scenery on it.
 
-cobbles-snow _to_ cave - terrain types. Select, click on map to lay down.
+cobbles-snow _to_ cave - Terrain_Types. Select, click on map to lay down.
 
 void - the end of the world. Use with discretion.
 
