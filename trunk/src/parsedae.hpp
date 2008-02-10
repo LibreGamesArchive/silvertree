@@ -21,7 +21,10 @@ namespace graphics
 
 model_ptr parsedae(const char* i1, const char* i2);
 
-struct parsedae_error {};
+struct parsedae_error : public std::runtime_error
+{
+	explicit parsedae_error(const std::string& what) : std::runtime_error(what) {}
+};
 }
 
 #endif
