@@ -1,3 +1,4 @@
+#summary Terrain Types & Data
 #labels Terrain
 cobbles-snow - snowy cobblestone path
 
