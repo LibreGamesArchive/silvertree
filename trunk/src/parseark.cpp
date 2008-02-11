@@ -97,7 +97,7 @@ void parse_mesh(const char*& i1, const char* i2, std::vector<graphics::model::fa
 			int i = 0;
 			while(get_next_token(i1, i2, &token) && token != rbrace) {
 				if(i < vertices.size()) {
-					vertices[i]->bone_num = strtol(token.c_str(), NULL, 10);
+					vertices[i]->influences[0] = std::make_pair(strtol(token.c_str(), NULL, 10), 1.0);
 				}
 				++i;
 			}

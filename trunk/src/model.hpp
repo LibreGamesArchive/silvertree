@@ -34,12 +34,12 @@ public:
 	struct bone;
 
 	struct vertex {
-		vertex() : uvmap_valid(false), bone_num(-1) {}
+		vertex() : uvmap_valid(false) { influences.push_back(std::make_pair(-1,1.0)); }
 		boost::array<GLfloat,3> point;
 		boost::array<GLfloat,3> normal;
 		boost::array<GLfloat,2> uvmap;
 		bool uvmap_valid;
-		int bone_num;
+		std::vector<std::pair<int, float> > influences;
 	};
 	typedef boost::shared_ptr<vertex> vertex_ptr;
 
