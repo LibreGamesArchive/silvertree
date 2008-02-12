@@ -1,36 +1,22 @@
 #summary Terrain Types & Data
 #labels Terrain
-cobbles-snow - snowy cobblestone path
-
-rock-brown-snow - rock partially covered with snow
-
-water-deep - impassably deep water
-
-cobbles - a nice cobblestone path
-
-wall - a brick wall you can not walk over
-
-dirt - dirt paths are a mainstay of medieval transportation
-
-forest - a dense forest you cannot walk through
-
-grass-dry - this grass is thirsty
-
-grass-green - this grass is nice and lush, and is the default terrain
-
-rock-brown-hole - rock with a cave
-
-rock-brown - common mountainside
-
-sand - common beach
-
-snow - a deep drift of snow
-
-cave - underground terrain
-
-void - 'edge of the map', impassible, use with caution
-
-water - a ford you can wade through
+|| *type* || *description* || *cost* ||
+||cobbles-snow || snowy cobblestone path || 90 ||
+||rock-brown-snow || rock partially covered with snow || 200 ||
+||water-deep || impassably deep water|| impassable ||
+||cobbles || a nice cobblestone || 66||
+||wall || a brick wall you can not walk over|| impassable||
+||dirt || dirt paths are a mainstay of medieval transportation||80||
+||forest || a dense forest you cannot walk through|| impassable||
+||grass-dry || this grass is thirsty||100||
+||grass-green || this grass is nice and lush, and is the default terrain||100||
+||rock-brown-hole || rock with a cave||150||
+||rock-brown || common mountainside||150||
+||sand || common beach||80||
+||snow || a deep drift of snow||150||
+||cave || underground terrain||125||
+||void || 'edge of the map', impassible, _use with caution_||impassable||
+||water || a ford you can wade through||200||
 
 
 Please see The_Editor_Manual for model references and other assorted miscellanea. 
