@@ -1,22 +1,22 @@
 #summary Terrain Types & Data
 #labels Terrain
-|| *type* || *description* || *cost* ||
-||cobbles-snow || snowy cobblestone path || 90 ||
-||rock-brown-snow || rock partially covered with snow || 200 ||
-||water-deep || impassably deep water|| impassable ||
-||cobbles || a nice cobblestone || 66||
-||wall || a brick wall you can not walk over|| impassable||
-||dirt || dirt paths are a mainstay of medieval transportation||80||
-||forest || a dense forest you cannot walk through|| impassable||
-||grass-dry || this grass is thirsty||100||
-||grass-green || this grass is nice and lush, and is the default terrain||100||
-||rock-brown-hole || rock with a cave||150||
-||rock-brown || common mountainside||150||
-||sand || common beach||80||
-||snow || a deep drift of snow||150||
-||cave || underground terrain||125||
-||void || 'edge of the map', impassible, _use with caution_||impassable||
-||water || a ford you can wade through||200||
+|| *type* || *description* || *cost* || *id* || *cascade* ||
+||cobbles-snow || snowy cobblestone path || 90 || C|| no||
+||rock-brown-snow || rock partially covered with snow || 200 || R|| no||
+||water-deep || impassably deep water|| impassable ||W|| yes||
+||cobbles || a nice cobblestone || 66|| c|| no||
+||wall || a brick wall you can not walk over|| impassable||cw|| no||
+||dirt || dirt paths are a mainstay of medieval transportation||80||d|| no||
+||forest || a dense forest you cannot walk through|| impassable||f|| no||
+||grass-dry || this grass is thirsty||100||g|| no||
+||grass-green || this grass is nice and lush, and is the default terrain||100||h|| no||
+||rock-brown-hole || rock with a cave||150||o|| no||
+||rock-brown || common mountainside||150||r|| no||
+||sand || common beach||80||s|| no||
+||snow || a deep drift of snow||150||t|| no||
+||cave || underground terrain||125||u|| no||
+||void || 'edge of the map', impassible, _use with caution_||impassable||v|| no||
+||water || a ford you can wade through||200||w|| yes||
 
 
 Please see The_Editor_Manual for model references and other assorted miscellanea. 
