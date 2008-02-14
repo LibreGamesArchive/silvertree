@@ -1,4 +1,4 @@
-#summary Terrain Types & Data
+#summary Terrain Types, Data, & Images
 #labels Terrain
 || *type* || *description* || *cost* || *id* || *cascade* || *image* ||
 ||cobbles-snow || snowy cobblestone path || 90 || C|| no|| http://silvertree.googlecode.com/svn/trunk/images/terrain/cobbles-snow-01.png||
