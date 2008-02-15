@@ -91,12 +91,10 @@ void battle_menu::handle_draw() const
 	}
 }
 
-bool battle_menu::handle_event(const SDL_Event& event)
+bool battle_menu::handle_event(const SDL_Event& event, bool claimed)
 {
-	bool claimed = false;
-
 	if(grid_) {
-		claimed = grid_->process_event(event);
+		claimed = grid_->process_event(event, claimed);
 	}
 
 	if(claimed) {

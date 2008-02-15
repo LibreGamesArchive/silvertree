@@ -51,34 +51,38 @@ bool battle_char_less(const const_battle_character_ptr& c1,
 
 battle::battle(const std::vector<battle_character_ptr>& chars,
                const hex::gamemap& battle_map)
-   : chars_(chars), focus_(chars_.end()), map_(battle_map),
-	 highlight_moves_(false), highlight_targets_(false),
-	 move_done_(false), turn_done_(false),
-	 camera_(battle_map), camera_controller_(camera_),
-	 result_(ONGOING), keyed_selection_(0),
-         current_time_(0), sub_time_(0.0),
-         skippy_(50, preference_maxfps()),
-         tracked_tile_(NULL),
-		 initiative_bar_(new gui::initiative_bar)
+    : chars_(chars), focus_(chars_.end()), map_(battle_map),
+      highlight_moves_(false), highlight_targets_(false),
+      move_done_(false), turn_done_(false),
+      camera_(battle_map), camera_controller_(camera_),
+      result_(ONGOING), keyed_selection_(0),
+      current_time_(0), sub_time_(0.0),
+      skippy_(50, preference_maxfps()),
+      tracked_tile_(NULL), 
+      initiative_bar_(new gui::initiative_bar),
+      listener_(this)
 {
 	srand(SDL_GetTicks());
 
 	for(std::vector<battle_character_ptr>::const_iterator i = chars_.begin();
 	    i != chars_.end(); ++i) {
 		gui::widget_ptr w(new game_dialogs::status_bars_widget(*this, *i));
-		widgets_.push_back(w);
+        add_widget(w);
 
 		initiative_bar_->add_character(*i);
 	}
 	time_cost_widget_.reset(new game_dialogs::time_cost_widget(*this));
-	widgets_.push_back(time_cost_widget_);
+    add_widget(time_cost_widget_);
 
 	initiative_bar_->set_loc(graphics::screen_width() - 100, 50);
 	initiative_bar_->set_dim(30, graphics::screen_height()/2);
 
-	widgets_.push_back(initiative_bar_);
+    add_widget(initiative_bar_);
 
 	std::sort(chars_.begin(), chars_.end(), battle_char_less);
+
+    pump_.register_listener(&listener_);
+    pump_.register_listener(&camera_controller_);
 }
 
 void battle::play()
@@ -108,19 +112,16 @@ void battle::play()
 		(*focus_)->play_turn(*this);
 	}
 
-	if(result_ == QUIT) {
-		SDL_Event e;
-		e.type = SDL_QUIT;
-		SDL_PushEvent(&e);
-		return;
-	}
-
+    if(result_ == QUIT) {
+        graphics::floating_label::clear();
+        return;
+    }
 	const std::string message = result_ == PLAYER_WIN ?
 	     "Victory!" : "Defeat!";
 	gui::widget_ptr msg = gui::label::create(message, result_ == PLAYER_WIN ? graphics::color_blue() : graphics::color_red(), 60);
 	msg->set_loc((graphics::screen_width()-msg->width())/2,
 	             (graphics::screen_height()-msg->height())/2);
-	widgets_.push_back(msg);
+    add_widget(msg);
 
 	elapse_time(0.0, 100);
 
@@ -129,8 +130,9 @@ void battle::play()
 
 void battle::player_turn(battle_character& c)
 {
+    listener_.set_character(c);
 	menu_.reset(new gui::battle_menu(*this,c));
-	widgets_.push_back(menu_);
+    add_widget(menu_);
 	move_done_ = false;
 	turn_done_ = false;
 	highlight_moves_ = false;
@@ -150,82 +152,12 @@ void battle::player_turn(battle_character& c)
 			SDL_GL_SwapBuffers();
 			SDL_Delay(1);
 		}
-
-		bool mouse_moved = false;
-		SDL_Event event;
-		while(SDL_PollEvent(&event)) {
-			if(stats_dialogs_process_event(event)) {
-				continue;
-			}
-
-			foreach(const gui::widget_ptr& w, widgets_) {
-				w->process_event(event);
-			}
-
-			switch(event.type) {
-				case SDL_QUIT:
-					turn_done_ = true;
-					result_ = QUIT;
-					break;
-				case SDL_KEYDOWN:
-					if(highlight_targets_ &&
-					   (event.key.keysym.sym == SDLK_RETURN ||
-						event.key.keysym.sym == SDLK_SPACE)) {
-						assert(current_move_);
-						if(current_move_->can_attack()) {
-							turn_done_ = true;
-							battle_character_ptr target_char = selected_char();
-							attack_character(**focus_, *target_char, *current_move_);
-						} else {
-							hex::location loc = selected_loc();
-							if(map_.is_loc_on_map(loc)) {
-								turn_done_ = true;
-								assert(current_move_->mod());
-								target_mod(**focus_, loc, *current_move_);
-							}
-						}
-					} else if(current_move_ &&
-					   (event.key.keysym.sym == SDLK_ESCAPE ||
-						event.key.keysym.sym == SDLK_RETURN ||
-						event.key.keysym.sym == SDLK_SPACE)) {
-
-						if(move_done_) {
-							turn_done_ = true;
-						} else {
-							current_move_.reset();
-							menu_.reset(new gui::battle_menu(*this,c));
-							widgets_.push_back(menu_);
-							highlight_targets_ = false;
-						}
-					} else if(highlight_targets_) {
-						switch(event.key.keysym.sym) {
-							case SDLK_RIGHT:
-								++keyed_selection_;
-								break;
-							case SDLK_LEFT:
-								--keyed_selection_;
-								break;
-						}
-					}
-					break;
-				case SDL_MOUSEBUTTONDOWN:
-					handle_mouse_button_down(event.button);
-					break;
-			    case SDL_MOUSEMOTION:
-					mouse_moved = true;
-					break;
-			}
-			// Allow the camera controller to react to events.
-			// TODO: Should not do this for events already consume above.
-			camera_controller_.event_control(event);
-		}
-
-		if(mouse_moved) {
-			handle_time_cost_popup();
-		}
-
-		camera_controller_.keyboard_control();
-
+        
+        if(!pump_.process()) {
+            turn_done_ = true;
+            result_ = QUIT;
+        }
+        
 		if(!current_move_) {
 			current_move_ = menu_->selected_move();
 			if(current_move_) {
@@ -261,6 +193,7 @@ void battle::player_turn(battle_character& c)
 				}
 			}
 		}
+        camera_controller_.update();
 	}
 
 	highlight_moves_ = false;
@@ -272,9 +205,16 @@ void battle::player_turn(battle_character& c)
 	initiative_bar_->focus_character(NULL);
 }
 
-void battle::remove_widget(gui::const_widget_ptr w)
+void battle::add_widget(gui::widget_ptr w) 
+{
+    widgets_.push_back(w);
+    pump_.register_listener(w);
+}
+
+void battle::remove_widget(gui::widget_ptr w)
 {
 	widgets_.erase(std::remove(widgets_.begin(),widgets_.end(),w),widgets_.end());
+    pump_.deregister_listener(w);
 }
 
 int battle::movement_duration()
@@ -565,12 +505,9 @@ void battle::animation_frame(float t, gui::slider* slider) {
 		draw(slider);
 		SDL_GL_SwapBuffers();
 	}
-	/* do this to ensure key tables are updated */
-	SDL_Event e;
-	if(SDL_PollEvent(&e)) {
-		SDL_PushEvent(&e);
-	}
-	camera_controller_.keyboard_control();
+
+    pump_.process();
+    camera_controller_.update();
 }
 
 void battle::end_animation() {
@@ -925,155 +862,6 @@ bool battle::can_make_move(const battle_character& c,
 	return true;
 }
 
-void battle::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
-{
-	if(e.button == SDL_BUTTON_LEFT) {
-		if(highlight_moves_) {
-			const battle_character::move_map::const_iterator move = moves_.find(selected_loc());
-			if(move != moves_.end()) {
-				move_character(**focus_, move->second);
-				turn_done_ = !enter_attack_mode();
-				move_done_ = true;
-			}
-		} else if(highlight_targets_ && current_move_->can_attack()) {
-			battle_character_ptr target_char = selected_char();
-
-			if(target_char && targets_.count(target_char->loc())) {
-				turn_done_ = true;
-				attack_character(**focus_, *target_char, *current_move_);
-				if(move_done_) {
-					turn_done_ = true;
-				}
-
-				highlight_targets_ = false;
-				targets_.clear();
-			}
-		} else if(highlight_targets_) {
-			hex::location loc = selected_loc();
-			if(map_.is_loc_on_map(loc) && targets_.count(loc)) {
-				turn_done_ = true;
-				target_mod(**focus_, loc, *current_move_);
-			}
-		}
-	}
-}
-
-bool battle::stats_dialogs_process_event(const SDL_Event& e) {
-	const bool has_dialogs = !stats_dialogs_.empty();
-
-	bool clear, grabbed;
-	switch(e.type) {
-	case SDL_KEYDOWN:
-		if(has_dialogs) {
-			clear = true;
-			grabbed = true;
-		} else {
-			clear = false;
-			grabbed = false;
-		}
-		break;
-	case SDL_MOUSEBUTTONDOWN:
-		if(e.button.button != SDL_BUTTON_RIGHT) {
-			if(has_dialogs) {
-				clear = true;
-				grabbed = true;
-			} else {
-				clear = false;
-				grabbed = false;
-			}
-			break;
-		}
-		{
-			battle_character_ptr target_char = mouse_selected_char();
-			if(target_char) {
-				grabbed = true;
-				clear = false;
-
-				game_dialogs::mini_stats_dialog_ptr ptr;
-
-				std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
-					stats_dialogs_.find(target_char);
-				if(i == stats_dialogs_.end()) {
-					ptr.reset(new game_dialogs::mini_stats_dialog(target_char, 200, 100));
-					stats_dialogs_[target_char] = ptr;
-					ptr->show();
-					ptr->set_frame(gui::frame_manager::make_frame(ptr, "mini-char-battle-stats"));
-				} else {
-					stats_dialogs_.erase(i);
-				}
-			} else {
-				if(has_dialogs) {
-					grabbed = true;
-					clear = true;
-				} else {
-					grabbed = false;
-					clear = false;
-				}
-			}
-		}
-		break;
-	default:
-		clear = false;
-		grabbed = false;
-		break;
-	}
-
-	if(clear) {
-		stats_dialogs_.clear();
-	}
-
-	return grabbed;
-}
-
-void battle::handle_time_cost_popup()
-{
-	battle_character_ptr attacker = *focus_;
-	assert(attacker);
-	assert(initiative_bar_);
-	assert(time_cost_widget_);
-
-	if(highlight_moves_ ) {
-		const battle_character::move_map::const_iterator move = moves_.find(selected_loc());
-		if(move != moves_.end()) {
-			int cost = attacker->route_cost(move->second);
-			initiative_bar_->focus_character(attacker.get(), cost);
-			time_cost_widget_->set_tracker(&hex_tracker_);
-			time_cost_widget_->set_time_cost(cost);
-			time_cost_widget_->set_visible(true);
-			return;
-		} else {
-			initiative_bar_->focus_character(attacker.get(), 0);
-		}
-	} else if(highlight_targets_) {
-		battle_character_ptr defender = selected_char();
-		assert(current_move_);
-		if(current_move_->can_attack() && defender) {
-			/* attack cost */
-			attack_stats stats = get_attack_stats(*attacker, *defender, *current_move_);
-			time_cost_widget_->set_tracker(&(defender->loc_tracker()));
-			time_cost_widget_->set_time_cost(stats.time_taken);
-			initiative_bar_->focus_character(attacker.get(), stats.time_taken);
-			time_cost_widget_->set_visible(true);
-			return;
-		} else {
-			/* SPELL cost */
-			hex::location loc = selected_loc();
-			if(map_.is_loc_on_map(loc)) {
-				/* move cost */
-				time_cost_widget_->set_tracker(&hex_tracker_);
-				const int cost = current_move_->get_stat("initiative",*attacker);
-				time_cost_widget_->set_time_cost(cost);
-				initiative_bar_->focus_character(attacker.get(), cost);
-				time_cost_widget_->set_visible(true);
-				return;
-			}
-		}
-	}
-
-	time_cost_widget_->clear_tracker();
-	time_cost_widget_->set_visible(false);
-}
-
 bool battle::enter_move_mode()
 {
 	if(move_done_) {
@@ -1214,6 +1002,238 @@ void battle::rebuild_visible_tiles()
 
 	hex::tile::initialize_features_cache(
 		&tiles_[0], &tiles_[0] + tiles_.size(), &features_cache_);
+}
+
+
+bool battle::listener::process_event(const SDL_Event& event, bool claimed) {
+    if(claimed) {
+        claimed |= handle_stats_dialogs(event, claimed);
+        return claimed;
+    }
+
+    switch(event.type) {
+    case SDL_KEYDOWN:
+        if(battle_->highlight_targets_ &&
+           (event.key.keysym.sym == SDLK_RETURN ||
+            event.key.keysym.sym == SDLK_SPACE)) {
+            assert(battle_->current_move_);
+            if(battle_->current_move_->can_attack()) {
+                battle_->turn_done_ = true;
+                battle_character_ptr target_char = battle_->selected_char();
+                battle_->attack_character(**(battle_->focus_), *target_char, 
+                                          *(battle_->current_move_));
+            } else {
+                hex::location loc = battle_->selected_loc();
+                if(battle_->map_.is_loc_on_map(loc)) {
+                    battle_->turn_done_ = true;
+                    assert(battle_->current_move_->mod());
+                    battle_->target_mod(**(battle_->focus_), loc, *(battle_->current_move_));
+                }
+            }
+            claimed = true;
+        } else if(battle_->current_move_ &&
+                  (event.key.keysym.sym == SDLK_ESCAPE ||
+                   event.key.keysym.sym == SDLK_RETURN ||
+                   event.key.keysym.sym == SDLK_SPACE)) {
+            if(battle_->move_done_) {
+                battle_->turn_done_ = true;
+            } else {
+                battle_->current_move_.reset();
+                battle_->menu_.reset(new gui::battle_menu(*battle_, *c_));
+                battle_->add_widget(battle_->menu_);
+                battle_->highlight_targets_ = false;
+                battle_->highlight_moves_ = false;
+            }
+            claimed = true;
+        } else if(battle_->highlight_targets_) {
+            switch(event.key.keysym.sym) {
+            case SDLK_RIGHT:
+                ++(battle_->keyed_selection_);
+                claimed = true;
+                break;
+            case SDLK_LEFT:
+                --(battle_->keyed_selection_);
+                claimed = true;
+                break;
+            }
+        }
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        claimed = handle_mouse_button_down(event.button);
+        break;
+    case SDL_MOUSEMOTION:
+        handle_time_cost_popup();
+        break;
+    }
+
+    claimed |= handle_stats_dialogs(event, claimed);
+
+    return claimed;
+}
+
+void battle::listener::handle_time_cost_popup()
+{
+	battle_character_ptr attacker = *(battle_->focus_);
+	assert(attacker);
+	assert(battle_->initiative_bar_);
+	assert(battle_->time_cost_widget_);
+
+	if(battle_->highlight_moves_ ) {
+		const battle_character::move_map::const_iterator move = battle_->moves_.find(battle_->selected_loc());
+		if(move != battle_->moves_.end()) {
+			int cost = attacker->route_cost(move->second);
+			battle_->initiative_bar_->focus_character(attacker.get(), cost);
+			battle_->time_cost_widget_->set_tracker(&(battle_->hex_tracker_));
+			battle_->time_cost_widget_->set_time_cost(cost);
+			battle_->time_cost_widget_->set_visible(true);
+			return;
+		} else {
+			battle_->initiative_bar_->focus_character(attacker.get(), 0);
+		}
+	} else if(battle_->highlight_targets_) {
+		battle_character_ptr defender = battle_->selected_char();
+		assert(battle_->current_move_);
+		if(battle_->current_move_->can_attack() && defender) {
+			/* attack cost */
+			attack_stats stats = 
+                battle_->get_attack_stats(*attacker, *defender, *(battle_->current_move_));
+			battle_->time_cost_widget_->set_tracker(&(defender->loc_tracker()));
+			battle_->time_cost_widget_->set_time_cost(stats.time_taken);
+			battle_->initiative_bar_->focus_character(attacker.get(), stats.time_taken);
+			battle_->time_cost_widget_->set_visible(true);
+			return;
+		} else {
+			/* SPELL cost */
+			hex::location loc = battle_->selected_loc();
+			if(battle_->map_.is_loc_on_map(loc)) {
+				/* move cost */
+				battle_->time_cost_widget_->set_tracker(&(battle_->hex_tracker_));
+				const int cost = battle_->current_move_->get_stat("initiative",*attacker);
+				battle_->time_cost_widget_->set_time_cost(cost);
+				battle_->initiative_bar_->focus_character(attacker.get(), cost);
+				battle_->time_cost_widget_->set_visible(true);
+				return;
+			}
+		}
+	}
+        
+	battle_->time_cost_widget_->clear_tracker();
+	battle_->time_cost_widget_->set_visible(false);
+}
+
+bool battle::listener::handle_stats_dialogs(const SDL_Event& e, bool claimed) {
+	const bool has_dialogs = !battle_->stats_dialogs_.empty();
+
+    if(claimed) {
+        if(has_dialogs) {
+            battle_->stats_dialogs_.clear();
+        }
+        return claimed;
+    }
+
+	bool clear;
+	switch(e.type) {
+	case SDL_KEYDOWN:
+		if(has_dialogs) {
+			clear = true;
+			claimed = true;
+		} else {
+			clear = false;
+			claimed = false;
+		}
+		break;
+	case SDL_MOUSEBUTTONDOWN:
+		if(e.button.button != SDL_BUTTON_RIGHT) {
+			if(has_dialogs) {
+				clear = true;
+				claimed = true;
+			} else {
+				clear = false;
+				claimed = false;
+			}
+			break;
+		}
+		{
+			battle_character_ptr target_char = battle_->mouse_selected_char();
+			if(target_char) {
+				claimed = true;
+				clear = false;
+                
+				game_dialogs::mini_stats_dialog_ptr ptr;
+                
+				std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
+					battle_->stats_dialogs_.find(target_char);
+				if(i == battle_->stats_dialogs_.end()) {
+					ptr.reset(new game_dialogs::mini_stats_dialog(target_char, 200, 100));
+					battle_->stats_dialogs_[target_char] = ptr;
+					ptr->show();
+					ptr->set_frame(gui::frame_manager::make_frame(ptr, "mini-char-battle-stats"));
+				} else {
+					battle_->stats_dialogs_.erase(i);
+				}
+			} else {
+				if(has_dialogs) {
+					claimed = true;
+					clear = true;
+				} else {
+					claimed = false;
+					clear = false;
+				}
+			}
+		}
+		break;
+	default:
+		clear = false;
+		claimed = false;
+		break;
+	}
+
+	if(clear) {
+		battle_->stats_dialogs_.clear();
+	}
+
+	return claimed;
+}
+
+bool battle::listener::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
+{
+    bool claimed = false;
+
+	if(e.button == SDL_BUTTON_LEFT) {
+		if(battle_->highlight_moves_) {
+			const battle_character::move_map::const_iterator move = 
+                battle_->moves_.find(battle_->selected_loc());
+			if(move != battle_->moves_.end()) {
+				battle_->move_character(**(battle_->focus_), move->second);
+                battle_->turn_done_ = !battle_->enter_attack_mode();
+				battle_->move_done_ = true;
+                claimed = true;
+			}
+		} else if(battle_->highlight_targets_ && battle_->current_move_->can_attack()) {
+			battle_character_ptr target_char = battle_->selected_char();
+
+			if(target_char && battle_->targets_.count(target_char->loc())) {
+				battle_->turn_done_ = true;
+				battle_->attack_character(**(battle_->focus_), *target_char, *(battle_->current_move_));
+				if(battle_->move_done_) {
+					battle_->turn_done_ = true;
+				}
+
+				battle_->highlight_targets_ = false;
+                battle_->highlight_moves_ = false;
+				battle_->targets_.clear();
+                claimed =  true;
+			}
+		} else if(battle_->highlight_targets_) {
+			hex::location loc = battle_->selected_loc();
+			if(battle_->map_.is_loc_on_map(loc) && battle_->targets_.count(loc)) {
+				battle_->turn_done_ = true;
+				battle_->target_mod(**(battle_->focus_), loc, *(battle_->current_move_));
+                claimed = true;
+			}
+		}
+	}
+    return claimed;
 }
 
 }

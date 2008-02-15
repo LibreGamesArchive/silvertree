@@ -30,7 +30,7 @@ public:
 	void improve_attribute(int index);
 	void learn_skill();
 private:
-	bool handle_event(const SDL_Event& event);
+	bool handle_event(const SDL_Event& event, bool claimed);
 	void init();
 	game_logic::character_ptr char_;
 	game_logic::party_ptr party_;

@@ -46,9 +46,12 @@ void button::handle_draw() const
 	label_->draw();
 }
 
-bool button::handle_event(const SDL_Event& event)
+bool button::handle_event(const SDL_Event& event, bool claimed)
 {
-	bool claimed = false;
+    if(claimed) {
+        current_texture_ = &normal_texture_;
+    }
+
 	if(event.type == SDL_MOUSEMOTION) {
 		const SDL_MouseMotionEvent& e = event.motion;
 		if(current_texture_ == &depressed_texture_) {

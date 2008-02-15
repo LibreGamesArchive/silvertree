@@ -6,8 +6,7 @@
 #include "font.hpp"
 #include "foreach.hpp"
 #include "text_gui.hpp"
-
-#define ST_EVENT_KEY_REPEAT 1
+#include "userevents.h"
 
 namespace gui {
 namespace text {
@@ -164,9 +163,13 @@ void key_editor::clear_key_repeating() {
 	repeating_key_.clear();
 }
 
-bool key_editor::process_event(const SDL_Event &e)
+bool key_editor::process_event(const SDL_Event &e, bool claimed)
 {
 	SDL_keysym sym;
+    if(claimed) {
+        return claimed;
+    }
+
 	bool sym_set = false;
 
 	switch(e.type) {
@@ -600,16 +603,19 @@ void init() {
 }
 } /* namespace text */
 
-bool text_box::handle_event(const SDL_Event &e)
+bool text_box::handle_event(const SDL_Event &e, bool claimed)
 {
 	/* first our own processing for input focus */
-	bool grabbed = false;
+    if(claimed) {
+        return claimed;
+    }
+
 	bool hidden_from_editors = false;
 	switch(e.type) {
 	case SDL_MOUSEBUTTONDOWN:
 		if(hit_me(e) && state() != DISABLED) {
 			set_state(SELECTED);
-			grabbed = true;
+			claimed = true;
 		} else {
 			set_state(NORMAL);
 		}
@@ -641,14 +647,14 @@ bool text_box::handle_event(const SDL_Event &e)
 		break;
 	}
 
-	bool edit_grabbed = false;
+	bool edit_claimed = false;
 	if(state() == SELECTED && !hidden_from_editors) {
 		foreach(text::editor_ptr edit, editors_) {
-			edit_grabbed = edit->process_event(e);
-			if(edit_grabbed) break;
+			edit_claimed = edit->process_event(e, claimed);
+			if(edit_claimed) break;
 		}
 	}
-	return edit_grabbed || grabbed;
+	return edit_claimed || claimed;
 }
 
 void text_box::inner_draw() const

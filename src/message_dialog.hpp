@@ -39,7 +39,7 @@ public:
 	void show_modal();
 protected:
 	void handle_draw() const;
-	bool handle_event(const SDL_Event &event);
+	bool handle_event(const SDL_Event &event, bool claimed);
 	void construct_interface();
 	int find_option(int x, int y);
 	frame_ptr make_option_frame(int opt, widget_ptr base,
@@ -62,6 +62,14 @@ private:
 	boost::shared_ptr<phantom_dialog> option_box_;
 	int fade_in_rate_;
 	bool starts_conversation_;
+
+    class fade_in_listener: public input::listener {
+    public:
+        fade_in_listener(bool& done) : done_(done) {}
+        bool process_event(const SDL_Event& event, bool claimed);
+    private:
+        bool& done_;
+    };
 };
 
 }

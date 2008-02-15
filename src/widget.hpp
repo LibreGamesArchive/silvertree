@@ -17,13 +17,14 @@
 #include <string>
 
 #include "SDL.h"
+#include "input.hpp"
 
 namespace gui {
 
-class widget
+class widget: public virtual input::listener
 {
 public:
-	bool process_event(const SDL_Event& event);
+	bool process_event(const SDL_Event& event, bool claimed);
 	void draw() const;
 
 	virtual void set_loc(int x, int y) { x_ = x; y_ = y; }
@@ -44,7 +45,7 @@ protected:
 	void normalize_event(SDL_Event* event);
 private:
 	virtual void handle_draw() const = 0;
-	virtual bool handle_event(const SDL_Event& event) { return false; }
+	virtual bool handle_event(const SDL_Event& event, bool claimed) { return claimed; }
 	int x_, y_;
 	int w_, h_;
 	boost::shared_ptr<std::string> tooltip_;

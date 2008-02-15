@@ -27,6 +27,7 @@
 #include "game_bar.hpp"
 #include "game_time.hpp"
 #include "grid_widget_fwd.hpp"
+#include "input.hpp"
 #include "particle_system.hpp"
 #include "party.hpp"
 #include "settlement_fwd.hpp"
@@ -37,9 +38,18 @@
 namespace game_logic
 {
 
+//forward decl
+
 class world : public formula_callable
 {
 public:
+    enum {
+        ACCEL_TIME_KEY = 0,
+        SUPER_ACCEL_TIME_KEY,
+        SHOW_GRID,
+        HIDE_GRID
+    };
+
 	class new_game_exception {
 	public:
 		new_game_exception(const std::string& filename) : filename_(filename) {}
@@ -97,10 +107,25 @@ public:
 
 	party_ptr get_pc_party() const;
 private:
+    friend class listener;
+
+    class listener : public input::listener {
+    public:
+        listener(world *wld);
+        void reset();
+        bool process_event(const SDL_Event& e, bool claimed);
+        void click(Sint32 x, Sint32 y, int clicks, 
+                   Uint8 state, Uint8 bstate, SDLMod mod);
+    private:
+        input::mouse_click_listener<listener *> listener_;
+        world *wld_;
+    };
+
 	bool remove_party(party_ptr p);
 
 	bool show_grid_;
 	graphics::frame_rate_tracker fps_track_;
+    graphics::frame_skipper skippy_;
 	graphics::texture compass_;
 
 	gui::const_grid_ptr get_track_info() const;
@@ -186,6 +211,8 @@ private:
 	mutable hex::location selected_hex_;
 	mutable bool camera_moving_;
 	mutable bool selected_hex_up_to_date_;
+    listener input_listener_;
+    input::key_down_listener keys_;
 };
 
 }

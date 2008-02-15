@@ -216,13 +216,11 @@ void button_widget::do_click()
 	}
 }
 
-bool button_widget::handle_event(const SDL_Event &e)
+bool button_widget::handle_event(const SDL_Event &e, bool claimed)
 {
-	if(state() == DISABLED) {
-		return false;
+	if(state() == DISABLED || claimed) {
+		return claimed;
 	}
-
-	bool claimed = false;
 
 	switch(e.type) {
 	case SDL_MOUSEBUTTONDOWN:
@@ -363,9 +361,12 @@ void scrolled_container::move_event(SDL_Event *ep, int dx, int dy) {
 	}
 }
 
-bool scrolled_container::handle_event(const SDL_Event &e)
+bool scrolled_container::handle_event(const SDL_Event &e, bool claimed)
 {
-	bool claimed = false;
+    if(claimed) {
+        return claimed;
+    }
+
 	SDL_Event ev = e;
 	move_event(&ev, x(), y());
 	const int max_widget = widgets_.size();
@@ -374,7 +375,7 @@ bool scrolled_container::handle_event(const SDL_Event &e)
 	int max_p = axis() == HORIZONTAL ? width() : height();
 	while(widget < max_widget && p_used < max_p) {
 		int d_used = axis() == HORIZONTAL ? widgets_[widget]->width() : widgets_[widget]->height();
-		claimed = widgets_[widget]->process_event(ev);
+		claimed = widgets_[widget]->process_event(ev, claimed);
 		p_used += d_used;
 		++widget;
 		if(claimed) {
@@ -532,8 +533,12 @@ int menu_widget::find_option(const SDL_Event &e)
 	return -1;
 }
 
-void menu_widget::update_key_selection(const SDL_Event &e)
+bool menu_widget::update_key_selection(const SDL_Event &e, bool claimed)
 {
+    if(claimed) {
+        return claimed;
+    }
+
 	switch(e.type) {
 	case SDL_MOUSEMOTION:
 	case SDL_MOUSEBUTTONDOWN:
@@ -543,7 +548,7 @@ void menu_widget::update_key_selection(const SDL_Event &e)
 	case SDL_KEYDOWN:
 		switch(e.key.keysym.sym) {
 		case SDLK_DOWN:
-		        {
+            {
 				int start;
 				if(key_selection_ < 0) {
 					start = 0;
@@ -561,9 +566,10 @@ void menu_widget::update_key_selection(const SDL_Event &e)
 					}
 				}
 			}
-			break;
+            claimed = true;
+            break;
 		case SDLK_UP:
-		        {
+            {
 				int start;
 				if(key_selection_ < 0) {
 					start = options_.size()-1;
@@ -581,6 +587,7 @@ void menu_widget::update_key_selection(const SDL_Event &e)
 					}
 				}
 			}
+            claimed = true;
 			break;
 		default:
 			break;
@@ -588,6 +595,8 @@ void menu_widget::update_key_selection(const SDL_Event &e)
 	default:
 		break;
 	}
+
+    return claimed;
 }
 
 void menu_widget::inner_set_loc(int nx, int ny)
@@ -664,9 +673,14 @@ void popup_menu_widget::get_options_loc(int *x, int *y)
 	}
 }
 
-bool popup_menu_widget::grab_option_event(const SDL_Event& e)
+bool popup_menu_widget::grab_option_event(const SDL_Event& e, bool claimed)
 {
-	update_key_selection(e);
+	claimed = update_key_selection(e, claimed);
+
+    if(claimed) {
+        return claimed;
+    }
+
 	int selected = find_option(e);
 	bool grab = selected >= 0;
 
@@ -749,23 +763,26 @@ bool popup_menu_widget::grab_option_event(const SDL_Event& e)
 	return grab;
 }
 
-bool popup_menu_widget::handle_event(const SDL_Event& e)
+bool popup_menu_widget::handle_event(const SDL_Event& e, bool claimed)
 {
-	if(state() == DISABLED) {
-		return false;
+	if(state() == DISABLED || claimed) {
+		return claimed;
 	}
 
-	if(popped_out_ && grab_option_event(e)) {
-		return true;
+	if(popped_out_) {
+        claimed = grab_option_event(e, claimed);
 	}
 
-	bool claimed = false;
+    if(claimed) {
+        return claimed;
+    }
 
 	switch(e.type) {
 	case SDL_MOUSEBUTTONDOWN:
 		if(hit_me(e)) {
 			ready_ = true;
 			set_state(CLICKED);
+            claimed = true;
 		} else {
 			set_state(NORMAL);
 			set_popped_out(false);
@@ -798,6 +815,7 @@ bool popup_menu_widget::handle_event(const SDL_Event& e)
 					set_state(DEPRESSED_HIGHLIGHTED);
 				}
 			}
+            claimed = true;
 		} else {
 			if(!popped_out_) {
 				set_state(NORMAL);
@@ -809,6 +827,7 @@ bool popup_menu_widget::handle_event(const SDL_Event& e)
 	case SDL_KEYDOWN:
 		if(has_hotkey() && e.key.keysym.sym == hotkey().sym && e.key.keysym.mod == hotkey().mod) {
 			set_state(CLICKED);
+            claimed = true;
 		}
 		break;
 	case SDL_KEYUP:
@@ -844,16 +863,18 @@ void rollin_menu_widget::rebuild_options() {
 	set_option_frame(option_frame);
 }
 
-bool rollin_menu_widget::handle_event(const SDL_Event& e)
+bool rollin_menu_widget::handle_event(const SDL_Event& e, bool claimed)
 {
-	if(state() == DISABLED) {
-		return false;
+	if(state() == DISABLED || claimed) {
+		return claimed;
 	}
-	if(popped_out() && grab_option_event(e)) {
-		return true;
+	if(popped_out()) {
+        claimed = grab_option_event(e, claimed);
 	}
 
-	bool claimed = false;
+    if(claimed) {
+        return claimed;
+    }
 
 	switch(e.type) {
 	case SDL_MOUSEBUTTONDOWN:
@@ -862,6 +883,7 @@ bool rollin_menu_widget::handle_event(const SDL_Event& e)
 		if(hit_me(e)) {
 			set_state(ROLLED_OVER);
 			set_popped_out(true);
+            claimed = true;
 		} else {
 			set_state(NORMAL);
 			set_popped_out(false);

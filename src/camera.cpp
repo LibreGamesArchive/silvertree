@@ -292,6 +292,8 @@ DIRECTION camera::direction() const
 	assert(false);
 }
 
+/* nb this isn't called or even referred to 
+   except in old_main */
 void camera::keyboard_control()
 {
 	const Uint8* keys = SDL_GetKeyState(NULL);

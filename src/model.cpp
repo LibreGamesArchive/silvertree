@@ -26,6 +26,7 @@
 namespace
 {
 std::map<std::string,graphics::const_model_ptr> model_cache;
+std::set<std::string> bad_models;
 const std::string ark_header = "ArkModel";
 }
 
@@ -40,8 +41,15 @@ const_model_ptr model::get_model(const std::string& key)
 		return itor->second;
 	}
 
+    const std::set<std::string>::const_iterator itor2 =
+        bad_models.find(key);
+    if(itor2 != bad_models.end()) {
+        return const_model_ptr();
+    }
+
 	const std::string data = sys::read_file(key);
 	if(data.empty()) {
+        bad_models.insert(bad_models.begin(), key);
 		return const_model_ptr();
 	}
 

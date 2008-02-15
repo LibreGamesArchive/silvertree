@@ -34,7 +34,7 @@ public:
 	virtual bool has_selected_file() { return !was_cancelled_; }
 protected:
 	void handle_draw() const;
-	bool handle_event(const SDL_Event &e);
+	bool handle_event(const SDL_Event &e, bool claimed);
 	virtual std::string do_selected_file() =0;
 private:
 	game_logic::world *wp_;
@@ -169,9 +169,9 @@ void persistence_dialog::handle_draw() const
 	handle_draw_children();
 }
 
-bool persistence_dialog::handle_event(const SDL_Event& e)
+bool persistence_dialog::handle_event(const SDL_Event& e, bool claimed)
 {
-	return handle_event_children(e);
+	return handle_event_children(e, claimed);
 }
 
 void save_dialog::construct_interface(const std::string& dir, const std::string& txt)
@@ -232,8 +232,6 @@ void load_dialog::construct_interface(const std::string& dir, const std::string&
 
 	std::vector<std::string> files;
 	sys::get_files_in_dir(dir, &files);
-	std::cout << "Reading dir "<<dir<<"\n";
-	std::cout << "found "<<files.size()<<" files\n";
 
 	scrolly_ = gui::scrolled_container_ptr(new gui::scrolled_container(gui::scrolled_container::VERTICAL));
 	foreach(std::string filename, files) {
@@ -243,7 +241,6 @@ void load_dialog::construct_interface(const std::string& dir, const std::string&
 		item->add_skin("load-dialog-item-skin-highlighted", load_dialog_item::HIGHLIGHTED);
 		item->add_skin("load-dialog-item-skin-clicked", load_dialog_item::CLICKED);
 		item->add_skin("load-dialog-item-skin-selected", load_dialog_item::SELECTED);
-		std::cout << "added file "<<filename<<" to the listing\n";
 		scrolly_->add_widget(item);
 	}
 	gui::frame_ptr box = gui::frame_manager::make_frame(scrolly_, "load-dialog-scroll-frame");
@@ -324,16 +321,13 @@ void silent_load(const std::string& filename)
 
 bool load(const std::string& start_filename, game_logic::world *wp)
 {
-	std::cout << "Loading game\n";
 	load_dialog l(wp, sys::get_saves_dir(), start_filename);
 	l.show_modal();
 
 	if(!l.has_selected_file() || !sys::file_exists(l.selected_file()))
 	{
-		std::cout << "No file selected\n";
 		return false;
 	}
-	std::cout << "Selected file "<<l.selected_file()<<"\n";
 	do_load(l.selected_file());
 	// we will never get here since a
 	// new_game_exception will be thrown

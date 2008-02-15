@@ -487,9 +487,19 @@ bool do_file_exists(const std::string& fname)
 
 std::string find_file(const std::string& fname)
 {
+    const std::string parent_dir = "..";
+
 	if(do_file_exists(fname)) {
 		return fname;
-	}
+	} 
+
+    {    
+        std::string parent_fname = parent_dir + "/" + fname;
+        if(do_file_exists(parent_fname)) {
+            return parent_fname;
+        } 
+    }
+
 	if(have_datadir) {
 		std::string data_fname = data_dir + "/" + fname;
 		if(do_file_exists(data_fname)) {

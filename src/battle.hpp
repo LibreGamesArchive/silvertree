@@ -86,14 +86,14 @@ public:
 
 	void draw(gui::slider* slider=NULL, bool draw_widgets=true);
 private:
-	void remove_widget(gui::const_widget_ptr w);
+    void add_widget(gui::widget_ptr w);
+	void remove_widget(gui::widget_ptr w);
 	void draw_route(const battle_character::route& r);
 	hex::location selected_loc();
 	battle_character_ptr selected_char();
 	battle_character_ptr mouse_selected_char();
-	void handle_mouse_button_down(const SDL_MouseButtonEvent& e);
+
 	bool stats_dialogs_process_event(const SDL_Event& e);
-	void handle_time_cost_popup();
 	void begin_animation();
 	void end_animation();
 	void animation_frame(GLfloat t, gui::slider* slider=NULL);
@@ -141,6 +141,24 @@ private:
 	boost::scoped_ptr<battle_missile> missile_;
 
 	gui::initiative_bar_ptr initiative_bar_;
+
+    input::pump pump_;
+
+    class listener: public input::listener {
+    public:
+        listener(battle* b) : battle_(b) {}
+        bool process_event(const SDL_Event& e, bool claimed);
+        void set_character(battle_character& c) { c_ = &c; }
+    private:
+        bool handle_stats_dialogs(const SDL_Event& ev, bool claimed);
+        void handle_time_cost_popup();
+        bool handle_mouse_button_down(const SDL_MouseButtonEvent& e);
+        battle* battle_;
+        battle_character* c_;
+    };
+    friend class listener;
+
+    listener listener_;
 };
 
 }

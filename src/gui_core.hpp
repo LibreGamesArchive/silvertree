@@ -87,7 +87,7 @@ protected:
 	virtual ~button_widget() {}
 private:
 	void do_click();
-	bool handle_event(const SDL_Event &e);
+	bool handle_event(const SDL_Event &e, bool claimed);
 	virtual void clicked() {}
 	SDL_keysym hotkey_;
 	bool ready_, has_hotkey_;
@@ -139,7 +139,7 @@ public:
 private:
 	static void move_event(SDL_Event*e, int x, int y);
 	void handle_draw() const;
-	bool handle_event(const SDL_Event& e);
+	bool handle_event(const SDL_Event& e, bool claimed);
 	int offset_;
 	std::vector<widget_ptr> widgets_;
 	AXIS axis_;
@@ -210,7 +210,7 @@ protected:
 	int num_options() const { return options_.size(); }
 
 	menu_option_ptr get_option(int i) { return options_[i]; }
-	void update_key_selection(const SDL_Event& e);
+	bool update_key_selection(const SDL_Event& e, bool claimed);
 	int key_selection() const { return key_selection_; }
 	void inner_set_loc(int x, int y);
 	void inner_set_dim(int w, int h);
@@ -255,9 +255,9 @@ protected:
 	const std::string& option_frame_name() { return option_frame_name_; }
 	const std::string& option_set_frame_name() { return option_set_frame_name_; }
 	void set_option_frame(frame_ptr frame) { option_frame_ = frame; }
-	bool grab_option_event(const SDL_Event &e);
+	bool grab_option_event(const SDL_Event &e, bool claimed);
 private:
-	bool handle_event(const SDL_Event& e);
+	bool handle_event(const SDL_Event& e, bool claimed);
 
 	bool popped_out_, ready_;
 	int opt_ready_;
@@ -279,7 +279,7 @@ public:
 protected:
 	void rebuild_options();
 private:
-	bool handle_event(const SDL_Event &e);
+	bool handle_event(const SDL_Event &e, bool claimed);
 };
 
 class framed_dialog: public dialog {
@@ -295,7 +295,9 @@ public:
 	void set_dim(int w, int h);
 protected:
 	void handle_draw_children() const;
-	bool handle_event(const SDL_Event &e) { return handle_event_children(e); }
+    bool handle_event(const SDL_Event &e, bool claimed) { 
+        return handle_event_children(e, claimed); 
+    }
 private:
 	void handle_draw() const;
 	virtual void inner_set_dim(int w, int h);

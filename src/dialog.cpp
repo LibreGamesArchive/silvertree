@@ -44,6 +44,7 @@ dialog& dialog::add_widget(widget_ptr w, int x, int y,
 {
 	w->set_loc(x,y);
 	widgets_.push_back(w);
+    register_listener(w);
 	switch(dir) {
 	case MOVE_DOWN:
 		add_x_ = x;
@@ -59,8 +60,16 @@ dialog& dialog::add_widget(widget_ptr w, int x, int y,
 
 void dialog::remove_widget(widget_ptr w)
 {
+    deregister_listener(w);
 	widgets_.erase(std::remove(widgets_.begin(),widgets_.end(),w),
 	               widgets_.end());
+}
+
+void dialog::clear() { 
+    foreach(widget_ptr w, widgets_) {
+        deregister_listener(w);
+    }
+    widgets_.clear(); 
 }
 
 void dialog::replace_widget(widget_ptr w_old, widget_ptr w_new)
@@ -74,6 +83,9 @@ void dialog::replace_widget(widget_ptr w_old, widget_ptr w_new)
 
 	w_new->set_loc(x,y);
 	w_new->set_dim(w,h);
+
+    register_listener(w_new);
+    deregister_listener(w_old);
 }
 
 void dialog::show() {
@@ -83,13 +95,11 @@ void dialog::show() {
 
 void dialog::show_modal()
 {
+    input::pump pump;
 	opened_ = true;
-	while(opened_) {
-		SDL_Event event;
-		while(SDL_PollEvent(&event)) {
-			process_event(event);
-		}
+    pump.register_listener(this);
 
+	while(opened_ && pump.process()) {
 		prepare_draw();
 		draw();
 		gui::draw_tooltip();
@@ -131,32 +141,27 @@ void dialog::handle_draw() const
 	handle_draw_children();
 }
 
-bool dialog::handle_event_children(const SDL_Event &event) {
-	SDL_Event ev = event;
-	normalize_event(&ev);
-	std::vector<widget_ptr> widgets = widgets_;
-	bool claimed = false;
-	foreach(const widget_ptr& w, widgets) {
-		if(w->process_event(ev)) {
-			claimed = true;
-			break;
-		}
-	}
-	return claimed;
+bool dialog::process_event(const SDL_Event& ev, bool claimed) {
+    return widget::process_event(ev, claimed);
 }
 
-bool dialog::handle_event(const SDL_Event& event)
+bool dialog::handle_event_children(const SDL_Event &event, bool claimed) {
+	SDL_Event ev = event;
+	normalize_event(&ev);
+    return input::listener_container::process_event(ev, claimed);
+}
+
+bool dialog::handle_event(const SDL_Event& event, bool claimed)
 {
-	bool claimed = false;
-	if(event.type == SDL_KEYDOWN &&
-	   (event.key.keysym.sym == SDLK_SPACE ||
-	    event.key.keysym.sym == SDLK_RETURN)) {
-		close();
-		claimed = true;
-	}
-	if(!claimed) {
-		claimed = handle_event_children(event);
-	}
+    if(!claimed && opened_) {
+        if(event.type == SDL_KEYDOWN &&
+           (event.key.keysym.sym == SDLK_SPACE ||
+            event.key.keysym.sym == SDLK_RETURN)) {
+            close();
+            claimed = true;
+        }
+    }
+    claimed |= handle_event_children(event, claimed);
 	return claimed;
 }
 

@@ -23,7 +23,7 @@ public:
 	SDL_Rect character_rect(int index) const;
 
 private:
-	bool handle_event(const SDL_Event &e);
+	bool handle_event(const SDL_Event &e, bool claimed);
 	void construct_interface(game_logic::party_ptr pty, game_logic::world *wp);
 	void inner_draw() const;
 

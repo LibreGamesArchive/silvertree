@@ -77,18 +77,20 @@ party::TURN_RESULT pc_party::do_turn()
 
 	seen_.swap(now_visible);
 
-	const hex::DIRECTION dir = keyboard::dir(
-	               game_world().camera().direction());
+    bool run, should_pass;
+	const hex::DIRECTION dir = keyboard::global_controls.dir(
+	               game_world().camera().direction(),
+                   run, should_pass);
 
 	if(dir != hex::NULL_DIRECTION) {
 		path_.clear();
 		const hex::location dst = tile_in_direction(loc(),dir);
 		if(movement_cost(loc(),dst) >= 0) {
-			set_movement_mode(keyboard::run() ? RUN : WALK);
+			set_movement_mode(run ? RUN : WALK);
 			move(dir);
 			return TURN_COMPLETE;
 		}
-	} else if(keyboard::pass()) {
+	} else if(should_pass) {
 		path_.clear();
 		pass();
 		return TURN_COMPLETE;

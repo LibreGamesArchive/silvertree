@@ -71,9 +71,9 @@ void frame::rebuild_frame() {
 	}
 }
 
-bool frame::handle_event(const SDL_Event &e)
+bool frame::handle_event(const SDL_Event &e, bool claimed)
 {
-	return base_->process_event(e);
+	return base_->process_event(e, claimed);
 }
 
 void frame::set_loc(int x, int y)

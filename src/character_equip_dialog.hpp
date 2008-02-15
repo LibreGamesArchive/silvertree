@@ -31,7 +31,7 @@ public:
 	void implement_equipment_change(int index);
 	void change_character(int index);
 private:
-	bool handle_event(const SDL_Event& event);
+	bool handle_event(const SDL_Event& event, bool claimed);
 	void init();
 	game_logic::character_ptr char_;
 	game_logic::party_ptr party_;

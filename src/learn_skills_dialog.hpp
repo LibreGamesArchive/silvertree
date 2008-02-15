@@ -35,7 +35,7 @@ public:
 
 private:
 	void init();
-	bool handle_event(const SDL_Event& event);
+	bool handle_event(const SDL_Event& event, bool claimed);
 	gui::grid_ptr get_grid_for_skill(game_logic::const_skill_ptr s);
 	game_logic::character_ptr char_;
 
