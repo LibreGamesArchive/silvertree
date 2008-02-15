@@ -197,9 +197,9 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 
 		const TiXmlElement* vertex_weights = skin->FirstChildElement("vertex_weights");
 		input = vertex_weights->FirstChildElement("input");
-		int max_offset, offset, vertex_count;
+		int max_offset=0, offset, vertex_count;
 		vertex_weights->QueryIntAttribute("count", &vertex_count);
-		int joint_offset, weight_offset;
+		int joint_offset=0, weight_offset=0;
 		vector<int> vcounts = get_array<int>(vertex_weights->FirstChildElement("vcount"));
 		vector<int> v_indices = get_array<int>(vertex_weights->FirstChildElement("v"));
 		vector<float> weights;
