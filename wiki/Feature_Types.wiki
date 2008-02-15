@@ -1,5 +1,5 @@
 #summary Feature Types, Data, & Images
-#labels Feature
+#labels Features
 || *type* || *description* || *cost* || *vision block* || *id* || *cascade* ||
 ||house_feature || This is a house. The doors are locked. ||impassable|| 8000||H|| no||
 ||house_passable_feature || This is a house, but you can walk through it. ||passable|| 8000||P|| no||
