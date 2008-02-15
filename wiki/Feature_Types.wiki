@@ -1,0 +1,10 @@
+#summary Feature Types, Data, & Images
+#labels Feature
+|| *type* || *description* || *cost* || *vision block* || *id* || *cascade* ||
+||house_feature || This is a house. The doors are locked. ||impassable|| 8000||H|| no||
+||house_passable_feature || This is a house, but you can walk through it. ||passable|| 8000||P|| no||
+||tree || Many may block view of forest. ||impassable|| 10000||F|| no||
+||fountain_1 || A beautiful fountain sending water into the air. ||impassable|| 0||fountain_1|| yes||
+||tower || Common fortification. ||impassable|| 12000||X||  no||
+||cave_entrance || 3D underground lair entrance ||passable|| 5000||XC|| no||
+||color_cube || A colorful, whimsical, magical floating block. ||impassable|| 0||color_cube|| no||
