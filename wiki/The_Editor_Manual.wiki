@@ -1,5 +1,5 @@
 #summary for silvertree-win-0.2.1
-#labels Editor,Terrain,Model
+#labels Editor,Terrains,Features
 
 ==Introduction==
 When you open the !SilverTree RPG editor, silvertreeedit, you will see a black window one quarter covered with green hexagonal tiling. You can use the scroll bars to move it. At the top, there are 4 buttons (rotate left, rotate right, tilt up, tilt down) that change viewing angle and zoom. Next to them are the save and open buttons. Above those, there are three drop down menus. On the right, there is a tool bar that allows you to edit the map.
