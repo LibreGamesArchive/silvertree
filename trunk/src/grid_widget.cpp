@@ -171,10 +171,11 @@ void grid::handle_draw() const
 	glPopMatrix();
 }
 
-bool grid::handle_event(const SDL_Event& event)
+bool grid::handle_event(const SDL_Event& event, bool claimed)
 {
-	bool claimed = false;
-
+    if(claimed) {
+        return claimed; 
+    }
 	if(allow_selection_) {
 		if(event.type == SDL_MOUSEMOTION) {
 			const SDL_MouseMotionEvent& e = event.motion;
@@ -217,7 +218,7 @@ bool grid::handle_event(const SDL_Event& event)
 	normalize_event(&ev);
 	foreach(const widget_ptr& widget, cells_) {
 		if(widget) {
-			claimed = widget->process_event(ev);
+			claimed = widget->process_event(ev, claimed);
 		}
 		if(claimed) break;
 	}

@@ -21,7 +21,7 @@
 
 namespace gui {
 
-class dialog : public widget
+class dialog : public widget, public input::listener_container
 {
 public:
 	typedef std::vector<widget_ptr>::const_iterator child_iterator;
@@ -36,7 +36,7 @@ public:
 	                MOVE_DIRECTION dir=MOVE_DOWN);
 	void remove_widget(widget_ptr w);
 	void replace_widget(widget_ptr w_old, widget_ptr w_new);
-	void clear() { widgets_.clear(); }
+	void clear();
 	void set_padding(int pad) { padding_ = pad; }
 	void close() { opened_ = false; }
 
@@ -46,10 +46,11 @@ public:
 	int cursor_y() const { return add_y_; }
 	child_iterator begin_children() const { return widgets_.begin(); }
 	child_iterator end_children() const { return widgets_.end(); }
+    bool process_event(const SDL_Event& e, bool claimed);
 protected:
 	dialog(int x, int y, int w, int h);
-	virtual bool handle_event(const SDL_Event& event);
-	virtual bool handle_event_children(const SDL_Event& event);
+	virtual bool handle_event(const SDL_Event& event, bool claimed);
+	virtual bool handle_event_children(const SDL_Event& event, bool claimed);
 	virtual void handle_draw() const;
 	virtual void handle_draw_children() const;
 	void prepare_draw();

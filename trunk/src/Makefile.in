@@ -68,13 +68,14 @@ am_libsilvertree_a_OBJECTS = base_terrain.$(OBJEXT) \
 	game_persistence.$(OBJEXT) game_time.$(OBJEXT) \
 	global_game_state.$(OBJEXT) graphics_logic.$(OBJEXT) \
 	grid_widget.$(OBJEXT) gui_core.$(OBJEXT) \
-	image_widget.$(OBJEXT) initiative_bar.$(OBJEXT) item.$(OBJEXT) \
-	item_display_dialog.$(OBJEXT) keyboard.$(OBJEXT) \
-	label.$(OBJEXT) learn_skills_dialog.$(OBJEXT) \
-	map_avatar.$(OBJEXT) material.$(OBJEXT) \
-	message_dialog.$(OBJEXT) mini_stats_dialog.$(OBJEXT) \
-	model.$(OBJEXT) npc_party.$(OBJEXT) parse3ds.$(OBJEXT) \
-	parseark.$(OBJEXT) parsedae.$(OBJEXT) particle.$(OBJEXT) \
+	image_widget.$(OBJEXT) initiative_bar.$(OBJEXT) \
+	input.$(OBJEXT) item.$(OBJEXT) item_display_dialog.$(OBJEXT) \
+	keyboard.$(OBJEXT) label.$(OBJEXT) \
+	learn_skills_dialog.$(OBJEXT) map_avatar.$(OBJEXT) \
+	material.$(OBJEXT) message_dialog.$(OBJEXT) \
+	mini_stats_dialog.$(OBJEXT) model.$(OBJEXT) \
+	npc_party.$(OBJEXT) parse3ds.$(OBJEXT) parseark.$(OBJEXT) \
+	parsedae.$(OBJEXT) particle.$(OBJEXT) \
 	particle_emitter.$(OBJEXT) particle_system.$(OBJEXT) \
 	party.$(OBJEXT) party_status_dialog.$(OBJEXT) \
 	pathfind.$(OBJEXT) pc_party.$(OBJEXT) \
@@ -309,6 +310,7 @@ image_widget_fwd.hpp \
 image_widget.hpp \
 initiative_bar.hpp \
 initiative_bar_fwd.hpp \
+input.hpp \
 item_display_dialog.hpp \
 item_fwd.hpp \
 item.hpp \
@@ -422,6 +424,7 @@ grid_widget.cpp \
 gui_core.cpp \
 image_widget.cpp \
 initiative_bar.cpp \
+input.cpp \
 item.cpp \
 item_display_dialog.cpp \
 keyboard.cpp \
@@ -592,6 +595,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gui_core.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/image_widget.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/initiative_bar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item_display_dialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/keyboard.Po@am__quote@

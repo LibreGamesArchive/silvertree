@@ -234,32 +234,14 @@ void message_dialog::fade_in()
 			option_frames_[count-1]->set_visible(true);
 		}
 
-		while(now < end && !done) {
-			SDL_Event event;
+        input::pump pump;
+        fade_in_listener listener(done);
+        pump.register_listener(&listener);
+
+		while(now < end && !done && pump.process()) {
 			prog = (now - start)/fade_in_rate_;
 			dlabel->set_progress(prog);
 			draw();
-			while(SDL_PollEvent(&event) && !done) {
-				switch(event.type) {
-				case SDL_KEYDOWN:
-					switch(event.key.keysym.sym) {
-					case SDLK_1: case SDLK_2: case SDLK_3:
-					case SDLK_4: case SDLK_5: case SDLK_6:
-					case SDLK_7: case SDLK_8: case SDLK_9:
-						SDL_PushEvent(&event);
-						break;
-					default:
-						break;
-					}
-					done = true;
-					break;
-				case SDL_MOUSEBUTTONDOWN:
-					done = true;
-					break;
-				default:
-					break;
-				}
-			}
 			now = SDL_GetTicks();
 		}
 		dlabel->set_progress(max);
@@ -279,9 +261,13 @@ void message_dialog::update_option(int option) {
 	}
 }
 
-bool message_dialog::handle_event(const SDL_Event& event) {
+bool message_dialog::handle_event(const SDL_Event& event, bool claimed) {
+    if(claimed) {
+        return claimed;
+    }
+
 	int old_selected = selected_;
-	bool claimed = false;
+
 	switch(event.type) {
 	case SDL_KEYDOWN:
 		if(options_) {
@@ -351,5 +337,36 @@ bool message_dialog::handle_event(const SDL_Event& event) {
 	}
 	return claimed;
 }
+
+bool message_dialog::fade_in_listener::process_event(const SDL_Event& event, bool claimed) {
+    if(claimed) {
+        return claimed;
+    }
+		
+    switch(event.type) {
+    case SDL_KEYDOWN:
+        switch(event.key.keysym.sym) {
+        case SDLK_1: case SDLK_2: case SDLK_3:
+        case SDLK_4: case SDLK_5: case SDLK_6:
+        case SDLK_7: case SDLK_8: case SDLK_9:
+            /* ideally we'd push this back but there
+               isn't an obvious way to do it for now */
+            break;
+        default:
+            break;
+        }
+        done_ = true;
+        claimed = true;
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        done_ = true;
+        claimed = true;
+        break;
+    default:
+        break;
+    }
+    return claimed;
+}
+
 
 } // namespace gui

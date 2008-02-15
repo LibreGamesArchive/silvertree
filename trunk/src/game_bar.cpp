@@ -21,6 +21,7 @@ namespace game_dialogs {
 
 SDL_Rect game_bar::character_rect(int index) const
 {
+    /* FIXME: this surely fails if the bar is scrolled */
 	assert(index >= 0);
 	if(index >= char_rects_.size()) {
 		SDL_Rect res = {0, 0, 0, 0};
@@ -40,16 +41,15 @@ void game_bar::inner_draw() const
 	handle_draw_children();
 }
 
-bool game_bar::handle_event(const SDL_Event &e)
+bool game_bar::handle_event(const SDL_Event &e, bool claimed)
 {
-	return handle_event_children(e);
+	claimed = handle_event_children(e, claimed);
+    return claimed;
 }
 
 void game_bar::construct_interface(game_logic::party_ptr pty, game_logic::world *wp)
 {
 	set_padding(0);
-	{
-	}
 
 	// add a game_bar_button for the party status widget
 	gui::button_widget_ptr party_button(new game_bar_party_button(pty));
@@ -68,7 +68,8 @@ void game_bar::construct_interface(game_logic::party_ptr pty, game_logic::world 
 	{
 		char_rects_.clear();
 		// add a scrollable char portrait widgets
-		gui::widget_ptr w(new game_bar_portrait_set(pty, width() - party_button->width()- game_button->width(), height(), &char_rects_));
+		gui::widget_ptr w(new game_bar_portrait_set(pty, width() - party_button->width()- game_button->width(), 
+                                                    height(), &char_rects_));
 		add_widget(w, dialog::MOVE_RIGHT);
 		portrait_set_ = w;
 	}

@@ -51,24 +51,26 @@ void widget::set_tooltip(const std::string& str)
 	tooltip_.reset(new std::string(i18n::translate(str)));
 }
 
-bool widget::process_event(const SDL_Event& event)
+bool widget::process_event(const SDL_Event& event, bool claimed)
 {
-	if(tooltip_ && event.type == SDL_MOUSEMOTION) {
-		if(event.motion.x >= x() && event.motion.x <= x()+width() &&
-		   event.motion.y >= y() && event.motion.y <= y()+height()) {
-			if(!tooltip_displayed_) {
-				gui::set_tooltip(tooltip_);
-				tooltip_displayed_ = true;
-			}
-		} else {
-			if(tooltip_displayed_) {
-				gui::remove_tooltip(tooltip_);
-				tooltip_displayed_ = false;
-			}
-		}
-	}
+    if(!claimed) {
+        if(tooltip_ && event.type == SDL_MOUSEMOTION) {
+            if(event.motion.x >= x() && event.motion.x <= x()+width() &&
+               event.motion.y >= y() && event.motion.y <= y()+height()) {
+                if(!tooltip_displayed_) {
+                    gui::set_tooltip(tooltip_);
+                    tooltip_displayed_ = true;
+                }
+            } else {
+                if(tooltip_displayed_) {
+                    gui::remove_tooltip(tooltip_);
+                    tooltip_displayed_ = false;
+                }
+            }
+        }
+    }
 
-	return handle_event(event);
+	return handle_event(event, claimed);
 }
 
 void widget::draw() const

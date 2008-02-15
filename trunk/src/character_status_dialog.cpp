@@ -243,7 +243,7 @@ void character_status_dialog::init()
 	}
 }
 
-bool character_status_dialog::handle_event(const SDL_Event& event)
+bool character_status_dialog::handle_event(const SDL_Event& event, bool claimed)
 {
 	if(modify_char_widget_) {
 
@@ -252,9 +252,9 @@ bool character_status_dialog::handle_event(const SDL_Event& event)
 		gui::widget_ptr ptr = modify_char_widget_;
 		SDL_Event ev = event;
 		normalize_event(&ev);
-		return ptr->process_event(ev);
+		return ptr->process_event(ev, claimed);
 	}
-	return dialog::handle_event(event);
+	return dialog::handle_event(event, claimed);
 }
 
 void character_status_dialog::change_character(int index)

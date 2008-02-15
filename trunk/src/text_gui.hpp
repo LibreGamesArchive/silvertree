@@ -185,7 +185,7 @@ typedef boost::shared_ptr<edit_operation> edit_operation_ptr;
 
 class editor {
 public:
-	virtual bool process_event(const SDL_Event &e) =0;
+    virtual bool process_event(const SDL_Event &e, bool claimed) =0;
 	virtual ~editor() {}
 };
 
@@ -238,7 +238,7 @@ public:
 		fill_function_table();
 	}
 
-	bool process_event(const SDL_Event &e);
+	bool process_event(const SDL_Event &e, bool claimed);
 	void handle_logical_key_press(const key_table::logical_key k);
 	void handle_unicode_press(const Uint32 unicode);
 
@@ -277,7 +277,7 @@ private:
 /* this class is WIP */
 class mouse_editor : public editor {
 public:
-	bool process_event(const SDL_Event& e) { return false; }
+	bool process_event(const SDL_Event& e, bool claimed) { return claimed; }
 };
 
 } /* namespace text */
@@ -318,7 +318,7 @@ public:
 	void set_text(const std::string& text) { edit_->set_text(text); }
 	std::string text() { return edit_->text(); }
 protected:
-	bool handle_event(const SDL_Event &e);
+	bool handle_event(const SDL_Event &e, bool claimed);
 	void inner_draw() const;
 	void recalculate_texture() const;
 private:

@@ -62,6 +62,7 @@ image_widget_fwd.hpp \
 image_widget.hpp \
 initiative_bar.hpp \
 initiative_bar_fwd.hpp \
+input.hpp \
 item_display_dialog.hpp \
 item_fwd.hpp \
 item.hpp \
@@ -175,6 +176,7 @@ grid_widget.cpp \
 gui_core.cpp \
 image_widget.cpp \
 initiative_bar.cpp \
+input.cpp \
 item.cpp \
 item_display_dialog.cpp \
 keyboard.cpp \

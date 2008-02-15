@@ -12,52 +12,92 @@
 */
 #include "keyboard.hpp"
 #include "SDL.h"
+#include <iostream>
 
 namespace keyboard
 {
 
-hex::DIRECTION dir(hex::DIRECTION orientation)
+controls global_controls;
+
+controls::controls() : input::delegate_listener(&keys_) {
+    keys_.bind_key(UP_LEFT, SDLK_KP7, KMOD_NONE);
+    keys_.bind_key(UP_RIGHT, SDLK_KP9, KMOD_NONE);
+    keys_.bind_key(DOWN_LEFT, SDLK_KP1, KMOD_NONE);
+    keys_.bind_key(DOWN_RIGHT, SDLK_KP3, KMOD_NONE);
+    keys_.bind_key(UP, SDLK_KP8, KMOD_NONE);
+    keys_.bind_key(DOWN, SDLK_KP2, KMOD_NONE);
+    
+    keys_.bind_key(UP, SDLK_UP, KMOD_NONE);
+    keys_.bind_key(DOWN, SDLK_DOWN, KMOD_NONE);
+    keys_.bind_key(LEFT, SDLK_LEFT, KMOD_NONE);
+    keys_.bind_key(RIGHT, SDLK_RIGHT, KMOD_NONE);
+
+    keys_.bind_key(RUN_UP_LEFT, SDLK_KP7, (SDLMod)KMOD_SHIFT);
+    keys_.bind_key(RUN_UP_RIGHT, SDLK_KP9, (SDLMod)KMOD_SHIFT);
+    keys_.bind_key(RUN_DOWN_LEFT, SDLK_KP1, (SDLMod)KMOD_SHIFT);
+    keys_.bind_key(RUN_DOWN_RIGHT, SDLK_KP3, (SDLMod)KMOD_SHIFT);
+    keys_.bind_key(RUN_UP, SDLK_KP8, (SDLMod)KMOD_SHIFT);
+    keys_.bind_key(RUN_DOWN, SDLK_KP2, (SDLMod)KMOD_SHIFT);
+    
+    keys_.bind_key(RUN_UP, SDLK_UP, (SDLMod)KMOD_SHIFT);
+    keys_.bind_key(RUN_DOWN, SDLK_DOWN, (SDLMod)KMOD_SHIFT);
+    keys_.bind_key(RUN_LEFT, SDLK_LEFT, (SDLMod)KMOD_SHIFT);
+    keys_.bind_key(RUN_RIGHT, SDLK_RIGHT, (SDLMod)KMOD_SHIFT);
+
+    keys_.bind_key(PASS, SDLK_SPACE, KMOD_NONE);
+    keys_.bind_key(PASS, SDLK_SPACE, (SDLMod)KMOD_SHIFT);
+}
+        
+    
+hex::DIRECTION controls::dir(hex::DIRECTION orientation, 
+                             bool& run, bool& pass)
 {
-	const Uint8* keys = SDL_GetKeyState(NULL);
+    int dir = NONE;
+    run = false;
 
-	if(keys[SDLK_LCTRL] || keys[SDLK_RCTRL]) {
-		return hex::NULL_DIRECTION;
-	}
+    if(keys_.key(UP_LEFT) || keys_.key(RUN_UP_LEFT)) {
+        dir = UP_LEFT;
+        run = keys_.key(RUN_UP_LEFT);
+    } else if(keys_.key(UP_RIGHT) || keys_.key(RUN_UP_RIGHT)) {
+        dir = UP_RIGHT;
+        run = keys_.key(RUN_UP_RIGHT);
+    } else if(keys_.key(DOWN_LEFT) || keys_.key(RUN_DOWN_LEFT)){
+        dir = DOWN_LEFT;
+        run = keys_.key(RUN_DOWN_LEFT);
+    } else if(keys_.key(DOWN_RIGHT) || keys_.key(RUN_DOWN_RIGHT)) {
+        dir = DOWN_RIGHT;
+        run = keys_.key(RUN_DOWN_RIGHT);
+    } else if(keys_.key(UP) || keys_.key(RUN_UP)) {
+        if(keys_.key(LEFT) || keys_.key(RUN_LEFT)) {
+            dir = UP_LEFT;
+        } else if(keys_.key(RIGHT) || keys_.key(RUN_RIGHT)) {
+            dir = UP_RIGHT;
+        } else {
+            dir = UP;
+        }
+        run = keys_.key(RUN_UP);
+    } else if(keys_.key(DOWN) || keys_.key(RUN_DOWN)) {
+        if(keys_.key(LEFT) || keys_.key(RUN_LEFT)) {
+            dir = DOWN_LEFT;
+        } else if(keys_.key(RIGHT) || keys_.key(RUN_RIGHT)) {
+            dir = DOWN_RIGHT;
+        } else {
+            dir = DOWN;
+        }
+        run = keys_.key(RUN_DOWN);
+    } else if(keys_.key(PASS)) {
+        dir = PASS;
+    }
 
-	int dir = -1;
-	if(keys[SDLK_KP7] || keys[SDLK_LEFT] && keys[SDLK_UP]) {
-		dir = 1;
-	} else if(keys[SDLK_KP9] || keys[SDLK_RIGHT] && keys[SDLK_UP]) {
-		dir = 5;
-	} else if(keys[SDLK_KP1] || keys[SDLK_LEFT] && keys[SDLK_DOWN]) {
-		dir = 2;
-	} else if(keys[SDLK_KP3] || keys[SDLK_RIGHT] && keys[SDLK_DOWN]) {
-		dir = 4;
-	} else if(keys[SDLK_KP8] || keys[SDLK_UP]) {
-		dir = 0;
-	} else if(keys[SDLK_KP2] || keys[SDLK_DOWN]) {
-		dir = 3;
-	}
-
-	if(dir != -1) {
+    pass = (dir == PASS);
+    
+	if(dir != NONE && dir != PASS) {
 		using namespace hex;
 		dir = (dir + static_cast<int>(orientation))%6;
 		return static_cast<DIRECTION>(dir);
 	} else {
 		return hex::NULL_DIRECTION;
 	}
-}
-
-bool run()
-{
-	const Uint8* keys = SDL_GetKeyState(NULL);
-	return keys[SDLK_LSHIFT] || keys[SDLK_RSHIFT];
-}
-
-bool pass()
-{
-	const Uint8* keys = SDL_GetKeyState(NULL);
-	return keys[SDLK_SPACE];
 }
 
 }

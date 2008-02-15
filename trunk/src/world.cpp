@@ -20,6 +20,7 @@
 #include "global_game_state.hpp"
 #include "grid_widget.hpp"
 #include "image_widget.hpp"
+#include "keyboard.hpp"
 #include "label.hpp"
 #include "party_status_dialog.hpp"
 #include "pathfind.hpp"
@@ -70,13 +71,16 @@ const std::vector<const world*>& world::current_world_stack()
 }
 
 world::world(wml::const_node_ptr node)
-	: compass_(graphics::texture::get(graphics::surface_cache::get("compass-rose.png"))),
+	: skippy_(50, preference_maxfps()),
+      compass_(graphics::texture::get(graphics::surface_cache::get("compass-rose.png"))),
 	  map_(get_map_data(node)), camera_(map_),
-	  camera_controller_(camera_), scale_(wml::get_int(node, "scale", 1)),
+	  camera_controller_(camera_), 
+      scale_(wml::get_int(node, "scale", 1)),
 	  time_(node), subtime_(0.0), tracks_(map_),
 	  border_tile_(wml::get_str(node, "border_tile")),
 	  done_(false), quit_(false), camera_moving_(false),
-	  selected_hex_up_to_date_(false)
+	  selected_hex_up_to_date_(false), 
+      input_listener_(this)
 {
 	show_grid_ = false;
 
@@ -176,6 +180,11 @@ world::world(wml::const_node_ptr node)
 	if(tracks) {
 		tracks_.read(tracks);
 	}
+
+    keys_.bind_key(ACCEL_TIME_KEY, SDLK_SPACE, KMOD_NONE);
+    keys_.bind_key(SUPER_ACCEL_TIME_KEY, SDLK_SPACE, (SDLMod)KMOD_SHIFT);
+    keys_.bind_key(SHOW_GRID, SDLK_g, KMOD_NONE);
+    keys_.bind_key(HIDE_GRID, SDLK_h, KMOD_NONE);
 }
 
 wml::node_ptr world::write() const
@@ -692,10 +701,17 @@ void world::play()
 
 	party_ptr active_party;
 
-	graphics::frame_skipper skippy(50, preference_maxfps());
+    skippy_.reset();
 	fps_track_.reset();
 
-	while(!done_) {
+    input::pump input_pump;
+    input_pump.register_listener(game_bar_);
+    input_pump.register_listener(&keyboard::global_controls);
+    input_pump.register_listener(&keys_);
+    input_pump.register_listener(&input_listener_);
+    input_pump.register_listener(&camera_controller_);
+
+    while(!done_) {
 		if(!focus_) {
 			for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
 				if(i->second->is_human_controlled()) {
@@ -710,7 +726,7 @@ void world::play()
 		}
 
 		{
-			bool draw_this_frame = !skippy.skip_frame();
+			bool draw_this_frame = !skippy_.skip_frame();
 
 			if(draw_this_frame) {
 				draw();
@@ -719,41 +735,11 @@ void world::play()
 			fps_track_.register_frame(draw_this_frame);
 		}
 
-		SDL_Event event;
-		while(SDL_PollEvent(&event)) {
-			if(game_bar_) {
-				const int start = SDL_GetTicks();
-				bool preclaimed = game_bar_->process_event(event);
-				const int end = SDL_GetTicks();
-				if(end - start > 20) {
-					/* more than 20ms processing an event ... */
-					skippy.reset();
-					fps_track_.reset();
-				}
-				if(preclaimed) continue;
-			}
-			switch(event.type) {
-				case SDL_QUIT:
-					done_ = true;
-					quit_ = true;
-					break;
-				case SDL_MOUSEMOTION:
-					selected_hex_up_to_date_ = false;
-					break;
-				case SDL_MOUSEBUTTONDOWN:
-					if(event.button.button == SDL_BUTTON_LEFT && focus_ &&
-					   event.button.y < game_bar_->y()) {
-						focus_->set_destination(get_selected_hex());
-					}
-					break;
-				default:
-					break;
-			}
-			// Allow the camera controller to react to events.
-			// TODO: Should not do this for events already consume above.
-			camera_controller_.event_control(event);
-		}
-
+        if(!input_pump.process()) {
+            done_ = true;
+            quit_ = true;
+        }                 
+    
 		if(!script_.empty()) {
 			bool scripted_moves = false;
 			for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
@@ -771,7 +757,7 @@ void world::play()
 				                .add("var", variant(&global_game_state::get().get_variables()));
 				script_.clear();
 				fire_event("finish_script", *script_callable);
-				skippy.reset();
+				skippy_.reset();
 			}
 		}
 
@@ -817,7 +803,7 @@ void world::play()
 						active_party->set_loc(start_loc);
 					}
 					if(were_encounters) {
-						skippy.reset();
+						skippy_.reset();
 						fps_track_.reset();
 					}
 				}
@@ -850,7 +836,7 @@ void world::play()
 
 						//player has left the settlement, return to this world
 						active_party->new_world(*this,active_party->loc(),active_party->last_move());
-						skippy.reset();
+						skippy_.reset();
 						fps_track_.reset();
 					}
 
@@ -868,14 +854,13 @@ void world::play()
 			}
 		}
 
-		const Uint8* keys = SDL_GetKeyState(NULL);
-
 		if(!active_party) {
-			const bool accel = keys[SDLK_SPACE] || !script_.empty();
-			double increase = scale_ * game_speed * (accel ? 2.0 : 1.0);
-			if(keys[SDLK_SPACE] && (keys[SDLK_LSHIFT] || keys[SDLK_RSHIFT])) {
-				increase *= 4;
-			}
+            double increase = scale_ * game_speed;
+            if(keys_.key(SUPER_ACCEL_TIME_KEY)) {
+                increase *= 4;
+            } else if(keys_.key(ACCEL_TIME_KEY) || !script_.empty()) {
+                increase *= 2;
+            } 
 
 			subtime_ += increase;
 
@@ -886,16 +871,14 @@ void world::play()
 			}
 		}
 
-		if(keys[SDLK_g]) {
+        if(keys_.key(SHOW_GRID)) {
 			show_grid_ = true;
-		}
+		} else if(keys_.key(HIDE_GRID)) {
+            show_grid_ = false;
+        }
 
-		if(keys[SDLK_h]) {
-			show_grid_ = false;
-		}
-
-		camera_controller_.keyboard_control();
-	}
+		camera_controller_.update();
+    }  
 	if(quit_) {
 		throw quit_exception();
 	}
@@ -1186,6 +1169,43 @@ void world::add_chat_label(gui::label_ptr label, const_character_ptr ch, int del
 	new_label.y_loc = rect.y - 50;
 	new_label.character = ch;
 	chat_labels_.push_back(new_label);
+}
+
+world::listener::listener(world *wld) : listener_(this), wld_(wld) {
+    listener_.set_target_state(SDL_BUTTON(SDL_BUTTON_LEFT), 
+                               input::mouse_listener::STATE_MASK_NONE);
+};
+
+void world::listener::reset() {
+    wld_->skippy_.reset();
+    wld_->fps_track_.reset();
+}
+
+bool world::listener::process_event(const SDL_Event& e, bool claimed) {
+    claimed |= listener_.process_event(e, claimed);
+    if(claimed) {
+        return claimed;
+    }
+
+    switch(e.type) {
+    case SDL_MOUSEMOTION:
+        wld_->selected_hex_up_to_date_ = false;
+        break;
+    default:
+        break;
+    }
+    return claimed;
+}
+
+void world::listener::click(Sint32 x, Sint32 y, int clicks, 
+                            Uint8 state, Uint8 bstate, SDLMod mod) {
+    hex::location click_hex = wld_->selected_hex_;
+
+    wld_->selected_hex_up_to_date_ = false;
+    if(wld_->get_selected_hex() != click_hex) {
+        return;
+    }
+    wld_->focus_->set_destination(wld_->get_selected_hex());        
 }
 
 }

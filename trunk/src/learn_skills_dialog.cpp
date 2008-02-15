@@ -121,10 +121,9 @@ void learn_skills_dialog::init()
 	add_widget(close_button, 1024-100, 800-100);
 }
 
-bool learn_skills_dialog::handle_event(const SDL_Event& event)
+bool learn_skills_dialog::handle_event(const SDL_Event& event, bool claimed)
 {
-	bool claimed = false;
-	claimed = gui::dialog::handle_event(event);
+	claimed = gui::dialog::handle_event(event, claimed);
 	foreach(const boost::shared_ptr<skill_dialog>& d, children_) {
 		if(d->learnt_skill()) {
 			init();
