@@ -15,7 +15,7 @@
 ||sand || common beach||80||s|| no|| http://silvertree.googlecode.com/svn/trunk/images/terrain/sand-01.png||
 ||snow || a deep drift of snow||150||t|| no|| http://silvertree.googlecode.com/svn/trunk/images/terrain/snow-01.png||
 ||cave || underground terrain||125||u|| no|| http://silvertree.googlecode.com/svn/trunk/images/terrain/cave-01.png||
-||void || 'edge of the map', impassible, _use with caution_||impassable||v|| no|| http://silvertree.googlecode.com/svn/trunk/images/terrain/void.png||
+||void || 'edge of the map', impassible, _use with caution_||impassable||v|| no|| https://silvertree.googlecode.com/svn/trunk/images/dialog-background.png||
 ||water || a ford you can wade through||200||w|| yes|| http://silvertree.googlecode.com/svn/trunk/images/terrain/water-01.png||
 
 
