@@ -52,8 +52,6 @@ namespace {
 	}
 
 	bool npot_allowed = true;
-	GLfloat width_multiplier = -1.0;
-	GLfloat height_multiplier = -1.0;
 
 	unsigned int next_power_of_2(unsigned int n)
 	{
@@ -131,9 +129,6 @@ namespace {
 
 texture::manager::manager() {
 	assert(!graphics_initialized);
-
-	width_multiplier = 1.0;
-	height_multiplier = 1.0;
 
 	if(preference_mipmapping()) {
 		std::cerr << "Mipmapping enabled: MIN "
@@ -232,8 +227,6 @@ void texture::set_as_current_texture() const
 	current_texture = id_->id;
 
 	glBindTexture(GL_TEXTURE_2D,id_->id);
-	width_multiplier = ratio_w_;
-	height_multiplier = ratio_h_;
 }
 
 texture texture::get_frame_buffer()
@@ -305,15 +298,27 @@ void texture::set_current_texture(const key& k)
 	t.set_as_current_texture();
 }
 
-void texture::set_coord_manual(GLfloat& x, GLfloat& y)
+void texture::set_coord_manual(const key& k, GLfloat& x, GLfloat &y)
 {
-	if(!npot_allowed) {
-		x*=width_multiplier;
-		y*=height_multiplier;
-	}
+    texture t(get(k));
+    t.set_coord_manual(x,y);
 }
 
-void texture::set_coord(GLfloat x, GLfloat y)
+void texture::set_coord_manual(GLfloat& x, GLfloat& y) const
+{
+	if(!npot_allowed) {
+		x*= ratio_w_;
+		y*= ratio_h_;
+    }
+}
+
+void texture::set_coord(const key& k, GLfloat x, GLfloat y) 
+{
+	texture t(get(k));
+    t.set_coord(x,y);
+}
+
+void texture::set_coord(GLfloat x, GLfloat y) const
 {
 	set_coord_manual(x,y);
 	glTexCoord2f(x,y);

@@ -65,18 +65,19 @@ void map_avatar::draw()
 	} else {
 		graphics::surface surf = graphics::surface_cache::get(image_);
 		if(surf.get()) {
-			graphics::texture::get(surf).set_as_current_texture();
+			graphics::texture t(graphics::texture::get(surf));
+            t.set_as_current_texture();
 			glBegin(GL_QUADS);
-			graphics::texture::set_coord(0.0,0.0);
+			t.set_coord(0.0,0.0);
 			glVertex3f(-0.5,0.0,1.0);
 
-			graphics::texture::set_coord(1.0,0.0);
+			t.set_coord(1.0,0.0);
 			glVertex3f(0.5,0.0,1.0);
 
-			graphics::texture::set_coord(1.0,1.0);
+			t.set_coord(1.0,1.0);
 			glVertex3f(0.5,0.0,0.0);
 
-			graphics::texture::set_coord(0.0,1.0);
+			t.set_coord(0.0,1.0);
 			glVertex3f(-0.5,0.0,0.0);
 
 			glEnd();
