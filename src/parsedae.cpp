@@ -212,6 +212,9 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 		bones.insert(bones.end(), subnode_bones.begin(), subnode_bones.end());
 	}
 
+	foreach(model::face& face, faces)
+		face.transform *= transform;
+
 	return make_pair(faces, bones);
 }
 
