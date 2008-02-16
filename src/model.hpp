@@ -18,6 +18,7 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
+#include "eigen/projective.h"
 
 #include "material.hpp"
 #include "model_fwd.hpp"
@@ -45,10 +46,11 @@ public:
 
 	struct face {
 		GLenum primitive_type;
-		face() { primitive_type = GL_TRIANGLES; }
+		face() { primitive_type = GL_TRIANGLES; transform.loadIdentity(); }
 		std::vector<vertex_ptr> vertices;
 		std::string material_name;
 		const_material_ptr mat;
+		Eigen::MatrixP3f transform;
 	};
 
 	struct bone {

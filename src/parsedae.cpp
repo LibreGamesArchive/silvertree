@@ -24,6 +24,7 @@
 #include "model.hpp"
 #include "parsedae.hpp"
 #include "tinyxml/tinyxml.h"
+#include "eigen/projective.h"
 
 #include <iostream>
 #include <sstream>
@@ -39,12 +40,34 @@ using std::istringstream;
 using std::pair;
 using std::make_pair;
 using boost::tie;
+using Eigen::Vector3f;
+using Eigen::Vector4f;
+using Eigen::MatrixP3f;
+using Eigen::affToProj;
 
 namespace graphics
 {
 
 namespace {
 const GLfloat ScaleFactor = 0.009;
+
+template <typename T, int n> std::istream& operator>>(std::istream& is, Eigen::Vector<T,n>& vec)
+{
+	for(int i = 0; i < n; i++)
+		is >> vec[i];
+	return is;
+}
+
+template <typename T, int n> std::istream& operator>>(std::istream& is, Eigen::MatrixP<T,n>& matrix)
+{
+	for(int row = 0; row < n+1; row++) {
+		for(int col = 0; col < n+1; col++) {
+			is >> matrix(row, col);
+		}
+	}
+	return is;
+}
+
 }
 
 void parse4vector(const string& str, GLfloat* v);
@@ -124,6 +147,7 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones() c
 			bones.insert(bones.end(), node_bones.begin(), node_bones.end());
 		}
 	}
+
 	return make_pair(faces, bones);
 }
 
@@ -131,6 +155,38 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 {
 	vector<model::face> faces;
 	vector<model::bone> bones;
+	MatrixP3f transform;
+	transform.loadIdentity();
+
+	const TiXmlElement* transform_element = node->FirstChildElement();
+	for(;transform_element; transform_element = transform_element->NextSiblingElement()) {
+		if(transform_element->Value() == string("rotate")) {
+			istringstream is(transform_element->GetText());
+			Vector3f axis;
+			is >> axis;
+			float angle;
+			is >> angle;
+			transform.rotate3(M_PI/180*angle, axis);
+		}
+		if(transform_element->Value() == string("scale")) {
+			istringstream is(transform_element->GetText());
+			Vector3f coeffs;
+			is >> coeffs;
+			transform.scale(coeffs);
+		}
+		if(transform_element->Value() == string("translate")) {
+			istringstream is(transform_element->GetText());
+			Vector3f vector;
+			is >> vector;
+			transform.translate(vector);
+		}
+	}
+
+	Vector3f translation;
+	transform.getTranslationVector(&translation);
+	translation *= ScaleFactor;
+	transform.setTranslationVector(translation);
+
 	const TiXmlElement* geometry = node->FirstChildElement("instance_geometry");
 	for(; geometry; geometry = geometry->NextSiblingElement("instance_geometry")) {
 		vector<model::face> geometry_faces =
@@ -155,6 +211,7 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 		faces.insert(faces.end(), subnode_faces.begin(), subnode_faces.end());
 		bones.insert(bones.end(), subnode_bones.begin(), subnode_bones.end());
 	}
+
 	return make_pair(faces, bones);
 }
 
@@ -194,6 +251,19 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 		}
 
 		tie(faces, vertices) = get_faces_from_geometry(resolve_shorthand_ptr(skin->Attribute("source")));
+
+		const TiXmlElement* bind_shape_matrix = skin->FirstChildElement("bind_shape_matrix");
+		if(bind_shape_matrix) {
+			istringstream is(bind_shape_matrix->GetText());
+			MatrixP3f bind_shape_matrix;
+			is >> bind_shape_matrix;
+			Vector3f translation;
+			bind_shape_matrix.getTranslationVector(&translation);
+			translation *= ScaleFactor;
+			bind_shape_matrix.setTranslationVector(translation);
+			foreach(model::face& face, faces)
+				face.transform = bind_shape_matrix;
+		}
 
 		const TiXmlElement* vertex_weights = skin->FirstChildElement("vertex_weights");
 		input = vertex_weights->FirstChildElement("input");
