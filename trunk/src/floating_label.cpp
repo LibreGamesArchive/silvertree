@@ -86,13 +86,13 @@ void draw_labels()
 		}
 		t.set_as_current_texture();
 		glBegin(GL_QUADS);
-		graphics::texture::set_coord(0.0,0.0);
+		t.set_coord(0.0,0.0);
 		glVertex3f(-0.5,0.0,1.0);
-		graphics::texture::set_coord(1.0,0.0);
+		t.set_coord(1.0,0.0);
 		glVertex3f(0.5,0.0,1.0);
-		graphics::texture::set_coord(1.0,1.0);
+		t.set_coord(1.0,1.0);
 		glVertex3f(0.5,0.0,0.0);
-		graphics::texture::set_coord(0.0,1.0);
+		t.set_coord(0.0,1.0);
 		glVertex3f(-0.5,0.0,0.0);
 		glEnd();
 		glPopMatrix();

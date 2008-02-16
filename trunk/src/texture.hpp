@@ -44,6 +44,8 @@ public:
 	typedef std::vector<surface> key;
 
 	void set_as_current_texture() const;
+    void set_coord_manual(GLfloat& x, GLfloat &y) const;
+    void set_coord(GLfloat x, GLfloat y) const;
 	bool valid() const { return id_; }
 
 	static texture get_frame_buffer();
@@ -52,13 +54,13 @@ public:
 	static texture get(const surface& surf, options_type options=options_type());
 	static texture get_no_cache(const key& k, options_type options=options_type());
 	static texture get_no_cache(const surface& surf, options_type options=options_type());
-	static void set_current_texture(const key& k);
-	static void set_coord(GLfloat x, GLfloat y);
-	static void set_coord_manual(GLfloat& x, GLfloat& y);
+	static void set_current_texture(const key& k);	
+    static void set_coord_manual(const key& k, GLfloat& x, GLfloat& y);
+    static void set_coord(const key& k, GLfloat x, GLfloat y);
 
 	unsigned int width() const { return width_; }
 	unsigned int height() const { return height_; }
-
+    
 	friend bool operator==(const texture&, const texture&);
 	friend bool operator<(const texture&, const texture&);
 

@@ -27,12 +27,15 @@ class material
 {
 public:
 	material();
+
 	void set_texture(const std::string& fname);
 	void set_ambient(const GLfloat* v);
 	void set_diffuse(const GLfloat* v);
 	void set_specular(const GLfloat* v);
 
 	void set_as_current_material() const;
+    void set_coord(GLfloat x, GLfloat y) const { tex_.set_coord(x,y); }
+    void set_coord_manual(GLfloat &x, GLfloat &y) const { tex_.set_coord_manual(x,y); }
 private:
 	texture tex_;
 

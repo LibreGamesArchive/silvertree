@@ -32,7 +32,7 @@ public:
     }
 
     bool process_event(const SDL_Event& e, bool claimed);
-    void reset() {}
+    void reset();
 
     void update();
     void click(Sint32 x, Sint32 y, int count, 

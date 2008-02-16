@@ -69,13 +69,13 @@ void blit_texture(const texture& tex, int x, int y, GLfloat rotate)
 	tex.set_as_current_texture();
 
 	glBegin(GL_QUADS);
-	graphics::texture::set_coord(0.0,0.0);
+	tex.set_coord(0.0,0.0);
 	glVertex3i(-w,-h,0);
-	graphics::texture::set_coord(0.0,1.0);
+	tex.set_coord(0.0,1.0);
 	glVertex3i(-w,h+h_odd,0);
-	graphics::texture::set_coord(1.0,1.0);
+	tex.set_coord(1.0,1.0);
 	glVertex3i(w+w_odd,h+h_odd,0);
-	graphics::texture::set_coord(1.0,0.0);
+	tex.set_coord(1.0,0.0);
 	glVertex3i(w+w_odd,-h,0);
 	glEnd();
 
@@ -98,13 +98,13 @@ void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate
 	glTranslatef(x+abs(w),y+abs(h),0.0);
 	glRotatef(rotate,0.0,0.0,1.0);
 	glBegin(GL_QUADS);
-	graphics::texture::set_coord(0.0,0.0);
+	tex.set_coord(0.0,0.0);
 	glVertex3i(-w,-h,0);
-	graphics::texture::set_coord(0.0,1.0);
+	tex.set_coord(0.0,1.0);
 	glVertex3i(-w,h+h_odd,0);
-	graphics::texture::set_coord(1.0,1.0);
+	tex.set_coord(1.0,1.0);
 	glVertex3i(w+w_odd,h+h_odd,0);
-	graphics::texture::set_coord(1.0,0.0);
+	tex.set_coord(1.0,0.0);
 	glVertex3i(w+w_odd,-h,0);
 	glEnd();
 	glPopMatrix();

@@ -99,16 +99,16 @@ void battle_character::draw() const
 
 		glBegin(GL_QUADS);
 
-		graphics::texture::set_coord(0.0,0.0);
+		graphics::texture::set_coord(surfs, 0.0,0.0);
 		glVertex3f(-0.5,0.0,1.0);
 
-		graphics::texture::set_coord(1.0,0.0);
+		graphics::texture::set_coord(surfs, 1.0,0.0);
 		glVertex3f(0.5,0.0,1.0);
 
-		graphics::texture::set_coord(1.0,1.0);
+		graphics::texture::set_coord(surfs, 1.0,1.0);
 		glVertex3f(0.5,0.0,0.0);
 
-		graphics::texture::set_coord(0.0,1.0);
+		graphics::texture::set_coord(surfs, 0.0,1.0);
 		glVertex3f(-0.5,0.0,0.0);
 
 		glEnd();

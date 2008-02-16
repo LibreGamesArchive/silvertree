@@ -57,6 +57,13 @@ bool camera_controller::process_event(const SDL_Event &e, bool claimed) {
     return claimed;
 }
 
+void camera_controller::reset() {
+    keys_.reset();
+    wheelup_clicks_.reset();
+    wheeldown_clicks_.reset();
+    drags_.reset();
+}
+
 void camera_controller::click(Sint32 x, Sint32 y, int count, 
                               Uint8 state, Uint8 bstate, SDLMod mod) {
     // Allow zooming with the mouse wheel.

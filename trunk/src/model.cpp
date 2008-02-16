@@ -322,7 +322,7 @@ void model::draw_face(const face& f, bool& in_triangles) const
 
 	foreach(const vertex_ptr& v,f.vertices) {
 		if(v->uvmap_valid) {
-			graphics::texture::set_coord(v->uvmap[0],v->uvmap[1]);
+			f.mat->set_coord(v->uvmap[0],v->uvmap[1]);
 		}
 
 		GLfloat vertex[] = {v->point[0],v->point[1],v->point[2]};
@@ -396,7 +396,7 @@ void model::update_arrays()
 				memcpy(normal_pos, &(v->normal), 3 * sizeof(GLfloat));
 				GLvoid* texcoord_pos = texcoord_array + current_vertex * 2;
 				memcpy(texcoord_pos, &(v->uvmap), 2 * sizeof(GLfloat));
-				graphics::texture::set_coord_manual(((GLfloat*)texcoord_pos)[0], ((GLfloat*)texcoord_pos)[1]);
+				f.mat->set_coord_manual(((GLfloat*)texcoord_pos)[0], ((GLfloat*)texcoord_pos)[1]);
 				*(element_array + current_index) = current_vertex;
 				added_vertices[v] = current_vertex;
 				current_index++;

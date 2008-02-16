@@ -501,13 +501,13 @@ void tile::do_draw() const
 		glColor4ub(0, 0, 255, 255);
 		glBegin(GL_TRIANGLE_FAN);
 
-		graphics::texture::set_coord(UVCenter[0],UVCenter[1]);
+		texture_.set_coord(UVCenter[0],UVCenter[1]);
 
 		draw_point(center_);
 
 		for(int i = 0; i != 7; ++i) {
 			const int n = i%6;
-			graphics::texture::set_coord(UVCorners[n][0],UVCorners[n][1]);
+			texture_.set_coord(UVCorners[n][0],UVCorners[n][1]);
 			draw_point(corners_[n]);
 		}
 
@@ -705,14 +705,14 @@ void tile::draw_cliff_transitions() const
 		glBegin(GL_TRIANGLES);
 		GLfloat normalx = 0.0, normaly = 0.0;
 		cliff_normal(n,normalx,normaly);
-		graphics::texture::set_coord(UVCenter[0],UVCenter[1]);
+		overlap_texture.set_coord(UVCenter[0],UVCenter[1]);
 		glNormal3f(normalx,normaly,0.0);
 		glVertex3f((points[0]->x+points[1]->x)/2.0,
 		           (points[0]->y+points[1]->y)/2.0, points[1]->height-1.0);
-		graphics::texture::set_coord(UVCorners[0][0],UVCorners[0][1]);
+		overlap_texture.set_coord(UVCorners[0][0],UVCorners[0][1]);
 		glNormal3f(normalx,normaly,-1.0);
 		glVertex3f(points[1]->x, points[1]->y, points[1]->height);
-		graphics::texture::set_coord(UVCorners[5][0],UVCorners[5][1]);
+		overlap_texture.set_coord(UVCorners[5][0],UVCorners[5][1]);
 		glNormal3f(normalx,normaly,-1.0);
 		glVertex3f(points[0]->x, points[0]->y, points[0]->height);
 		glEnd();
