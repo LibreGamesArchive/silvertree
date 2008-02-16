@@ -449,12 +449,16 @@ void model::draw(const const_material_ptr& mat) const
 	if (GLEW_VERSION_1_5) {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertex_buffer_objects[3]);
 	}
+	glMatrixMode(GL_MODELVIEW);
 	unsigned int* face_elements = element_array;
 	foreach(const face& f, faces_) {
 		unsigned int num_vertices = f.vertices.size();
 		if(!mat || (mat == f.mat)) {
+			glPushMatrix();
+			glMultMatrixf(f.transform.array());
 			f.mat->set_as_current_material();
 			glDrawElements(f.primitive_type, num_vertices, GL_UNSIGNED_INT, face_elements);
+			glPopMatrix();
 		}
 		face_elements += num_vertices;
 	}
