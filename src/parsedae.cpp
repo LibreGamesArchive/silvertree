@@ -213,7 +213,7 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 	}
 
 	foreach(model::face& face, faces)
-		face.transform *= transform;
+		face.transform = transform * face.transform;
 
 	return make_pair(faces, bones);
 }
