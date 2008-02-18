@@ -188,7 +188,7 @@ void save_dialog::construct_interface(const std::string& dir, const std::string&
 
 	gui::framed_dialog_ptr inner(new gui::framed_dialog(0,0,
 							    graphics::screen_width()/2,
-							    graphics::screen_height()/2));
+							    graphics::screen_height()/4));
 	inner->set_frame(gui::frame_manager::make_frame(inner, "save-dialog-frame"));
 	inner->set_padding(0);
 
@@ -211,7 +211,7 @@ void save_dialog::construct_interface(const std::string& dir, const std::string&
 	cancel_button = gui::frame_manager::make_frame(cancel_button, "save-dialog-cancel-button-frame");
 	inner->add_widget(cancel_button, dialog::MOVE_RIGHT);
 
-	set_cursor(graphics::screen_width()/4, graphics::screen_height()/4);
+	set_cursor(graphics::screen_width()/4, 3*graphics::screen_height()/8);
 	add_widget(inner);
 }
 
