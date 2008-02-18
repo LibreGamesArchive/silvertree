@@ -12,5 +12,6 @@ silvertree = env.Program("silvertreerpg", ["main.cpp", lib_silvertree])
 
 Export("lib_silvertree")
 editor = SConscript("editor/SConscript")
+SConscript("eigen/SConscript")
 silvertree_and_editor = (silvertree, editor)
 Return("silvertree_and_editor")
