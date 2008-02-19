@@ -182,6 +182,7 @@ void EditorGLWidget::initializeGL()
 
 	glFrontFace(GL_CCW);
 	//glEnable(GL_CULL_FACE);
+	glEnable(GL_RESCALE_NORMAL);
 	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0,GL_AMBIENT,ambient_light);
 	glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuse_light);

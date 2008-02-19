@@ -125,9 +125,14 @@ COLLADA::COLLADA(const char* i1)
 
 const TiXmlElement* COLLADA::resolve_shorthand_ptr(string id) const
 {
-	if(id[0] != '#') return NULL;
+	if(id[0] != '#')
+		throw parsedae_error(string("Unable to resolve url: ") + id + ". Only shorthand pointers are supported.");
 	id.erase(id.begin());
-	return (*(ids_.find(id))).second;
+	map<string,const TiXmlElement*>::const_iterator id_iter = ids_.find(id);
+	if(id_iter == ids_.end())
+		throw parsedae_error(string("Unable to resolve shorthand pointer: #") + id);
+	else
+		return id_iter->second;
 }
 
 pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones() const
