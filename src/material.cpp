@@ -16,7 +16,7 @@
 namespace graphics
 {
 
-material::material()
+material::material() : shininess_(0)
 {
 }
 
@@ -43,11 +43,17 @@ void material::set_specular(const GLfloat* v)
 	specular_[3] = 1.0;
 }
 
+void material::set_shininess(GLfloat shininess)
+{
+	shininess_ = shininess;
+}
+
 void material::set_as_current_material() const
 {
 	glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,ambient_.data());
 	glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,diffuse_.data());
 	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,specular_.data());
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess_);
 	tex_.set_as_current_texture();
 }
 

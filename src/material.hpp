@@ -32,6 +32,7 @@ public:
 	void set_ambient(const GLfloat* v);
 	void set_diffuse(const GLfloat* v);
 	void set_specular(const GLfloat* v);
+	void set_shininess(GLfloat shininess);
 
 	void set_as_current_material() const;
     void set_coord(GLfloat x, GLfloat y) const { tex_.set_coord(x,y); }
@@ -41,6 +42,7 @@ private:
 
 	typedef boost::array<GLfloat,4> color;
 	color ambient_, diffuse_, specular_;
+	GLfloat shininess_;
 };
 
 typedef boost::shared_ptr<material> material_ptr;
