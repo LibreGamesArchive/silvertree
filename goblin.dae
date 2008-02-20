@@ -25,10 +25,10 @@
 							<color>0.40000 0.40000 0.40000 1</color>
 						</ambient>
 						<diffuse>
-							<color>0.80000 0.80000 0.80000 1</color>
+							<color>0.40000 0.40000 0.40000 1</color>
 						</diffuse>
 						<specular>
-							<color>0.50000 0.50000 0.50000 1</color>
+							<color>0.00000 0.00000 0.00000 1</color>
 						</specular>
 						<shininess>
 							<float>12.5</float>
@@ -60,10 +60,10 @@
 							<color>0.40000 0.40000 0.40000 1</color>
 						</ambient>
 						<diffuse>
-							<color>0.80000 0.80000 0.80000 1</color>
+							<color>0.40000 0.40000 0.40000 1</color>
 						</diffuse>
 						<specular>
-							<color>0.50000 0.50000 0.50000 1</color>
+							<color>0.00000 0.00000 0.00000 1</color>
 						</specular>
 						<shininess>
 							<float>12.5</float>
@@ -95,10 +95,10 @@
 							<color>0.40000 0.40000 0.40000 1</color>
 						</ambient>
 						<diffuse>
-							<color>0.80000 0.80000 0.80000 1</color>
+							<color>0.40000 0.40000 0.40000 1</color>
 						</diffuse>
 						<specular>
-							<color>0.50000 0.50000 0.50000 1</color>
+							<color>0.30000 0.30000 0.30000 1</color>
 						</specular>
 						<shininess>
 							<float>12.5</float>
@@ -130,10 +130,10 @@
 							<color>0.40000 0.40000 0.40000 1</color>
 						</ambient>
 						<diffuse>
-							<color>0.80000 0.80000 0.80000 1</color>
+							<color>0.40000 0.40000 0.40000 1</color>
 						</diffuse>
 						<specular>
-							<color>0.50000 0.50000 0.50000 1</color>
+							<color>0.30000 0.30000 0.30000 1</color>
 						</specular>
 						<shininess>
 							<float>12.5</float>
@@ -165,10 +165,10 @@
 							<color>0.40000 0.40000 0.40000 1</color>
 						</ambient>
 						<diffuse>
-							<color>0.80000 0.80000 0.80000 1</color>
+							<color>0.40000 0.40000 0.40000 1</color>
 						</diffuse>
 						<specular>
-							<color>0.50000 0.50000 0.50000 1</color>
+							<color>0.00000 0.00000 0.00000 1</color>
 						</specular>
 						<shininess>
 							<float>12.5</float>
@@ -200,10 +200,10 @@
 							<color>0.40000 0.40000 0.40000 1</color>
 						</ambient>
 						<diffuse>
-							<color>0.80000 0.80000 0.80000 1</color>
+							<color>0.40000 0.40000 0.40000 1</color>
 						</diffuse>
 						<specular>
-							<color>0.50000 0.50000 0.50000 1</color>
+							<color>0.30000 0.30000 0.30000 1</color>
 						</specular>
 						<shininess>
 							<float>12.5</float>
@@ -235,10 +235,10 @@
 							<color>0.40000 0.40000 0.40000 1</color>
 						</ambient>
 						<diffuse>
-							<color>0.80000 0.80000 0.80000 1</color>
+							<color>0.40000 0.40000 0.40000 1</color>
 						</diffuse>
 						<specular>
-							<color>0.50000 0.50000 0.50000 1</color>
+							<color>0.00000 0.00000 0.00000 1</color>
 						</specular>
 						<shininess>
 							<float>12.5</float>
@@ -270,10 +270,10 @@
 							<color>0.40000 0.40000 0.40000 1</color>
 						</ambient>
 						<diffuse>
-							<color>0.80000 0.80000 0.80000 1</color>
+							<color>0.40000 0.40000 0.40000 1</color>
 						</diffuse>
 						<specular>
-							<color>0.50000 0.50000 0.50000 1</color>
+							<color>0.00000 0.00000 0.00000 1</color>
 						</specular>
 						<shininess>
 							<float>12.5</float>
