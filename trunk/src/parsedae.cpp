@@ -414,6 +414,7 @@ const_material_ptr COLLADA::get_material(const TiXmlElement* material_element) c
 	mat->set_ambient(material_data);
 	mat->set_diffuse(material_data);
 	mat->set_specular(material_data);
+	mat->set_shininess(12.5);
 	bool have_texture = false;
 	const char* effect_url = material_element->FirstChildElement("instance_effect")->Attribute("url");
 	const TiXmlElement* effect_element = resolve_shorthand_ptr(effect_url);
@@ -458,6 +459,15 @@ const_material_ptr COLLADA::get_material(const TiXmlElement* material_element) c
 					if(color_value) {
 						parse4vector(color_value->GetText(), material_data);
 						mat->set_specular(material_data);
+					}
+				}
+				if(color->Value() == string("shininess")) {
+					const TiXmlElement* shininess_value = color->FirstChildElement("float");
+					if(shininess_value) {
+						float shininess;
+						istringstream is(shininess_value->GetText());
+						is >> shininess;
+						mat->set_shininess(shininess);
 					}
 				}
 			}
