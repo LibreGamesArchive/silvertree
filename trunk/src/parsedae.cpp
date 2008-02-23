@@ -68,6 +68,14 @@ template <typename T, int n> std::istream& operator>>(std::istream& is, Eigen::M
 	return is;
 }
 
+void scale_translation_vector(MatrixP3f& mat)
+{
+	Vector3f vec;
+	mat.getTranslationVector(&vec);
+	vec *= ScaleFactor;
+	mat.setTranslationVector(vec);
+}
+
 }
 
 void parse4vector(const string& str, GLfloat* v);
@@ -81,9 +89,11 @@ class COLLADA
 	vector<std::pair<string, GLenum> > primitive_types;
 
 	const TiXmlElement* resolve_shorthand_ptr(string ptr) const;
+	void get_transform_from_node(const TiXmlElement*, MatrixP3f&) const;
 	pair<vector<model::face>, multimap<int, model::vertex_ptr> > get_faces_from_geometry(const TiXmlElement*) const;
 	pair<vector<model::face>, vector<model::bone> > get_faces_and_bones_from_node(const TiXmlElement*) const;
 	pair<vector<model::face>, vector<model::bone> > get_faces_and_bones_from_controller(const TiXmlElement*) const;
+	int get_bones_from_skeleton(const TiXmlElement*, vector<model::bone>&) const;
 	void bind_materials(const TiXmlElement*, vector<model::face>& faces) const;
 	const_material_ptr get_material(const TiXmlElement*) const;
 	template<typename T> vector<T> get_array(const TiXmlElement*) const;
@@ -161,6 +171,49 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 	vector<model::face> faces;
 	vector<model::bone> bones;
 	MatrixP3f transform;
+	get_transform_from_node(node, transform);
+
+	const TiXmlElement* geometry = node->FirstChildElement("instance_geometry");
+	for(; geometry; geometry = geometry->NextSiblingElement("instance_geometry")) {
+		vector<model::face> geometry_faces =
+			get_faces_from_geometry(resolve_shorthand_ptr(geometry->Attribute("url"))).first;
+		bind_materials(geometry, geometry_faces);
+		faces.insert(faces.end(), geometry_faces.begin(), geometry_faces.end());
+	}
+	const TiXmlElement* controller = node->FirstChildElement("instance_controller");
+	for(; controller; controller = controller->NextSiblingElement("instance_controller")) {
+		vector<model::face> controller_faces;
+		vector<model::bone> controller_bones;
+		tie(controller_faces, controller_bones) = get_faces_and_bones_from_controller(resolve_shorthand_ptr(controller->Attribute("url")));
+		bind_materials(controller, controller_faces);
+		const TiXmlElement* skeleton = controller->FirstChildElement("skeleton");
+		if(skeleton) {
+			get_bones_from_skeleton(resolve_shorthand_ptr(skeleton->GetText()), controller_bones);
+		}
+		else
+			continue;
+		if(controller_bones.size() != 0 && bones.size() != 0)
+			throw parsedae_error("Loading multiple skins from one file is not supported.");
+		faces.insert(faces.end(), controller_faces.begin(), controller_faces.end());
+		bones.insert(bones.end(), controller_bones.begin(), controller_bones.end());
+	}
+	const TiXmlElement* subnode = node->FirstChildElement("node");
+	for(; subnode; subnode = subnode->NextSiblingElement("node")) {
+		vector<model::face> subnode_faces;
+		vector<model::bone> subnode_bones;
+		tie(subnode_faces, subnode_bones) = get_faces_and_bones_from_node(subnode);
+		faces.insert(faces.end(), subnode_faces.begin(), subnode_faces.end());
+		bones.insert(bones.end(), subnode_bones.begin(), subnode_bones.end());
+	}
+
+	foreach(model::face& face, faces)
+		face.transform = transform * face.transform;
+
+	return make_pair(faces, bones);
+}
+
+void COLLADA::get_transform_from_node(const TiXmlElement* node, MatrixP3f& transform) const
+{
 	transform.loadIdentity();
 
 	const TiXmlElement* transform_element = node->FirstChildElement();
@@ -186,41 +239,6 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 			transform.translate(vector);
 		}
 	}
-
-	Vector3f translation;
-	transform.getTranslationVector(&translation);
-	translation *= ScaleFactor;
-	transform.setTranslationVector(translation);
-
-	const TiXmlElement* geometry = node->FirstChildElement("instance_geometry");
-	for(; geometry; geometry = geometry->NextSiblingElement("instance_geometry")) {
-		vector<model::face> geometry_faces =
-			get_faces_from_geometry(resolve_shorthand_ptr(geometry->Attribute("url"))).first;
-		bind_materials(geometry, geometry_faces);
-		faces.insert(faces.end(), geometry_faces.begin(), geometry_faces.end());
-	}
-	const TiXmlElement* controller = node->FirstChildElement("instance_controller");
-	for(; controller; controller = controller->NextSiblingElement("instance_controller")) {
-		vector<model::face> controller_faces;
-		vector<model::bone> controller_bones;
-		tie(controller_faces, controller_bones) = get_faces_and_bones_from_controller(resolve_shorthand_ptr(controller->Attribute("url")));
-		bind_materials(controller, controller_faces);
-		faces.insert(faces.end(), controller_faces.begin(), controller_faces.end());
-		bones.insert(bones.end(), controller_bones.begin(), controller_bones.end());
-	}
-	const TiXmlElement* subnode = node->FirstChildElement("node");
-	for(; subnode; subnode = subnode->NextSiblingElement("node")) {
-		vector<model::face> subnode_faces;
-		vector<model::bone> subnode_bones;
-		tie(subnode_faces, subnode_bones) = get_faces_and_bones_from_node(subnode);
-		faces.insert(faces.end(), subnode_faces.begin(), subnode_faces.end());
-		bones.insert(bones.end(), subnode_bones.begin(), subnode_bones.end());
-	}
-
-	foreach(model::face& face, faces)
-		face.transform = transform * face.transform;
-
-	return make_pair(faces, bones);
 }
 
 void COLLADA::bind_materials(const TiXmlElement* instance, vector<model::face>& faces) const
@@ -236,6 +254,25 @@ void COLLADA::bind_materials(const TiXmlElement* instance, vector<model::face>& 
 	}
 }
 
+int COLLADA::get_bones_from_skeleton(const TiXmlElement* node, vector<model::bone>& bones) const
+{
+	const char* sid = node->Attribute("sid");
+	for(int i = 0; i < bones.size(); i++) {
+		model::bone& bone = bones[i];
+		if(bone.name == string(sid)) {
+			get_transform_from_node(node, bone.transform);
+			const TiXmlElement* sub_node = node->FirstChildElement("node");
+			for(; sub_node; sub_node = sub_node->NextSiblingElement("node")) {
+				int child_num = get_bones_from_skeleton(sub_node, bones);
+				if(child_num != -1)
+					bone.children.push_back(child_num);
+			}
+			return i;
+		}
+	}
+	return -1;
+}
+
 pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_from_controller(const TiXmlElement* controller) const
 {
 	vector<model::face> faces;
@@ -245,17 +282,22 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 	const TiXmlElement* skin = controller->FirstChildElement("skin");
 	if(skin) {
 		vector<string> bone_ids;
+		vector<MatrixP3f> inv_bind_matrices;
 		const TiXmlElement* joints = skin->FirstChildElement("joints");
 		const TiXmlElement* input = joints->FirstChildElement("input");
 		for(;input; input = input->NextSiblingElement("input")) {
 			if(input->Attribute("semantic") == string("JOINT")) {
 				bone_ids = get_array<string>(resolve_shorthand_ptr(input->Attribute("source"))->FirstChildElement("IDREF_array"));
 			}
+			if(input->Attribute("semantic") == string("INV_BIND_MATRIX")) {
+				inv_bind_matrices = get_array<MatrixP3f>(resolve_shorthand_ptr(input->Attribute("source"))->FirstChildElement("float_array"));
+			}
 		}
-		foreach(string& bone_id, bone_ids) {
+		for(int i = 0; i < bone_ids.size(); i++) {
 			bones.push_back(model::bone());
 			model::bone& bone = bones.back();
-			bone.name = bone_id;
+			bone.name = bone_ids[i];
+			bone.inv_bind_matrix = inv_bind_matrices[i];
 		}
 
 		tie(faces, vertices) = get_faces_from_geometry(resolve_shorthand_ptr(skin->Attribute("source")));
@@ -265,10 +307,6 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 			istringstream is(bind_shape_matrix->GetText());
 			MatrixP3f bind_shape_matrix;
 			is >> bind_shape_matrix;
-			Vector3f translation;
-			bind_shape_matrix.getTranslationVector(&translation);
-			translation *= ScaleFactor;
-			bind_shape_matrix.setTranslationVector(translation);
 			foreach(model::face& face, faces)
 				face.transform = bind_shape_matrix;
 		}
@@ -374,9 +412,9 @@ pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_
 						face.vertices.push_back(model::vertex_ptr(new model::vertex));
 						model::vertex_ptr vertex = face.vertices.back();
 						vertices.insert(make_pair(primitive_indices[i + positions_offset], vertex));
-						vertex->point[0] = positions[primitive_indices[i + positions_offset]*3] * ScaleFactor;
-						vertex->point[1] = positions[primitive_indices[i + positions_offset]*3 + 1] * ScaleFactor;
-						vertex->point[2] = positions[primitive_indices[i + positions_offset]*3 + 2] * ScaleFactor;
+						vertex->point[0] = positions[primitive_indices[i + positions_offset]*3];
+						vertex->point[1] = positions[primitive_indices[i + positions_offset]*3 + 1];
+						vertex->point[2] = positions[primitive_indices[i + positions_offset]*3 + 2];
 						if(have_normals) {
 							vertex->normal[0] = -normals[primitive_indices[i + normals_offset]*3];
 							vertex->normal[1] = -normals[primitive_indices[i + normals_offset]*3 + 1];
@@ -493,6 +531,16 @@ model_ptr parsedae(const char* i1, const char* i2)
 	std::cerr << "Parsing COLLADA...\n";
 	COLLADA collada(i1);
 	tie(faces, bones) = collada.get_faces_and_bones();
+	foreach(model::face& face, faces) {
+		face.transform.scale(ScaleFactor);
+		scale_translation_vector(face.transform);
+	}
+	foreach(model::bone& bone, bones) {
+		bone.transform.scale(ScaleFactor);
+		scale_translation_vector(bone.transform);
+		bone.inv_bind_matrix.scale(ScaleFactor);
+		scale_translation_vector(bone.inv_bind_matrix);
+	}
 	return(model_ptr(new model(faces, bones)));
 }
 
