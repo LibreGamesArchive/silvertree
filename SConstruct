@@ -98,8 +98,8 @@ install_executables = Install(join(env["STAGE_PREFIX"], "bin"), executables)
 install_data = Install(data_stage_dir, datafiles)
 if not env["PLATFORM"] == "win32":
     Alias("install", [install_executables, install_data])
-    env.Replace(CPPDEFINES = { "HAVE_CONFIG_H" : None, "DATADIR" : '\\"' + data_install_dir + '\\"' })
-    editor_env.Replace(CPPDEFINES = { "HAVE_CONFIG_H" : None, "DATADIR" : '\\"' + data_install_dir + '\\"' })
+    env.Replace(CPPDEFINES = { "DATADIR" : '\\"' + data_install_dir + '\\"' })
+    editor_env.Replace(CPPDEFINES = { "DATADIR" : '\\"' + data_install_dir + '\\"' })
 
 bindistdir = env.Install("silvertree", Split("README LICENSE") + executables + datafiles)
 bindistzip = env.Zip("silvertree.zip", bindistdir)
