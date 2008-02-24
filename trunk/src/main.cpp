@@ -43,6 +43,10 @@
 #include "translate.hpp"
 #include "world.hpp"
 
+#ifdef AUDIO
+#include "audio/audio.hpp"
+#endif
+
 extern "C" int main(int argc, char** argv)
 {
 	if(!parse_args(argc, argv)) {
@@ -73,6 +77,10 @@ extern "C" int main(int argc, char** argv)
 	graphics::font::manager font_manager;
 	graphics::texture::manager texture_manager;
 	gui::text::init();
+
+#ifdef AUDIO
+    audio::init_audio();
+#endif
 
 	wml::node_ptr rules_cfg;
 

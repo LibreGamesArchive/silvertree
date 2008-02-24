@@ -34,6 +34,17 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = silvertreerpg$(EXEEXT)
+@WANT_AUDIO_TRUE@am__append_1 = \
+@WANT_AUDIO_TRUE@audio/audio.cpp \
+@WANT_AUDIO_TRUE@audio/mpg123.cpp \
+@WANT_AUDIO_TRUE@audio/openal.cpp \
+@WANT_AUDIO_TRUE@audio/openalc.cpp \
+@WANT_AUDIO_TRUE@\
+@WANT_AUDIO_TRUE@audio/audio.hpp \
+@WANT_AUDIO_TRUE@audio/mpg123.hpp \
+@WANT_AUDIO_TRUE@audio/openal.hpp \
+@WANT_AUDIO_TRUE@audio/openalc.hpp 
+
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -96,7 +107,13 @@ libsilvertree_a_OBJECTS = $(am_libsilvertree_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_silvertreerpg_OBJECTS = main.$(OBJEXT)
+am__silvertreerpg_SOURCES_DIST = main.cpp audio/audio.cpp \
+	audio/mpg123.cpp audio/openal.cpp audio/openalc.cpp \
+	audio/audio.hpp audio/mpg123.hpp audio/openal.hpp \
+	audio/openalc.hpp
+@WANT_AUDIO_TRUE@am__objects_1 = audio.$(OBJEXT) mpg123.$(OBJEXT) \
+@WANT_AUDIO_TRUE@	openal.$(OBJEXT) openalc.$(OBJEXT)
+am_silvertreerpg_OBJECTS = main.$(OBJEXT) $(am__objects_1)
 silvertreerpg_OBJECTS = $(am_silvertreerpg_OBJECTS)
 silvertreerpg_DEPENDENCIES = libsilvertree.a
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
@@ -112,7 +129,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libsilvertree_a_SOURCES) $(silvertreerpg_SOURCES)
-DIST_SOURCES = $(libsilvertree_a_SOURCES) $(silvertreerpg_SOURCES)
+DIST_SOURCES = $(libsilvertree_a_SOURCES) \
+	$(am__silvertreerpg_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -249,9 +267,9 @@ target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LIBRARIES = libsilvertree.a
-silvertreerpg_SOURCES = main.cpp $(SHARED_SOURCES)
+silvertreerpg_SOURCES = main.cpp $(SHARED_SOURCES) $(am__append_1)
 silvertreerpg_LDADD = libsilvertree.a
-AM_CPPFLAGS = -DDATADIR=\"$(pkgdatadir)\" -DVERSION=\"$(VERSION)\" 
+AM_CPPFLAGS = -DDATADIR=\"$(pkgdatadir)\"
 AM_CXXFLAGS = -Wall -Werror -Wno-sign-compare -Wno-switch -Wno-switch-enum
 SUBDIRS = . editor
 libsilvertree_a_SOURCES = \
@@ -554,6 +572,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/audio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base_terrain.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/battle.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/battle_character.Po@am__quote@
@@ -607,7 +626,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/message_dialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mini_stats_dialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpg123.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/npc_party.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/openal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/openalc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse3ds.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parseark.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parsedae.Po@am__quote@
@@ -708,6 +730,62 @@ tinyxmlparser.obj: tinyxml/tinyxmlparser.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='tinyxml/tinyxmlparser.cpp' object='tinyxmlparser.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tinyxmlparser.obj `if test -f 'tinyxml/tinyxmlparser.cpp'; then $(CYGPATH_W) 'tinyxml/tinyxmlparser.cpp'; else $(CYGPATH_W) '$(srcdir)/tinyxml/tinyxmlparser.cpp'; fi`
+
+audio.o: audio/audio.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT audio.o -MD -MP -MF $(DEPDIR)/audio.Tpo -c -o audio.o `test -f 'audio/audio.cpp' || echo '$(srcdir)/'`audio/audio.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/audio.Tpo $(DEPDIR)/audio.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='audio/audio.cpp' object='audio.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o audio.o `test -f 'audio/audio.cpp' || echo '$(srcdir)/'`audio/audio.cpp
+
+audio.obj: audio/audio.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT audio.obj -MD -MP -MF $(DEPDIR)/audio.Tpo -c -o audio.obj `if test -f 'audio/audio.cpp'; then $(CYGPATH_W) 'audio/audio.cpp'; else $(CYGPATH_W) '$(srcdir)/audio/audio.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/audio.Tpo $(DEPDIR)/audio.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='audio/audio.cpp' object='audio.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o audio.obj `if test -f 'audio/audio.cpp'; then $(CYGPATH_W) 'audio/audio.cpp'; else $(CYGPATH_W) '$(srcdir)/audio/audio.cpp'; fi`
+
+mpg123.o: audio/mpg123.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mpg123.o -MD -MP -MF $(DEPDIR)/mpg123.Tpo -c -o mpg123.o `test -f 'audio/mpg123.cpp' || echo '$(srcdir)/'`audio/mpg123.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/mpg123.Tpo $(DEPDIR)/mpg123.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='audio/mpg123.cpp' object='mpg123.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mpg123.o `test -f 'audio/mpg123.cpp' || echo '$(srcdir)/'`audio/mpg123.cpp
+
+mpg123.obj: audio/mpg123.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mpg123.obj -MD -MP -MF $(DEPDIR)/mpg123.Tpo -c -o mpg123.obj `if test -f 'audio/mpg123.cpp'; then $(CYGPATH_W) 'audio/mpg123.cpp'; else $(CYGPATH_W) '$(srcdir)/audio/mpg123.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/mpg123.Tpo $(DEPDIR)/mpg123.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='audio/mpg123.cpp' object='mpg123.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mpg123.obj `if test -f 'audio/mpg123.cpp'; then $(CYGPATH_W) 'audio/mpg123.cpp'; else $(CYGPATH_W) '$(srcdir)/audio/mpg123.cpp'; fi`
+
+openal.o: audio/openal.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT openal.o -MD -MP -MF $(DEPDIR)/openal.Tpo -c -o openal.o `test -f 'audio/openal.cpp' || echo '$(srcdir)/'`audio/openal.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/openal.Tpo $(DEPDIR)/openal.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='audio/openal.cpp' object='openal.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o openal.o `test -f 'audio/openal.cpp' || echo '$(srcdir)/'`audio/openal.cpp
+
+openal.obj: audio/openal.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT openal.obj -MD -MP -MF $(DEPDIR)/openal.Tpo -c -o openal.obj `if test -f 'audio/openal.cpp'; then $(CYGPATH_W) 'audio/openal.cpp'; else $(CYGPATH_W) '$(srcdir)/audio/openal.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/openal.Tpo $(DEPDIR)/openal.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='audio/openal.cpp' object='openal.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o openal.obj `if test -f 'audio/openal.cpp'; then $(CYGPATH_W) 'audio/openal.cpp'; else $(CYGPATH_W) '$(srcdir)/audio/openal.cpp'; fi`
+
+openalc.o: audio/openalc.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT openalc.o -MD -MP -MF $(DEPDIR)/openalc.Tpo -c -o openalc.o `test -f 'audio/openalc.cpp' || echo '$(srcdir)/'`audio/openalc.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/openalc.Tpo $(DEPDIR)/openalc.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='audio/openalc.cpp' object='openalc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o openalc.o `test -f 'audio/openalc.cpp' || echo '$(srcdir)/'`audio/openalc.cpp
+
+openalc.obj: audio/openalc.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT openalc.obj -MD -MP -MF $(DEPDIR)/openalc.Tpo -c -o openalc.obj `if test -f 'audio/openalc.cpp'; then $(CYGPATH_W) 'audio/openalc.cpp'; else $(CYGPATH_W) '$(srcdir)/audio/openalc.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/openalc.Tpo $(DEPDIR)/openalc.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='audio/openalc.cpp' object='openalc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o openalc.obj `if test -f 'audio/openalc.cpp'; then $(CYGPATH_W) 'audio/openalc.cpp'; else $(CYGPATH_W) '$(srcdir)/audio/openalc.cpp'; fi`
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.

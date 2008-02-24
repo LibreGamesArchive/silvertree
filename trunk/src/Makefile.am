@@ -1,9 +1,23 @@
 noinst_LIBRARIES=libsilvertree.a
 bin_PROGRAMS=silvertreerpg
-silvertreerpg_SOURCES= main.cpp $(SHARED_SOURCES)
+silvertreerpg_SOURCES=main.cpp $(SHARED_SOURCES)
 silvertreerpg_LDADD=libsilvertree.a
-AM_CPPFLAGS = -DDATADIR=\"$(pkgdatadir)\" -DVERSION=\"$(VERSION)\" 
+AM_CPPFLAGS = -DDATADIR=\"$(pkgdatadir)\"
 AM_CXXFLAGS = -Wall -Werror -Wno-sign-compare -Wno-switch -Wno-switch-enum
+
+if WANT_AUDIO
+silvertreerpg_SOURCES +=\
+audio/audio.cpp \
+audio/mpg123.cpp \
+audio/openal.cpp \
+audio/openalc.cpp \
+\
+audio/audio.hpp \
+audio/mpg123.hpp \
+audio/openal.hpp \
+audio/openalc.hpp 
+endif
+
 SUBDIRS=. editor
 
 libsilvertree_a_SOURCES=\

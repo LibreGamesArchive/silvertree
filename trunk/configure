@@ -733,6 +733,8 @@ QT_DIR
 QT_LIBS
 QT_UIC
 QT_MOC
+WANT_AUDIO_TRUE
+WANT_AUDIO_FALSE
 WANT_EDITOR_TRUE
 WANT_EDITOR_FALSE
 LIBOBJS
@@ -1337,6 +1339,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
+  --enable-audio          enable sound (default is yes)
   --disable-sdltest       Do not try to compile and run a test SDL program
 
 Optional Packages:
@@ -3987,6 +3990,14 @@ else
 fi
 
 
+# Check whether --enable-audio was given.
+if test "${enable_audio+set}" = set; then
+  enableval=$enable_audio; want_audio=$enableval
+else
+  want_audio=check
+fi
+
+
 min_sdl_version=1.2.10
 
 
@@ -4433,6 +4444,153 @@ else
   { { echo "$as_me:$LINENO: error: **** SDL_image not found !" >&5
 echo "$as_me: error: **** SDL_image not found !" >&2;}
    { (exit 1); exit 1; }; }
+fi
+
+
+
+if test x$want_audio = xno; then
+  have_audio=no
+else
+  have_audio=yes
+       { echo "$as_me:$LINENO: checking for mpg123_init in -lmpg123" >&5
+echo $ECHO_N "checking for mpg123_init in -lmpg123... $ECHO_C" >&6; }
+if test "${ac_cv_lib_mpg123_mpg123_init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmpg123  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char mpg123_init ();
+int
+main ()
+{
+return mpg123_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_mpg123_mpg123_init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_mpg123_mpg123_init=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_mpg123_mpg123_init" >&5
+echo "${ECHO_T}$ac_cv_lib_mpg123_mpg123_init" >&6; }
+if test $ac_cv_lib_mpg123_mpg123_init = yes; then
+  AUDIO_LIBS="-lmpg123 $AUDIO_LIBS"
+else
+  { echo "$as_me:$LINENO: WARNING: **** mpg123 not found !" >&5
+echo "$as_me: WARNING: **** mpg123 not found !" >&2;}
+                    have_audio=no
+fi
+
+       { echo "$as_me:$LINENO: checking for alcGetIntegerv in -lopenal" >&5
+echo $ECHO_N "checking for alcGetIntegerv in -lopenal... $ECHO_C" >&6; }
+if test "${ac_cv_lib_openal_alcGetIntegerv+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopenal  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char alcGetIntegerv ();
+int
+main ()
+{
+return alcGetIntegerv ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_openal_alcGetIntegerv=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_openal_alcGetIntegerv=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_openal_alcGetIntegerv" >&5
+echo "${ECHO_T}$ac_cv_lib_openal_alcGetIntegerv" >&6; }
+if test $ac_cv_lib_openal_alcGetIntegerv = yes; then
+  AUDIO_LIBS="-lopenal $AUDIO_LIBS"
+else
+  { echo "$as_me:$LINENO: WARNING: **** OpenAL not found !" >&5
+echo "$as_me: WARNING: **** OpenAL not found !" >&2;}
+                    have_audio=no
+fi
+
+
 fi
 
 
@@ -8799,7 +8957,7 @@ echo "$as_me: error: Failed to find matching components of a complete
 
 if test x$have_qt = xno; then
 
-        { echo "$as_me:$LINENO: WARNING: **** Qt library not found." >&5
+              { echo "$as_me:$LINENO: WARNING: **** Qt library not found." >&5
 echo "$as_me: WARNING: **** Qt library not found." >&2;}
 
 else
@@ -8932,6 +9090,41 @@ fi
 
 
 
+fi
+
+
+if test x$want_audio = xno; then
+  :
+else
+  if test x$have_audio = xno; then
+  if test x$want_audio = xyes; then
+  { { echo "$as_me:$LINENO: error: **** Audio libraries not found." >&5
+echo "$as_me: error: **** Audio libraries not found." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  { echo "$as_me:$LINENO: WARNING: **** Audio libraries not found - no sound." >&5
+echo "$as_me: WARNING: **** Audio libraries not found - no sound." >&2;}
+fi
+
+else
+
+cat >>confdefs.h <<\_ACEOF
+#define AUDIO 1
+_ACEOF
+
+       LIBS="$AUDIO_LIBS $LIBS"
+
+fi
+
+fi
+
+
+ if test x$have_audio = xyes; then
+  WANT_AUDIO_TRUE=
+  WANT_AUDIO_FALSE='#'
+else
+  WANT_AUDIO_TRUE='#'
+  WANT_AUDIO_FALSE=
 fi
 
 
@@ -9071,6 +9264,13 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${WANT_AUDIO_TRUE}" && test -z "${WANT_AUDIO_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"WANT_AUDIO\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"WANT_AUDIO\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -9777,13 +9977,15 @@ QT_DIR!$QT_DIR$ac_delim
 QT_LIBS!$QT_LIBS$ac_delim
 QT_UIC!$QT_UIC$ac_delim
 QT_MOC!$QT_MOC$ac_delim
+WANT_AUDIO_TRUE!$WANT_AUDIO_TRUE$ac_delim
+WANT_AUDIO_FALSE!$WANT_AUDIO_FALSE$ac_delim
 WANT_EDITOR_TRUE!$WANT_EDITOR_TRUE$ac_delim
 WANT_EDITOR_FALSE!$WANT_EDITOR_FALSE$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 25; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 27; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

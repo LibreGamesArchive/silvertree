@@ -37,6 +37,10 @@
 #include <iostream>
 #include <sstream>
 
+#ifdef AUDIO
+#include "audio/openal.hpp"
+#endif
+
 namespace game_logic
 {
 
@@ -103,6 +107,8 @@ world::world(wml::const_node_ptr node)
 	if(!party_light_power.empty()) {
 		party_light_power_.reset(new formula(party_light_power));
 	}
+
+    music_file_ = wml::get_str(node, "music");
 
 	wml::node::const_child_iterator p1 = node->begin_child("party");
 	const wml::node::const_child_iterator p2 = node->end_child("party");
@@ -207,6 +213,10 @@ wml::node_ptr world::write() const
 	if(party_light_power_) {
 		res->set_attr("party_light_power", party_light_power_->str());
 	}
+
+    if(!music_file_.empty()) {
+        res->set_attr("music", music_file_);
+    }
 
 	res->set_attr("border_tile", border_tile_);
 
@@ -670,6 +680,11 @@ void world::draw() const
 	if(game_bar_) {
 		game_bar_->draw();
 	}
+#ifdef AUDIO
+    if(audio_) {
+        audio_->pump_sound();
+    }
+#endif
 }
 
 namespace {
@@ -679,6 +694,11 @@ const GLfloat game_speed = 0.2;
 void world::play()
 {
 	world_context context(this);
+#ifdef AUDIO
+    audio::scoped_audio_context_ptr my_audio(audio_, new audio::audio_context());
+    audio::source_ptr source;
+    audio::stream_ptr music;
+#endif
 	if(!get_pc_party()) {
 		for(settlement_map::iterator i = settlements_.begin();
 		    i != settlements_.end(); ++i) {
@@ -711,6 +731,16 @@ void world::play()
     input_pump.register_listener(&input_listener_);
     input_pump.register_listener(&camera_controller_);
 
+#ifdef AUDIO
+    if(!music_file_.empty()) {
+        source = my_audio->make_source();
+        music = my_audio->make_stream(music_file_);
+        music->set_looping(true);
+        source->set_sound(music.get());
+        source->play();
+    }
+#endif
+      
     while(!done_) {
 		if(!focus_) {
 			for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
@@ -824,7 +854,7 @@ void world::play()
 						std::cerr << "exiting through exit at " << active_party->loc().x() << "," << active_party->loc().y() << "\n";
 						active_party->set_loc(exit->second);
 						remove_party(active_party);
-						std::cerr << "returning from world...\n";
+                        std::cerr << "returning from world...\n";
 						return;
 					}
 
@@ -832,7 +862,9 @@ void world::play()
 					if(s != settlements_.end() && active_party->is_human_controlled()) {
 						remove_party(active_party);
 						//enter the new world
+                        std::cout << "enter\n";
 						time_ = s->second->enter(active_party, active_party->loc(), time_);
+                        std::cout << "got this far\n";
 
 						//player has left the settlement, return to this world
 						active_party->new_world(*this,active_party->loc(),active_party->last_move());
@@ -878,7 +910,7 @@ void world::play()
         }
 
 		camera_controller_.update();
-    }  
+    }
 	if(quit_) {
 		throw quit_exception();
 	}

@@ -35,6 +35,14 @@
 #include "wml_node.hpp"
 #include "world_fwd.hpp"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef AUDIO
+#include "audio/audio.hpp"
+#endif
+
 namespace game_logic
 {
 
@@ -213,6 +221,11 @@ private:
 	mutable bool selected_hex_up_to_date_;
     listener input_listener_;
     input::key_down_listener keys_;
+
+    std::string music_file_;
+#ifdef AUDIO
+    audio::audio_context_ptr audio_;
+#endif
 };
 
 }
