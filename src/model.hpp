@@ -66,7 +66,7 @@ public:
 	};
 
 	explicit model(const std::vector<face>& faces);
-	model(const std::vector<face>& faces, const std::vector<bone>& bones);
+	model(const std::vector<face>& faces, const std::vector<bone>& bones, const std::vector<int>& root_bones = std::vector<int>());
 	~model();
 
 	void draw(const const_material_ptr& mat = const_material_ptr()) const;
@@ -81,8 +81,10 @@ private:
 	boost::array<GLfloat,3> face_normal(const face& f, int n) const;
 	std::vector<face> faces_;
 	std::vector<bone> bones_;
+	std::vector<int> root_bones_;
 
 	void update_arrays();
+	void update_skinning_matrices(bone&, Eigen::MatrixP3f);
 	GLfloat* vertex_array;
 	GLfloat* normal_array;
 	GLfloat* texcoord_array;

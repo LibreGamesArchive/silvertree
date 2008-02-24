@@ -91,16 +91,17 @@ class COLLADA
 	const TiXmlElement* resolve_shorthand_ptr(string ptr) const;
 	void get_transform_from_node(const TiXmlElement*, MatrixP3f&) const;
 	pair<vector<model::face>, multimap<int, model::vertex_ptr> > get_faces_from_geometry(const TiXmlElement*) const;
-	pair<vector<model::face>, vector<model::bone> > get_faces_and_bones_from_node(const TiXmlElement*) const;
+	pair<vector<model::face>, vector<model::bone> > get_faces_and_bones_from_node(const TiXmlElement*);
 	pair<vector<model::face>, vector<model::bone> > get_faces_and_bones_from_controller(const TiXmlElement*) const;
-	int get_bones_from_skeleton(const TiXmlElement*, vector<model::bone>&) const;
+	int get_bones_from_skeleton(const TiXmlElement*, vector<model::bone>&, bool is_root = true);
 	void bind_materials(const TiXmlElement*, vector<model::face>& faces) const;
 	const_material_ptr get_material(const TiXmlElement*) const;
 	template<typename T> vector<T> get_array(const TiXmlElement*) const;
 
 	public:
+	vector<int> root_bones_;
 	explicit COLLADA(const char*);
-	pair<vector<model::face>, vector<model::bone> > get_faces_and_bones() const;
+	pair<vector<model::face>, vector<model::bone> > get_faces_and_bones();
 };
 
 COLLADA::COLLADA(const char* i1)
@@ -145,7 +146,7 @@ const TiXmlElement* COLLADA::resolve_shorthand_ptr(string id) const
 		return id_iter->second;
 }
 
-pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones() const
+pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones()
 {
 	vector<model::face> faces;
 	vector<model::bone> bones;
@@ -166,7 +167,7 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones() c
 	return make_pair(faces, bones);
 }
 
-pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_from_node(const TiXmlElement* node) const
+pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_from_node(const TiXmlElement* node)
 {
 	vector<model::face> faces;
 	vector<model::bone> bones;
@@ -254,7 +255,7 @@ void COLLADA::bind_materials(const TiXmlElement* instance, vector<model::face>& 
 	}
 }
 
-int COLLADA::get_bones_from_skeleton(const TiXmlElement* node, vector<model::bone>& bones) const
+int COLLADA::get_bones_from_skeleton(const TiXmlElement* node, vector<model::bone>& bones, bool is_root)
 {
 	const char* sid = node->Attribute("sid");
 	for(int i = 0; i < bones.size(); i++) {
@@ -263,12 +264,19 @@ int COLLADA::get_bones_from_skeleton(const TiXmlElement* node, vector<model::bon
 			get_transform_from_node(node, bone.transform);
 			const TiXmlElement* sub_node = node->FirstChildElement("node");
 			for(; sub_node; sub_node = sub_node->NextSiblingElement("node")) {
-				int child_num = get_bones_from_skeleton(sub_node, bones);
+				int child_num = get_bones_from_skeleton(sub_node, bones, false);
 				if(child_num != -1)
 					bone.children.push_back(child_num);
 			}
+			if(is_root)
+				root_bones_.push_back(i);
 			return i;
 		}
+	}
+
+	const TiXmlElement* sub_node = node->FirstChildElement("node");
+	for(; sub_node; sub_node = sub_node->NextSiblingElement("node")) {
+		get_bones_from_skeleton(sub_node, bones, true);
 	}
 	return -1;
 }
@@ -535,13 +543,7 @@ model_ptr parsedae(const char* i1, const char* i2)
 		face.transform.scale(ScaleFactor);
 		scale_translation_vector(face.transform);
 	}
-	foreach(model::bone& bone, bones) {
-		bone.transform.scale(ScaleFactor);
-		scale_translation_vector(bone.transform);
-		bone.inv_bind_matrix.scale(ScaleFactor);
-		scale_translation_vector(bone.inv_bind_matrix);
-	}
-	return(model_ptr(new model(faces, bones)));
+	return(model_ptr(new model(faces, bones, collada.root_bones_)));
 }
 
 }
