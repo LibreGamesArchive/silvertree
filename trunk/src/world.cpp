@@ -734,7 +734,7 @@ void world::play()
 #ifdef AUDIO
     if(!music_file_.empty()) {
         source = my_audio->make_source();
-        music = my_audio->make_stream(music_file_);
+        music = my_audio->make_stream(sys::find_file(music_file_));
         music->set_looping(true);
         source->set_sound(music.get());
         source->play();
