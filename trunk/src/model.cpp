@@ -23,6 +23,9 @@
 
 #include <iostream>
 
+using Eigen::MatrixP3f;
+using Eigen::Vector3f;
+
 namespace
 {
 std::map<std::string,graphics::const_model_ptr> model_cache;
@@ -81,10 +84,12 @@ model::model(const std::vector<model::face>& faces) :
 }
 
 model::model(const std::vector<model::face>& faces,
-             const std::vector<model::bone>& bones)
+             const std::vector<model::bone>& bones,
+	     const std::vector<int>& root_bones)
   :
 	faces_(faces),
 	bones_(bones),
+	root_bones_(root_bones),
 	vertex_array(NULL),
 	normal_array(NULL),
 	texcoord_array(NULL),
@@ -362,6 +367,10 @@ void model::draw_face(const face& f, bool& in_triangles) const
 
 void model::update_arrays()
 {
+	if(root_bones_.size() > 0)
+		foreach(int root, root_bones_)
+			update_skinning_matrices(bones_[root], MatrixP3f().loadIdentity());
+
 	unsigned int num_vertices = 0;
 	foreach(face& f, faces_) {
 		num_vertices += f.vertices.size();
@@ -390,10 +399,26 @@ void model::update_arrays()
 		foreach(const vertex_ptr& v, f.vertices) {
 			added_vertex_iterator added_vertex = added_vertices.find(v);
 			if(added_vertex == added_vertices.end()) {
+				MatrixP3f skinning_matrix;
+				skinning_matrix.loadZero();
+				for(int i = 0; i < v->influences.size(); i++) {
+					MatrixP3f bone_matrix;
+					if(v->influences[i].first == -1)
+						bone_matrix.loadIdentity();
+					else
+						bone_matrix = bones_[v->influences[i].first].skinning_matrix.matrix();
+					skinning_matrix.matrix() += bone_matrix.matrix() * v->influences[i].second;
+				}
+
 				GLvoid* vertex_pos = vertex_array + current_vertex * 3;
-				memcpy(vertex_pos, &(v->point), 3 * sizeof(GLfloat));
+				Vector3f vertex(v->point.data());
+				vertex = skinning_matrix * vertex;
+				memcpy(vertex_pos, vertex.array(), 3 * sizeof(GLfloat));
 				GLvoid* normal_pos = normal_array + current_vertex * 3;
-				memcpy(normal_pos, &(v->normal), 3 * sizeof(GLfloat));
+				Vector3f normal(v->normal.data());
+				normal = skinning_matrix * normal;
+				normal.normalize();
+				memcpy(normal_pos, normal.array(), 3 * sizeof(GLfloat));
 				GLvoid* texcoord_pos = texcoord_array + current_vertex * 2;
 				memcpy(texcoord_pos, &(v->uvmap), 2 * sizeof(GLfloat));
 				f.mat->set_coord_manual(((GLfloat*)texcoord_pos)[0], ((GLfloat*)texcoord_pos)[1]);
@@ -425,6 +450,15 @@ void model::update_arrays()
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, current_index * sizeof(unsigned int), element_array, GL_STATIC_DRAW);
 		delete[] element_array; element_array = NULL;
 	}
+}
+
+void model::update_skinning_matrices(bone& the_bone, Eigen::MatrixP3f transform)
+{
+	transform *= the_bone.transform;
+	foreach(int child, the_bone.children) {
+		update_skinning_matrices(bones_[child], transform);
+	}
+	the_bone.skinning_matrix = transform * the_bone.inv_bind_matrix;
 }
 
 void model::draw(const const_material_ptr& mat) const
