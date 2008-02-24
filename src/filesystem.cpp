@@ -282,7 +282,7 @@ namespace sys
 {
 
 namespace {
-#ifdef HAVE_CONFIG_H
+#ifdef DATADIR
   const std::string data_dir=DATADIR ;
   const bool have_datadir = true;
 #else

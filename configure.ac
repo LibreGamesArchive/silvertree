@@ -9,6 +9,10 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_RANLIB
 
+AC_ARG_ENABLE([audio], 
+              AC_HELP_STRING([--enable-audio], [enable sound (default is yes)]), 
+              [want_audio=$enableval], [want_audio=check])
+
 min_sdl_version=1.2.10
 AM_PATH_SDL($min_sdl_version, 
 	    [LIBS="$SDL_LIBS $LIBS" CXXFLAGS="$SDL_CFLAGS $CXXFLAGS"],
@@ -17,6 +21,18 @@ AC_CHECK_LIB([SDL_ttf], [TTF_Init], [LIBS="-lSDL_ttf $LIBS"],
              AC_MSG_ERROR([**** SDL_ttf not found !]))
 AC_CHECK_LIB([SDL_image], [IMG_Load], [LIBS="-lSDL_image $LIBS"],
              AC_MSG_ERROR([**** SDL_image not found !]))
+
+
+AS_IF([test x$want_audio = xno], 
+      [have_audio=no],
+      [have_audio=yes
+       AC_CHECK_LIB([mpg123], [mpg123_init], [AUDIO_LIBS="-lmpg123 $AUDIO_LIBS"],
+       [AC_MSG_WARN([**** mpg123 not found !])
+                    have_audio=no])
+       AC_CHECK_LIB([openal], [alcGetIntegerv], [AUDIO_LIBS="-lopenal $AUDIO_LIBS"],
+       [AC_MSG_WARN([**** OpenAL not found !])
+                    have_audio=no])
+])
 
 AX_BOOST_BASE
 AX_BOOST_REGEX
@@ -41,7 +57,7 @@ LIBS="$GL_LIBS $GLU_LIBS $LIBS"
 BNV_HAVE_QT
 AS_IF([test x$have_qt = xno], 
       [
-        AC_MSG_WARN([**** Qt library not found.])
+              AC_MSG_WARN([**** Qt library not found.])
       ],
       [
         AC_CHECK_LIB([QtGui], [main], [QT_LIBS="$QT_LIBS -lQtGui"],
@@ -52,6 +68,17 @@ AS_IF([test x$have_qt = xno],
                       have_qt=no])
       ]
 )
+
+AS_IF([test x$want_audio = xno], [],
+AS_IF([test x$have_audio = xno],
+      AS_IF([test x$want_audio = xyes],
+            AC_MSG_ERROR([**** Audio libraries not found.]),
+            AC_MSG_WARN([**** Audio libraries not found - no sound.])),
+      [AC_DEFINE([AUDIO], 1, [Audio enabled])
+       LIBS="$AUDIO_LIBS $LIBS"]
+))
+
+AM_CONDITIONAL([WANT_AUDIO], [test x$have_audio = xyes])
 
 AS_IF([test x$have_qt = xno],
      AC_MSG_WARN([**** Editor will not be built.])

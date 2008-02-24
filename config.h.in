@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Audio enabled */
+#undef AUDIO
+
 /* Use the Apple OpenGL framework. */
 #undef HAVE_APPLE_OPENGL_FRAMEWORK
 
