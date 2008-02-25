@@ -6,7 +6,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
-#include "scoped_shared_ptr.hpp"
+#include "../scoped_shared_ptr.hpp"
 
 /* avoid pulling all this into every file */
 namespace openal {

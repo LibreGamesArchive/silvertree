@@ -15,6 +15,7 @@ opts.AddOptions(
     ("BOOSTDIR", "Root directory of boost installation.", "/usr/include"),
     ("BOOSTLIBS", "Directory where boost libs are located.", "/usr/lib"),
     ("BOOST_SUFFIX", "Suffix of the boost regex library.", ""),
+    BoolOption("AUDIO", "Whether sound support is enabled", False),
     EnumOption("Build", "Build variant: debug or release", "release", ["debug", "release"], ignorecase=1),
     ("EXTRA_FLAGS_RELEASE", "Extra compiler/linker flags to use in release build variant.(e.g. \"-O3 -march=prescott\")", ""),
     ("EXTRA_FLAGS_DEBUG", "Extra compiler/linker flags to use in debug build variant.", ""),
@@ -47,6 +48,9 @@ conf.CheckGLEW() and \
 conf.CheckSDL(require_version = "1.2.10") and \
 conf.CheckSDL("SDL_image") and \
 conf.CheckSDL("SDL_ttf") or Exit(1)
+if env["AUDIO"]:
+    env["AUDIO"] = conf.CheckLibWithHeader("openal", "AL/al.h", "C") and \
+                   conf.CheckLibWithHeader("mpg123", "mpg123.h", "C")
 conf.Finish()
 
 editor_env = env.Clone()
@@ -55,6 +59,11 @@ editor_conf = editor_env.Configure(custom_tests = editor_env["config_checks"])
 editor_env["HaveQt"] = editor_conf.CheckQt4Tools() and \
                        editor_conf.CheckQt4Libs(["QtCore", "QtGui", "QtOpenGL"])
 editor_conf.Finish()
+
+if env["AUDIO"]:
+    env.Replace(CPPDEFINES = { "AUDIO" : None })
+else:
+    env.Replace(CPPDEFINES = dict())
 
 if "gcc" in env["TOOLS"]:
     ccflags = Split("-Wall -Wno-sign-compare -Wno-switch -Wno-switch-enum")
@@ -98,7 +107,7 @@ install_executables = Install(join(env["STAGE_PREFIX"], "bin"), executables)
 install_data = Install(data_stage_dir, datafiles)
 if not env["PLATFORM"] == "win32":
     Alias("install", [install_executables, install_data])
-    env.Replace(CPPDEFINES = { "DATADIR" : '\\"' + data_install_dir + '\\"' })
+    env.AppendUnique(CPPDEFINES = { "DATADIR" : '\\"' + data_install_dir + '\\"' })
     editor_env.Replace(CPPDEFINES = { "DATADIR" : '\\"' + data_install_dir + '\\"' })
 
 bindistdir = env.Install("silvertree", Split("README LICENSE") + executables + datafiles)
