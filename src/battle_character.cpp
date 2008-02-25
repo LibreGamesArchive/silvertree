@@ -173,6 +173,7 @@ void battle_character::get_pos_during_move(GLfloat* pos,
 
 		++index;
 	}
+    const GLfloat cur_rotation = facing_*60.0;
 
 	const GLfloat ratio2 = (cost <= 0) ? 0 : time/cost;
 	const GLfloat ratio1 = 1.0 - ratio2;
@@ -193,9 +194,9 @@ void battle_character::get_pos_during_move(GLfloat* pos,
 	pos[2] = ratio1*tile::translate_height(t1.height()) +
 	         ratio2*tile::translate_height(t2.height());
 
-	const GLfloat rotate1 = get_adjacent_direction(loc0,loc1)*60.0;
-	const GLfloat rotate2 = get_adjacent_direction(loc1,loc2)*60.0;
-	*rotate = graphics::calculate_rotation(rotate1,rotate2,ratio1);
+	const GLfloat rotate1 = loc0 == loc1 ? cur_rotation : get_adjacent_direction(loc0,loc1)*60.0;
+	const GLfloat rotate2 = loc1 == loc2 ? cur_rotation : get_adjacent_direction(loc1,loc2)*60.0;
+	*rotate = graphics::calculate_rotation(rotate2,rotate1,ratio1);
 }
 
 hex::location battle_character::get_loc_during_move(int time) const

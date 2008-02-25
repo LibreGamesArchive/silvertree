@@ -142,7 +142,7 @@ void battle::player_turn(battle_character& c)
 		if(!highlight_moves_ && !highlight_targets_) {
 			const_battle_move_ptr move = menu_->highlighted_move();
 			if(move) {
-				std::cerr << "highlighted move: " << move->name() << ": " << move->min_moves() << "\n";
+				//std::cerr << "highlighted move: " << move->name() << ": " << move->min_moves() << "\n";
 				initiative_bar_->focus_character(focus_->get(), move->min_moves() > 0 ? 0 : move->get_stat("initiative", **focus_));
 			}
 		}
