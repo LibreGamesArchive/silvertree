@@ -84,12 +84,10 @@ model::model(const std::vector<model::face>& faces) :
 }
 
 model::model(const std::vector<model::face>& faces,
-             const std::vector<model::bone>& bones,
-	     const std::vector<int>& root_bones)
+             const std::vector<model::bone>& bones)
   :
 	faces_(faces),
 	bones_(bones),
-	root_bones_(root_bones),
 	vertex_array(NULL),
 	normal_array(NULL),
 	texcoord_array(NULL),
@@ -367,9 +365,7 @@ void model::draw_face(const face& f, bool& in_triangles) const
 
 void model::update_arrays()
 {
-	if(root_bones_.size() > 0)
-		foreach(int root, root_bones_)
-			update_skinning_matrices(bones_[root], MatrixP3f().loadIdentity());
+	update_skinning_matrices();
 
 	unsigned int num_vertices = 0;
 	foreach(face& f, faces_) {
@@ -452,13 +448,29 @@ void model::update_arrays()
 	}
 }
 
-void model::update_skinning_matrices(bone& the_bone, Eigen::MatrixP3f transform)
+void model::update_skinning_matrices()
 {
-	transform *= the_bone.transform;
-	foreach(int child, the_bone.children) {
-		update_skinning_matrices(bones_[child], transform);
+	foreach(bone& the_bone, bones_)
+		the_bone.skinning_matrix_valid = false;
+
+	foreach(bone& the_bone, bones_)
+		the_bone.update_skinning_matrix(bones_);
+
+	foreach(bone& the_bone, bones_)
+		the_bone.skinning_matrix *= the_bone.inv_bind_matrix;
+}
+
+void model::bone::update_skinning_matrix(std::vector<bone>& bones)
+{
+	if(!skinning_matrix_valid) {
+		if(parent == -1)
+			skinning_matrix = transform;
+		else {
+			bones[parent].update_skinning_matrix(bones);
+			skinning_matrix = bones[parent].skinning_matrix * transform;
+		}
+		skinning_matrix_valid = true;
 	}
-	the_bone.skinning_matrix = transform * the_bone.inv_bind_matrix;
 }
 
 void model::draw(const const_material_ptr& mat) const
