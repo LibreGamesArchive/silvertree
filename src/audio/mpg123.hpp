@@ -24,8 +24,8 @@ private:
 
 class stream: public openal::stream {
 public:
-    stream(bool throws = true);
-    stream(const std::string& decoder, bool throws=true);
+    stream(int buffers=4, bool throws = true);
+    stream(const std::string& decoder, int buffers=4, bool throws=true);
     ~stream();
     std::string get_mpg_error() const;
     bool has_mpg_error() const;
@@ -40,8 +40,7 @@ private:
     void stream_call(int error_return, const std::string& op);
     mpg123_handle* mh_;
     int err_;
-    bool opened_, format_change_, throws_;
-    int processed_;
+    bool opened_, format_change_;
     ALint al_encoding_;
     int channels_;
     long rate_;

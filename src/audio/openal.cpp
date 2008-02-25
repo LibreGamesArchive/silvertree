@@ -18,7 +18,7 @@ bool wrapper::check_error(const std::string& op) {
     return has_error();
 }
 
-source::source() : init_(false), sound_(NULL) {
+source::source(bool throws) : wrapper(throws), init_(false), sound_(NULL) {
     alGenSources(1, &name_);
     init_ = true;
     check_error("alGenSources (source::source)");
@@ -70,8 +70,9 @@ void sample::deapply(source& source) {
     }
 }
 
-stream::stream(int buffers) 
-    : buffers_(NULL),
+stream::stream(int buffers, bool throws) 
+    : sound(throws), 
+      buffers_(NULL),
       num_buffers_(buffers),
       buffer_playing_(0),
       state_(START), 

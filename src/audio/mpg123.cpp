@@ -6,12 +6,12 @@
 namespace mpg123 {
 namespace {
 
-class wrapper {
+class module {
 public:
-    wrapper() { 
+    module() { 
         err_ = mpg123_init();
     }
-    ~wrapper() {
+    ~module() {
         if(is_init()) {
             mpg123_exit();
         }
@@ -27,7 +27,7 @@ private:
 };
 
 /* static module var - constructor inits, destructor exits */
-static wrapper libmpg123;
+static module libmpg123;
 
 /* debug function */
 #if 0
@@ -99,28 +99,27 @@ inline void stream::stream_call(int err, const std::string& op) {
             std::cout << " in " << op;
         } 
         std::cout <<"\n";
-        if(throws_) {
+        if(will_throw()) {
             throw exception(err_);
         }
     }
 }
 
-stream::stream(bool throws) : 
-    mh_(mpg123_new(NULL, &err_)), throws_(throws) {
+stream::stream(int buffers, bool throws) : 
+    openal::stream(buffers, throws), mh_(mpg123_new(NULL, &err_))  {
     stream_call(err_, "mpg123_new (mpg123::stream::stream)");
     init();
 }
 
-stream::stream(const std::string& decoder, bool throws) : 
-    mh_(mpg123_new(decoder.c_str(), &err_)), 
-    throws_(throws) {
+stream::stream(const std::string& decoder, int buffers, bool throws) : 
+    openal::stream(buffers, throws), mh_(mpg123_new(decoder.c_str(), &err_)) {
 
     stream_call(err_, "mpg123_new (mpg123::stream::stream(decoder))");
     init();
 }
 
 stream::~stream() {
-    throws_ = false;
+    set_throws(false);
     close();
     /* void return despite library docs */
     mpg123_delete(mh_);
