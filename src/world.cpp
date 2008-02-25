@@ -862,9 +862,7 @@ void world::play()
 					if(s != settlements_.end() && active_party->is_human_controlled()) {
 						remove_party(active_party);
 						//enter the new world
-                        std::cout << "enter\n";
 						time_ = s->second->enter(active_party, active_party->loc(), time_);
-                        std::cout << "got this far\n";
 
 						//player has left the settlement, return to this world
 						active_party->new_world(*this,active_party->loc(),active_party->last_move());
