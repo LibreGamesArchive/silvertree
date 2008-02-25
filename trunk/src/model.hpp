@@ -55,7 +55,6 @@ public:
 
 	struct bone {
 		bone() : parent(-1) {}
-		std::vector<int> children;
 		std::string name;
 		int parent;
 		boost::array<GLfloat,3> default_pos;
@@ -63,10 +62,13 @@ public:
 		Eigen::MatrixP3f transform;
 		Eigen::MatrixP3f inv_bind_matrix;
 		Eigen::MatrixP3f skinning_matrix;
+		bool skinning_matrix_valid;
+
+		void update_skinning_matrix(std::vector<bone>& bones);
 	};
 
 	explicit model(const std::vector<face>& faces);
-	model(const std::vector<face>& faces, const std::vector<bone>& bones, const std::vector<int>& root_bones = std::vector<int>());
+	model(const std::vector<face>& faces, const std::vector<bone>& bones);
 	~model();
 
 	void draw(const const_material_ptr& mat = const_material_ptr()) const;
@@ -81,10 +83,9 @@ private:
 	boost::array<GLfloat,3> face_normal(const face& f, int n) const;
 	std::vector<face> faces_;
 	std::vector<bone> bones_;
-	std::vector<int> root_bones_;
 
 	void update_arrays();
-	void update_skinning_matrices(bone&, Eigen::MatrixP3f);
+	void update_skinning_matrices();
 	GLfloat* vertex_array;
 	GLfloat* normal_array;
 	GLfloat* texcoord_array;
