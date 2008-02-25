@@ -171,9 +171,6 @@ void stream::close() {
 }
 
 void stream::reopen() {
-    if(!opened_) {
-        return;
-    }
     close();
     open(filename_);
 }
@@ -212,7 +209,6 @@ bool stream::fill_buffer(ALuint buffer) {
         format_change_ = true;
     } else if(err_ == MPG123_DONE) {
         if(looping()) {
-            close();
             reopen();
         } else {
             return false;
