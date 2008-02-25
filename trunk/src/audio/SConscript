@@ -1,0 +1,9 @@
+Import("env")
+
+import glob
+from os.path import join
+from os.path import basename
+abspath_sources = glob.glob(join(GetLaunchDir(), "src", "audio", "*.cpp"))
+sources = map(basename, abspath_sources)
+sources = map(lambda name: join("audio", name), sources)
+Return("sources")

@@ -6,6 +6,8 @@ from os.path import basename
 abspath_sources = glob.glob(join(GetLaunchDir(), "src", "*.cpp"))
 sources = map(basename, abspath_sources)
 sources += ["tinyxml/tinyxml.cpp", "tinyxml/tinyxmlerror.cpp", "tinyxml/tinyxmlparser.cpp"]
+if env["AUDIO"]:
+    sources += SConscript("audio/SConscript")
 sources.remove("main.cpp")
 lib_silvertree = env.StaticLibrary("libsilvertree", sources)
 silvertree = env.Program("silvertreerpg", ["main.cpp", lib_silvertree])
