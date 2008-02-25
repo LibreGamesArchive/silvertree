@@ -28,7 +28,7 @@ private:
 
 class wrapper {
 public:
-    wrapper(bool throws=true) : err_(AL_NO_ERROR), throws_(throws) {}
+    wrapper(bool throws) : err_(AL_NO_ERROR), throws_(throws) {}
     std::string get_error() {
         return get_error_message(err_);
     }
@@ -48,6 +48,7 @@ class source;
 
 class sound: public wrapper {
 public:
+    sound(bool throws) : wrapper(throws) {}
     virtual ~sound() {}
     virtual void apply(source& source)=0;
     virtual void deapply(source& source)=0;
@@ -55,7 +56,7 @@ public:
 
 class source: public wrapper {
 public:
-    source();
+    source(bool throws=false);
     virtual ~source();
     void set_sound(sound *sound);
     void clear_sound();
@@ -152,7 +153,7 @@ private:
        fixed stream bugs */
 class sample: public sound {
 public:
-    sample() : init_(false), filled_(false) {
+    sample(bool throws) : sound(throws), init_(false), filled_(false) {
         alGenBuffers(1, &name_);
         init_ = true;
         check_error("alGenBuffers (sample::sample)");
@@ -175,7 +176,7 @@ private:
 
 class stream: public sound {
 public:
-    stream(int buffers=4);
+    stream(int buffers, bool throws);
     virtual ~stream();
     void apply(source& source);
     void update();
