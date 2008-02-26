@@ -40,6 +40,7 @@ using std::istringstream;
 using std::pair;
 using std::make_pair;
 using boost::tie;
+using Eigen::Vector2f;
 using Eigen::Vector3f;
 using Eigen::Vector4f;
 using Eigen::MatrixP3f;
@@ -366,11 +367,11 @@ pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_
 			for(; primitive_element; primitive_element = primitive_element->NextSiblingElement(primitive_type.first)) {
 				int offset, max_offset = 0;
 				bool have_positions = false;int positions_offset = 0;
-				vector<GLfloat> positions;
+				vector<Vector3f> positions;
 				bool have_normals = false;int normals_offset = 0;
-				vector<GLfloat> normals;
+				vector<Vector3f> normals;
 				bool have_texcoords = false;int texcoords_offset = 0;
-				vector<GLfloat> texcoords;
+				vector<Vector2f> texcoords;
 
 				const TiXmlElement* input = primitive_element->FirstChildElement("input");
 				for(; input; input = input->NextSiblingElement("input")) {
@@ -381,19 +382,19 @@ pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_
 						vertices = resolve_shorthand_ptr(input->Attribute("source"));
 						const TiXmlElement* positions_source =
 							resolve_shorthand_ptr(vertices->FirstChildElement("input")->Attribute("source"));
-						positions = get_array<GLfloat>(positions_source->FirstChildElement("float_array"));
+						positions = get_array<Vector3f>(positions_source->FirstChildElement("float_array"));
 						have_positions = true;
 						positions_offset = offset;
 					}
 					if(input->Attribute("semantic") == string("NORMAL")) {
 						const TiXmlElement* normals_source = resolve_shorthand_ptr(input->Attribute("source"));
-						normals = get_array<GLfloat>(normals_source->FirstChildElement("float_array"));
+						normals = get_array<Vector3f>(normals_source->FirstChildElement("float_array"));
 						have_normals = true;
 						normals_offset = offset;
 					}
 					if(input->Attribute("semantic") == string("TEXCOORD")) {
 						const TiXmlElement* texcoords_source = resolve_shorthand_ptr(input->Attribute("source"));
-						texcoords = get_array<GLfloat>(texcoords_source->FirstChildElement("float_array"));
+						texcoords = get_array<Vector2f>(texcoords_source->FirstChildElement("float_array"));
 						have_texcoords = true;
 						texcoords_offset = offset;
 					}
@@ -417,17 +418,13 @@ pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_
 						face.vertices.push_back(model::vertex_ptr(new model::vertex));
 						model::vertex_ptr vertex = face.vertices.back();
 						vertices.insert(make_pair(primitive_indices[i + positions_offset], vertex));
-						vertex->point[0] = positions[primitive_indices[i + positions_offset]*3];
-						vertex->point[1] = positions[primitive_indices[i + positions_offset]*3 + 1];
-						vertex->point[2] = positions[primitive_indices[i + positions_offset]*3 + 2];
+						vertex->point = positions[primitive_indices[i + positions_offset]];
 						if(have_normals) {
-							vertex->normal[0] = -normals[primitive_indices[i + normals_offset]*3];
-							vertex->normal[1] = -normals[primitive_indices[i + normals_offset]*3 + 1];
-							vertex->normal[2] = -normals[primitive_indices[i + normals_offset]*3 + 2];
+							vertex->normal = -normals[primitive_indices[i + normals_offset]];
 						}
 						if(have_texcoords) {
-							vertex->uvmap[0] =  texcoords[primitive_indices[i + texcoords_offset]*2];
-							vertex->uvmap[1] = -texcoords[primitive_indices[i + texcoords_offset]*2 + 1];
+							vertex->uvmap = texcoords[primitive_indices[i + texcoords_offset]];
+							vertex->uvmap[1] *= -1;
 							vertex->uvmap_valid = true;
 						}
 					}
