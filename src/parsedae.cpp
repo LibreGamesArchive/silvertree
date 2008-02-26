@@ -271,7 +271,7 @@ void COLLADA::get_bones_from_skeleton(const TiXmlElement* node, vector<model::bo
 			for(int i = 0; i < bones.size(); i++)
 				if(bones[i].name == string(parent_id)) {
 					bone.parent = i;
-					continue;
+					break;
 				}
 		}
 		else
@@ -414,18 +414,32 @@ pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_
 					face.mat = mat;
 					if(material_name)
 						face.material_name = material_name;
+
+					map<boost::array<int,3>, model::vertex_ptr> vertex_ptrs;
 					for(int i = 0; i < primitive_indices.size(); i += (max_offset+1)) {
-						face.vertices.push_back(model::vertex_ptr(new model::vertex));
-						model::vertex_ptr vertex = face.vertices.back();
-						vertices.insert(make_pair(primitive_indices[i + positions_offset], vertex));
-						vertex->point = positions[primitive_indices[i + positions_offset]];
-						if(have_normals) {
-							vertex->normal = -normals[primitive_indices[i + normals_offset]];
-						}
-						if(have_texcoords) {
-							vertex->uvmap = texcoords[primitive_indices[i + texcoords_offset]];
-							vertex->uvmap[1] *= -1;
-							vertex->uvmap_valid = true;
+						int position_index = primitive_indices[i + positions_offset];
+						int normal_index = primitive_indices[i + normals_offset];
+						int texcoord_index = primitive_indices[i + texcoords_offset];
+						boost::array<int,3> vertex_index;
+						vertex_index[0] = position_index;
+						vertex_index[1] = have_normals ? normal_index : 0;
+						vertex_index[2] = have_texcoords ? texcoord_index : 0;
+						if(vertex_ptrs.find(vertex_index) == vertex_ptrs.end()) {
+							face.vertices.push_back(model::vertex_ptr(new model::vertex));
+							model::vertex_ptr vertex = face.vertices.back();
+							vertices.insert(make_pair(primitive_indices[i + positions_offset], vertex));
+							vertex_ptrs.insert(make_pair(vertex_index, vertex));
+							vertex->point = positions[position_index];
+							if(have_normals) {
+								vertex->normal = -normals[normal_index];
+							}
+							if(have_texcoords) {
+								vertex->uvmap = texcoords[texcoord_index];
+								vertex->uvmap[1] *= -1;
+								vertex->uvmap_valid = true;
+							}
+						} else {
+							face.vertices.push_back(vertex_ptrs[vertex_index]);
 						}
 					}
 				}
