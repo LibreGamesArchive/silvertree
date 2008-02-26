@@ -182,7 +182,9 @@ void model::init_normals()
 				continue;
 			}
 
-			v->normal = face_normal(f,v);
+			v->normal[0] = face_normal(f,v)[0];
+			v->normal[1] = face_normal(f,v)[1];
+			v->normal[2] = face_normal(f,v)[2];
 
 			/*
 			foreach(const face& f,faces_) {
@@ -407,16 +409,14 @@ void model::update_arrays()
 				}
 
 				GLvoid* vertex_pos = vertex_array + current_vertex * 3;
-				Vector3f vertex(v->point.data());
-				vertex = skinning_matrix * vertex;
+				Vector3f vertex = skinning_matrix * v->point;
 				memcpy(vertex_pos, vertex.array(), 3 * sizeof(GLfloat));
 				GLvoid* normal_pos = normal_array + current_vertex * 3;
-				Vector3f normal(v->normal.data());
-				normal = skinning_matrix * normal;
+				Vector3f normal = skinning_matrix * v->normal;
 				normal.normalize();
 				memcpy(normal_pos, normal.array(), 3 * sizeof(GLfloat));
 				GLvoid* texcoord_pos = texcoord_array + current_vertex * 2;
-				memcpy(texcoord_pos, &(v->uvmap), 2 * sizeof(GLfloat));
+				memcpy(texcoord_pos, v->uvmap.array(), 2 * sizeof(GLfloat));
 				f.mat->set_coord_manual(((GLfloat*)texcoord_pos)[0], ((GLfloat*)texcoord_pos)[1]);
 				*(element_array + current_index) = current_vertex;
 				added_vertices[v] = current_vertex;

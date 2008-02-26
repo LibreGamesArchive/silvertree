@@ -36,9 +36,9 @@ public:
 
 	struct vertex {
 		vertex() : uvmap_valid(false) { influences.push_back(std::make_pair(-1,1.0)); }
-		boost::array<GLfloat,3> point;
-		boost::array<GLfloat,3> normal;
-		boost::array<GLfloat,2> uvmap;
+		Eigen::Vector3f point;
+		Eigen::Vector3f normal;
+		Eigen::Vector2f uvmap;
 		bool uvmap_valid;
 		std::vector<std::pair<int, float> > influences;
 	};
