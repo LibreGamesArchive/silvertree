@@ -407,12 +407,15 @@ void model::update_arrays()
 						bone_matrix = bones_[v->influences[i].first].skinning_matrix.matrix();
 					skinning_matrix.matrix() += bone_matrix.matrix() * v->influences[i].second;
 				}
+				Eigen::Matrix3f transpose_normal_matrix = skinning_matrix.linearComponent().inverse();
+				Eigen::Matrix3f normal_matrix;
+				normal_matrix.readRows(transpose_normal_matrix.array());
 
 				GLvoid* vertex_pos = vertex_array + current_vertex * 3;
 				Vector3f vertex = skinning_matrix * v->point;
 				memcpy(vertex_pos, vertex.array(), 3 * sizeof(GLfloat));
 				GLvoid* normal_pos = normal_array + current_vertex * 3;
-				Vector3f normal = skinning_matrix * v->normal;
+				Vector3f normal = normal_matrix * v->normal;
 				normal.normalize();
 				memcpy(normal_pos, normal.array(), 3 * sizeof(GLfloat));
 				GLvoid* texcoord_pos = texcoord_array + current_vertex * 2;
