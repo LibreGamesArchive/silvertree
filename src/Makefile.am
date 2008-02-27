@@ -130,6 +130,8 @@ texture.hpp \
 tile.hpp \
 tile_logic.hpp \
 time_cost_widget.hpp \
+titlescreen.cpp \
+titlescreen.hpp \
 tooltip.hpp \
 tracks.hpp \
 translate.hpp \

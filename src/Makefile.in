@@ -60,13 +60,13 @@ AR = ar
 ARFLAGS = cru
 libsilvertree_a_AR = $(AR) $(ARFLAGS)
 libsilvertree_a_LIBADD =
-am_libsilvertree_a_OBJECTS = base_terrain.$(OBJEXT) \
-	battle_character.$(OBJEXT) battle_character_npc.$(OBJEXT) \
-	battle_character_pc.$(OBJEXT) battle.$(OBJEXT) \
-	battle_map_generator.$(OBJEXT) battle_menu.$(OBJEXT) \
-	battle_missile.$(OBJEXT) battle_modification.$(OBJEXT) \
-	battle_move.$(OBJEXT) button.$(OBJEXT) \
-	camera_controller.$(OBJEXT) camera.$(OBJEXT) \
+am_libsilvertree_a_OBJECTS = titlescreen.$(OBJEXT) \
+	base_terrain.$(OBJEXT) battle_character.$(OBJEXT) \
+	battle_character_npc.$(OBJEXT) battle_character_pc.$(OBJEXT) \
+	battle.$(OBJEXT) battle_map_generator.$(OBJEXT) \
+	battle_menu.$(OBJEXT) battle_missile.$(OBJEXT) \
+	battle_modification.$(OBJEXT) battle_move.$(OBJEXT) \
+	button.$(OBJEXT) camera_controller.$(OBJEXT) camera.$(OBJEXT) \
 	character.$(OBJEXT) character_equip_dialog.$(OBJEXT) \
 	character_generator.$(OBJEXT) \
 	character_status_dialog.$(OBJEXT) dialog.$(OBJEXT) \
@@ -382,6 +382,8 @@ texture.hpp \
 tile.hpp \
 tile_logic.hpp \
 time_cost_widget.hpp \
+titlescreen.cpp \
+titlescreen.hpp \
 tooltip.hpp \
 tracks.hpp \
 translate.hpp \
@@ -661,6 +663,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlerror.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tinyxmlparser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/titlescreen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tooltip.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tracks.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/translate.Po@am__quote@
