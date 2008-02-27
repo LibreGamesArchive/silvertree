@@ -77,6 +77,57 @@ void scale_translation_vector(MatrixP3f& mat)
 	mat.setTranslationVector(vec);
 }
 
+class Tesselator
+{
+	GLUtesselator* tesselator_;
+	vector<model::vertex_ptr> triangles_;
+	Eigen::Vector3d* positions_;
+
+	static void begin(GLenum type, void* polygon_data) {}
+	static void edge_flag(GLboolean flag, void* polygon_data) {} // This callback is necessary to ensure that only GL_TRIANGLES
+								     // primitives are generated.
+	static void vertex(void* vertex_data, void* polygon_data)
+	{
+		vector<model::vertex_ptr>* triangles = static_cast<vector<model::vertex_ptr>*>(polygon_data);
+		model::vertex_ptr* vertex = static_cast<model::vertex_ptr*>(vertex_data);
+
+		triangles->push_back(*vertex);
+	}
+	static void end(void* polygon_data) {}
+
+	public:
+	Tesselator()
+	{
+		tesselator_ = gluNewTess();
+
+		gluTessCallback(tesselator_, GLU_TESS_BEGIN_DATA, (GLvoid(*)())begin);
+		gluTessCallback(tesselator_, GLU_TESS_EDGE_FLAG_DATA, (GLvoid(*)())edge_flag);
+		gluTessCallback(tesselator_, GLU_TESS_VERTEX_DATA, (GLvoid(*)())vertex);
+		gluTessCallback(tesselator_, GLU_TESS_END_DATA, (GLvoid(*)())end);
+	}
+	~Tesselator()
+	{
+		gluDeleteTess(tesselator_);
+	}
+
+	vector<model::vertex_ptr> tesselate(vector<model::vertex_ptr> polygon)
+	{
+		triangles_.clear();
+		positions_ = new Eigen::Vector3d[polygon.size()];
+		gluTessBeginPolygon(tesselator_, &triangles_);
+		gluTessBeginContour(tesselator_);
+		for(int i = 0; i < polygon.size(); i++) {
+			model::vertex_ptr& vertex = polygon[i];
+			positions_[i] = Eigen::Vector3d(vertex->point.x(), vertex->point.y(), vertex->point.z());
+			gluTessVertex(tesselator_, positions_[i].array(), &vertex);
+		}
+		gluTessEndContour(tesselator_);
+		gluTessEndPolygon(tesselator_);
+		delete[] positions_;
+		return triangles_;
+	}
+};
+
 }
 
 void parse4vector(const string& str, GLfloat* v);
@@ -108,6 +159,7 @@ COLLADA::COLLADA(const char* i1)
 {
 	primitive_types.push_back(std::make_pair(string("triangles"), GL_TRIANGLES));
 	primitive_types.push_back(std::make_pair(string("tristrips"), GL_TRIANGLE_STRIP));
+	primitive_types.push_back(std::make_pair(string("polylist"), GL_TRIANGLES));
 
 	doc_.Parse(i1);
 	if(doc_.Error())
@@ -441,6 +493,20 @@ pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_
 						} else {
 							face.vertices.push_back(vertex_ptrs[vertex_index]);
 						}
+					}
+
+					if(primitive_type.first == string("polylist")) {
+						vector<model::vertex_ptr> tesselated_polygons;
+						vector<int> vcounts = get_array<int>(primitive_element->FirstChildElement("vcount"));
+						int i = 0;
+						Tesselator tess;
+						foreach(int vcount, vcounts) {
+							vector<model::vertex_ptr> tesselated_polygon;
+							tesselated_polygon = tess.tesselate(vector<model::vertex_ptr>(face.vertices.begin() + i, face.vertices.begin() + i + vcount));
+							i += vcount;
+							tesselated_polygons.insert(tesselated_polygons.end(), tesselated_polygon.begin(), tesselated_polygon.end());
+						}
+						face.vertices.swap(tesselated_polygons);
 					}
 				}
 			}
