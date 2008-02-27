@@ -191,6 +191,8 @@ world::world(wml::const_node_ptr node)
     keys_.bind_key(SUPER_ACCEL_TIME_KEY, SDLK_SPACE, (SDLMod)KMOD_SHIFT);
     keys_.bind_key(SHOW_GRID, SDLK_g, KMOD_NONE);
     keys_.bind_key(HIDE_GRID, SDLK_h, KMOD_NONE);
+
+    find_focus();
 }
 
 wml::node_ptr world::write() const
@@ -471,6 +473,16 @@ const hex::location& world::get_selected_hex() const
 
 void world::draw() const
 {
+	if(!get_pc_party()) {
+		for(settlement_map::const_iterator i = settlements_.begin();
+		    i != settlements_.end(); ++i) {
+			if(party_ptr p = i->second->get_world().get_pc_party()) {
+                i->second->get_world().draw();
+                return;
+            }
+        }
+    }
+
 	assert(focus_);
 	const std::set<hex::location>& visible =
 		focus_->get_visible_locs();
@@ -691,6 +703,15 @@ namespace {
 const GLfloat game_speed = 0.2;
 }
 
+void world::find_focus() {
+    for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
+        if(i->second->is_human_controlled()) {
+            focus_ = i->second;
+            break;
+        }
+    }
+}
+
 void world::play()
 {
 	world_context context(this);
@@ -743,13 +764,7 @@ void world::play()
       
     while(!done_) {
 		if(!focus_) {
-			for(party_map::const_iterator i = parties_.begin(); i != parties_.end(); ++i) {
-				if(i->second->is_human_controlled()) {
-					focus_ = i->second;
-					break;
-				}
-			}
-
+            find_focus();
 			if(!focus_) {
 				break;
 			}

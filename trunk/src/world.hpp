@@ -180,6 +180,8 @@ private:
 	void set_value(const std::string& key, const variant& value);
 	void get_inputs(std::vector<formula_input>* inputs) const;
 
+    void find_focus();
+
 	int scale_;
 	game_time time_;
 	GLfloat subtime_;

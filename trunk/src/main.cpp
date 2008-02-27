@@ -40,6 +40,7 @@
 #include "terrain_feature.hpp"
 #include "text_gui.hpp"
 #include "texture.hpp"
+#include "titlescreen.hpp"
 #include "translate.hpp"
 #include "world.hpp"
 
@@ -208,6 +209,7 @@ extern "C" int main(int argc, char** argv)
 
 		game_logic::world_ptr w(new game_logic::world(world_cfg));
 		try {
+            title::show(w, "logo-title-screen.png", "music/silvertree-theme.mp3", 2000);
 			w->play();
 		} catch(game_logic::world::new_game_exception new_game) {
 			save_file = new_game.filename();
