@@ -37,11 +37,22 @@ public:
     }
     bool will_throw() { return throws_; }
     void set_throws(bool throws) { throws_ = throws; }
+    void push_throws(bool throws) {
+        throws_stack_.push_back(throws_);
+        set_throws(throws);
+    }
+    void pop_throws() {
+        if(!throws_stack_.empty()) {
+            set_throws(throws_stack_.back());
+            throws_stack_.pop_back();
+        }
+    }
 protected:
     bool check_error(const std::string& op);
 private:
     ALenum err_;
     bool throws_;
+    std::vector<bool> throws_stack_;
 };
 
 class source;
