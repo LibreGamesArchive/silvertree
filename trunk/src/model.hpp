@@ -76,7 +76,6 @@ public:
 	void get_materials(std::vector<const_material_ptr>* mats) const;
 
 private:
-	void optimize();
 	void init_normals();
 	std::string id_;
 	boost::array<GLfloat,3> face_normal(const face& f, const vertex_ptr& v) const;

@@ -93,7 +93,6 @@ model::model(const std::vector<model::face>& faces,
 	texcoord_array(NULL),
 	element_array(NULL)
 {
-	//optimize();
 	//init_normals();
 	update_arrays();
 }
@@ -112,65 +111,6 @@ model::~model()
 	if (GLEW_VERSION_1_5) {
 		glDeleteBuffers(4, vertex_buffer_objects);
 	}
-}
-
-namespace {
-bool merge_faces(model::face& a, model::face& b)
-{
-	std::vector<model::vertex_ptr>& va = a.vertices;
-	std::vector<model::vertex_ptr>& vb = b.vertices;
-	if(va.size() < 3 || vb.size() != 3) {
-		std::cerr << "bad sizes: " << va.size() << "," << vb.size() << "\n";
-		return false;
-	}
-
-	model::vertex_ptr different;
-	int unfound = 0;
-	foreach(const model::vertex_ptr& vp, vb) {
-		if(std::find(va.end()-3,va.end(),vp) == va.end()) {
-			++unfound;
-			different = vp;
-		}
-	}
-
-	std::cerr << "unfound(1): " << unfound << "\n";
-
-	if(unfound == 1) {
-		va.push_back(different);
-		return true;
-	}
-
-	unfound = 0;
-	foreach(const model::vertex_ptr& vp, vb) {
-		if(std::find(va.begin(),va.begin()+3,vp) == va.end()) {
-			++unfound;
-			different = vp;
-		}
-	}
-
-	std::cerr << "unfound(2): " << unfound << "\n";
-
-	if(unfound == 1) {
-		va.insert(va.begin(),different);
-		return true;
-	}
-
-	return false;
-}
-
-}
-
-void model::optimize()
-{
-	std::cerr << "BEFORE OPTIMIZE: " << faces_.size() << "\n";
-	for(int n = 0; n < faces_.size()-1; ) {
-		if(merge_faces(faces_[n],faces_[n+1])) {
-			faces_.erase(faces_.begin()+n+1);
-		} else {
-			++n;
-		}
-	}
-	std::cerr << "AFTER OPTIMIZE: " << faces_.size() << "\n";
 }
 
 void model::init_normals()
@@ -247,123 +187,6 @@ boost::array<GLfloat,3> model::face_normal(const model::face& f, int n) const
 
 	return res;
 }
-
-namespace {
-
-GLfloat deg_to_rad(GLfloat angle)
-{
-	return (angle*3.14159)/180.0;
-}
-
-void roll_matrix(GLfloat angle, GLfloat* matrix)
-{
-	angle = deg_to_rad(angle);
-	matrix[0 + 0*3] += 1.0;
-	matrix[1 + 0*3] += 0.0;
-	matrix[2 + 0*3] += 0.0;
-	matrix[0 + 1*3] += 0.0;
-	matrix[1 + 1*3] += cos(angle);
-	matrix[2 + 1*3] += sin(angle);
-	matrix[0 + 2*3] += 0.0;
-	matrix[1 + 2*3] += -sin(angle);
-	matrix[2 + 2*3] += cos(angle);
-}
-
-void pitch_matrix(GLfloat angle, GLfloat* matrix)
-{
-	angle = deg_to_rad(angle);
-	matrix[0 + 0*3] += cos(angle);
-	matrix[1 + 0*3] += 0.0;
-	matrix[2 + 0*3] += -sin(angle);
-	matrix[0 + 1*3] += 0.0;
-	matrix[1 + 1*3] += 1.0;
-	matrix[2 + 1*3] += 0.0;
-	matrix[0 + 2*3] += sin(angle);
-	matrix[1 + 2*3] += 0.0;
-	matrix[2 + 2*3] += cos(angle);
-}
-
-void yaw_matrix(GLfloat angle, GLfloat* matrix)
-{
-	angle = deg_to_rad(angle);
-	matrix[0 + 0*3] += cos(angle);
-	matrix[1 + 0*3] += sin(angle);
-	matrix[2 + 0*3] += 0.0;
-	matrix[0 + 1*3] += -sin(angle);
-	matrix[1 + 1*3] += cos(angle);
-	matrix[2 + 1*3] += 0.0;
-	matrix[0 + 2*3] += 0.0;
-	matrix[1 + 2*3] += 0.0;
-	matrix[2 + 2*3] += 1.0;
-}
-
-void mult_matrix(const GLfloat* matrix, GLfloat* vec)
-{
-	GLfloat res[3];
-	res[0] = matrix[0 + 0*3]*vec[0] + matrix[0 + 1*3]*vec[1] + matrix[0 + 2*3]*vec[2];
-	res[1] = matrix[1 + 0*3]*vec[0]  + matrix[1 + 1*3]*vec[1] + matrix[1 + 2*3]*vec[2];
-	res[2] = matrix[2 + 0*3]*vec[0]  + matrix[2 + 1*3]*vec[1] + matrix[2 + 2*3]*vec[2];
-	vec[0] = res[0];
-	vec[1] = res[1];
-	vec[2] = res[2];
-}
-
-}
-
-/*
-void model::draw_face(const face& f, bool& in_triangles) const
-{
-	if(f.vertices.size() > 3) {
-		if(in_triangles) {
-			glEnd();
-		}
-
-		glBegin(GL_TRIANGLE_STRIP);
-		in_triangles = false;
-	} else if(!in_triangles) {
-		glBegin(GL_TRIANGLES);
-		in_triangles = true;
-	}
-
-	foreach(const vertex_ptr& v,f.vertices) {
-		if(v->uvmap_valid) {
-			f.mat->set_coord(v->uvmap[0],v->uvmap[1]);
-		}
-
-		GLfloat vertex[] = {v->point[0],v->point[1],v->point[2]};
-		GLfloat normal[] = {v->normal[0],v->normal[1],v->normal[2]};
-
-		int bones[64] = {v->bone_num};
-		int cur_bone = 0;
-		while(bones[cur_bone] != -1) {
-			bones[cur_bone+1] = bones_[bones[cur_bone]].parent;
-			++cur_bone;
-		}
-
-		for(int n = 0; n != cur_bone; ++n) {
-			const bone& b = bones_[bones[n]];
-
-			vertex[0] += b.default_pos[0];
-			vertex[1] += b.default_pos[1];
-			vertex[2] += b.default_pos[2];
-
-			GLfloat matrix[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-			roll_matrix(b.default_rot[0], matrix);
-			pitch_matrix(b.default_rot[1], matrix);
-			yaw_matrix(b.default_rot[2], matrix);
-			mult_matrix(matrix, vertex);
-			mult_matrix(matrix, normal);
-		}
-
-		glNormal3fv(normal);
-		glVertex3fv(vertex);
-	}
-
-	if(f.vertices.size() > 3) {
-		glEnd();
-	}
-}
-*/
 
 void model::update_arrays()
 {
