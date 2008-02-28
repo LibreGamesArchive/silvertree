@@ -1,6 +1,12 @@
 #ifndef OPENAL_HPP_INCLUDED
 #define OPENAL_HPP_INCLUDED
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef AUDIO
+
 #include <AL/al.h>
 #include <string>
 #include <vector>
@@ -216,5 +222,5 @@ std::string get_vendor();
 std::vector<std::string> get_extensions();
 
 }
-
+#endif
 #endif

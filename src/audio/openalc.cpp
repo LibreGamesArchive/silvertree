@@ -112,13 +112,19 @@ std::string device::get_string(ALCenum token) const {
 }    
 
 void device::detect_version() {
-#ifdef linux
     if(openal::get_renderer() == "OpenAL Soft") {
         alc_implementation_ = OPENAL_SOFT;
         return;
     } 
+#ifdef linux
     if(openal::get_vendor() == "OpenAL Community") {
         alc_implementation_ = OPENAL_RI_LINUX;
+        return;
+    }
+#endif
+#ifdef WIN32
+    if(openal::get_vendor() == "Creative Labs Inc. ") {
+        alc_implementation_ = OPENAL_CREATIVE_WINDOWS;
         return;
     }
 #endif
@@ -171,7 +177,9 @@ ALCcontext *device::add_context(const context *c, bool& shared) {
 
     /* openal-soft only supports 1 context 
      */
-    if(alc_implementation_ == OPENAL_SOFT && get_error_code() == ALC_INVALID_VALUE) {
+    if(get_error_code() == ALC_INVALID_VALUE &&
+       (alc_implementation_ == OPENAL_SOFT  ||
+        alc_implementation_ == OPENAL_CREATIVE_WINDOWS)) {
         context = alcGetCurrentContext();
         shared = true;
         ++shared_context_count_ ;
@@ -185,7 +193,9 @@ ALCcontext *device::add_context(const context *c, bool& shared) {
                   << "Renderer: "<<openal::get_renderer()<<"\n"
                   << "Device: "<<get_specifier()<<"\n"
                   << "AL Version: "<<openal::get_version()<<"\n"
-                  << "ALC Version: "<<openalc::get_version()<<"\n";
+                  << "ALC Version: "<<get_version()<<"\n"
+                  << "Reported error: "<<get_error()<<"\n";
+        
         if(will_throw()) {
             throw exception(get_error_code());
         }

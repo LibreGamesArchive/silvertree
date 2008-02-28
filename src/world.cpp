@@ -37,9 +37,7 @@
 #include <iostream>
 #include <sstream>
 
-#ifdef AUDIO
 #include "audio/openal.hpp"
-#endif
 
 namespace game_logic
 {
@@ -693,7 +691,7 @@ void world::draw() const
 		game_bar_->draw();
 	}
 #ifdef AUDIO
-    if(audio_) {
+    if(audio::audio_available() && audio_) {
         audio_->pump_sound();
     }
 #endif
@@ -753,7 +751,7 @@ void world::play()
     input_pump.register_listener(&camera_controller_);
 
 #ifdef AUDIO
-    if(!music_file_.empty()) {
+    if(audio::audio_available() && !music_file_.empty()) {
         source = my_audio->make_source();
         music = my_audio->make_stream(sys::find_file(music_file_));
         music->set_looping(true);

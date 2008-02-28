@@ -26,16 +26,37 @@ private:
 /* yet another global to init/deinit device */
 boost::shared_ptr<audio_wrapper> wrapper;
 
-/* module functions */
-void init_audio() {
-    wrapper.reset(new audio_wrapper());
+bool audio_available() {
+#ifdef AUDIO
+    return wrapper;
+#else
+    return false;
+#endif
 }
-void init_audio(const std::string& device) {
-    wrapper.reset(new audio_wrapper(device));
+
+/* module functions */
+bool init_audio(const std::string& device) {
+    try {
+        if(device.empty()) {
+            wrapper.reset(new audio_wrapper());
+        } else {
+            wrapper.reset(new audio_wrapper(device));
+        }
+        return true;
+    } catch(openalc::exception e) {
+        std::cerr << "Warning: OpenAL could not be initialised on your system.\n" 
+                  << "Check your soundcard is configured correctly.\n";
+        return false;
+    }
 }
 
 /* audio context members */
 audio_context::audio_context() : frozen_(false) {
+    /* this looks pathological but we just can't avoid making
+       an ac when we have no device sometimes - luckily, we can
+       avoid ever using it */
+    if(!audio_available()) return;
+
     context_.reset(new openalc::context(wrapper->get_device()));
     if(!context_stack.empty()) {
         context_stack.back()->freeze();
@@ -45,6 +66,8 @@ audio_context::audio_context() : frozen_(false) {
 }
 
 audio_context::~audio_context() {
+    if(!audio_available()) return;
+        
     context_stack.pop_back();
     if(!context_stack.empty()) {
         context_stack.back()->resume();

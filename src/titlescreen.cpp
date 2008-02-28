@@ -6,10 +6,8 @@
 
 #include <SDL_image.h>
 
-#ifdef AUDIO
 #include "audio/audio.hpp"
 #include "audio/openal.hpp"
-#endif
 
 namespace title {
 
@@ -45,13 +43,18 @@ void show(game_logic::world_ptr w, const std::string& logo,
     graphics::texture title(graphics::texture::get_no_cache(graphics::surface(IMG_Load(sys::find_file(fname).c_str()))));
 
 #ifdef AUDIO
-    audio::audio_context_ptr ac(new audio::audio_context());
-    audio::stream_ptr music = ac->make_stream(music_file);
-    audio::source_ptr source = ac->make_source();
-
-    source->set_sound(music.get());
-    source->play();
-    ac->pump_sound();
+    audio::audio_context_ptr ac;
+    audio::stream_ptr music;
+    audio::source_ptr source;
+    if(audio::audio_available()) {
+        ac.reset(new audio::audio_context());
+        music = ac->make_stream(music_file);
+        source = ac->make_source();
+        
+        source->set_sound(music.get());
+        source->play();
+        ac->pump_sound();
+    }
 #endif
     
     SDL_Event e;
@@ -75,8 +78,11 @@ void show(game_logic::world_ptr w, const std::string& logo,
 
     while(!done) {
 #ifdef AUDIO
-        ac->pump_sound();
+        if(audio::audio_available()) {
+            ac->pump_sound();
+        }
 #endif
+
         alpha = 127;
         if((time = SDL_GetTicks()) < end_time) {
             alpha += (Uint8)(128*(end_time - time) / fade_time);
@@ -118,8 +124,10 @@ void show(game_logic::world_ptr w, const std::string& logo,
         Uint8 alpha = (Uint8)(128*(end_time - time) / fade_time);
         draw(w, title, alpha);
 #ifdef AUDIO
-        source->set_gain((end_time - time)/(float)fade_time);
-        ac->pump_sound();
+        if(audio::audio_available()) {
+            source->set_gain((end_time - time)/(float)fade_time);
+            ac->pump_sound();
+        }
 #endif
     }
 

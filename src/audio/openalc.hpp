@@ -61,10 +61,11 @@ class device: public wrapper {
 public:
     friend class context;
     enum implementation {
+        OPENAL_UNKNOWN,
         OPENAL_RI_LINUX,
         OPENAL_SOFT,
         OPENAL_OTHER,
-        OPENAL_UNKNOWN
+        OPENAL_CREATIVE_WINDOWS
     };
     static std::vector<std::string> get_available_devices();
     static std::string get_default_device();
