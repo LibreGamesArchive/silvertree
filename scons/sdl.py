@@ -24,7 +24,7 @@ def CheckSDL(context, sdl_lib = "SDL", require_version = None):
         if env["PLATFORM"] == "win32":
             env.AppendUnique(CCFLAGS = ["-D_GNU_SOURCE"])
             env.AppendUnique(LIBS = Split("mingw32 SDLmain SDL SDL_image SDL_ttf"))
-            env.AppendUnique(LINKFLAGS = ["-mwindows", "-s"])
+            env.AppendUnique(LINKFLAGS = ["-mwindows"])
     else:
         if require_version:
             context.Message("Checking for %s library version >= %d.%d.%d... " % (sdl_lib, major_version, minor_version, patchlevel))

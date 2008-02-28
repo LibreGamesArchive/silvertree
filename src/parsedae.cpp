@@ -77,33 +77,39 @@ void scale_translation_vector(MatrixP3f& mat)
 	mat.setTranslationVector(vec);
 }
 
+#ifdef WIN32
+#define CALLBACK __stdcall
+#else
+#define CALLBACK
+#endif
+
 class Tesselator
 {
 	GLUtesselator* tesselator_;
 	vector<model::vertex_ptr> triangles_;
 	Eigen::Vector3d* positions_;
 
-	static void begin(GLenum type, void* polygon_data) {}
-	static void edge_flag(GLboolean flag, void* polygon_data) {} // This callback is necessary to ensure that only GL_TRIANGLES
+	static void CALLBACK begin(GLenum type, void* polygon_data) {}
+	static void CALLBACK edge_flag(GLboolean flag, void* polygon_data) {} // This callback is necessary to ensure that only GL_TRIANGLES
 								     // primitives are generated.
-	static void vertex(void* vertex_data, void* polygon_data)
+	static void CALLBACK vertex(void* vertex_data, void* polygon_data)
 	{
 		vector<model::vertex_ptr>* triangles = static_cast<vector<model::vertex_ptr>*>(polygon_data);
 		model::vertex_ptr* vertex = static_cast<model::vertex_ptr*>(vertex_data);
 
 		triangles->push_back(*vertex);
 	}
-	static void end(void* polygon_data) {}
+	static void CALLBACK end(void* polygon_data) {}
 
 	public:
 	Tesselator()
 	{
 		tesselator_ = gluNewTess();
 
-		gluTessCallback(tesselator_, GLU_TESS_BEGIN_DATA, (GLvoid(*)())begin);
-		gluTessCallback(tesselator_, GLU_TESS_EDGE_FLAG_DATA, (GLvoid(*)())edge_flag);
-		gluTessCallback(tesselator_, GLU_TESS_VERTEX_DATA, (GLvoid(*)())vertex);
-		gluTessCallback(tesselator_, GLU_TESS_END_DATA, (GLvoid(*)())end);
+		gluTessCallback(tesselator_, GLU_TESS_BEGIN_DATA, (CALLBACK void (*)())begin);
+		gluTessCallback(tesselator_, GLU_TESS_EDGE_FLAG_DATA, (CALLBACK void (*)())edge_flag);
+		gluTessCallback(tesselator_, GLU_TESS_VERTEX_DATA, (CALLBACK void (*)())vertex);
+		gluTessCallback(tesselator_, GLU_TESS_END_DATA, (CALLBACK void (*)())end);
 	}
 	~Tesselator()
 	{
