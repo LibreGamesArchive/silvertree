@@ -23,6 +23,7 @@ opts.AddOptions(
 )
 
 env = Environment(tools = ["zip", "config_checks"], toolpath = ["scons"], options = opts)
+env["Build"] = env["Build"].lower()
 if env["PLATFORM"] == "win32":
     env.Tool("mingw")
 else:
