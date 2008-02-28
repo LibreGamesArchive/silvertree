@@ -4,7 +4,7 @@
 #include "texture.hpp"
 #include "world.hpp"
 
-#include <SDL/SDL_image.h>
+#include <SDL_image.h>
 
 #ifdef AUDIO
 #include "audio/audio.hpp"
