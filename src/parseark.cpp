@@ -161,6 +161,7 @@ void parse_mesh(const char*& i1, const char* i2, std::vector<graphics::model::fa
 model_ptr parseark(const char* i1, const char* i2)
 {
 	const GLfloat material_data[] = {1.0,1.0,1.0,1.0};
+	const GLfloat material_data_specular[] = {0.0,0.0,0.0,1.0};
 
 	std::vector<const_material_ptr> materials;
 	std::vector<model::face> faces;
@@ -174,7 +175,7 @@ model_ptr parseark(const char* i1, const char* i2)
 				m->set_texture(token);
 				m->set_ambient(material_data);
 				m->set_diffuse(material_data);
-				m->set_specular(material_data);
+				m->set_specular(material_data_specular);
 				materials.push_back(m);
 			}
 		} else if(token == "SubModels") {

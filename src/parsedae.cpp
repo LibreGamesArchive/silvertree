@@ -531,10 +531,10 @@ const_material_ptr COLLADA::get_material(const TiXmlElement* material_element) c
 {
 	material_ptr mat(new material);
 	GLfloat material_data[] = {1.0,1.0,1.0,1.0};
+	GLfloat material_data_specular[] = {0.0,0.0,0.0,1.0};
 	mat->set_ambient(material_data);
 	mat->set_diffuse(material_data);
-	mat->set_specular(material_data);
-	mat->set_shininess(12.5);
+	mat->set_specular(material_data_specular);
 	bool have_texture = false;
 	const char* effect_url = material_element->FirstChildElement("instance_effect")->Attribute("url");
 	const TiXmlElement* effect_element = resolve_shorthand_ptr(effect_url);
