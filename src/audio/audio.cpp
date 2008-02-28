@@ -37,10 +37,8 @@ void init_audio(const std::string& device) {
 /* audio context members */
 audio_context::audio_context() : frozen_(false) {
     context_.reset(new openalc::context(wrapper->get_device()));
-    if(context_->isShared()) {
-        if(!context_stack.empty()) {
-            context_stack.back()->freeze();
-        }
+    if(!context_stack.empty()) {
+        context_stack.back()->freeze();
     }
     context_stack.push_back(this);
     context_->setAsCurrent();
@@ -48,10 +46,8 @@ audio_context::audio_context() : frozen_(false) {
 
 audio_context::~audio_context() {
     context_stack.pop_back();
-    if(context_->isShared()) {
-        if(!context_stack.empty()) {
-            context_stack.back()->resume();
-        }
+    if(!context_stack.empty()) {
+        context_stack.back()->resume();
     }
 }
 
@@ -97,6 +93,8 @@ void audio_context::resume() {
         return;
     }
     frozen_ = false;
+    context_->setAsCurrent();
+
     clean_up();
     for(std::vector<source_weak_ptr>::iterator itor = sources_.begin();
         itor != sources_.end(); ++itor) {
@@ -108,9 +106,6 @@ void audio_context::resume() {
 }
 
 void audio_context::pump_sound() {
-    if(!context_->isCurrent()) {
-        context_->setAsCurrent();
-    }
     if(frozen_) {
         resume();
     }

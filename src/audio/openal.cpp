@@ -28,10 +28,9 @@ source::~source() {
     set_throws(false);
     if(init_) {
         if(sound_) {
-            bool threw = sound_->will_throw();
-            sound_->set_throws(false);
+            sound_->push_throws(false);
             sound_->deapply(*this);
-            sound_->set_throws(threw);
+            sound_->pop_throws();
         }
         alDeleteSources(1, &name_);
         check_error("alDeleteSources (source::~source)");
@@ -92,10 +91,9 @@ stream::~stream() {
     set_throws(false);
     while(!users_.empty()) {
         source* user = users_.back();
-        bool threw = user->will_throw();
-        user->set_throws(false);
+        user->push_throws(false);
         user->set_sound(NULL);
-        user->set_throws(threw);
+        user->pop_throws();
     }
     if(state_ > START) {
         alDeleteBuffers(num_buffers_, buffers_.get());

@@ -1,3 +1,4 @@
+#include "openal.hpp"
 #include "openalc.hpp"
 #include "../string_utils.hpp"
 
@@ -5,11 +6,6 @@
 #include <sstream>
 
 namespace openalc {
-
-namespace {
-int shared_context_count = 0;
-std::vector<ALCcontext*> dead_real_contexts;
-}
 
 bool wrapper::check_error(ALCdevice *dev, const std::string& op) const {
     wrapper *non_const_this = const_cast<wrapper*>(this);
@@ -93,7 +89,7 @@ ALCenum device::get_enum(const std::string& name) const {
 std::string device::get_specifier() const {
     return get_string(ALC_DEVICE_SPECIFIER);
 }
-std::vector<std::string> device::get_extensions() {
+std::vector<std::string> device::get_extensions() const {
     std::string extension_string = get_string(ALC_EXTENSIONS);
     if(!extension_string.empty()) {
         return util::split(extension_string, ' ');
@@ -115,51 +111,150 @@ std::string device::get_string(ALCenum token) const {
     return "";
 }    
 
-context::context(device& dev) : dev_(dev), shared_(false) {
-    context_ = alcCreateContext(dev_.device_, NULL);
-    {
-        bool threw = will_throw();
-        set_throws(false);
-        check_error(dev_.device_, "alcCreateContext (context::context)");
-        set_throws(threw);
+void device::detect_version() {
+#ifdef linux
+    if(openal::get_renderer() == "OpenAL Soft") {
+        alc_implementation_ = OPENAL_SOFT;
+        return;
+    } 
+    if(openal::get_vendor() == "OpenAL Community") {
+        alc_implementation_ = OPENAL_RI_LINUX;
+        return;
     }
-    /* some openal implementations only support 1 context 
-       so we have to subvert our own system briefly
+#endif
+    alc_implementation_ = OPENAL_OTHER;
+}
+
+ALCcontext *device::add_context(const context *c, bool& shared) {
+    ALCcontext *context;
+
+    /*
+       ri only processes 1 context (you can have more, they just never reach
+       the mixing loop)
     */
-    if(get_error_code() == ALC_INVALID_VALUE) {
-        context_ = alcGetCurrentContext();
-        shared_ = true;
-        ++shared_context_count;
-    } else if(has_error() && will_throw()) {
-        throw exception(get_error_code());
+    if(alc_implementation_ == OPENAL_RI_LINUX) {
+        context = alcGetCurrentContext();
+        check_error(device_, "alcGetCurrentContext (device::add_context)");
+        shared = true;
+        ++shared_context_count_ ;
+    } else {
+        context = alcCreateContext(device_, NULL);
+        push_throws(false);
+        check_error(device_, "alcCreateContext (device::add_context)");
+        pop_throws();
     }
+    
+    if(alc_implementation_ != OPENAL_RI_LINUX && context && !has_error()) {
+        ++total_contexts_;
+
+        /* catch 22 - unless the call succeeds we cant get the version
+           -  if the call doesnt succeed, we need the version
+           infact the ri will only return meaningful values if a 
+           context has been set as current
+        */
+        
+        /* this is really brutal hackery */
+        if(alc_implementation_ == OPENAL_UNKNOWN) {
+            ALCcontext *old = alcGetCurrentContext();
+            check_error(device_, "alcGetCurrentContext (device::add_context) [2]");
+            alcMakeContextCurrent(context);
+            check_error(device_, "alcMakeContextCurrent (device::add_context)");
+            detect_version();
+            /* watch out for the fact that restoring the old null context after
+               having set a non-null context will bomb the ri */
+            if(alc_implementation_ != OPENAL_RI_LINUX) {
+                alcMakeContextCurrent(old);
+                check_error(device_, "alcMakeContextCurrent (device::add_context) [2]");
+            }
+        }
+    }
+
+    /* openal-soft only supports 1 context 
+     */
+    if(alc_implementation_ == OPENAL_SOFT && get_error_code() == ALC_INVALID_VALUE) {
+        context = alcGetCurrentContext();
+        shared = true;
+        ++shared_context_count_ ;
+    } else if(has_error()) {
+        /* prefer to die here so we can accumulate a list of AL versions with
+           context issues and manually check for them, reducing the risk we just
+           ignore valid and important errors from well written implementations */
+        std::cerr << "Your version of OpenAL maxed out at "<<(total_contexts_)<<" contexts.\n"
+                  << "Please report the following details to the Silvertree maintainers:\n"
+                  << "Vendor: "<<openal::get_vendor()<<"\n"
+                  << "Renderer: "<<openal::get_renderer()<<"\n"
+                  << "Device: "<<get_specifier()<<"\n"
+                  << "AL Version: "<<openal::get_version()<<"\n"
+                  << "ALC Version: "<<openalc::get_version()<<"\n";
+        if(will_throw()) {
+            throw exception(get_error_code());
+        }
+    } 
+
+    return context;
+}
+
+void device::cleanup_contexts() {
+    if(alc_implementation_ != OPENAL_RI_LINUX) {
+        return;
+    }
+    /* we only have one context and we couldn't risk destroying it
+       before... we can afford to do it now in the destructor */
+    ALCcontext *context = alcGetCurrentContext();
+    check_error(device_, "alcGetCurrentContext (device::cleanup_contexts)");
+    if(context) {
+        alcMakeContextCurrent(NULL);
+        check_error(device_, "alcMakeContextCurrent (device::cleanup_contexts)");
+        alcDestroyContext(context);
+        check_error(device_, "alcDestroyContext (device::cleanup_contexts)");
+    }
+}
+
+void device::destroy_context(context *c) {
+    if(c->isShared()) {
+        --shared_context_count_;
+    } else {
+        dead_real_contexts_.push_back(c->context_);
+    }
+
+    if(shared_context_count_ == 0 && alc_implementation_ != OPENAL_RI_LINUX) {
+        bool changed;
+        do {
+            changed = false;
+            for(std::vector<ALCcontext*>::iterator itor = dead_real_contexts_.begin();
+                itor != dead_real_contexts_.end(); ++itor) {
+                
+                ALCcontext *cur;
+                cur = alcGetCurrentContext();
+                check_error(device_, "alcGetCurrentContext (device::destroy_context)");
+                
+                if(cur == *itor) {
+                    alcMakeContextCurrent(NULL);
+                    check_error(device_, "alcMakeContextCurrent (device::destroy_context)");
+                }
+                alcDestroyContext(*itor);
+                check_error(device_, "alcDestroyContext (device::destroy_context)");
+                --total_contexts_;
+                dead_real_contexts_.erase(itor);
+                changed = true;
+                break;
+            }
+        } while(changed);
+    }
+}
+
+context::context(device& dev) : dev_(dev), shared_(false) {
+    context_ = dev_.add_context(this, shared_);
 }
 
 context::~context() {
     set_throws(false);
-    if(isShared()) {
-        --shared_context_count;
-    } else {
-        dead_real_contexts.push_back(context_);
+    {
+        dev_.push_throws(false);
+        dev_.destroy_context(this);
+        dev_.pop_throws();
     }
-
-    if(shared_context_count == 0) {
-        for(std::vector<ALCcontext*>::iterator itor = dead_real_contexts.begin();
-            itor != dead_real_contexts.end(); ++itor) {
-
-            ALCcontext *cur;
-            cur = alcGetCurrentContext();
-            check_error(dev_.device_, "alcGetCurrentContext (context::~context)");
-
-            if(cur == *itor) {
-                alcMakeContextCurrent(NULL);
-                check_error(dev_.device_, "alcMakeContextCurrent (context::~context)");
-            }
-            alcDestroyContext(*itor);
-            check_error(dev_.device_, "alcDestroyContext (context::~context)");
-        }
-        dead_real_contexts.clear();
-    }
+    
 }
 void context::process() {
     alcProcessContext(context_);
@@ -175,8 +270,10 @@ bool context::isCurrent() {
     return ret;
 }
 void context::setAsCurrent() {
-    alcMakeContextCurrent(context_);
-    check_error(dev_.device_, "alcMakeContextCurrent (context::setAsCurrent)");
+    if(dev_.alc_implementation_ != device::OPENAL_RI_LINUX) {
+        alcMakeContextCurrent(context_);
+        check_error(dev_.device_, "alcMakeContextCurrent (context::setAsCurrent)");
+    }
 }
 
 bool context::isShared() {

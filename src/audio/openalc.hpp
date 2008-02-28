@@ -36,28 +36,51 @@ public:
     }
     bool will_throw() { return throws_; }
     void set_throws(bool throws) { throws_ = throws; }
+    void push_throws(bool throws) { 
+        throws_stack_.push_back(throws_); 
+        set_throws(throws); 
+    }
+    void pop_throws() {
+        if(!throws_stack_.empty()) {
+            set_throws(throws_stack_.back());
+            throws_stack_.pop_back(); 
+        }
+    }
 protected:
     bool check_error(ALCdevice *device, const std::string& op) const;
 private:
     ALCenum err_;
     bool throws_;
+    std::vector<bool> throws_stack_;
 };              
+
+/* forward decl */
+class context;
 
 class device: public wrapper {
 public:
     friend class context;
+    enum implementation {
+        OPENAL_RI_LINUX,
+        OPENAL_SOFT,
+        OPENAL_OTHER,
+        OPENAL_UNKNOWN
+    };
     static std::vector<std::string> get_available_devices();
     static std::string get_default_device();
 
-    device(const std::string& name) 
-        : device_(alcOpenDevice(name.c_str())) {
-        check_error(device_, "alcOpenDevice (device::device(string))");
-    }
-    device() : device_(alcOpenDevice(NULL)) {
+    device(const std::string& name="") 
+        : device_(alcOpenDevice(name.empty() ? NULL : name.c_str())),
+          shared_context_count_(0), alc_implementation_(OPENAL_UNKNOWN),
+          total_contexts_(0)
+    {
         check_error(device_, "alcOpenDevice (device::device)");
+        
     }
 
     ~device() {
+        set_throws(false);
+        cleanup_contexts();
         alcCloseDevice(device_);
     }
     
@@ -65,16 +88,29 @@ public:
     void *get_extension(const std::string& name) const;
     ALCenum get_enum(const std::string& name) const;
     std::string get_specifier() const;
-    std::vector<std::string> get_extensions();
+    std::vector<std::string> get_extensions() const;
+
+    ALCcontext *add_context(const context *c, bool& shared);
+    void destroy_context(context *c);
 protected:
     std::string get_string(ALCenum token) const;
 private:
+    void detect_version();
+    void cleanup_contexts();
     ALCdevice *device_;
+
+    /* all of this to try to get buggy openal working
+       under linux */
+    int shared_context_count_;
+    std::vector<ALCcontext*> dead_real_contexts_;
+    implementation alc_implementation_;    
+    int total_contexts_;
 };
 
 
 class context: public wrapper {
 public:
+    friend class device;
     context(device& dev);
     ~context();
     void process();
