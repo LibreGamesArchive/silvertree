@@ -34,14 +34,7 @@
 #include "tracks.hpp"
 #include "wml_node.hpp"
 #include "world_fwd.hpp"
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#ifdef AUDIO
 #include "audio/audio.hpp"
-#endif
 
 namespace game_logic
 {

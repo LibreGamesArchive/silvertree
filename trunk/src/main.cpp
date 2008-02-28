@@ -43,10 +43,7 @@
 #include "titlescreen.hpp"
 #include "translate.hpp"
 #include "world.hpp"
-
-#ifdef AUDIO
 #include "audio/audio.hpp"
-#endif
 
 extern "C" int main(int argc, char** argv)
 {

@@ -1,6 +1,12 @@
 #ifndef AUDIO_HPP_INCLUDED
 #define AUDIO_HPP_INCLUDED
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef AUDIO
+
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -48,9 +54,10 @@ private:
 typedef boost::shared_ptr<audio_context> audio_context_ptr;
 typedef util::scoped_shared_ptr<audio_context> scoped_audio_context_ptr;
 
-void init_audio(const std::string& device);
-void init_audio();
+bool init_audio(const std::string& device="");
+bool audio_available();
 
 }
 
+#endif
 #endif
