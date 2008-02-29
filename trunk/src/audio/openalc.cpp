@@ -175,11 +175,10 @@ ALCcontext *device::add_context(const context *c, bool& shared) {
         }
     }
 
-    /* openal-soft only supports 1 context 
+    /* generally, an openal implementation may support as few contexts as it
+       wishes (see programmer's guide). INVALID_VALUE means "no more contexts for you"
      */
-    if(get_error_code() == ALC_INVALID_VALUE &&
-       (alc_implementation_ == OPENAL_SOFT  ||
-        alc_implementation_ == OPENAL_CREATIVE_WINDOWS)) {
+    if(get_error_code() == ALC_INVALID_VALUE) {
         context = alcGetCurrentContext();
         shared = true;
         ++shared_context_count_ ;
