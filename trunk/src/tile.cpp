@@ -29,6 +29,8 @@
 #include "frustum.hpp"
 #endif
 
+#include "eigen/vector.h"
+
 namespace hex
 {
 
@@ -211,33 +213,17 @@ void tile::init_corners()
 	}
 
 	if(center_.init == false) {
-		GLfloat vectors[6][3];
-		for(int n = 0; n != 6; ++n) {
-			vectors[n][0] = corners_[n].x - center_.x;
-			vectors[n][1] = corners_[n].y - center_.y;
-			vectors[n][2] = corners_[n].height - center_.height;
+		Eigen::Vector3f positions[6];
+		for(int i = 0; i < 6; i++) {
+			positions[i] = Eigen::Vector3f(corners_[i].x, corners_[i].y, corners_[i].height);
 		}
+		Eigen::Vector3f normal;
+		normal = (positions[1] - positions[0]).cross(positions[2] - positions[1]);
+		normal.normalize();
 
-		std::fill(center_.normal,center_.normal+3,0.0);
-
-		for(int n = 0; n != 6; ++n) {
-			const GLfloat* v1 = vectors[n];
-			const GLfloat* v2 = vectors[(n+1)%6];
-			GLfloat normal[3];
-			normal[0] = v1[1]*v2[2] - v1[2]*v2[1];
-			normal[1] = v1[2]*v2[0] - v1[0]*v2[2];
-			normal[2] = v1[0]*v2[1] - v1[1]*v2[0];
-
-			if(normal[2] < 0.0) {
-				normal[0] *= -1.0;
-				normal[1] *= -1.0;
-				normal[2] *= -1.0;
-			}
-
-			center_.normal[0] += normal[0];
-			center_.normal[1] += normal[1];
-			center_.normal[2] += normal[2];
-		}
+		center_.normal[0] = normal[0];
+		center_.normal[1] = normal[1];
+		center_.normal[2] = normal[2];
 
 		center_.init = true;
 	}
@@ -275,32 +261,17 @@ GLfloat tile::height_at_point_vision(GLfloat x, GLfloat y) const
 
 void tile::init_normals()
 {
-	for(int n = 0; n != 6; ++n) {
-		GLfloat num = 1.0;
-		std::copy(center_.normal,center_.normal+3,
-		          corners_[n].normal);
-		const tile* n1 = neighbours_[n];
-		const tile* n2 = neighbours_[(n+1)%6];
-		if(n1 != NULL) {
-
-			for(int m = 0; m != 3; ++m) {
-				corners_[n].normal[m] += n1->center_.normal[m];
-			}
-
-			num += 1.0;
-		}
-
-		if(n2 != NULL) {
-			for(int m = 0; m != 3; ++m) {
-				corners_[n].normal[m] += n2->center_.normal[m];
-			}
-
-			num += 1.0;
-		}
-
-		for(int m = 0; m != 3; ++m) {
-			corners_[n].normal[m] /= num;
-		}
+	Eigen::Vector3f positions[6];
+	for(int i = 0; i < 6; i++) {
+		positions[i] = Eigen::Vector3f(corners_[i].x, corners_[i].y, corners_[i].height);
+	}
+	for(int n = 6; n < 12; n++) {
+		Eigen::Vector3f normal;
+		normal = (positions[n%6] - positions[(n-1)%6]).cross(positions[(n+1)%6] - positions[n%6]);
+		normal.normalize();
+		corners_[n%6].normal[0] = normal[0];
+		corners_[n%6].normal[1] = normal[1];
+		corners_[n%6].normal[2] = normal[2];
 	}
 }
 
