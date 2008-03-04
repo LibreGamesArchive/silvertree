@@ -1059,7 +1059,7 @@ void world::set_lighting() const
 	if(party_light && party_light_power) {
 		GLfloat position[] = { 0.0, 0.0, 0.0, 1.0 };
 		focus_->get_pos(position);
-		position[2] += 5.0;
+		position[2] += 1.0;
 		glEnable(GL_LIGHT4);
 		GLfloat ambient[] = {0.0,0.0,0.0,0.0};
 		GLfloat diffuse[] = {1.0,1.0,1.0,1.0};
@@ -1070,7 +1070,7 @@ void world::set_lighting() const
 		glLightfv(GL_LIGHT4, GL_POSITION, position);
 		glLightfv(GL_LIGHT4, GL_AMBIENT, ambient);
 		glLightfv(GL_LIGHT4, GL_DIFFUSE, diffuse);
-		glLightf(GL_LIGHT4, GL_CONSTANT_ATTENUATION, 0.0);
+		glLightf(GL_LIGHT4, GL_CONSTANT_ATTENUATION, 1.0);
 		glLightf(GL_LIGHT4, GL_QUADRATIC_ATTENUATION, GLfloat(party_light_power)/100.0);
 	} else {
 		glDisable(GL_LIGHT4);

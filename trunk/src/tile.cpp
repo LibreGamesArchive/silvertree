@@ -382,8 +382,8 @@ const GLfloat UVCorners[6][2] = {
 
 void tile::setup_drawing()
 {
-	GLfloat diffuse[] = {1.0,1.0,1.0,1.0};
-	GLfloat ambient[] = {0.6,0.6,0.6,1.0};
+	GLfloat diffuse[] = {0.6,0.6,0.6,1.0};
+	GLfloat ambient[] = {0.4,0.4,0.4,1.0};
 	GLfloat specular[] = {0.0,0.0,0.0,0.0};
 
 	glMaterialfv(GL_FRONT,GL_DIFFUSE,diffuse);
