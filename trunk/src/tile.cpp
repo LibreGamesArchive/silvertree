@@ -213,17 +213,6 @@ void tile::init_corners()
 	}
 
 	if(center_.init == false) {
-		Eigen::Vector3f positions[6];
-		for(int i = 0; i < 6; i++) {
-			positions[i] = Eigen::Vector3f(corners_[i].x, corners_[i].y, corners_[i].height);
-		}
-		Eigen::Vector3f normal;
-		normal = (positions[1] - positions[0]).cross(positions[2] - positions[1]);
-		normal.normalize();
-
-		center_.normal[0] = normal[0];
-		center_.normal[1] = normal[1];
-		center_.normal[2] = normal[2];
 
 		center_.init = true;
 	}
@@ -265,14 +254,22 @@ void tile::init_normals()
 	for(int i = 0; i < 6; i++) {
 		positions[i] = Eigen::Vector3f(corners_[i].x, corners_[i].y, corners_[i].height);
 	}
+	Eigen::Vector3f center_normal;
+	center_normal.loadZero();
 	for(int n = 6; n < 12; n++) {
 		Eigen::Vector3f normal;
 		normal = (positions[n%6] - positions[(n-1)%6]).cross(positions[(n+1)%6] - positions[n%6]);
 		normal.normalize();
+		center_normal += normal;
 		corners_[n%6].normal[0] = normal[0];
 		corners_[n%6].normal[1] = normal[1];
 		corners_[n%6].normal[2] = normal[2];
 	}
+	center_normal /= 6;
+	center_normal.normalize();
+	center_.normal[0] = center_normal[0];
+	center_.normal[1] = center_normal[1];
+	center_.normal[2] = center_normal[2];
 }
 
 void tile::init_particles()
@@ -547,27 +544,27 @@ void cliff_normal(int n, GLfloat& normalx, GLfloat& normaly)
 	switch(n%6) {
 	case 0:
 		normalx += 0.0;
-		normaly += -1.0;
+		normaly += 1.0;
 		break;
 	case 1:
-		normalx += -0.6666;
-		normaly += -0.3333;
+		normalx += 0.6666;
+		normaly += 0.3333;
 		break;
 	case 2:
-		normalx += -0.6666;
-		normaly += 0.3333;
+		normalx += 0.6666;
+		normaly += -0.3333;
 		break;
 	case 3:
 		normalx += 0.0;
-		normaly += 1.0;
+		normaly += -1.0;
 		break;
 	case 4:
-		normalx += 0.6666;
-		normaly += 0.3333;
+		normalx += -0.6666;
+		normaly += -0.3333;
 		break;
 	case 5:
-		normalx += 0.6666;
-		normaly += -0.3333;
+		normalx += -0.6666;
+		normaly += 0.3333;
 		break;
 	default:
 		assert(false);
