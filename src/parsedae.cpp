@@ -489,7 +489,7 @@ pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_
 							vertex_ptrs.insert(make_pair(vertex_index, vertex));
 							vertex->point = positions[position_index];
 							if(have_normals) {
-								vertex->normal = -normals[normal_index];
+								vertex->normal = normals[normal_index];
 							}
 							if(have_texcoords) {
 								vertex->uvmap = texcoords[texcoord_index];
