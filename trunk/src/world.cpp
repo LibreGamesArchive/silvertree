@@ -1019,7 +1019,7 @@ void world::set_lighting() const
 {
 	if(time_.hour() >= 6 && time_.hour() <= 17) {
 		const GLfloat x = 2.0*GLfloat((time_.hour()-6)*60 + time_.minute())/(60.0*12.0) - 1.0;
-		const GLfloat y = -std::sqrt(std::max(0.0,1.0 - x*x));
+		const GLfloat y = std::sqrt(std::max(0.0,1.0 - x*x));
 
 		GLfloat direction[] = {x,0.0,y,0.0};
 		glLightfv(GL_LIGHT0, GL_POSITION, direction);
