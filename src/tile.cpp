@@ -367,16 +367,17 @@ void tile::calculate_corner(int n)
 
 namespace {
 
-const GLfloat UVVerticalMargin = 9.0/125.0;
-const GLfloat UVHorizontalMargin = 33.0/125.0;
+const GLfloat UVVerticalMargin = 10.0/128.0;
+const GLfloat UVHorizontalMargin = 33.0/128.0;
 const GLfloat UVCenter[] = {0.5,0.5};
 const GLfloat UVCorners[6][2] = {
-	{1.0-UVHorizontalMargin,UVVerticalMargin},
-	{1.0,0.5},
 	{1.0-UVHorizontalMargin,1.0-UVVerticalMargin},
-	{UVHorizontalMargin,1.0-UVVerticalMargin},
-	{0.0,0.5},
-	{UVHorizontalMargin,UVVerticalMargin} };
+	{1.0,0.5},
+	{1.0-UVHorizontalMargin,UVVerticalMargin + 2.0/128.0},
+	{UVHorizontalMargin + 6.0/128.0,UVVerticalMargin + 2.0/128.0},
+	{6.0/128.0,0.5},
+	{UVHorizontalMargin + 6.0/128.0,1.0-UVVerticalMargin}
+};
 
 }
 
