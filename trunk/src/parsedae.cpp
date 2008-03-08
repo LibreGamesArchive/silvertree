@@ -38,7 +38,9 @@ using std::multimap;
 using std::string;
 using std::istringstream;
 using std::pair;
+using boost::tuple;
 using std::make_pair;
+using boost::make_tuple;
 using boost::tie;
 using Eigen::Vector2f;
 using Eigen::Vector3f;
@@ -146,11 +148,28 @@ class COLLADA
 
 	vector<std::pair<string, GLenum> > primitive_types;
 
+	struct id_collector : public TiXmlVisitor
+	{
+		bool sid_;
+		map<string,const TiXmlElement*>& ids_;
+		id_collector(map<string,const TiXmlElement*>& ids, bool sid = false) 
+			: sid_(sid), ids_(ids) {}
+		bool VisitEnter(const TiXmlElement& element, const TiXmlAttribute* attribute)
+		{
+			const char* id = element.Attribute(sid_ ? "sid" : "id");
+			if(id) {
+				ids_[id] = &element;
+			}
+			return true;
+		}
+	};
+
 	const TiXmlElement* resolve_shorthand_ptr(string ptr) const;
+	const TiXmlElement* resolve_id(string id, const TiXmlElement* parent = NULL, bool sid = false) const;
 	void get_transform_from_node(const TiXmlElement*, MatrixP3f&) const;
 	pair<vector<model::face>, multimap<int, model::vertex_ptr> > get_faces_from_geometry(const TiXmlElement*) const;
 	pair<vector<model::face>, vector<model::bone> > get_faces_and_bones_from_node(const TiXmlElement*) const;
-	pair<vector<model::face>, vector<model::bone> > get_faces_and_bones_from_controller(const TiXmlElement*) const;
+	tuple<vector<model::face>, vector<model::bone>, bool > get_faces_and_bones_from_controller(const TiXmlElement*) const;
 	void get_bones_from_skeleton(const TiXmlElement*, vector<model::bone>&, bool is_sid = false) const;
 	void bind_materials(const TiXmlElement*, vector<model::face>& faces) const;
 	const_material_ptr get_material(const TiXmlElement*) const;
@@ -175,21 +194,8 @@ COLLADA::COLLADA(const char* i1)
 	if(root_->Value() != string("COLLADA"))
 		throw parsedae_error("Not a COLLADA document.");
 
-	struct id_collector_t : public TiXmlVisitor
-	{
-		map<string,const TiXmlElement*>& ids_;
-		id_collector_t(map<string,const TiXmlElement*>& ids) 
-			: ids_(ids) {}
-		bool VisitEnter(const TiXmlElement& element, const TiXmlAttribute* attribute)
-		{
-			const char* id = element.Attribute("id");
-			if(id) {
-				ids_[id] = &element;
-			}
-			return true;
-		}
-	} id_collector(ids_);
-	root_->Accept(&id_collector);
+	id_collector collector(ids_);
+	root_->Accept(&collector);
 }
 
 const TiXmlElement* COLLADA::resolve_shorthand_ptr(string id) const
@@ -197,11 +203,29 @@ const TiXmlElement* COLLADA::resolve_shorthand_ptr(string id) const
 	if(id[0] != '#')
 		throw parsedae_error(string("Unable to resolve url: ") + id + ". Only shorthand pointers are supported.");
 	id.erase(id.begin());
-	map<string,const TiXmlElement*>::const_iterator id_iter = ids_.find(id);
-	if(id_iter == ids_.end())
-		throw parsedae_error(string("Unable to resolve shorthand pointer: #") + id);
-	else
-		return id_iter->second;
+	return resolve_id(id);
+}
+
+const TiXmlElement* COLLADA::resolve_id(string id, const TiXmlElement* parent, bool sid) const
+{
+	map<string,const TiXmlElement*>::const_iterator id_iter;
+	if(sid) {
+		map<string,const TiXmlElement*> sids;
+		id_collector collector(sids, true);
+		parent->Accept(&collector);
+		id_iter = sids.find(id);
+		if(id_iter == sids.end())
+			throw parsedae_error(string("Unable to resolve SID: ") + id + " under parent ID: " + string(parent->Attribute("id")));
+		else
+			return id_iter->second;
+	}
+	else {
+		id_iter = ids_.find(id);
+		if(id_iter == ids_.end())
+			throw parsedae_error(string("Unable to resolve ID: ") + id);
+		else
+			return id_iter->second;
+	}
 }
 
 pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones() const
@@ -243,11 +267,12 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 	for(; controller; controller = controller->NextSiblingElement("instance_controller")) {
 		vector<model::face> controller_faces;
 		vector<model::bone> controller_bones;
-		tie(controller_faces, controller_bones) = get_faces_and_bones_from_controller(resolve_shorthand_ptr(controller->Attribute("url")));
+		bool sids;
+		tie(controller_faces, controller_bones, sids) = get_faces_and_bones_from_controller(resolve_shorthand_ptr(controller->Attribute("url")));
 		bind_materials(controller, controller_faces);
 		const TiXmlElement* skeleton = controller->FirstChildElement("skeleton");
 		if(skeleton) {
-			get_bones_from_skeleton(resolve_shorthand_ptr(skeleton->GetText()), controller_bones);
+			get_bones_from_skeleton(resolve_shorthand_ptr(skeleton->GetText()), controller_bones, sids);
 		}
 		else
 			continue;
@@ -316,10 +341,7 @@ void COLLADA::bind_materials(const TiXmlElement* instance, vector<model::face>& 
 void COLLADA::get_bones_from_skeleton(const TiXmlElement* node, vector<model::bone>& bones, bool is_sid) const
 {
 	foreach(model::bone& bone, bones) {
-		map<string,const TiXmlElement*>::const_iterator bone_node_iter = ids_.find(bone.name);
-		if(bone_node_iter == ids_.end())
-			throw parsedae_error(string("Failed to find bone node ID ") + bone.name + " referenced by <joints> element.");
-		const TiXmlElement* bone_node = bone_node_iter->second;
+		const TiXmlElement* bone_node = resolve_id(bone.name, node, is_sid);
 		if(bone_node->Attribute("type") && bone_node->Attribute("type") == string("JOINT")) {
 			get_transform_from_node(bone_node, bone.transform);
 			const TiXmlElement* parent_node = bone_node->Parent()->ToElement();
@@ -337,11 +359,12 @@ void COLLADA::get_bones_from_skeleton(const TiXmlElement* node, vector<model::bo
 	}
 }
 
-pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_from_controller(const TiXmlElement* controller) const
+tuple<vector<model::face>, vector<model::bone>, bool > COLLADA::get_faces_and_bones_from_controller(const TiXmlElement* controller) const
 {
 	vector<model::face> faces;
 	vector<model::bone> bones;
 	multimap<int, model::vertex_ptr> vertices;
+	bool sids = false;
 
 	const TiXmlElement* skin = controller->FirstChildElement("skin");
 	if(skin) {
@@ -351,7 +374,13 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 		const TiXmlElement* input = joints->FirstChildElement("input");
 		for(;input; input = input->NextSiblingElement("input")) {
 			if(input->Attribute("semantic") == string("JOINT")) {
-				bone_ids = get_array<string>(resolve_shorthand_ptr(input->Attribute("source"))->FirstChildElement("IDREF_array"));
+				const TiXmlElement* ids = resolve_shorthand_ptr(input->Attribute("source"))->FirstChildElement("IDREF_array");
+				sids = false;
+				if(ids == NULL) {
+					ids = resolve_shorthand_ptr(input->Attribute("source"))->FirstChildElement("Name_array");
+					sids = true;
+				}
+				bone_ids = get_array<string>(ids);
 			}
 			if(input->Attribute("semantic") == string("INV_BIND_MATRIX")) {
 				inv_bind_matrices = get_array<MatrixP3f>(resolve_shorthand_ptr(input->Attribute("source"))->FirstChildElement("float_array"));
@@ -409,7 +438,7 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 			v += (max_offset+1)*vcount;
 		}
 	}
-	return make_pair(faces, bones);
+	return make_tuple(faces, bones, sids);
 }
 
 pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_from_geometry(const TiXmlElement* geometry) const
