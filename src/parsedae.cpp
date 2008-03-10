@@ -591,6 +591,8 @@ const_material_ptr COLLADA::get_material(const TiXmlElement* material_element) c
 	}
 	if(technique && !have_texture) {
 		const TiXmlElement* phong = technique->FirstChildElement("phong");
+		if(!phong)
+			phong = technique->FirstChildElement("lambert");
 		if(phong) {
 			const TiXmlElement* color = phong->FirstChildElement();
 			const TiXmlElement* color_value;
