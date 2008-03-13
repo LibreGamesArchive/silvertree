@@ -185,6 +185,7 @@ COLLADA::COLLADA(const char* i1)
 	primitive_types.push_back(std::make_pair(string("triangles"), GL_TRIANGLES));
 	primitive_types.push_back(std::make_pair(string("tristrips"), GL_TRIANGLE_STRIP));
 	primitive_types.push_back(std::make_pair(string("polylist"), GL_TRIANGLES));
+	primitive_types.push_back(std::make_pair(string("polygons"), GL_TRIANGLES));
 
 	doc_.Parse(i1);
 	if(doc_.Error())
@@ -271,11 +272,10 @@ pair<vector<model::face>, vector<model::bone> > COLLADA::get_faces_and_bones_fro
 		tie(controller_faces, controller_bones, sids) = get_faces_and_bones_from_controller(resolve_shorthand_ptr(controller->Attribute("url")));
 		bind_materials(controller, controller_faces);
 		const TiXmlElement* skeleton = controller->FirstChildElement("skeleton");
-		if(skeleton) {
+		if(skeleton)
 			get_bones_from_skeleton(resolve_shorthand_ptr(skeleton->GetText()), controller_bones, sids);
-		}
 		else
-			continue;
+			get_bones_from_skeleton(NULL, controller_bones);
 		if(controller_bones.size() != 0 && bones.size() != 0)
 			throw parsedae_error("Loading multiple skins from one file is not supported.");
 		faces.insert(faces.end(), controller_faces.begin(), controller_faces.end());
@@ -488,7 +488,18 @@ pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_
 				}
 
 				if(have_positions) {
-					vector<int> primitive_indices = get_array<int>(primitive_element->FirstChildElement("p"));
+					vector<int> primitive_indices;
+					vector<int> polygons;
+					if(primitive_type.first == string("polygons")) {
+						const TiXmlElement* polygon = primitive_element->FirstChildElement("p");
+						for(; polygon; polygon = polygon->NextSiblingElement("p")) {
+							vector<int> poly = get_array<int>(polygon);
+							polygons.push_back(poly.size()/(max_offset+1));
+							primitive_indices.insert(primitive_indices.end(), poly.begin(), poly.end());
+						}
+					} else {
+						primitive_indices = get_array<int>(primitive_element->FirstChildElement("p"));
+					}
 					faces.push_back(model::face());
 					model::face& face = faces.back();
 					const char* material_name = primitive_element->Attribute("material");
@@ -530,12 +541,13 @@ pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_
 						}
 					}
 
-					if(primitive_type.first == string("polylist")) {
+					if(primitive_type.first == string("polylist") || primitive_type.first == string("polygons")) {
 						vector<model::vertex_ptr> tesselated_polygons;
-						vector<int> vcounts = get_array<int>(primitive_element->FirstChildElement("vcount"));
+						if(primitive_type.first == string("polylist"))
+							polygons = get_array<int>(primitive_element->FirstChildElement("vcount"));
 						int i = 0;
 						Tesselator tess;
-						foreach(int vcount, vcounts) {
+						foreach(int vcount, polygons) {
 							vector<model::vertex_ptr> tesselated_polygon;
 							tesselated_polygon = tess.tesselate(vector<model::vertex_ptr>(face.vertices.begin() + i, face.vertices.begin() + i + vcount));
 							i += vcount;
