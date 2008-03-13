@@ -582,6 +582,7 @@ const_material_ptr COLLADA::get_material(const TiXmlElement* material_element) c
 	mat->set_ambient(material_data);
 	mat->set_diffuse(material_data);
 	mat->set_specular(material_data_specular);
+	mat->set_emission(material_data_specular);
 	bool have_texture = false;
 	const char* effect_url = material_element->FirstChildElement("instance_effect")->Attribute("url");
 	const TiXmlElement* effect_element = resolve_shorthand_ptr(effect_url);
@@ -609,6 +610,13 @@ const_material_ptr COLLADA::get_material(const TiXmlElement* material_element) c
 			const TiXmlElement* color = phong->FirstChildElement();
 			const TiXmlElement* color_value;
 			for(;color;color = color->NextSiblingElement()) {
+				if(color->Value() == string("emission")) {
+					color_value = color->FirstChildElement("color");
+					if(color_value) {
+						parse4vector(color_value->GetText(), material_data);
+						mat->set_emission(material_data);
+					}
+				}
 				if(color->Value() == string("ambient")) {
 					color_value = color->FirstChildElement("color");
 					if(color_value) {
