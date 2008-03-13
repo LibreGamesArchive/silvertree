@@ -29,6 +29,7 @@ public:
 	material();
 
 	void set_texture(const std::string& fname);
+	void set_emission(const GLfloat* v);
 	void set_ambient(const GLfloat* v);
 	void set_diffuse(const GLfloat* v);
 	void set_specular(const GLfloat* v);
@@ -41,7 +42,7 @@ private:
 	texture tex_;
 
 	typedef boost::array<GLfloat,4> color;
-	color ambient_, diffuse_, specular_;
+	color ambient_, diffuse_, specular_, emission_;
 	GLfloat shininess_;
 };
 

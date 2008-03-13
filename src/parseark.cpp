@@ -173,6 +173,7 @@ model_ptr parseark(const char* i1, const char* i2)
 			while(get_next_token(i1, i2, &token) && token != rbrace) {
 				material_ptr m(new material);
 				m->set_texture(token);
+				m->set_emission(material_data_specular);
 				m->set_ambient(material_data);
 				m->set_diffuse(material_data);
 				m->set_specular(material_data_specular);

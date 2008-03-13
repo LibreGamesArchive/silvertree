@@ -25,6 +25,12 @@ void material::set_texture(const std::string& image)
 	tex_ = texture::get(surface_cache::get(image));
 }
 
+void material::set_emission(const GLfloat* v)
+{
+	std::copy(v,v+3,emission_.begin());
+	emission_[3] = 1.0;
+}
+
 void material::set_ambient(const GLfloat* v)
 {
 	std::copy(v,v+3,ambient_.begin());
@@ -50,6 +56,7 @@ void material::set_shininess(GLfloat shininess)
 
 void material::set_as_current_material() const
 {
+	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,emission_.data());
 	glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,ambient_.data());
 	glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,diffuse_.data());
 	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,specular_.data());
