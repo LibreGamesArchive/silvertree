@@ -1,0 +1,91 @@
+; installer.nsi.template
+;
+; nsi script template based on example2.nsi
+
+;--------------------------------
+
+SetCompressor /SOLID lzma
+
+; The name of the installer
+Name "%(name)s"
+
+; The file to write
+OutFile "%(name)s-%(version)s.exe"
+
+; The default installation directory
+InstallDir $PROGRAMFILES\%(name)s
+
+; Registry key to check for directory (so if you install again, it will 
+; overwrite the old one automatically)
+InstallDirRegKey HKLM "Software\%(name)s" "Install_Dir"
+
+; Request application privileges for Windows Vista
+RequestExecutionLevel admin
+
+;--------------------------------
+
+; Pages
+
+Page components
+Page directory
+Page instfiles
+
+UninstPage uninstConfirm
+UninstPage instfiles
+
+;--------------------------------
+
+; The stuff to install
+Section "%(name)s (required)"
+
+  SectionIn RO
+  
+  ; Set output path to the installation directory.
+  SetOutPath $INSTDIR
+  
+  ; Put file there
+%(files)s
+  
+  ; Write the installation path into the registry
+  WriteRegStr HKLM SOFTWARE\%(name)s "Install_Dir" "$INSTDIR"
+  
+  ; Write the uninstall keys for Windows
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\%(name)s" "DisplayName" "%(name)s"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\%(name)s" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\%(name)s" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\%(name)s" "NoRepair" 1
+  WriteUninstaller "uninstall.exe"
+  
+SectionEnd
+
+; Optional section (can be disabled by the user)
+Section "Start Menu Shortcuts"
+
+  CreateDirectory "$SMPROGRAMS\%(name)s"
+  CreateShortCut "$SMPROGRAMS\%(name)s\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  CreateShortCut "$SMPROGRAMS\%(name)s\%(name)s.lnk" "$INSTDIR\%(executable)s" "" "$INSTDIR\%(executable)s" 0
+  
+SectionEnd
+
+;--------------------------------
+
+; Uninstaller
+
+Section "Uninstall"
+  
+  ; Remove registry keys
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\%(name)s"
+  DeleteRegKey HKLM SOFTWARE\%(name)s
+
+  ; Remove files and uninstaller
+%(uninst_files)s
+  Delete $INSTDIR\uninstall.exe
+
+  ; Remove shortcuts, if any
+  Delete "$SMPROGRAMS\%(name)s\*.*"
+
+  ; Remove directories used
+  RMDir "$SMPROGRAMS\%(name)s"
+  RMDir "$INSTDIR"
+
+SectionEnd
