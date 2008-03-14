@@ -6,6 +6,7 @@ checks = Split("""
     sdl
     boost
     qt4ng
+    nsis
 """)
 
 def exists(env):

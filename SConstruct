@@ -40,6 +40,9 @@ Additional options:
 """)
 Help(opts.GenerateHelpText(env))
 
+if env["PLATFORM"] == "win32": openal_lib = "openal32"
+else: openal_lib = "openal"
+
 conf = env.Configure(custom_tests = env["config_checks"])
 conf.CheckBoost("regex", "1.20") or Exit(1)
 conf.Finish()
@@ -50,8 +53,12 @@ conf.CheckSDL(require_version = "1.2.10") and \
 conf.CheckSDL("SDL_image") and \
 conf.CheckSDL("SDL_ttf") or Exit(1)
 if env["AUDIO"]:
-    env["AUDIO"] = conf.CheckLibWithHeader("openal", "AL/al.h", "C") and \
+    env["AUDIO"] = conf.CheckLibWithHeader(openal_lib, "AL/al.h", "C") and \
                    conf.CheckLibWithHeader("mpg123", "mpg123.h", "C")
+if env["PLATFORM"] == "win32":
+    HaveNSIS = conf.CheckMakeNSIS()
+else:
+    HaveNSIS = False
 conf.Finish()
 
 editor_env = env.Clone()
@@ -100,7 +107,9 @@ if editor:
 executables = [silvertree]
 if editor_env["HaveQt"]:
     executables.append(editor)
-datafiles = Split("data images model-sources FreeSans.ttf") + map(glob, Split("*.dae *.3ds *.3d"))
+executables += glob("*.dll")
+datafiles = map(Dir, Split("data images model-sources"))
+datafiles += ["FreeSans.ttf"] + map(glob, Split("*.dae *.3ds *.3d"))
 
 data_install_dir = join(env["PREFIX"], "share/silvertree-rpg")
 data_stage_dir = join(env["STAGE_PREFIX"], "share/silvertree-rpg")
@@ -114,6 +123,16 @@ if not env["PLATFORM"] == "win32":
 bindistdir = env.Install("silvertree", Split("README LICENSE") + executables + datafiles)
 bindistzip = env.Zip("silvertree.zip", bindistdir)
 env.Alias("bindistzip", bindistzip)
+
+if HaveNSIS:
+    env["INSTALLER_FILES"] = datafiles + executables
+    env["INSTALLER_NAME"] = "SilverTree"
+    env["INSTALLER_VERSION"] = "0.2.1"
+    env["INSTALLER_SHORTCUTS"] = silvertree
+    script = env.NSISScript("installer.nsi.template")
+    env.Depends(script, Flatten(env["INSTALLER_FILES"]))
+    installer = env.Installer(env["INSTALLER_NAME"] + "-" + env["INSTALLER_VERSION"], script)
+    env.Alias("installer", installer)
 
 setup_build_output([env, editor_env, namegen_env])
 
