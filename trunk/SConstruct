@@ -5,6 +5,7 @@ from glob import glob
 import sys
 sys.path.append("./scons")
 from build_output import setup_build_output
+from cross_compile import setup_cross_compile
 
 opts = Options("options.cache")
 opts.AddOptions(
@@ -20,6 +21,7 @@ opts.AddOptions(
     ("EXTRA_FLAGS_RELEASE", "Extra compiler/linker flags to use in release build variant.(e.g. \"-O3 -march=prescott\")", ""),
     ("EXTRA_FLAGS_DEBUG", "Extra compiler/linker flags to use in debug build variant.", ""),
     BoolOption("VERBOSE_BUILD_OUTPUT", "If true, SCons will display full command lines of commands it's running.", False),
+    ("HOST", "Cross-compile host.", ""),
 )
 
 env = Environment(tools = ["zip", "config_checks"], toolpath = ["scons"], options = opts)
@@ -28,6 +30,7 @@ if env["PLATFORM"] == "win32":
     env.Tool("mingw")
 else:
     env.Tool("default")
+setup_cross_compile(env)
 opts.Save("options.cache", env)
 
 Help("""
@@ -55,10 +58,7 @@ conf.CheckSDL("SDL_ttf") or Exit(1)
 if env["AUDIO"]:
     env["AUDIO"] = conf.CheckLibWithHeader(openal_lib, "AL/al.h", "C") and \
                    conf.CheckLibWithHeader("mpg123", "mpg123.h", "C")
-if env["PLATFORM"] == "win32":
-    HaveNSIS = conf.CheckMakeNSIS()
-else:
-    HaveNSIS = False
+HaveNSIS = conf.CheckMakeNSIS()
 conf.Finish()
 
 editor_env = env.Clone()
@@ -94,12 +94,14 @@ env.Program("version_finder", "utilities/versions/version_finder.cpp")
 
 Export("env")
 Export("editor_env")
-silvertree, editor = SConscript("src/SConscript", build_dir = join("build", env["Build"]))
+if env["HOST"]: build = env["Build"] + "-" + env["HOST"]
+else: build = env["Build"]
+silvertree, editor = SConscript("src/SConscript", build_dir = join("build", build))
 
-if env["Build"] == "debug":
-    ExecutableSuffix = "-debug" + env["PROGSUFFIX"]
-else:
+if not env["HOST"] and env["Build"] == "release":
     ExecutableSuffix = env["PROGSUFFIX"]
+else:
+    ExecutableSuffix = "-" + build + env["PROGSUFFIX"]
 env.Default(env.Alias("silvertreerpg", env.InstallAs("./silvertreerpg" + ExecutableSuffix, silvertree)))
 if editor:
     editor_env.Alias("editor", editor_env.InstallAs("./silvertreeedit" + ExecutableSuffix, editor))
