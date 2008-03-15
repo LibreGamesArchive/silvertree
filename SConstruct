@@ -98,7 +98,7 @@ if env["HOST"]: build = env["Build"] + "-" + env["HOST"]
 else: build = env["Build"]
 silvertree, editor = SConscript("src/SConscript", build_dir = join("build", build))
 
-if not env["HOST"] and env["Build"] == "release":
+if (not env["HOST"] or env["HOST"] == "mingw32") and env["Build"] == "release":
     ExecutableSuffix = env["PROGSUFFIX"]
 else:
     ExecutableSuffix = "-" + build + env["PROGSUFFIX"]
@@ -110,7 +110,7 @@ executables = [silvertree]
 if editor_env["HaveQt"]:
     executables.append(editor)
 executables += glob("*.dll")
-datafiles = map(Dir, Split("data images model-sources"))
+datafiles = map(Dir, Split("data images model-sources music"))
 datafiles += ["FreeSans.ttf"] + map(glob, Split("*.dae *.3ds *.3d"))
 
 data_install_dir = join(env["PREFIX"], "share/silvertree-rpg")
@@ -127,7 +127,7 @@ bindistzip = env.Zip("silvertree.zip", bindistdir)
 env.Alias("bindistzip", bindistzip)
 
 if HaveNSIS:
-    env["INSTALLER_FILES"] = datafiles + executables
+    env["INSTALLER_FILES"] = datafiles + executables + glob("*.dll")
     env["INSTALLER_NAME"] = "SilverTree"
     env["INSTALLER_VERSION"] = "0.2.1"
     env["INSTALLER_SHORTCUTS"] = silvertree

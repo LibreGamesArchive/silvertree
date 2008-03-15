@@ -3,6 +3,7 @@
 def setup_cross_compile(env):
     if env["HOST"] == "mingw32":
         env["PLATFORM"] = "win32"
+        env["PROGSUFFIX"] = ".exe"
 
     tools = [
         "CC",
