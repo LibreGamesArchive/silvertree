@@ -131,9 +131,7 @@ if HaveNSIS:
     env["INSTALLER_NAME"] = "SilverTree"
     env["INSTALLER_VERSION"] = "0.2.1"
     env["INSTALLER_SHORTCUTS"] = silvertree
-    script = env.NSISScript("installer.nsi.template")
-    env.Depends(script, Flatten(env["INSTALLER_FILES"]))
-    installer = env.Installer(env["INSTALLER_NAME"] + "-" + env["INSTALLER_VERSION"], script)
+    installer = env.Installer(env["INSTALLER_NAME"] + "-" + env["INSTALLER_VERSION"], "installer.nsi.template")
     env.Alias("installer", installer)
 
 setup_build_output([env, editor_env, namegen_env])

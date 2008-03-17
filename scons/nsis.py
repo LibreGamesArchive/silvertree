@@ -6,13 +6,6 @@ from SCons.Action  import Action
 
 from os.path import basename, isdir
 
-installer_builder = Builder(
-                src_suffix=".nsi",
-                suffix=".exe",
-                action = Action("$MAKENSIS $SOURCE"),#, "Generating installer..."),
-                single_source = True
-                )
-
 def generate_nsis_script(target, source, env):
     env["INSTALLER_FILES"] = Flatten(env["INSTALLER_FILES"])
     files = map(lambda src : "File /r /x .* " + str(src), env["INSTALLER_FILES"])
@@ -30,11 +23,24 @@ def generate_nsis_script(target, source, env):
     output.write(script)
     output.close()
 
+def nsis_script_emitter(target, source, env):
+    env.Depends(target, Flatten(env["INSTALLER_FILES"]))
+    return (target, source)
+
 nsis_script_generator = Builder(
                 src_suffix="nsi.template",
                 suffix=".nsi",
-                action = Action(generate_nsis_script),#, "Generating installer script..."),
+                emitter=nsis_script_emitter,
+                action = Action(generate_nsis_script, "$NSISSCRIPTCOMSTR"),
                 single_source = True
+                )
+
+installer_builder = Builder(
+                src_suffix=".nsi",
+                suffix=".exe",
+                action = Action("$MAKENSIS $SOURCE", "$MAKENSISCOMSTR"),
+                single_source = True,
+                src_builder = nsis_script_generator
                 )
 
 def CheckMakeNSIS(context):
