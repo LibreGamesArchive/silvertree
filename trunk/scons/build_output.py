@@ -12,3 +12,6 @@ def setup_build_output(envs):
 
             env["QT4_MOCCOMSTR"] = "Moccing ${SOURCE.srcpath} ..."
             env["QT4_UICCOMSTR"]      = "Compiling user interface: ${SOURCE.srcpath} ..."
+
+            env["NSISSCRIPTCOMSTR"] = "Generating NSIS script ..."
+            env["MAKENSISCOMSTR"] = "Generating installer ..."
