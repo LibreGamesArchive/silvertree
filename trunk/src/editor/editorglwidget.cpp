@@ -219,6 +219,7 @@ void EditorGLWidget::paintGL()
 		GLfloat xscroll = -camera_->get_pan_x();
 		GLfloat yscroll = -camera_->get_pan_y();
 		const hex::tile* center = map_->closest_tile(&xscroll,&yscroll);
+		hex::tile::setup_drawing();
 		if(center) {
 			camera_->prepare_selection(mousex_,mousey_);
 			locs.clear();

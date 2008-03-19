@@ -385,11 +385,13 @@ void tile::setup_drawing()
 {
 	GLfloat diffuse[] = {0.6,0.6,0.6,1.0};
 	GLfloat ambient[] = {0.4,0.4,0.4,1.0};
-	GLfloat specular[] = {0.0,0.0,0.0,0.0};
+	GLfloat specular[] = {0.0,0.0,0.0,1.0};
+	GLfloat emission[] = {0.0,0.0,0.0,1.0};
 
 	glMaterialfv(GL_FRONT,GL_DIFFUSE,diffuse);
 	glMaterialfv(GL_FRONT,GL_AMBIENT,ambient);
 	glMaterialfv(GL_FRONT,GL_SPECULAR,specular);
+	glMaterialfv(GL_FRONT,GL_EMISSION,emission);
 
 #ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
 	frustum::initialize();

@@ -57,8 +57,6 @@ public:
 		bone() : parent(-1) {}
 		std::string name;
 		int parent;
-		boost::array<GLfloat,3> default_pos;
-		boost::array<GLfloat,3> default_rot;
 		Eigen::MatrixP3f transform;
 		Eigen::MatrixP3f inv_bind_matrix;
 		Eigen::MatrixP3f skinning_matrix;
