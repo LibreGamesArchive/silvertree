@@ -97,7 +97,7 @@ void battle::play()
 			sub_time_ = 0.0;
 			while(sub_time_ < 1.0) {
 				initiative_bar_->set_current_time(current_time_ + sub_time_);
-				animation_frame(0.1);
+				animation_frame(0.5);
 			}
 			// Check whether character modifications expired.
 			foreach(battle_character_ptr ch, chars_) {
@@ -671,7 +671,7 @@ void battle::attack_character(battle_character& attacker,
 	}
 
 	begin_animation();
-	for(GLfloat t = 0.0; t < anim_time; t += 0.02) {
+	for(GLfloat t = 0.0; t < anim_time; t += 0.08) {
 		slider.process();
 		slider.set_time(t);
 		initiative_bar_->focus_character(&attacker, t*(elapsed_time/anim_time));
@@ -730,10 +730,10 @@ void battle::attack_character(battle_character& attacker,
 	defender.get_pos(pos,&rotate);
 	if(damage) {
 		graphics::texture damage_tex = graphics::font::render_text(boost::lexical_cast<std::string>(damage), 20, red);
-		graphics::floating_label::add(damage_tex,pos,move,1000);
+		graphics::floating_label::add(damage_tex,pos,move,50);
 	} else {
 		graphics::texture damage_tex = graphics::font::render_text("miss!", 20, blue);
-		graphics::floating_label::add(damage_tex,pos,move,1000);
+		graphics::floating_label::add(damage_tex,pos,move,50);
 	}
 
 	defender.get_character().take_damage(damage);
