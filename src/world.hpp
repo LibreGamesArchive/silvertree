@@ -164,7 +164,6 @@ private:
 
 	mutable hex::location current_loc_;
 	mutable std::vector<const hex::tile*> tiles_;
-	mutable hex::tile::features_cache features_cache_;
 	mutable gui::const_grid_ptr track_info_grid_;
 
 	void rebuild_drawing_caches(const std::set<hex::location>& visible) const;
