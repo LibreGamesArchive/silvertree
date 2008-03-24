@@ -357,8 +357,9 @@ void battle::draw(gui::slider* slider, bool draw_widgets)
 		t->draw_cliffs();
 	}
 
-	hex::tile::draw_features(&tiles_[0], &tiles_[0] + tiles_.size(),
-				 features_cache_);
+	foreach(const tile* t, tiles_) {
+		t->draw_model();
+	}
 
 	tile::finish_drawing();
 
@@ -999,9 +1000,6 @@ void battle::rebuild_visible_tiles()
 	}
 
 	std::sort(tiles_.begin(), tiles_.end(), hex::tile::compare_texture());
-
-	hex::tile::initialize_features_cache(
-		&tiles_[0], &tiles_[0] + tiles_.size(), &features_cache_);
 }
 
 

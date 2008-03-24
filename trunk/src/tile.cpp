@@ -79,48 +79,6 @@ void invalidate_display_list(unsigned int tile_id)
 }
 }
 
-void tile::initialize_features_cache(const tile** beg, const tile** end,
-                                     tile::features_cache* cache)
-{
-	cache->clear();
-	for(; beg != end; ++beg) {
-		const tile& t = **beg;
-		if(!t.feature_) {
-			continue;
-		}
-
-		if(t.model_init_ == false) {
-			t.model_ = t.feature_->generate_model(t.loc_,t.height_);
-		}
-
-		if(!t.model_) {
-			continue;
-		}
-
-		t.model_->get_materials(cache);
-	}
-}
-
-void tile::draw_features(const tile** beg, const tile** end,
-                         const tile::features_cache& cache)
-{
-	foreach(const graphics::const_material_ptr& mat, cache) {
-		if(mat) {
-			mat->set_as_current_material();
-		}
-		for(const tile** i = beg; i != end; ++i) {
-			const tile& t = **i;
-			if(t.model_) {
-				glPushMatrix();
-				glTranslatef(t.center_.x,t.center_.y,t.center_.height);
-				glRotatef(t.feature_->get_rotation(t.loc_,t.height_),0.0,0.0,1.0);
-				t.model_->draw(mat);
-				glPopMatrix();
-			}
-		}
-	}
-}
-
 tile::tile(const location& loc, const std::string& data)
 	: id_(current_id++), loc_(loc), height_(0), model_init_(false),
 	  active_tracker_(NULL)

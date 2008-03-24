@@ -108,7 +108,6 @@ private:
 	std::vector<const hex::tile*> tiles_;
 	hex::location current_focus_;
 	battle_character::move_map moves_;
-	hex::tile::features_cache features_cache_;
 	bool highlight_moves_;
 	bool enter_attack_mode();
 	bool enter_target_mode();

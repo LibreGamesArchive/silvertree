@@ -409,9 +409,6 @@ void world::rebuild_drawing_caches(const std::set<hex::location>& visible) const
 
 	std::sort(tiles_.begin(),tiles_.end(), hex::tile::compare_texture());
 
-	hex::tile::initialize_features_cache(
-		&tiles_[0], &tiles_[0] + tiles_.size(), &features_cache_);
-
 	track_info_grid_ = get_track_info();
 }
 
@@ -525,8 +522,9 @@ void world::draw() const
 	}
 	glCullFace(cull);
 
-	hex::tile::draw_features(&tiles_[0], &tiles_[0] + tiles_.size(),
-				 features_cache_);
+	foreach(const hex::tile* t, tiles_) {
+		t->draw_model();
+	}
 	hex::tile::finish_drawing();
 
 	foreach(const hex::tile* t, tiles_) {

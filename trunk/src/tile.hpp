@@ -37,12 +37,6 @@ class tile
 public:
 	friend class frustum;
 
-	typedef std::vector<graphics::const_material_ptr> features_cache;
-	static void initialize_features_cache(const tile** beg, const tile** end,
-	                                      features_cache* cache);
-	static void draw_features(const tile** beg, const tile** end,
-	                          const features_cache& cache);
-
 	tile(const location& loc, const std::string& data);
 	tile(const location& loc, int height,
 	     const_base_terrain_ptr terrain,
