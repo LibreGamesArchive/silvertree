@@ -513,14 +513,9 @@ void world::draw() const
 		t->draw();
 	}
 
-	/* Let OpenGL cull away cliff faces not facing the viewer. */
-	GLint cull;
-	glGetIntegerv(GL_CULL_FACE, &cull);
-	glCullFace(GL_BACK);
 	foreach(const hex::tile* t, tiles_) {
 		t->draw_cliffs();
 	}
-	glCullFace(cull);
 
 	foreach(const hex::tile* t, tiles_) {
 		t->draw_model();

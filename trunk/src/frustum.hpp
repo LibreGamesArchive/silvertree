@@ -30,7 +30,7 @@ private:
 inline bool frustum::contains(const tile::point& p) {
 	/* for each plane */
 	for(int i=0;i<6;++i) {
-		GLfloat d = planes_[i*4+0]*p.x + planes_[i*4+1]*p.y + planes_[i*4+2]*p.height + planes_[i*4+3];
+		GLfloat d = planes_[i*4+0]*p.position.x() + planes_[i*4+1]*p.position.y() + planes_[i*4+2]*p.position.z() + planes_[i*4+3];
 		if(d <= 0) {
 			/* this plane has point on wrong side */
 			return false;
@@ -42,7 +42,7 @@ inline bool frustum::contains(const tile::point& p) {
 
 inline bool frustum::intersects(const tile::point& p, GLfloat radius) {
 	for(int i=0;i<6;++i) {
-		GLfloat d = planes_[i*4+0]*p.x + planes_[i*4+1]*p.y + planes_[i*4+2]*p.height + planes_[i*4+3] + radius;
+		GLfloat d = planes_[i*4+0]*p.position.x() + planes_[i*4+1]*p.position.y() + planes_[i*4+2]*p.position.z() + planes_[i*4+3] + radius;
 		if(d <= 0) {
 			return false;
 		}
@@ -53,7 +53,7 @@ inline bool frustum::intersects(const tile::point& p, GLfloat radius) {
 inline Uint32 frustum::calculate_misses(const tile::point& p) {
 	Uint32 plane_misses = 0;
 	for(int j=0;j<6;++j) {
-		GLfloat d = planes_[j*4+0]*p.x + planes_[j*4+1]*p.y + planes_[j*4+2]*p.height + planes_[j*4+3];
+		GLfloat d = planes_[j*4+0]*p.position.x() + planes_[j*4+1]*p.position.y() + planes_[j*4+2]*p.position.z() + planes_[j*4+3];
 		if(d <= 0) {
 			plane_misses |= 1<<j;
 		}
