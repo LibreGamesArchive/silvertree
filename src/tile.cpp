@@ -29,54 +29,18 @@
 #include "frustum.hpp"
 #endif
 
-#include "eigen/vector.h"
-
 namespace hex
 {
 
 namespace {
 
 unsigned int current_id = 1;
-const unsigned int num_display_lists = 10001;
-unsigned int display_list_map[num_display_lists];
-GLuint start_display_list = GLuint(-1);
-int display_hit = 0;
-int display_miss = 0;
 unsigned int frame_number = 0;
 
 #ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
 frustum pc_frustum;
 #endif
 
-GLuint get_display_list(unsigned int tile_id, bool* is_new)
-{
-        if(start_display_list == GLuint(-1)) {
-                start_display_list = glGenLists(num_display_lists);
-        }
-
-        const unsigned int index = tile_id%num_display_lists;
-        *is_new = display_list_map[index] != tile_id;
-        if(*is_new) {
-                display_list_map[index] = tile_id;
-                display_miss++;
-        } else {
-                display_hit++;
-        }
-
-        if(((display_miss+display_hit)%10000) == 0) {
-                std::cerr << "hits: " << display_hit << " misses: " << display_miss << "\n";
-        }
-
-        return start_display_list + index;
-}
-
-void invalidate_display_list(unsigned int tile_id)
-{
-        const unsigned int index = tile_id%num_display_lists;
-        if(display_list_map[index] == tile_id) {
-                display_list_map[index] = 0;
-        }
-}
 }
 
 tile::tile(const location& loc, const std::string& data)
@@ -130,9 +94,9 @@ void tile::init(int height, const_base_terrain_ptr terrain,
 	terrain_ = terrain;
 	feature_ = feature;
 
-	center_.x = translate_x(loc_);
-	center_.y = translate_y(loc_);
-	center_.height = translate_height(height_);
+	center_.position.x() = translate_x(loc_);
+	center_.position.y() = translate_y(loc_);
+	center_.position.z() = translate_height(height_);
 	center_.init = false;
 }
 
@@ -151,11 +115,10 @@ bool tile::is_passable(DIRECTION dir) const
 
 void tile::invalidate()
 {
-	invalidate_display_list(id_);
 	texture_ = graphics::texture();
-	center_.x = translate_x(loc_);
-	center_.y = translate_y(loc_);
-	center_.height = translate_height(height_);
+	center_.position.x() = translate_x(loc_);
+	center_.position.y() = translate_y(loc_);
+	center_.position.z() = translate_height(height_);
 	center_.init = false;
 	for(int n = 0; n != 6; ++n) {
 		corners_[n].init = false;
@@ -178,6 +141,7 @@ void tile::init_corners()
 
 GLfloat tile::height_at_point(GLfloat x, GLfloat y) const
 {
+	Eigen::Vector2f the_point(x,y);
 	int index = -1;
 	if(y < 0.5) {
 		if(x < 0.5) {
@@ -194,40 +158,34 @@ GLfloat tile::height_at_point(GLfloat x, GLfloat y) const
 	}
 
 	const point& corner = corners_[index];
-	const GLfloat dist_corner =
-	    sqrt((corner.x-x)*(corner.x-x)+(corner.y-y)*(corner.y-y));
-	const GLfloat dist_center =
-	    sqrt((center_.x-x)*(center_.x-x)+(center_.y-y)*(center_.y-y));
-	return (dist_corner*center_.height + dist_center*corner.height)/(dist_corner+dist_center);
+	Eigen::Vector2f corner_pos = Eigen::Vector2f(corner.position.x(), corner.position.y());
+	const GLfloat dist_corner = (corner_pos - the_point).norm();
+	Eigen::Vector2f center_pos = Eigen::Vector2f(center_.position.x(), center_.position.y());
+	const GLfloat dist_center = (center_pos - the_point).norm();
+	return (dist_corner*center_.position.z() + dist_center*corner.position.z())/(dist_corner+dist_center);
 }
 
 GLfloat tile::height_at_point_vision(GLfloat x, GLfloat y) const
 {
-	return center_.height + (feature_ ? feature_->vision_block() : 0);
+	return center_.position.z() + (feature_ ? feature_->vision_block() : 0);
 }
 
 void tile::init_normals()
 {
 	Eigen::Vector3f positions[6];
 	for(int i = 0; i < 6; i++) {
-		positions[i] = Eigen::Vector3f(corners_[i].x, corners_[i].y, corners_[i].height);
+		positions[i] = corners_[i].position;
 	}
-	Eigen::Vector3f center_normal;
-	center_normal.loadZero();
+	center_.normal.loadZero();
 	for(int n = 6; n < 12; n++) {
 		Eigen::Vector3f normal;
 		normal = (positions[n%6] - positions[(n-1)%6]).cross(positions[(n+1)%6] - positions[n%6]);
 		normal.normalize();
-		center_normal += normal;
-		corners_[n%6].normal[0] = normal[0];
-		corners_[n%6].normal[1] = normal[1];
-		corners_[n%6].normal[2] = normal[2];
+		center_.normal += normal;
+		corners_[n%6].normal = normal;
 	}
-	center_normal /= 6;
-	center_normal.normalize();
-	center_.normal[0] = center_normal[0];
-	center_.normal[1] = center_normal[1];
-	center_.normal[2] = center_normal[2];
+	center_.normal /= 6;
+	center_.normal.normalize();
 }
 
 void tile::init_particles()
@@ -243,11 +201,11 @@ void tile::init_particles()
 			if(particle) {
 				const point& c1 = corners_[(n+5)%6];
 				const point& c2 = corners_[(n+6)%6];
-				const GLfloat pos1[3] = {c1.x, c1.y, c1.height};
-				const GLfloat pos2[3] = {c2.x, c2.y, c2.height};
-				const GLfloat dir1[3] = {c1.x - center_.x, c1.y - center_.y, 0.0};
-				const GLfloat dir2[3] = {c2.x - center_.x, c2.y - center_.y, 0.0};
-				emitters_.push_back(graphics::particle_emitter(particle, dir1, dir2,  pos1, pos2));
+				const Eigen::Vector3f& pos1 = c1.position;
+				const Eigen::Vector3f& pos2 = c2.position;
+				Eigen::Vector3f dir1 = pos1 - center_.position; dir1.z() = 0.0;
+				Eigen::Vector3f dir2 = pos2 - center_.position; dir2.z() = 0.0;
+				emitters_.push_back(graphics::particle_emitter(particle, dir1.array(), dir2.array(),  pos1.array(), pos2.array()));
 			}
 		}
 	}
@@ -255,9 +213,8 @@ void tile::init_particles()
 	if(feature_) {
 		wml::const_node_ptr particle = feature_->particle_emitter();
 		if(particle) {
-			const GLfloat center_pos[3] = {center_.x, center_.y, center_.height};
 			const GLfloat null_dir[3] = {0.0,0.0,0.0};
-			emitters_.push_back(graphics::particle_emitter(particle, null_dir, null_dir, center_pos, center_pos));
+			emitters_.push_back(graphics::particle_emitter(particle, null_dir, null_dir, center_.position.array(), center_.position.array()));
 		}
 	}
 }
@@ -286,40 +243,27 @@ void tile::calculate_corner(int n)
 	location adj[6];
 	get_adjacent_tiles(loc_,adj);
 
-	corners_[n].x = (translate_x(loc_) +
-	                 translate_x(adj[neighbour_a]) +
-	                 translate_x(adj[neighbour_b]))/3.0;
-	corners_[n].y = (translate_y(loc_) +
-	                 translate_y(adj[neighbour_a]) +
-	                 translate_y(adj[neighbour_b]))/3.0;
-
-	GLfloat red = center_.red;
-	GLfloat green = center_.green;
-	GLfloat blue = center_.blue;
+	corners_[n].position.x() = (translate_x(loc_) +
+	                            translate_x(adj[neighbour_a]) +
+	                            translate_x(adj[neighbour_b]))/3.0;
+	corners_[n].position.y() = (translate_y(loc_) +
+	                            translate_y(adj[neighbour_a]) +
+	                            translate_y(adj[neighbour_b]))/3.0;
 
 	int sum = height_;
 	int num = 1;
 	if(adja != NULL) {
 		sum += adja->height_;
-		red += adja->center_.red;
-		green += adja->center_.green;
-		blue += adja->center_.blue;
 		++num;
 	}
 
 	if(adjb != NULL) {
 		sum += adjb->height_;
-		red += adjb->center_.red;
-		green += adjb->center_.green;
-		blue += adjb->center_.blue;
 		++num;
 	}
 
 	sum /= num;
-	corners_[n].height = translate_height(sum);
-	corners_[n].red = red/static_cast<GLfloat>(num);
-	corners_[n].green = green/static_cast<GLfloat>(num);
-	corners_[n].blue = blue/static_cast<GLfloat>(num);
+	corners_[n].position.z() = translate_height(sum);
 	corners_[n].init = true;
 }
 
@@ -382,28 +326,11 @@ void tile::load_texture() const
 			}
 		}
 
-
 		texture_ = terrain_->generate_texture(loc_,height_,adj);
 	}
 }
 
 void tile::draw() const
-{
-	do_draw();
-/*
-	bool is_new;
-	GLuint display_list = get_display_list(id_,&is_new);
-	if(is_new) {
-		glNewList(display_list,GL_COMPILE_AND_EXECUTE);
-		do_draw();
-		glEndList();
-	} else {
-		glCallList(display_list);
-	}
-*/
-}
-
-void tile::do_draw() const
 {
 	load_texture();
 	texture_.set_as_current_texture();
@@ -427,7 +354,6 @@ void tile::do_draw() const
 		glDepthMask(GL_TRUE);
 	} else {
 #endif
-		glColor4ub(0, 0, 255, 255);
 		glBegin(GL_TRIANGLE_FAN);
 
 		texture_.set_coord(UVCenter[0],UVCenter[1]);
@@ -466,7 +392,7 @@ void tile::draw_model() const
 	}
 
 	glPushMatrix();
-	glTranslatef(center_.x,center_.y,center_.height);
+	glTranslatef(center_.position.x(), center_.position.y(), center_.position.z());
 	glRotatef(feature_->get_rotation(loc_,height_),0.0,0.0,1.0);
 	model_->draw();
 	glPopMatrix();
@@ -491,8 +417,8 @@ void tile::adjust_height(int n)
 
 void tile::draw_point(const point& p) const
 {
-	glNormal3fv(p.normal);
-	glVertex3f(p.x,p.y,p.height);
+	glNormal3fv(p.normal.array());
+	glVertex3fv(p.position.array());
 }
 
 namespace {
@@ -571,45 +497,46 @@ void tile::draw_cliffs() const
 		for(int m = 0; m != 4; ++m) {
 			const bool is_left = m == 0 || m == 3;
 			const GLfloat u = is_left ? left : right;
-			const GLfloat v = points[m]->height * sixth;
+			const GLfloat v = points[m]->position.z() * sixth;
 			glTexCoord2f(u,v);
 
 			GLfloat normalx = 0.0, normaly = 0.0;
 			cliff_normal(n,normalx,normaly);
 			cliff_normal(is_left ? prev : next,normalx,normaly);
 			glNormal3f(normalx,normaly,0.0);
-			glVertex3f(points[m]->x, points[m]->y, points[m]->height);
+			glVertex3fv(points[m]->position.array());
 		}
 		glEnd();
 
 		if(neighbours_[next] && neighbours_[next]->neighbours_[prev]) {
 			glNormal3f(0.6666*next,-1.0+0.6666*next,0.0);
-			const point& corner = neighbours_[next]->corners_[prev];
+			const Eigen::Vector3f& corner = neighbours_[next]->corners_[prev].position;
 			glBegin(GL_TRIANGLES);
-			glTexCoord2f(right+sixth,corner.height * sixth);
-			glVertex3f(corner.x, corner.y, corner.height);
-			glTexCoord2f(right,points[2]->height * sixth);
-			glVertex3f(points[2]->x, points[2]->y, points[2]->height);
-			glTexCoord2f(right,points[1]->height * sixth);
-			glVertex3f(points[1]->x, points[1]->y, points[1]->height);
+			glTexCoord2f(right+sixth,corner.z() * sixth);
+			glVertex3fv(corner.array());
+			glTexCoord2f(right,points[2]->position.z() * sixth);
+			glVertex3fv(points[2]->position.array());
+			glTexCoord2f(right,points[1]->position.z() * sixth);
+			glVertex3fv(points[1]->position.array());
 			glEnd();
 		}
 
 		if(neighbours_[prev] && neighbours_[prev]->neighbours_[next]) {
 			glNormal3f(0.6666*prev,-1.0+0.6666*prev,0.0);
-			const point& corner = corners_[prev == 0 ? 5 : prev-1];
+			const Eigen::Vector3f& corner = corners_[prev == 0 ? 5 : prev-1].position;
 			glBegin(GL_TRIANGLES);
-			glTexCoord2f(left - sixth,corner.height * sixth);
-			glVertex3f(corner.x, corner.y, corner.height);
-			glTexCoord2f(left,points[0]->height * sixth);
-			glVertex3f(points[0]->x, points[0]->y, points[0]->height);
-			glTexCoord2f(left,points[3]->height * sixth);
-			glVertex3f(points[3]->x, points[3]->y, points[3]->height);
+			glTexCoord2f(left - sixth,corner.z() * sixth);
+			glVertex3fv(corner.array());
+			glTexCoord2f(left,points[0]->position.z() * sixth);
+			glVertex3fv(points[0]->position.array());
+			glTexCoord2f(left,points[3]->position.z() * sixth);
+			glVertex3fv(points[3]->position.array());
 			glEnd();
 		}
 	}
 }
 
+/*
 void tile::draw_cliff_transitions() const
 {
 	const hex::camera* cam = camera::current_camera();
@@ -647,13 +574,14 @@ void tile::draw_cliff_transitions() const
 		glEnd();
 	}
 }
+*/
 
 void tile::draw_grid() const
 {
 	glBegin(GL_LINE_LOOP);
 	glColor4f(0.0,0.0,0.0,1.0);
 	for(int n = 0; n != 6; ++n) {
-		glVertex3f(corners_[n].x,corners_[n].y,corners_[n].height+0.1);
+		glVertex3fv((corners_[n].position + Eigen::Vector3f(0.0,0.0,0.1)).array());
 	}
 	glEnd();
 }
@@ -682,9 +610,9 @@ void tile::draw_highlight() const
 void tile::attach_tracker(graphics::location_tracker* tracker) const {
 	active_tracker_ = tracker;
 	active_tracker_->clear_vertices();
-	active_tracker_->add_vertex(center_.x, center_.y, center_.height);
+	active_tracker_->add_vertex(center_.position.x(), center_.position.y(), center_.position.z());
 	for(int i=0; i<6;i++) {
-		active_tracker_->add_vertex(corners_[i].x, corners_[i].y, corners_[i].height);
+		active_tracker_->add_vertex(corners_[i].position.x(), corners_[i].position.y(), corners_[i].position.z());
 	}
 }
 

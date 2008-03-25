@@ -42,7 +42,7 @@ boost::shared_ptr<gamemap> generate_zoom_map(
 				GLfloat max_distance = -1.0;
 				tile::point* max_point = NULL;
 				for(std::vector<tile::point>::iterator p = closest_points.begin(); p != closest_points.end(); ++p) {
-					double new_distance = distance_between_points(xpos, ypos, p->x, p->y);
+					double new_distance = distance_between_points(xpos, ypos, p->position.x(), p->position.y());
 					if(max_point == NULL || new_distance > max_distance) {
 						max_point = &*p;
 						max_distance = new_distance;
@@ -50,7 +50,7 @@ boost::shared_ptr<gamemap> generate_zoom_map(
 				}
 
 				const tile::point& p = src_tile->corners()[n];
-				const GLfloat distance = distance_between_points(xpos, ypos, p.x, p.y);
+				const GLfloat distance = distance_between_points(xpos, ypos, p.position.x(), p.position.y());
 				if(distance < max_distance) {
 					*max_point = p;
 				}
@@ -58,12 +58,12 @@ boost::shared_ptr<gamemap> generate_zoom_map(
 
 			GLfloat distance_sum = 0.0;
 			foreach(const tile::point& p, closest_points) {
-				distance_sum += distance_between_points(xpos, ypos, p.x, p.y);
+				distance_sum += distance_between_points(xpos, ypos, p.position.x(), p.position.y());
 			}
 
 			GLfloat height = 0.0;
 			foreach(const tile::point& p, closest_points) {
-				height += p.height * (1.0 - distance_between_points(xpos, ypos, p.x, p.y)/distance_sum);
+				height += p.position.z() * (1.0 - distance_between_points(xpos, ypos, p.position.x(), p.position.y())/distance_sum);
 			}
 
 			heights.push_back(height);

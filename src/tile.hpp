@@ -18,6 +18,8 @@
 
 #include <GL/glew.h>
 
+#include "eigen/vector.h"
+
 #include "base_terrain_fwd.hpp"
 #include "location_tracker.hpp"
 #include "material.hpp"
@@ -123,14 +125,13 @@ public:
 	};
 
 	struct point {
-		point() : x(0), y(0), height(0),
-			  red(1), green(1), blue(1), init(false)
+		point() : position(0, 0, 0),
+			  init(false)
 		{
 		}
 
-		GLfloat x, y, height;
-		GLfloat red, green, blue;
-		GLfloat normal[3];
+		Eigen::Vector3f position;
+		Eigen::Vector3f normal;
 		bool init;
 	};
 
@@ -138,7 +139,6 @@ public:
 	const point* corners() const { return corners_; }
 
 private:
-	void do_draw() const;
 	void init(int height, const_base_terrain_ptr terrain,
 	          const_terrain_feature_ptr feature);
 
