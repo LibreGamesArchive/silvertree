@@ -23,7 +23,7 @@ def CheckSDL(context, sdl_lib = "SDL", require_version = None):
             env.ParseConfig("sdl-config --cflags --libs")
         if env["PLATFORM"] == "win32":
             env.AppendUnique(CCFLAGS = ["-D_GNU_SOURCE"])
-            env.AppendUnique(LIBS = Split("mingw32 SDLmain SDL SDL_image SDL_ttf"))
+            env.AppendUnique(LIBS = Split("mingw32 SDLmain SDL"))
             env.AppendUnique(LINKFLAGS = ["-mwindows"])
     else:
         if require_version:

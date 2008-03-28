@@ -178,11 +178,10 @@ void tile::init_normals()
 	}
 	center_.normal.loadZero();
 	for(int n = 6; n < 12; n++) {
-		Eigen::Vector3f normal;
+		Eigen::Vector3f& normal = corners_[n%6].normal;
 		normal = (positions[n%6] - positions[(n-1)%6]).cross(positions[(n+1)%6] - positions[n%6]);
 		normal.normalize();
 		center_.normal += normal;
-		corners_[n%6].normal = normal;
 	}
 	center_.normal /= 6;
 	center_.normal.normalize();
