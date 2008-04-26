@@ -138,8 +138,6 @@ class Tesselator
 
 }
 
-void parse4vector(const string& str, GLfloat* v);
-
 class COLLADA
 {
 	TiXmlDocument doc_;
@@ -173,6 +171,7 @@ class COLLADA
 	void get_bones_from_skeleton(const TiXmlElement*, vector<model::bone>&, bool is_sid = false) const;
 	void bind_materials(const TiXmlElement*, vector<model::face>& faces) const;
 	const_material_ptr get_material(const TiXmlElement*) const;
+	template<typename T> T get(const TiXmlElement*) const;
 	template<typename T> vector<T> get_array(const TiXmlElement*) const;
 
 	public:
@@ -310,18 +309,10 @@ void COLLADA::get_transform_from_node(const TiXmlElement* node, MatrixP3f& trans
 			is >> angle;
 			transform.rotate3(M_PI/180*angle, axis);
 		}
-		if(transform_element->Value() == string("scale")) {
-			istringstream is(transform_element->GetText());
-			Vector3f coeffs;
-			is >> coeffs;
-			transform.scale(coeffs);
-		}
-		if(transform_element->Value() == string("translate")) {
-			istringstream is(transform_element->GetText());
-			Vector3f vector;
-			is >> vector;
-			transform.translate(vector);
-		}
+		if(transform_element->Value() == string("scale"))
+			transform.scale(get<Vector3f>(transform_element));
+		if(transform_element->Value() == string("translate"))
+			transform.translate(get<Vector3f>(transform_element));
 	}
 }
 
@@ -397,11 +388,9 @@ tuple<vector<model::face>, vector<model::bone>, bool > COLLADA::get_faces_and_bo
 
 		const TiXmlElement* bind_shape_matrix = skin->FirstChildElement("bind_shape_matrix");
 		if(bind_shape_matrix) {
-			istringstream is(bind_shape_matrix->GetText());
-			MatrixP3f bind_shape_matrix;
-			is >> bind_shape_matrix;
+			MatrixP3f matrix = get<MatrixP3f>(bind_shape_matrix);
 			foreach(model::face& face, faces)
-				face.transform = bind_shape_matrix;
+				face.transform = matrix;
 		}
 
 		const TiXmlElement* vertex_weights = skin->FirstChildElement("vertex_weights");
@@ -562,6 +551,14 @@ pair<vector<model::face>, multimap<int, model::vertex_ptr> > COLLADA::get_faces_
 	return make_pair(faces, vertices);
 }
 
+template<typename T> T COLLADA::get(const TiXmlElement* element) const
+{
+	istringstream is(element->GetText());
+	T result;
+	is >> result;
+	return result;
+}
+
 template<typename T> vector<T> COLLADA::get_array(const TiXmlElement* array_element) const
 {
 	istringstream is(array_element->GetText());
@@ -609,58 +606,45 @@ const_material_ptr COLLADA::get_material(const TiXmlElement* material_element) c
 		if(phong) {
 			const TiXmlElement* color = phong->FirstChildElement();
 			const TiXmlElement* color_value;
+			Vector4f color_vector;
 			for(;color;color = color->NextSiblingElement()) {
 				if(color->Value() == string("emission")) {
 					color_value = color->FirstChildElement("color");
 					if(color_value) {
-						parse4vector(color_value->GetText(), material_data);
-						mat->set_emission(material_data);
+						color_vector = get<Vector4f>(color_value);
+						mat->set_emission(color_vector.array());
 					}
 				}
 				if(color->Value() == string("ambient")) {
 					color_value = color->FirstChildElement("color");
 					if(color_value) {
-						parse4vector(color_value->GetText(), material_data);
-						mat->set_ambient(material_data);
+						color_vector = get<Vector4f>(color_value);
+						mat->set_ambient(color_vector.array());
 					}
 				}
 				if(color->Value() == string("diffuse")) {
 					color_value = color->FirstChildElement("color");
 					if(color_value) {
-						parse4vector(color_value->GetText(), material_data);
-						mat->set_diffuse(material_data);
+						color_vector = get<Vector4f>(color_value);
+						mat->set_diffuse(color_vector.array());
 					}
 				}
 				if(color->Value() == string("specular")) {
 					color_value = color->FirstChildElement("color");
 					if(color_value) {
-						parse4vector(color_value->GetText(), material_data);
-						mat->set_specular(material_data);
+						color_vector = get<Vector4f>(color_value);
+						mat->set_specular(color_vector.array());
 					}
 				}
 				if(color->Value() == string("shininess")) {
 					const TiXmlElement* shininess_value = color->FirstChildElement("float");
-					if(shininess_value) {
-						float shininess;
-						istringstream is(shininess_value->GetText());
-						is >> shininess;
-						mat->set_shininess(shininess);
-					}
+					if(shininess_value)
+						mat->set_shininess(get<float>(shininess_value));
 				}
 			}
 		}
 	}
 	return mat;
-}
-
-void parse4vector(const string& str, GLfloat* v)
-{
-	istringstream is(str);
-	for(int i = 0; i < 4; i++) {
-		GLfloat num;
-		is >> num;
-		v[i] = num;
-	}
 }
 
 model_ptr parsedae(const char* i1, const char* i2)
