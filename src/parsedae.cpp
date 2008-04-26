@@ -606,35 +606,26 @@ const_material_ptr COLLADA::get_material(const TiXmlElement* material_element) c
 		if(phong) {
 			const TiXmlElement* color = phong->FirstChildElement();
 			const TiXmlElement* color_value;
-			Vector4f color_vector;
 			for(;color;color = color->NextSiblingElement()) {
 				if(color->Value() == string("emission")) {
 					color_value = color->FirstChildElement("color");
-					if(color_value) {
-						color_vector = get<Vector4f>(color_value);
-						mat->set_emission(color_vector.array());
-					}
+					if(color_value)
+						mat->set_emission(get<Vector4f>(color_value));
 				}
 				if(color->Value() == string("ambient")) {
 					color_value = color->FirstChildElement("color");
-					if(color_value) {
-						color_vector = get<Vector4f>(color_value);
-						mat->set_ambient(color_vector.array());
-					}
+					if(color_value)
+						mat->set_ambient(get<Vector4f>(color_value));
 				}
 				if(color->Value() == string("diffuse")) {
 					color_value = color->FirstChildElement("color");
-					if(color_value) {
-						color_vector = get<Vector4f>(color_value);
-						mat->set_diffuse(color_vector.array());
-					}
+					if(color_value)
+						mat->set_diffuse(get<Vector4f>(color_value));
 				}
 				if(color->Value() == string("specular")) {
 					color_value = color->FirstChildElement("color");
-					if(color_value) {
-						color_vector = get<Vector4f>(color_value);
-						mat->set_specular(color_vector.array());
-					}
+					if(color_value)
+						mat->set_specular(get<Vector4f>(color_value));
 				}
 				if(color->Value() == string("shininess")) {
 					const TiXmlElement* shininess_value = color->FirstChildElement("float");
