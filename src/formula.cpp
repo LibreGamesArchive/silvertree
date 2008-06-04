@@ -562,6 +562,63 @@ private:
 	}
 };
 
+class element_function : public function_expression {
+public:
+	explicit element_function(const args_list& args)
+	    : function_expression(args, 2, 2)
+	{}
+private:
+	variant execute(const formula_callable& variables) const {
+		const variant items = args()[0]->evaluate(variables);
+		const variant element = args()[1]->evaluate(variables);
+		return items[element.as_int()];
+	}
+};
+
+class count_function : public function_expression {
+public:
+	explicit count_function(const args_list& args)
+	     : function_expression(args, 2, 2)
+	{}
+
+private:
+	variant execute(const formula_callable& variables) const {
+		const variant items = args()[0]->evaluate(variables);
+		const variant element = args()[1]->evaluate(variables);
+
+		int count = 0;
+		for(int n = 0; n != items.num_elements(); ++n) {
+
+			if(items[n] == element) {
+				++count;
+			}
+		}
+
+		return variant(count);
+	}
+};
+
+class index_function : public function_expression {
+public:
+	explicit index_function(const args_list& args)
+	     : function_expression(args, 2, 2)
+	{}
+
+private:
+	variant execute(const formula_callable& variables) const {
+		const variant items = args()[0]->evaluate(variables);
+		const variant element = args()[1]->evaluate(variables);
+
+		for(int n = 0; n != items.num_elements(); ++n) {
+			if(items[n] == element) {
+				return variant(n);
+			}
+		}
+
+		return variant(-1);
+	}
+};
+
 expression_ptr create_function(const std::string& fn,
                                const std::vector<expression_ptr>& args)
 {
@@ -606,6 +663,12 @@ expression_ptr create_function(const std::string& fn,
 		return expression_ptr(new null_function(args));
 	} else if(fn == "remove") {
 		return expression_ptr(new remove_function(args));
+	} else if(fn == "element") {
+		return expression_ptr(new element_function(args));
+	} else if(fn == "count") {
+		return expression_ptr(new count_function(args));
+	} else if(fn == "index") {
+		return expression_ptr(new index_function(args));
 	} else {
 		std::cerr << "no function '" << fn << "'\n";
 		throw formula_error();
