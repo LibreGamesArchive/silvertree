@@ -13,6 +13,7 @@
 #include "party.hpp"
 #include "post_battle_dialog.hpp"
 #include "shop_dialog.hpp"
+#include "string_utils.hpp"
 #include "wml_command.hpp"
 #include "wml_node.hpp"
 #include "wml_utils.hpp"
@@ -231,6 +232,30 @@ class shop_command : public wml_command {
 public:
 	explicit shop_command(wml::const_node_ptr node)
 	   : items_(node->attr("items")), cost_(wml::get_str(node, "cost", "100")), pc_(wml::get_str(node, "pc", "pc"))
+	{}
+};
+
+class inventory_command : public wml_command
+{
+	formula party_;
+	const std::string& acquire_;
+	void do_execute(const formula_callable& info, world& world) const {
+		party& p = *party_.execute(info).convert_to<party>();
+
+		foreach(const std::string& str, util::split(acquire_)) {
+			const_item_ptr i = item::get(str);
+			if(i) {
+				p.acquire_item(i->clone());
+			} else {
+				std::cerr << "could not find item '" << str << "'\n";
+			}
+		}
+
+	}
+public:
+	explicit inventory_command(wml::const_node_ptr node)
+	  :	party_(wml::get_str(node, "party", "pc")),
+		acquire_(node->attr("acquire"))
 	{}
 };
 
@@ -581,6 +606,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	DEFINE_COMMAND(party_chat);
 	DEFINE_COMMAND(dialog);
 	DEFINE_COMMAND(shop);
+	DEFINE_COMMAND(inventory);
 	DEFINE_COMMAND(party);
 	DEFINE_COMMAND(quit);
 	DEFINE_COMMAND(character_status_dialog);
