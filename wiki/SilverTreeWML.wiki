@@ -43,7 +43,7 @@ party_light_power: the intensity of the light that should come from the PC's par
 
 == Lighting and formulas ==
 
-The lighting settings are actually all formulas. The game supports writing formulas for certain WML attributes that will be calculated when the game is run. See SilverTreeFormula.
+The lighting settings are actually all formulas. The game supports writing formulas for certain WML attributes that will be calculated when the game is run. See [SilverTreeFormula].
 
 == Settlements ==
 {{{
@@ -62,8 +62,40 @@ This creates a portal between the coordinates (1,1) on the current map and the c
 
 Portals are two-way, so going to the coordinates (2,2) in the fort scenario will cause the player to leave the fort map.
 
+== Parties ==
+Parties are defined using a `[party]` tag. All party definitions use the following keys:
+ * `id`
+ * `money`
+ * `x,y` starting coordinates of the party
+ * `[character]` see below
+
+To denote the player's party, use `controller="human"`
+
+NPCs should define:
+ * `allegiance` (good/evil)
+ * `aggressive` (yes/no) If no, the party will not attack the player.
+ * `destination_chooser` A location that serves as the party's destination when it moves.
+
+===Characters===
+Keys that can be used for all characters:
+ * `id`
+ * `description` The character's name
+ * `alignment` (lawful/chaotic)
+ * `equipment` The weapons the party is carrying. If none, use `equipment="weapon_slot,shield_slot,armor_slot"`
+ * `model` (the party's model to display on the map) OR `image` (a placeholder image where no model exists)
+ * `portrait`
+ * `level`
+ * `[attributes]` elements are: agility,endurance,intelligence,perception,strength,will
+
+Player characters (or ones that may join your party) also use:
+ * `improvement_points` Number of points available to improve attributes
+ * `bar_portrait` The portrait displayed in the bar below the map
+
+
 == Events ==
 
 See [Events]
 
 For scripted moves, see [ScriptedMoves]
+
+For tags that can be used in events, see [WmlCommands]

@@ -1,8 +1,8 @@
-#summary for silvertree-win-0.2.1
+#summary Editor version 0.2.1
 #labels Editor,Terrains,Features
 
 ==Introduction==
-When you open the !SilverTree RPG editor, silvertreeedit, you will see a black window one quarter covered with green hexagonal tiling. You can use the scroll bars to move it. At the top, there are 4 buttons (rotate left, rotate right, tilt up, tilt down) that change viewing angle and zoom. Next to them are the save and open buttons. Above those, there are three drop down menus. On the right, there is a tool bar that allows you to edit the map.
+When you open the SilverTree RPG editor, silvertreeedit, you will see a black window one quarter covered with green hexagonal tiling. You can use the scroll bars to move it. At the top, there are 4 buttons (rotate left, rotate right, tilt up, tilt down) that change viewing angle and zoom. Next to them are the save and open buttons. Above those, there are three drop down menus. On the right, there is a tool bar that allows you to edit the map.
 
 ==Top Drop Down Menus==
 ===File===
@@ -20,9 +20,9 @@ Vertical scale - Multiplier for tallness (z axis) of new map.
 
 Fuzziness - Unknown Value. Presumably to get softer features on the new map.
 ====Area on Current Map====
-x1, y1 - the quardinents for the top corner of the 'box' to be derived.
+x1, y1 - the coordinates for the top corner of the 'box' to be derived.
 
-x2, y2 - the quardinents for the bottom corner of the 'box' to be derived.
+x2, y2 - the coordinates for the bottom corner of the 'box' to be derived.
 
 ===Edit===
 Undo - Delete the last change you made.
@@ -43,11 +43,15 @@ Height - Left click to raise terrain, right-click to lower. Middle click does bo
 
 Picker - Right-click to copy a tile, left-click to paste it. This takes _all_ the attributes of a tile, including the scenery on it.
 
-cobbles-snow _to_ cave - Terrain_Types. Select, click on map to lay down.
+===[Terrain_Types]===
+
+cobbles-snow _to_ cave - Select, click on map to lay down.
 
 void - the end of the world. Use with discretion.
 
 water, water-deep - waterfalls occur if terrain changes are steep enough. water-deep is impassible. (water effects do not show in the editor)
+
+===[Feature_Types]===
 
 tree - 3D forest part.
 

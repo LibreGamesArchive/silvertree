@@ -1,17 +1,14 @@
+#summary This page documents possible WML commands that are available when an event is triggered.
 #labels WML
-= Introduction =
-This page documents possible WML commands that are available when an event is triggered.
-
-Note: Tag names in parentheses may actually be called something else.
 
 = award=
 
 The award tag is used to give the player an award. 
 
- * (party): party to give award to
- * (chars): party characters to which the award is given
+ * party: party to give award to
+ * characters: party characters to which the award is given
  * experience: experience given
- * (money): money given
+ * money: money given
 
 = battle =
 
@@ -21,8 +18,8 @@ The battle tag is used to start a battle.
  * pc_chars: party members involved in this battle
  * npc_party: enemy party
  * npc_chars: enemy party members involved in this battle
- * {{{[on_victory]}}}: all members of this tag will be executed if the player wins
- * {{{[on_defeat]}}}: all members of this tag will be executed if the player loses
+ * `[on_victory]`: all members of this tag will be executed if the player wins
+ * `[on_defeat]`: all members of this tag will be executed if the player loses
 
 = debug =
 
@@ -41,7 +38,7 @@ Will destroy all the parties that match the given filter.
  * filter: The formula which each party is tested against. Those which evaluate to true will be destroyed.
 
 = dialog =
- * npc: the character speaking. {{{npc="pc"}}} or {{{npc="npc"}}} may be used in events. Otherwise, {{{find(world.parties, id = 'vurgans')}}} or similar code is used.
+ * npc: the character speaking. `npc="pc"` or `npc="npc"` may be used in events. Otherwise, `find(world.parties, id = 'vurgans')` or similar code is used.
 
 = execute_script =
 
@@ -49,9 +46,16 @@ See [ScriptedMoves]
 
 = if =
 
-Will evaluate the given condition. If it is true, all the commands within all children named {{{[then]}}} will be evaluated, otherwise all the commands within all children named {{{[else]}}} will be evaluated.
+Will evaluate the given condition. If it is true, all the commands within all children named `[then]` will be evaluated, otherwise all the commands within all children named `[else]` will be evaluated.
 
- * condition: The formula which is evaluated to decide between executing {{{[then]}}} or {{{[else]}}}
+ * condition: The formula which is evaluated to decide between executing `[then]` or `[else]`
+
+= inventory =
+
+This tag allows giving items to a party.
+
+ * party: Party recieving the items. Optional, defaults to `pc`
+ * acquire: Comma-separated list of items to be given to the party
 
 = modify_objects, set=
 
@@ -80,11 +84,12 @@ See [ScriptedMoves]
 
 = shop =
 
- * (pc): player party doing the shopping
+ * pc: player party doing the shopping
  * items: id's of all items sold in this shop
  * cost: cost (in percent of the default) of all items
 
 
 = while =
 
- * (condition): condition for running the loop
+ * condition: condition for running the loop
+ * (everything else): will be run repeatedly until `condition` is false

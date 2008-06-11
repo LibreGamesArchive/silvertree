@@ -15,15 +15,15 @@ damage=10
 
 to make damage always equal to 10. Some WML attributes are usually just specified as numbers, but have the added flexibility of being formulas where desired.
 
-= Details =
+== Details ==
 
 Different formulas are used at different times, of course. For instance, the formula to determine the color of sunlight wouldn't depend on a character's strength. For this reason, different formulas have different sets of inputs, depending on their context. The input for light calculations is the time of day: 'hour', 'minute', and 'second'. If one tried to use 'strength' in a light calculation, it wouldn't be recognized (meaning it would be considered equal to 0).
 
 Most formulas that calculate character statistics have characters as inputs. This means you can access all standard character statistics. This includes the basic attributes, strength, endurance, etc. hitpoints and max_hitpoints, speed, and so on and so forth.
 
-The [rules]/[calculations] section in data/rules.cfg for instance contains calculations of a large range of character stats based on other stats the character has.
+The `[rules]`/`[calculations]` section in data/rules.cfg for instance contains calculations of a large range of character stats based on other stats the character has.
  
-= Functions =
+== Functions ==
 
 In addition to standard arithmetic, there are 'functions' which are available for more complex operations. A common example of such a function is the 'if' function. Suppose you wanted to make it so that damage was equal to 10, unless the character's strength was greater than 10, in which case it was equal to the character's strength. You could do this:
 
@@ -43,9 +43,9 @@ The 'transition' function is used to map a value from one scale to another.
 
 transition(value, min1, min2, max1, max2)
 
-For instance, a healer that charges 1 trinka per percent of health restored would have a healing_cost=(hitpoints, max_hitpoints, 0, 0, 100) (we're of course inverting the scale in the process in this example.)
+For instance, a healer that charges 1 trinka per percent of health restored would have a healing_cost=transition(hitpoints, max_hitpoints, 0, 0, 100) (we're of course inverting the scale in the process in this example.)
 
-= Objects and Lists =
+== Objects and Lists ==
 
 It is also possible for formulas to have 'objects' as inputs. An object is an input that contains other values. For instance, a party is an input. When an 'encounter' event is fired, the input to all formulas in the event handler contains 'pc' which is an object referring to the character's party, and 'npc', which is an object referring to the NPC party the PC has encountered.
 
@@ -59,29 +59,123 @@ Some inputs may also be lists. A list contains multiple inputs in a sequence. Fo
 
 List elements may be referenced by using this notation: pc.members.0, party.members.1 etc.
 
-A list can be operated on by several functions. For instance,
+A list can be operated on by several functions, which are documented in the function list.
 
-size(list): number of items in the list
-EXAMPLE: size(pc.members) -- number of characters in the PC's party
 
-head(list): the first item in the list
-EXAMPLE: head(npc.members) -- the first character in the NPC's party (i.e. the party leader).
+= Function list =
 
-map(list, formula): will run 'formula' on each item in the list, and evaluate to a new list which contains the same number of items as in 'list', with the formulas run on each item.
-EXAMPLE: map(pc.members, hitpoints) -- will give a list back with the number of hitpoints each party member has. This is more useful in conjunction with other functions.
+===abs(int)===
+Evaluates the absolute value of an integer.
 
-filter(list, formula): will run 'formula' on each item in the list. Will evaluate to a list which only contains items the formula was true for.
-EXAMPLE: size(filter(pc.members, hitpoints < max_hitpoints)) > 0 -- tells you if any of the characters in the party are injured.
+===choose(list, formula)===
+Evaluates 'formula' for each item in the list. Will evaluate to the item which 'formula' gave the highest value. 
+ * To give back the character with the highest strength, `choose(pc.members, strength)`. Note that this is different to `max(map(pc.members, strength))` because choose will return the actual character. max+map will return the character's strength, not the character themselves. This is very useful for finding a character with the highest or lowest of a certain attribute.
 
-sum(list): evaluates to the sum of the items in the list (which all must be numbers)
-EXAMPLE: sum(map(pc.members, max_hitpoints - hitpoints)) -- finds the total damage the characters in the party have taken (perhaps to calculate healing costs): 
+===color_transition(...)===
+Changes value depending on the first input.
+ * `ambient_light="color_transition(hour*60+minute,0,rgb(0,0,50), 12*60,rgb(40,70,100), 24*60,rgb(0,0,50))"` Changes the lighting from `rgb(0,0,50)` at midnight to `rgb(40,70,100)` at noon and back.
 
-max(list) and min(list): evaluates to the maximum or minimum item in the list (which all must be numbers)
-EXAMPLE: max(map(pc.members, strength)) -- finds the strength of the strongest character in the party
+===count(list, element)===
+Counts the number of times an element appears in a list.
+ * `count([1,1,2,3,5],1) = 2`
+ * `count([1,2,3,4],5) = 0`
 
-choose(list, formula): evaluates 'formula' for each item in the list. Will evaluate to the item which 'formula' gave the highest value. EXAMPLE: to give back the character with the highest strength, choose(pc.members, strength). Note that this is different to max(map(pc.members, strength)) because choose will return the actual character. max+map will return the character's strength, not the character themselves. This is very useful for finding a character with the highest or lowest of a certain attribute.
+===distance(loc1,loc2)===
+Returns the distance between two hexes. Both inputs must be locations.
 
-sort(list, formula): evaluates to a list sorted according to the comparison 'formula' for each item 'a' and its successor 'b'. For instance, sorting characters according to initiative would be done by sort(pc.members, a.initiative > b.initiative).
+===element(list, position)===
+Returns a certain element from a list.
+ * `element(list,2)` is equivalent `list.2`
 
-remove(list, object) or remove(list, list): If any elements of list are found in the second argument, they are removed from list1.
-EXAMPLES: {{{remove([4,5], 4) -> [5]}}}; {{{ remove([4,5,4], [4]) -> [5]}}}; {{{remove([2,7,8,9], [2,8]) -> [7,9]}}}
+===filter(list, formula)===
+Will run 'formula' on each item in the list. Will evaluate to a list which only contains items the formula was true for.
+ * `size(filter(pc.members, hitpoints < max_hitpoints)) > 0` -- tells you if any of the characters in the party are injured.
+
+===find(list,condition)===
+Returns the first element of the list that matches the condition. Returns null if no element is found.
+
+===head(list)===
+The first item in the list
+ * `head(npc.members)` -- the first character in the NPC's party (i.e. the party leader).
+
+===if(condition, then, else)===
+Evaluates `then` if `condition` is true, `else` if `condition` is false.
+ * damage=if(strength > 10, strength, 10) -- Damage is equal to 10, unless the character's strength iss greater than 10, in which case it is equal to the character's strength.
+
+===index(list, element)===
+Returns the index of the first time an element appears in a list. If there is no such element, it evaluates to -1. 
+ * `index([3,2,1,2,3],2) = 1`
+ * `index([1,2,3,4],5) = -1`
+
+===loc(x,y)===
+Returns a location generated by two coordinates.
+
+===map(list, formula)===
+Will run 'formula' on each item in the list, and evaluate to a new list which contains the same number of items as in 'list', with the formulas run on each item.
+ * `map(pc.members, hitpoints)` -- will give a list back with the number of hitpoints each party member has. This is more useful in conjunction with other functions.
+
+===max(list); min(list)===
+Evaluates to the maximum or minimum item in the list (which all must be numbers)
+ * `max(map(pc.members, strength))` -- finds the strength of the strongest character in the party
+
+===null()===
+Evaluates to `null`.
+
+===remove(list, object); remove(list, list)===
+If any elements of list are found in the second argument, they are removed from list1.
+ * `remove([4,5], 4) = [5]`
+ * `remove([4,5,4], [4]) = [5]`
+ * `remove([2,7,8,9], [2,8]) = [7,9]`
+
+===rgb(red,green,blue)===
+Combines three integers for lighting purposes. Values of `red`,`green`,`blue` range from 0 to 100
+ * `rgb(100,100,100)` is pure qhite light
+
+===size(list)===
+Number of items in the list
+ * `size(pc.members)` -- number of characters in the PC's party
+
+===sort(list, formula)===
+Evaluates to a list sorted according to the comparison 'formula' for each item 'a' and its successor 'b'. 
+ * Sorting characters according to initiative would be done by `sort(pc.members, a.initiative > b.initiative)`.
+
+===sum(list)===
+Evaluates to the sum of the items in the list (which all must be numbers)
+ * `sum(map(pc.members, max_hitpoints - hitpoints))` -- finds the total damage the characters in the party have taken (perhaps to calculate healing costs)
+
+===transition(value, min1, min2, max1, max2)===
+Maps a value from one scale to another.
+ * `healing_cost=transition(hitpoints, max_hitpoints, 0, 0, 100)` -- A healer that charges 1 trinka per percent of health restored
+
+===wave(int)===
+ * `wave(x) = sin(2*Pi*(x%1000/1000))*1000`
+
+
+
+=Operator list=
+ * not
+ * where (see below)
+ * or
+ * and
+ * =
+ * !=
+ * <
+ * >
+ * <=
+ * >=
+ * +
+ * -
+ * `*`
+ * /
+ * %
+ * ^
+ * d (see below)
+ * .
+
+===where===
+Sets the value of a variable for a certain formula
+ * `(x*2 where x=5)` = 10
+
+===(num_rolls)d(faces)===
+Dice roll (used to generate random numbers). Rolls the a die with `(faces)` sides `num_rolls` number of times, adding the results.
+ * `3d6` ranges from 3 and 18 inclusive
