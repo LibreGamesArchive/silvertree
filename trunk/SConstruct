@@ -22,6 +22,7 @@ opts.AddOptions(
     ("EXTRA_FLAGS_DEBUG", "Extra compiler/linker flags to use in debug build variant.", ""),
     BoolOption("VERBOSE_BUILD_OUTPUT", "If true, SCons will display full command lines of commands it's running.", False),
     ("HOST", "Cross-compile host.", ""),
+    BoolOption("STRICT", "Strict compilation (warnings are errors, etc..).", False)
 )
 
 env = Environment(tools = ["zip", "config_checks"], toolpath = ["scons"], options = opts)
@@ -75,6 +76,8 @@ else:
 
 if "gcc" in env["TOOLS"]:
     ccflags = Split("-Wall -Wno-sign-compare -Wno-switch -Wno-switch-enum")
+    if env["STRICT"]:
+        ccflags += Split("-Werror -ansi")
     linkflags = []
     if env["Build"] == "release":
         ccflags.append("-O2")
