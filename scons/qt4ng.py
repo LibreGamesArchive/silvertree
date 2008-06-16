@@ -3,7 +3,6 @@ from os.path import join
 from SCons.Script  import *
 from SCons.Builder import Builder
 from SCons.Action  import Action
-from config_check_utils import *
 
 moc4builder = Builder(
                 action = Action("$QT4_MOCCOM", "$QT4_MOCCOMSTR"),
@@ -103,6 +102,7 @@ def CheckQt4Tools(context, tools = ["moc", "uic"]):
 def CheckQt4Libs(context, libs = ["QtCore", "QtGui"]):
     context.Message("Checking for Qt 4 libraries %s... " % ", ".join(libs))
     env = context.env
+    backup = env.Clone().Dictionary()
     if env["PLATFORM"] != "win32":
         for lib in libs:
             env.ParseConfig("pkg-config --libs --cflags %s" % lib)
@@ -127,6 +127,7 @@ def CheckQt4Libs(context, libs = ["QtCore", "QtGui"]):
             return True
     else:
             context.Result("no")
+            env.Replace(**backup)
             return False
 
 def get_checks():

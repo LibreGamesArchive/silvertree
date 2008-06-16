@@ -1,10 +1,8 @@
 # vi: syntax=python:et:ts=4
 
-from config_check_utils import backup_env, restore_env
-
 def CheckBoostLib(context, boost_lib, require_version = None):
     env = context.env
-    backup = backup_env(env, ["CPPPATH", "LIBPATH", "LIBS"])
+    backup = env.Clone().Dictionary()
     env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
 
     boost_headers = { "regex" : "regex/config.hpp" }
@@ -37,7 +35,7 @@ def CheckBoostLib(context, boost_lib, require_version = None):
     if context.TryLink(test_program, ".cpp"):
         return True
     else:
-        restore_env(env, backup)
+        env.Replace(**backup)
         return False
 
 def CheckBoost(context, boost_lib, require_version = None):

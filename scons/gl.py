@@ -1,11 +1,9 @@
 # vi: syntax=python:et:ts=4
 
-from config_check_utils import backup_env, restore_env
-
 def CheckOpenGL(context, libs = ["gl"]):
     context.Message("Checking for OpenGL... ")
     env = context.env
-    backup = backup_env(env, ["LIBS"])
+    backup = env.Clone().Dictionary()
     if env["PLATFORM"] == "win32":
         libnames = { "gl" : "opengl32", "glu" : "glu32" }
     else:
@@ -19,14 +17,14 @@ def CheckOpenGL(context, libs = ["gl"]):
         context.Result("yes")
         return True
     else:
-        restore_env(env, backup)
+        env.Replace(**backup)
         context.Result("no")
         return False
 
 def CheckGLEW(context):
     context.Message("Checking for OpenGL Extension Wrangler... ")
     env = context.env
-    backup = backup_env(env, ["LIBS"])
+    backup = env.Clone().Dictionary()
     if env["PLATFORM"] == "win32":
         env.AppendUnique(LIBS = ["glew32", "glu32", "opengl32"])
     else:
@@ -42,7 +40,7 @@ def CheckGLEW(context):
         context.Result("yes")
         return True
     else:
-        restore_env(env, backup)
+        env.Replace(**backup)
         context.Result("no")
         return False
 
