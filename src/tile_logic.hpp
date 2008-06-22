@@ -84,7 +84,7 @@ namespace hex
 
 	inline bool operator<(const location& a, const location& b)
 	{
-		return a.x() < b.x() || a.x() == b.x() && a.y() < b.y();
+		return a.x() < b.x() || (a.x() == b.x() && a.y() < b.y());
 	}
 }
 

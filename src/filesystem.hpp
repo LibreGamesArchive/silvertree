@@ -18,6 +18,8 @@
 #include <stdexcept>
 #include <cerrno>
 
+#include <string.h>
+
 namespace sys
 {
 

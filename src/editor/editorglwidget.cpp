@@ -489,7 +489,7 @@ void EditorGLWidget::mousePressEvent(QMouseEvent *event)
 				}
 				EditPartyDialog d(p);
 				d.exec();
-				if(!p->get_child("character") || new_party && d.cancelled()) {
+				if(!p->get_child("character") || (new_party && d.cancelled())) {
 					parties_->erase(selected_);
 				} else {
 					party_clipboard_ = wml::deep_copy(p);

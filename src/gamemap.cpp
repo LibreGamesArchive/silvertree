@@ -371,7 +371,7 @@ bool line_of_sight(const gamemap& m,
 		GLfloat yloc = y;
 
 		const tile* t = m.closest_tile(&xloc,&yloc);
-		if(t == NULL || range != -1 && distance*step > range) {
+		if(t == NULL || (range != -1 && distance*step > range)) {
 			if(draw) {
 				draw_line_of_sight(x1,y1,h1,x,y,h,x2,y2,h2,true);
 			}

@@ -95,7 +95,7 @@ const key_table_ptr get_key_table(int table)
 }
 void set_key_binding(int table, SDLKey key, SDLMod mod, key_table::logical_key k)
 {
-	SDL_keysym ks;
+	SDL_keysym ks = {0};
 	ks.sym = key;
 	ks.mod = mod;
 	get_key_table(table)->set_binding(ks, k);
