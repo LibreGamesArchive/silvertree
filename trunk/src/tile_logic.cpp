@@ -245,8 +245,8 @@ bool tiles_adjacent(const location& a, const location& b)
 
 	const int xdiff = std::abs(a.x() - b.x());
 	const int ydiff = std::abs(a.y() - b.y());
-	return ydiff == 1 && a.x() == b.x() || xdiff == 1 && a.y() == b.y() ||
-	       xdiff == 1 && ydiff == 1 && (a.y() > b.y() ? is_even(a.x()) : is_even(b.x()));
+	return (ydiff == 1 && a.x() == b.x()) || (xdiff == 1 && a.y() == b.y()) ||
+	       (xdiff == 1 && ydiff == 1 && (a.y() > b.y() ? is_even(a.x()) : is_even(b.x())));
 }
 
 }

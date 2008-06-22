@@ -331,7 +331,7 @@ void battle::draw(gui::slider* slider, bool draw_widgets)
 	}
 
 	camera_.prepare_frame();
-	if(focus_ != chars_.end() && current_focus_ != (*focus_)->loc() || camera_.moved_since_last_check()) {
+	if((focus_ != chars_.end() && current_focus_ != (*focus_)->loc()) || camera_.moved_since_last_check()) {
 		rebuild_visible_tiles();
 	}
 
@@ -339,8 +339,8 @@ void battle::draw(gui::slider* slider, bool draw_widgets)
 
 	tile::setup_drawing();
 	foreach(const tile* t, tiles_) {
-		const bool dim = highlight_moves_ && moves_.count(t->loc()) == 0
-		        || highlight_targets_ && targets_.count(t->loc()) == 0;
+		const bool dim = (highlight_moves_ && moves_.count(t->loc()) == 0)
+		        || (highlight_targets_ && targets_.count(t->loc()) == 0);
 		if(dim) {
 			glEnable(GL_LIGHT2);
 			glDisable(GL_LIGHT0);
