@@ -16,6 +16,7 @@ opts.AddOptions(
     ("BOOSTDIR", "Root directory of boost installation.", "/usr/include"),
     ("BOOSTLIBS", "Directory where boost libs are located.", "/usr/lib"),
     ("BOOST_SUFFIX", "Suffix of the boost regex library.", ""),
+    BoolOption("use_pango", "Compile experemental pango based text renderer.", False),
     BoolOption("AUDIO", "Whether sound support is enabled", False),
     EnumOption("Build", "Build variant: debug or release", "release", ["debug", "release"], ignorecase=1),
     ("EXTRA_FLAGS_RELEASE", "Extra compiler/linker flags to use in release build variant.(e.g. \"-O3 -march=prescott\")", ""),
@@ -68,6 +69,9 @@ editor_conf = editor_env.Configure(custom_tests = editor_env["config_checks"])
 editor_env["HaveQt"] = editor_conf.CheckQt4Tools() and \
                        editor_conf.CheckQt4Libs(["QtCore", "QtGui", "QtOpenGL"])
 editor_conf.Finish()
+
+if env["use_pango"]:
+    env.ParseConfig("pkg-config --libs --cflags pangoft2")
 
 if env["AUDIO"]:
     env.Replace(CPPDEFINES = { "AUDIO" : None })
