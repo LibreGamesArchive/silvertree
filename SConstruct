@@ -70,13 +70,14 @@ editor_env["HaveQt"] = editor_conf.CheckQt4Tools() and \
                        editor_conf.CheckQt4Libs(["QtCore", "QtGui", "QtOpenGL"])
 editor_conf.Finish()
 
-if env["use_pango"]:
-    env.ParseConfig("pkg-config --libs --cflags pangoft2")
-
 if env["AUDIO"]:
     env.Replace(CPPDEFINES = { "AUDIO" : None })
 else:
     env.Replace(CPPDEFINES = dict())
+
+if env["use_pango"]:
+    env.ParseConfig("pkg-config --libs --cflags pangoft2")
+    env.Append(CPPDEFINES = "USE_PANGO")
 
 if "gcc" in env["TOOLS"]:
     ccflags = Split("-Wall -Wno-sign-compare -Wno-switch -Wno-switch-enum")

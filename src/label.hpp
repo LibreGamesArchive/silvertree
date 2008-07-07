@@ -20,6 +20,10 @@
 #include "texture.hpp"
 #include "widget.hpp"
 
+#ifdef USE_PANGO
+#include "gl_utils.hpp"
+#endif
+
 namespace gui {
 
 class label;
@@ -57,6 +61,9 @@ private:
 
 	std::string text_, formatted_;
 	graphics::texture texture_;
+#ifdef USE_PANGO
+	graphics::gl::texture2d_ptr gl_texture_;
+#endif
 	SDL_Color color_;
 	int size_;
 	bool fixed_width_;
