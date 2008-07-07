@@ -17,13 +17,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>   *
  ***************************************************************************/
 
+#include <iostream>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <freetype/ftbitmap.h>
 #include <pango/pangoft2.h>
+#include <boost/lexical_cast.hpp>
+#include <string>
 
 #include "text.hpp"
 #include "gl_utils.hpp"
+
+using std::string;
 
 namespace
 {
@@ -65,16 +70,22 @@ renderer::~renderer()
 	g_object_unref(font_map);
 }
 
-gl::texture2d_ptr renderer::render_text(std::string text, bool markup)
+gl::texture2d_ptr renderer::render_text(std::string text, int& width, int& height, int size, bool markup)
 {
 	FT_Bitmap bitmap;
 
 	PangoLayout* layout = pango_layout_new(context);
-	pango_layout_set_text(layout, text.data(), text.size());
+	if(markup)
+		pango_layout_set_markup(layout, text.data(), text.size());
+	else
+		pango_layout_set_text(layout, text.data(), text.size());
 
-	PangoFontDescription *desc = pango_font_description_from_string("Sans Bold 27");
+	PangoFontDescription *desc = pango_font_description_new();
+	pango_font_description_set_family_static(desc, "FreeSans");
+	pango_font_description_set_size(desc, size * PANGO_SCALE);
 	pango_layout_set_font_description(layout, desc);
 	pango_font_description_free(desc);
+	std::cout << text << std::endl;
 
 	PangoRectangle rect;
 	pango_layout_get_pixel_extents(layout, NULL, &rect);
@@ -93,10 +104,15 @@ gl::texture2d_ptr renderer::render_text(std::string text, bool markup)
 	texture->bind();
 
 	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, bitmap.width, bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
+	//glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmap.width, bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
 
 	delete[] bitmap.buffer;
 	g_object_unref(layout);
 
+	width = bitmap.width;
+	height = bitmap.rows;
+	std::cout << width << " " << height << std::endl;
 	return texture;
 }
 

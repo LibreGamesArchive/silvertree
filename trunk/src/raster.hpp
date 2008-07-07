@@ -16,12 +16,14 @@
 #include "SDL.h"
 
 #include "texture.hpp"
+#include "gl_utils.hpp"
 
 namespace graphics
 {
 
 void prepare_raster();
 void blit_texture(const texture& tex, int x=0, int y=0, GLfloat rotate=0.0);
+void blit_gl_texture(gl::texture2d_ptr tex, int x, int y, int w, int h, GLfloat rotate=0.0);
 void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate=0.0);
 void draw_rect(const SDL_Rect& rect, const SDL_Color& color,
                unsigned char alpha=0xFF);

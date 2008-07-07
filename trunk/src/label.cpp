@@ -16,6 +16,9 @@
 #include "label.hpp"
 #include "raster.hpp"
 #include "translate.hpp"
+#ifdef USE_PANGO
+#include "text.hpp"
+#endif
 
 namespace gui {
 
@@ -80,13 +83,24 @@ void label::reformat_text()
 
 void label::recalculate_texture()
 {
+#ifdef USE_PANGO
+	int width, height;
+	gl_texture_ = graphics::text::renderer::instance().render_text(current_text(), width, height, size_ - 4);
+	inner_set_dim(width, height);
+#else
 	texture_ = graphics::font::render_text(current_text(), size_, color_);
 	inner_set_dim(texture_.width(),texture_.height());
+#endif
 }
 
 void label::handle_draw() const
 {
+#ifdef USE_PANGO
+	//glColor3b(color_.r, color_.g, color_.b);
+	graphics::blit_gl_texture(gl_texture_, x(), y(), width(), height());
+#else
 	graphics::blit_texture(texture_, x(), y());
+#endif
 }
 
 void label::set_texture(graphics::texture t) {

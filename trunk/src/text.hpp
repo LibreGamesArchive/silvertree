@@ -43,7 +43,7 @@ class renderer
 
 	static renderer& instance();
 
-	gl::texture2d_ptr render_text(std::string text, bool markup = false);
+	gl::texture2d_ptr render_text(std::string text, int&, int&, int size = 14, bool markup = false);
 };
 
 }

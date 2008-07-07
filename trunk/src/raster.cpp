@@ -82,6 +82,33 @@ void blit_texture(const texture& tex, int x, int y, GLfloat rotate)
 	glPopMatrix();
 }
 
+void blit_gl_texture(gl::texture2d_ptr tex, int x, int y, int w, int h, GLfloat rotate)
+{
+	tex->bind();
+	const int w_odd = w % 2;
+	const int h_odd = h % 2;
+	h /= 2;
+	w /= 2;
+
+	glPushMatrix();
+
+	glTranslatef(x+w,y+h,0.0);
+	glRotatef(rotate,0.0,0.0,1.0);
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0,0.0);
+	glVertex3i(-w,-h,0);
+	glTexCoord2f(0.0,1.0);
+	glVertex3i(-w,h+h_odd,0);
+	glTexCoord2f(1.0,1.0);
+	glVertex3i(w+w_odd,h+h_odd,0);
+	glTexCoord2f(1.0,0.0);
+	glVertex3i(w+w_odd,-h,0);
+	glEnd();
+
+	glPopMatrix();
+}
+
 void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate)
 {
 	if(!tex.valid()) {
