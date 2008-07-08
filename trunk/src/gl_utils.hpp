@@ -36,18 +36,6 @@ template<GLenum dim> class texture
 	~texture() { glDeleteTextures(1, &id); }
 
 	void bind() { glBindTexture(dim, id); }
-	GLint width()
-	{
-		GLint width;
-		glGetTexLevelParameteriv(dim, 0, GL_TEXTURE_WIDTH, &width);
-		return width;
-	}
-	GLint height()
-	{
-		GLint height;
-		glGetTexLevelParameteriv(dim, 0, GL_TEXTURE_HEIGHT, &height);
-		return height;
-	}
 
 	protected:
 	texture(const texture&);

@@ -18,6 +18,14 @@
 #include "texture.hpp"
 #include "gl_utils.hpp"
 
+#ifdef USE_PANGO
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include <freetype/ftbitmap.h>
+#else
+struct FT_Bitmap;
+#endif
+
 namespace graphics
 {
 
@@ -25,6 +33,7 @@ void prepare_raster();
 void blit_texture(const texture& tex, int x=0, int y=0, GLfloat rotate=0.0);
 void blit_gl_texture(gl::texture2d_ptr tex, int x, int y, int w, int h, GLfloat rotate=0.0);
 void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate=0.0);
+void blit_ft_bitmap(const FT_Bitmap& bitmap, int x, int y);
 void draw_rect(const SDL_Rect& rect, const SDL_Color& color,
                unsigned char alpha=0xFF);
 void draw_hollow_rect(const SDL_Rect& rect, const SDL_Color& color,
