@@ -22,14 +22,32 @@
 #include <memory>
 #include <string>
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "gl_utils.hpp"
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include <freetype/ftbitmap.h>
 
 namespace graphics
 {
 
 namespace text
 {
+
+struct ft_bitmap_handle
+{
+	FT_Bitmap bitmap;
+
+	ft_bitmap_handle(int width, int height);
+	~ft_bitmap_handle();
+
+	private:
+	ft_bitmap_handle(const ft_bitmap_handle&);
+};
+
+typedef boost::shared_ptr<ft_bitmap_handle> ft_bitmap_ptr;
 
 class renderer
 {
@@ -43,7 +61,8 @@ class renderer
 
 	static renderer& instance();
 
-	gl::texture2d_ptr render_text(std::string text, int&, int&, int size = 14, bool markup = false);
+	gl::texture2d_ptr render_to_texture(std::string text, int size = 14, bool markup = false);
+	ft_bitmap_ptr render(std::string text, int size = 14, bool markup = false);
 };
 
 }

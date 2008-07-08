@@ -70,10 +70,8 @@ renderer::~renderer()
 	g_object_unref(font_map);
 }
 
-gl::texture2d_ptr renderer::render_text(std::string text, int& width, int& height, int size, bool markup)
+ft_bitmap_ptr renderer::render(std::string text, int size, bool markup)
 {
-	FT_Bitmap bitmap;
-
 	PangoLayout* layout = pango_layout_new(context);
 	if(markup)
 		pango_layout_set_markup(layout, text.data(), text.size());
@@ -85,20 +83,24 @@ gl::texture2d_ptr renderer::render_text(std::string text, int& width, int& heigh
 	pango_font_description_set_size(desc, size * PANGO_SCALE);
 	pango_layout_set_font_description(layout, desc);
 	pango_font_description_free(desc);
-	std::cout << text << std::endl;
 
 	PangoRectangle rect;
 	pango_layout_get_pixel_extents(layout, NULL, &rect);
 
-	bitmap.width = rect.width;
-	bitmap.rows = rect.height;
-	bitmap.pitch = rect.width;
-	bitmap.num_grays = 256;
-	bitmap.pixel_mode = FT_PIXEL_MODE_GRAY;
-	bitmap.buffer = new unsigned char[bitmap.pitch * bitmap.rows];
-	memset(bitmap.buffer, 0x00, bitmap.pitch * bitmap.rows);
+	ft_bitmap_ptr ptr(new ft_bitmap_handle(rect.width, rect.height));
+	FT_Bitmap& bitmap = ptr->bitmap;
 
 	pango_ft2_render_layout(&bitmap, layout, 0, 0);
+
+	g_object_unref(layout);
+
+	return ptr;
+}
+
+gl::texture2d_ptr renderer::render_to_texture(std::string text, int size, bool markup)
+{
+	ft_bitmap_ptr ptr(render(text, size, markup));
+	FT_Bitmap& bitmap = ptr->bitmap;
 
 	gl::texture2d_ptr texture(new gl::texture2d);
 	texture->bind();
@@ -110,13 +112,23 @@ gl::texture2d_ptr renderer::render_text(std::string text, int& width, int& heigh
 	//glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmap.width, bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
 
-	delete[] bitmap.buffer;
-	g_object_unref(layout);
-
-	width = bitmap.width;
-	height = bitmap.rows;
-	std::cout << width << " " << height << std::endl;
 	return texture;
+}
+
+ft_bitmap_handle::ft_bitmap_handle(int width, int height)
+{
+	bitmap.width = width;
+	bitmap.rows = height;
+	bitmap.pitch = width;
+	bitmap.num_grays = 256;
+	bitmap.pixel_mode = FT_PIXEL_MODE_GRAY;
+	bitmap.buffer = new unsigned char[bitmap.pitch * bitmap.rows];
+	memset(bitmap.buffer, 0x00, bitmap.pitch * bitmap.rows);
+}
+
+ft_bitmap_handle::~ft_bitmap_handle()
+{
+	delete[] bitmap.buffer;
 }
 
 }

@@ -140,8 +140,16 @@ void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate
 #ifdef USE_PANGO
 void blit_ft_bitmap(const FT_Bitmap& bitmap, int x, int y)
 {
+	glPushAttrib(GL_CURRENT_BIT | GL_PIXEL_MODE_BIT);
+	glDisable(GL_TEXTURE_2D);
 	glRasterPos2i(x,y);
+	glPixelZoom(1, -1);
+	glPixelTransferf(GL_RED_BIAS, 1.);
+	glPixelTransferf(GL_GREEN_BIAS, 1.);
+	glPixelTransferf(GL_BLUE_BIAS, 1.);
 	glDrawPixels(bitmap.width, bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
+	glEnable(GL_TEXTURE_2D);
+	glPopAttrib();
 }
 #endif
 

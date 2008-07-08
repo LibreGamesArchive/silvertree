@@ -21,7 +21,7 @@
 #include "widget.hpp"
 
 #ifdef USE_PANGO
-#include "gl_utils.hpp"
+#include "text.hpp"
 #endif
 
 namespace gui {
@@ -62,7 +62,7 @@ private:
 	std::string text_, formatted_;
 	graphics::texture texture_;
 #ifdef USE_PANGO
-	graphics::gl::texture2d_ptr gl_texture_;
+	graphics::text::ft_bitmap_ptr ft_texture_;
 #endif
 	SDL_Color color_;
 	int size_;
