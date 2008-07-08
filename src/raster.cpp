@@ -137,6 +137,14 @@ void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate
 	glPopMatrix();
 }
 
+#ifdef USE_PANGO
+void blit_ft_bitmap(const FT_Bitmap& bitmap, int x, int y)
+{
+	glRasterPos2i(x,y);
+	glDrawPixels(bitmap.width, bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
+}
+#endif
+
 void draw_rect(const SDL_Rect& r, const SDL_Color& color,
                unsigned char alpha)
 {

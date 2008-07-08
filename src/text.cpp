@@ -103,6 +103,9 @@ gl::texture2d_ptr renderer::render_text(std::string text, int& width, int& heigh
 	gl::texture2d_ptr texture(new gl::texture2d);
 	texture->bind();
 
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, bitmap.width, bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
 	//glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmap.width, bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
