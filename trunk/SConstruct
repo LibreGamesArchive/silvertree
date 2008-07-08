@@ -57,6 +57,8 @@ conf.CheckGLEW() and \
 conf.CheckSDL(require_version = "1.2.10") and \
 conf.CheckSDL("SDL_image") and \
 conf.CheckSDL("SDL_ttf") or Exit(1)
+if env["use_pango"]:
+    conf.CheckPango("ft2") or Exit(1)
 if env["AUDIO"]:
     env["AUDIO"] = conf.CheckLibWithHeader(openal_lib, "AL/al.h", "C") and \
                    conf.CheckLibWithHeader("mpg123", "mpg123.h", "C")
@@ -76,7 +78,6 @@ else:
     env.Replace(CPPDEFINES = dict())
 
 if env["use_pango"]:
-    env.ParseConfig("pkg-config --libs --cflags pangoft2")
     env.Append(CPPDEFINES = "USE_PANGO")
 
 if "gcc" in env["TOOLS"]:
