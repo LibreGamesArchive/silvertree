@@ -7,6 +7,7 @@ checks = Split("""
     boost
     qt4ng
     nsis
+    pango
 """)
 
 def exists(env):
