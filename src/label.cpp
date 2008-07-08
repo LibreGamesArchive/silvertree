@@ -96,7 +96,7 @@ void label::recalculate_texture()
 void label::handle_draw() const
 {
 #ifdef USE_PANGO
-	graphics::blit_ft_bitmap(ft_texture_->bitmap, x(), y());
+	graphics::blit_ft_bitmap(ft_texture_->bitmap, x(), y(), color_);
 #else
 	graphics::blit_texture(texture_, x(), y());
 #endif
