@@ -16,11 +16,13 @@
 #include <boost/shared_ptr.hpp>
 
 #include "formula_fwd.hpp"
+#include "map_avatar.hpp"
 #include "model_fwd.hpp"
 #include "party_fwd.hpp"
 #include "settlement_fwd.hpp"
 #include "tile_logic.hpp"
 #include "wml_node_fwd.hpp"
+#include "world.hpp"
 
 namespace hex
 {
@@ -30,7 +32,7 @@ namespace hex
 namespace game_logic
 {
 
-class settlement
+class settlement: public hex::basic_drawable
 {
 public:
 	settlement(const wml::const_node_ptr& node,
@@ -40,20 +42,26 @@ public:
 
 	void entry_points(std::vector<hex::location>& result) const;
 	bool has_entry_point(const hex::location& loc) const;
-	void draw() const;
 	game_time enter(party_ptr pty, const hex::location& loc,
 					const game_time& t);
 	void play();
 	const world& get_world() const;
+    const std::vector<hex::const_map_avatar_ptr>& avatars() { return avatars_; }
+
+    void update_rotation(int key) const;
+    void update_position(int key) const;
 private:
 	std::map<hex::location, hex::location> portals_;
-	graphics::const_model_ptr model_;
+    std::map<int, hex::location> avatar_keys_;
+    std::vector<hex::const_map_avatar_ptr> avatars_;
 	const_formula_ptr model_height_formula_;
 	const_formula_ptr model_rotation_formula_;
 	wml::const_node_ptr wml_;
 	mutable boost::shared_ptr<world> world_;
 	const hex::gamemap& map_;
 };
+
+typedef boost::shared_ptr<const settlement> const_settlement_ptr;
 
 }
 

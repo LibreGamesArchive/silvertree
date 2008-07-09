@@ -15,9 +15,10 @@ const GLfloat PI = 3.14159265;
 }
 
 battle_missile::battle_missile(graphics::const_model_ptr model,
-				               const GLfloat* src,
-							   const GLfloat* dst)
-  : model_(model), rotate_(0.0)
+                               const GLfloat* src,
+                               const GLfloat* dst)
+  : avatar_(hex::map_avatar::create(model, graphics::surface(), this)), 
+    rotate_(0.0)
 {
 	memcpy(src_, src, sizeof(src_));
 	memcpy(dst_, dst, sizeof(dst_));
@@ -34,19 +35,24 @@ battle_missile::battle_missile(graphics::const_model_ptr model,
 
 void battle_missile::update()
 {
-	if(!model_) {
+	if(!avatar_) {
 		return;
 	}
 
 	const GLfloat speed = 0.5;
-	GLfloat diff[] = { dst_[0] - src_[0], dst_[1] - src_[1], dst_[2] - src_[2] };
+	GLfloat diff[] = { 
+        dst_[0] - src_[0], 
+        dst_[1] - src_[1], 
+        dst_[2] - src_[2] 
+    };
+
 	GLfloat sum = 0;
 	foreach(const GLfloat& num, diff) {
 		sum += std::abs(num);
 	}
 
 	if(sum < speed) {
-		model_.reset();
+		avatar_.reset();
 		return;
 	}
 
@@ -59,17 +65,13 @@ void battle_missile::update()
 	}
 }
 
-void battle_missile::draw()
-{
-	if(!model_) {
-		return;
-	}
-
-	glPushMatrix();
-	glTranslatef(src_[0], src_[1], src_[2]);
-	glRotatef(rotate_, 0.0, 0.0, 1.0);
-	model_->draw();
-	glPopMatrix();
+void battle_missile::update_position(int key) const {
+    position_s(0) = src_[0];
+    position_s(1) = src_[1];
+    position_s(2) = src_[2];
+}
+void battle_missile::update_rotation(int key) const {
+    rotation_s(0) = rotate_;
 }
 
 }

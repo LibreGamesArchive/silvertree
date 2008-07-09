@@ -38,9 +38,10 @@ private:
     void reopen();
     void init();
     void stream_call(int error_return, const std::string& op);
+    bool opened_;
     mpg123_handle* mh_;
     int err_;
-    bool opened_, format_change_;
+    bool format_change_;
     ALint al_encoding_;
     int channels_;
     long rate_;

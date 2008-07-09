@@ -160,7 +160,7 @@ bool play_battle(party_ptr p1, party_ptr p2, const std::vector<character_ptr>& c
 
 		b.camera().zoom_in();
 		b.camera().zoom_in();
-		b.draw(NULL, false);
+		b.draw();
 		glColor4f(1.0,1.0,1.0,0.8);
 		graphics::blit_texture(framebuffer, 0, 0, graphics::screen_width(), -graphics::screen_height());
 		framebuffer = graphics::texture::get_frame_buffer();

@@ -17,7 +17,7 @@ mini_stats_dialog::mini_stats_dialog(game_logic::battle_character_ptr ch, int w,
 
 void mini_stats_dialog::prepare_draw() const {
 	GLfloat box[4];
-	ch_->loc_tracker().get_bbox(box);
+	ch_->avatar()->loc_tracker().get_bbox(box);
 
 	glPushMatrix();
 	glTranslatef(floor(box[2]), floor(box[1]), 0);

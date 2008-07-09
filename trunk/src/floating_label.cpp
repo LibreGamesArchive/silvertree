@@ -48,55 +48,60 @@ bool label_dead(const label_ptr& lb) {
 
 void add(texture t, const GLfloat* pos, const GLfloat* vel, int ttl)
 {
-	label_ptr lb(new label);
-	lb->tex = t;
-	std::copy(pos,pos+3,lb->pos);
-	std::copy(vel,vel+3,lb->vel);
-	lb->ttl = ttl;
-	labels.push_back(lb);
+    label_ptr lb(new label);
+    lb->tex = t;
+    std::copy(pos,pos+3,lb->pos);
+    std::copy(vel,vel+3,lb->vel);
+    lb->ttl = ttl;
+    labels.push_back(lb);
 }
 
 void clear()
 {
-	labels.clear();
+    labels.clear();
 }
 
 void update_labels()
 {
-	foreach(const label_ptr& lb, labels) {
-		lb->ttl--;
-		for(int n = 0; n != 3; ++n) {
-			lb->pos[n] += lb->vel[n];
-		}
-	}
-
-	labels.erase(std::remove_if(labels.begin(),labels.end(),label_dead),labels.end());
+    foreach(const label_ptr& lb, labels) {
+        lb->ttl--;
+        for(int n = 0; n != 3; ++n) {
+            lb->pos[n] += lb->vel[n];
+        }
+    }
+    
+    labels.erase(std::remove_if(labels.begin(),labels.end(),label_dead),labels.end());
 }
 
 void draw_labels()
 {
-	hex::camera* cam = hex::camera::current_camera();
-	foreach(const label_ptr& lb, labels) {
-		glPushMatrix();
-		const texture& t = lb->tex;
-		glTranslatef(lb->pos[0],lb->pos[1],lb->pos[2]);
-		if(cam) {
-			const GLfloat rotate = cam->current_rotation();
-			glRotatef(-rotate,0.0,0.0,1.0);
-		}
-		t.set_as_current_texture();
-		glBegin(GL_QUADS);
-		t.set_coord(0.0,0.0);
-		glVertex3f(-0.5,0.0,1.0);
-		t.set_coord(1.0,0.0);
-		glVertex3f(0.5,0.0,1.0);
-		t.set_coord(1.0,1.0);
-		glVertex3f(0.5,0.0,0.0);
-		t.set_coord(0.0,1.0);
-		glVertex3f(-0.5,0.0,0.0);
-		glEnd();
-		glPopMatrix();
-	}
+    hex::camera* cam = hex::camera::current_camera();
+    foreach(const label_ptr& lb, labels) {
+        std::cout << "Camera is "<<cam<<"\n";
+        std::cout << "Drawing label at "
+                  <<lb->pos[0]<<","
+                  <<lb->pos[1]<<","
+                  <<lb->pos[2]<<"\n";
+        glPushMatrix();
+        const texture& t = lb->tex;
+        glTranslatef(lb->pos[0],lb->pos[1],lb->pos[2]);
+        if(cam) {
+            const GLfloat rotate = cam->current_rotation();
+            glRotatef(-rotate,0.0,0.0,1.0);
+        }
+        t.set_as_current_texture();
+        glBegin(GL_QUADS);
+        t.set_coord(0.0,0.0);
+        glVertex3f(-0.5,0.0,1.0);
+        t.set_coord(1.0,0.0);
+        glVertex3f(0.5,0.0,1.0);
+        t.set_coord(1.0,1.0);
+        glVertex3f(0.5,0.0,0.0);
+        t.set_coord(0.0,1.0);
+        glVertex3f(-0.5,0.0,0.0);
+        glEnd();
+        glPopMatrix();
+    }
 }
 
 }

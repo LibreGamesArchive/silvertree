@@ -87,6 +87,7 @@ location_fwd.hpp \
 location_tracker.hpp \
 map_avatar.hpp \
 map_object.hpp \
+map_selection.hpp \
 map_utils.hpp \
 material.hpp \
 message_dialog.hpp \
@@ -110,6 +111,7 @@ post_battle_dialog.hpp \
 preferences.hpp \
 raster.hpp \
 reference_counted_object.hpp \
+renderer.hpp \
 scoped_resource.hpp \
 sdl_algo.hpp \
 settlement_fwd.hpp \
@@ -199,6 +201,7 @@ keyboard.cpp \
 label.cpp \
 learn_skills_dialog.cpp \
 map_avatar.cpp \
+map_selection.cpp \
 material.cpp \
 message_dialog.cpp \
 mini_stats_dialog.cpp \
@@ -217,6 +220,7 @@ pc_party.cpp \
 post_battle_dialog.cpp \
 preferences.cpp \
 raster.cpp \
+renderer.cpp \
 sdl_algo.cpp \
 settlement.cpp \
 shop_dialog.cpp \

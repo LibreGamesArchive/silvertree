@@ -31,22 +31,21 @@ namespace game_logic
 {
 
 battle_character::battle_character(
-          character_ptr ch, const party& p,
-          const hex::location& loc, hex::DIRECTION facing,
-		  const hex::gamemap& map, const game_time& time)
- : char_(ch), party_(p), loc_(loc),
-   facing_(facing), old_facing_(facing),
-   move_at_(ch->initiative()), time_in_move_(-1.0), map_(map),
-   highlight_(NULL),
-   time_of_day_adjustment_(ch->alignment()*time.alignment_adjustment()),
-   energy_(0)
+                       character_ptr ch, const party& p,
+                       const hex::location& loc, hex::DIRECTION facing,
+                       const hex::gamemap& map, const game_time& time)
+    : char_(ch), party_(p), loc_(loc),
+      facing_(facing), old_facing_(facing),
+      move_at_(ch->initiative()), time_in_move_(-1.0), map_(map),
+      highlight_(NULL),
+      time_of_day_adjustment_(ch->alignment()*time.alignment_adjustment()),
+      energy_(0), 
+      avatar_(hex::map_avatar::create(
+                  graphics::model::get_model(char_->model()), 
+                  graphics::surface_cache::get(char_->image()),
+                  this))
 {
-	assert(old_facing_ >= hex::NORTH && old_facing_ <= hex::NULL_DIRECTION);
-
-	loc_tracker_.add_vertex(0.5, 0, 0.0);
-	loc_tracker_.add_vertex(-0.5, 0, 0.0);
-	loc_tracker_.add_vertex(0.5, 0, 1.0);
-	loc_tracker_.add_vertex(-0.5, 0, 1.0);
+    assert(old_facing_ >= hex::NORTH && old_facing_ <= hex::NULL_DIRECTION);
 }
 
 battle_character::~battle_character()
@@ -56,147 +55,103 @@ battle_character::~battle_character()
 battle_character_ptr battle_character::make_battle_character(
           character_ptr ch, const party& p,
           const hex::location& loc, hex::DIRECTION facing,
-		  const hex::gamemap& map, const game_time& time)
+          const hex::gamemap& map, const game_time& time)
 {
-	if(p.is_human_controlled()) {
-		return battle_character_ptr(
-		         new battle_character_pc(ch,p,loc,facing,map,time));
-	} else {
-		return battle_character_ptr(
-		         new battle_character_npc(ch,p,loc,facing,map,time));
-	}
+    if(p.is_human_controlled()) {
+        return battle_character_ptr(
+                  new battle_character_pc(ch,p,loc,facing,map,time));
+    } else {
+        return battle_character_ptr(
+                  new battle_character_npc(ch,p,loc,facing,map,time));
+    }
 }
 
-void battle_character::draw() const
-{
-	GLfloat pos[3];
-	GLfloat rotate;
-	get_pos(pos, &rotate);
-
-	glPushMatrix();
-	glTranslatef(pos[0],pos[1],pos[2]);
-	glRotatef(rotate,0.0,0.0,1.0);
-
-	if(highlight_) {
-		glDisable(GL_LIGHT0);
-		glEnable(GL_LIGHT3);
-		glLightfv(GL_LIGHT3,GL_AMBIENT,highlight_);
-		glLightfv(GL_LIGHT3,GL_DIFFUSE,highlight_);
-	}
-
-	graphics::const_model_ptr model = graphics::model::get_model(char_->model());
-	if(model) {
-		model->draw();
-	}
-
-	graphics::surface surf = graphics::surface_cache::get(
-	                                            char_->image());
-	if(surf.get()) {
-		std::vector<graphics::surface> surfs;
-		surfs.push_back(surf);
-
-		graphics::texture::set_current_texture(surfs);
-
-		glBegin(GL_QUADS);
-
-		graphics::texture::set_coord(surfs, 0.0,0.0);
-		glVertex3f(-0.5,0.0,1.0);
-
-		graphics::texture::set_coord(surfs, 1.0,0.0);
-		glVertex3f(0.5,0.0,1.0);
-
-		graphics::texture::set_coord(surfs, 1.0,1.0);
-		glVertex3f(0.5,0.0,0.0);
-
-		graphics::texture::set_coord(surfs, 0.0,1.0);
-		glVertex3f(-0.5,0.0,0.0);
-
-		glEnd();
-	}
-
-	if(highlight_) {
-		glEnable(GL_LIGHT0);
-		glDisable(GL_LIGHT3);
-	}
-
-	loc_tracker_.update();
-
-	glPopMatrix();
+void battle_character::update_position(int key) const {
+    GLfloat junk;
+    get_pos(position_v(), &junk);
 }
+
+void battle_character::update_rotation(int key) const {
+    GLfloat junk[3];
+    get_pos(junk, &(rotation_v()[0]));
+}
+
 
 void battle_character::get_pos(GLfloat* pos, GLfloat* rotate) const
 {
-	if(time_in_move_ >= 0.0 && !move_.empty()) {
-		get_pos_during_move(pos,rotate,time_in_move_);
-		return;
-	}
-
-	using hex::tile;
-	if(pos) {
-		pos[0] = tile::translate_x(loc_);
-		pos[1] = tile::translate_y(loc_);
-		if(map_.is_loc_on_map(loc_)) {
-			pos[2] = tile::translate_height(
-			                  map_.get_tile(loc_).height());
-		}
-	}
-
-	if(rotate) {
-		*rotate = facing_*60.0;
-
-		//if the unit is rotating
-		if(time_in_move_ >= 0.0) {
-			const GLfloat rotate_time = 1.0;
-			if(time_in_move_ < rotate_time) {
-				*rotate = graphics::calculate_rotation(
-				  old_facing_*60.0,facing_*60.0,time_in_move_/rotate_time);
-			}
-		}
-	}
+    if(time_in_move_ >= 0.0 && !move_.empty()) {
+        get_pos_during_move(pos,rotate,time_in_move_);
+        return;
+    }
+    
+    using hex::tile;
+    if(pos) {
+        pos[0] = tile::translate_x(loc_);
+        pos[1] = tile::translate_y(loc_);
+        if(map_.is_loc_on_map(loc_)) {
+            pos[2] = tile::translate_height(
+                                            map_.get_tile(loc_).height());
+        } else {
+            pos[2] = 0.0;
+        }
+    }
+    
+    if(rotate) {
+        *rotate = facing_*60.0;
+        
+        //if the unit is rotating
+        if(time_in_move_ >= 0.0) {
+            const GLfloat rotate_time = 1.0;
+            if(time_in_move_ < rotate_time) {
+                *rotate = graphics::calculate_rotation(
+                                                       old_facing_*60.0,facing_*60.0,time_in_move_/rotate_time);
+            }
+        }
+    }
 }
 
 void battle_character::get_pos_during_move(GLfloat* pos,
                                            GLfloat* rotate,
                                            GLfloat time) const
 {
-	assert(move_.empty() == false);
-
-	unsigned int index = 0;
-	int cost = 0;
-	while(index < move_.size()-1) {
-		cost = move_cost(move_[index],move_[index+1]);
-		if(cost > time) {
-			break;
-		} else {
-			time -= cost;
-		}
-
-		++index;
-	}
+    assert(move_.empty() == false);
+    
+    unsigned int index = 0;
+    int cost = 0;
+    while(index < move_.size()-1) {
+        cost = move_cost(move_[index],move_[index+1]);
+        if(cost > time) {
+            break;
+        } else {
+            time -= cost;
+        }
+        
+        ++index;
+    }
     const GLfloat cur_rotation = facing_*60.0;
-
-	const GLfloat ratio2 = (cost <= 0) ? 0 : time/cost;
-	const GLfloat ratio1 = 1.0 - ratio2;
-	const hex::location loc0 = index == 0 ? move_[index] : move_[index-1];
-	const hex::location loc1 = move_[index];
-	const hex::location loc2 = index+1 < move_.size() ?
-	                           move_[index+1] : move_[index];
-	assert(map_.is_loc_on_map(loc1) &&
-	       map_.is_loc_on_map(loc2));
-
-	using hex::tile;
-	const tile& t1 = map_.get_tile(loc1);
-	const tile& t2 = map_.get_tile(loc2);
-	pos[0] = ratio1*tile::translate_x(loc1) +
-	         ratio2*tile::translate_x(loc2);
-	pos[1] = ratio1*tile::translate_y(loc1) +
-	         ratio2*tile::translate_y(loc2);
-	pos[2] = ratio1*tile::translate_height(t1.height()) +
-	         ratio2*tile::translate_height(t2.height());
-
-	const GLfloat rotate1 = loc0 == loc1 ? cur_rotation : get_adjacent_direction(loc0,loc1)*60.0;
-	const GLfloat rotate2 = loc1 == loc2 ? cur_rotation : get_adjacent_direction(loc1,loc2)*60.0;
-	*rotate = graphics::calculate_rotation(rotate2,rotate1,ratio1);
+    
+    const GLfloat ratio2 = (cost <= 0) ? 0 : time/cost;
+    const GLfloat ratio1 = 1.0 - ratio2;
+    const hex::location loc0 = index == 0 ? move_[index] : move_[index-1];
+    const hex::location loc1 = move_[index];
+    const hex::location loc2 = index+1 < move_.size() ?
+        move_[index+1] : move_[index];
+    assert(map_.is_loc_on_map(loc1) &&
+           map_.is_loc_on_map(loc2));
+    
+    using hex::tile;
+    const tile& t1 = map_.get_tile(loc1);
+    const tile& t2 = map_.get_tile(loc2);
+    pos[0] = ratio1*tile::translate_x(loc1) +
+        ratio2*tile::translate_x(loc2);
+    pos[1] = ratio1*tile::translate_y(loc1) +
+        ratio2*tile::translate_y(loc2);
+    pos[2] = ratio1*tile::translate_height(t1.height()) +
+        ratio2*tile::translate_height(t2.height());
+    
+    const GLfloat rotate1 = loc0 == loc1 ? cur_rotation : get_adjacent_direction(loc0,loc1)*60.0;
+    const GLfloat rotate2 = loc1 == loc2 ? cur_rotation : get_adjacent_direction(loc1,loc2)*60.0;
+    *rotate = graphics::calculate_rotation(rotate2,rotate1,ratio1);
 }
 
 hex::location battle_character::get_loc_during_move(int time) const
@@ -348,55 +303,55 @@ bool battle_character::can_attack(const battle_character& c,
 				  const std::vector<battle_character_ptr>& chars,
                                   hex::location loc, bool draw) const
 {
-	if(!loc.valid()) {
-		loc = loc_;
-	}
-
-	const int range = char_->attack_range();
-	if(range > 1) {
-		std::vector<const hex::tile*> line;
-		if(!hex::line_of_sight(map_,loc,c.loc(),&line,range,draw)) {
-			return false;
-		}
-		foreach(const hex::tile* t, line) {
-			foreach(const battle_character_ptr& d, chars) {
-				if(this == d.get() || &c == d.get()) continue;
-				if(t->loc() == d->loc()) {
-					return false;
-				}
-			}
-		}
-
-		if(tiles_adjacent(loc,c.loc()) && !get_character().can_attack_engaged()) {
-			//see if the target is engaged with someone else
-			const hex::location target_facing = hex::tile_in_direction(c.loc(), c.facing());
-
-			//see if they're already facing us, or the position we intend to attack from
-			if(target_facing == loc_ || target_facing == loc) {
-				return false;
-			}
-
-			foreach(const battle_character_ptr& engager, chars) {
-				if(engager->loc() == target_facing && c.is_enemy(*engager) &&
-				   (engager->facing()%6) == c.facing()) {
-					//they are engaged with someone else, so we can attack
-					return true;
-				}
-			}
-
-			//they'd be able to turn toward us and engage, so we can't attack
-			return false;
-		}
-		return true;
-	} else {
-		return tiles_adjacent(loc,c.loc());
-	}
+    if(!loc.valid()) {
+        loc = loc_;
+    }
+    
+    const int range = char_->attack_range();
+    if(range > 1) {
+        std::vector<hex::location> line;
+        if(!map_.has_line_of_sight(loc,c.loc(),&line,range)) {
+            return false;
+        }
+        foreach(const hex::location& l, line) {
+            foreach(const battle_character_ptr& d, chars) {
+                if(this == d.get() || &c == d.get()) continue;
+                if(l == d->loc()) {
+                    return false;
+                }
+            }
+        }
+        
+        if(tiles_adjacent(loc,c.loc()) && !get_character().can_attack_engaged()) {
+            //see if the target is engaged with someone else
+            const hex::location target_facing = hex::tile_in_direction(c.loc(), c.facing());
+            
+            //see if they're already facing us, or the position we intend to attack from
+            if(target_facing == loc_ || target_facing == loc) {
+                return false;
+            }
+            
+            foreach(const battle_character_ptr& engager, chars) {
+                if(engager->loc() == target_facing && c.is_enemy(*engager) &&
+                   (engager->facing()%6) == c.facing()) {
+                    //they are engaged with someone else, so we can attack
+                    return true;
+                }
+            }
+            
+            //they'd be able to turn toward us and engage, so we can't attack
+            return false;
+        }
+        return true;
+    } else {
+        return tiles_adjacent(loc,c.loc());
+    }
 }
 
 void battle_character::begin_facing_change(hex::DIRECTION facing)
 {
-	assert(hex::is_valid_direction(facing));
-	facing_ = facing;
+    assert(hex::is_valid_direction(facing));
+    facing_ = facing;
 }
 
 void battle_character::end_move()

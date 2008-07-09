@@ -1,5 +1,7 @@
 #include "SDL.h"
 
+#include <iostream>
+
 #include "camera.hpp"
 #include "camera_controller.hpp"
 
@@ -125,15 +127,15 @@ void camera_controller::update() {
         cam_.zoom_in();
     }
     if(keys_.key(ZOOM_OUT)) {
-		cam_.zoom_out();
-	}
+        cam_.zoom_out();
+    }
     if(keys_.key(DEBUG_ADJUST_ON)) {
-		cam_.set_debug_adjust(true);
-	}
+        cam_.set_debug_adjust(true);
+    }
     if(keys_.key(DEBUG_ADJUST_OFF)) {
-		cam_.set_debug_adjust(false);
-	}
-	if(!keyboard_pan_) {
+        cam_.set_debug_adjust(false);
+    }
+    if(!keyboard_pan_) {
         return;
     }
     if(keys_.key(PAN_UP)) {
@@ -148,18 +150,6 @@ void camera_controller::update() {
     if(keys_.key(PAN_RIGHT)) {
         cam_.pan_right();
     }
-}
-
-void camera_controller::prepare_selection()
-{
-	int mousex, mousey;
-	SDL_GetMouseState(&mousex, &mousey);
-	return cam_.prepare_selection(mousex,mousey);
-}
-
-unsigned int camera_controller::finish_selection()
-{
-	return cam_.finish_selection();
 }
 
 }

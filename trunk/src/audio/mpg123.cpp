@@ -106,13 +106,18 @@ inline void stream::stream_call(int err, const std::string& op) {
 }
 
 stream::stream(int buffers, bool throws) : 
-    openal::stream(buffers, throws), mh_(mpg123_new(NULL, &err_))  {
+    openal::stream(buffers, throws), 
+    opened_(false),
+    mh_(mpg123_new(NULL, &err_))  {
     stream_call(err_, "mpg123_new (mpg123::stream::stream)");
     init();
 }
 
-stream::stream(const std::string& decoder, int buffers, bool throws) : 
-    openal::stream(buffers, throws), mh_(mpg123_new(decoder.c_str(), &err_)) {
+stream::stream(const std::string& decoder, int buffers, bool throws) :
+    openal::stream(buffers, throws), 
+    opened_(false),
+    mh_(mpg123_new(decoder.c_str(), &err_))
+{
 
     stream_call(err_, "mpg123_new (mpg123::stream::stream(decoder))");
     init();

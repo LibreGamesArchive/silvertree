@@ -26,34 +26,40 @@ namespace hex
 class gamemap
 {
 public:
-	explicit gamemap(const std::string& data);
-	gamemap(const std::vector<tile>& tiles, const location& dim);
-	void copy_from(const gamemap& m);
+    explicit gamemap(const std::string& data);
+    gamemap(const std::vector<tile>& tiles, const location& dim);
+    void copy_from(const gamemap& m);
+    
+    std::string write() const;
+    
+    const location& size() const { return dim_; }
+    const tile& get_tile(const location& loc) const;
+    tile& get_tile(const location& loc);
+    bool is_loc_on_map(const location& loc) const;
 
-	std::string write() const;
-
-	const location& size() const { return dim_; }
-	const tile& get_tile(const location& loc) const;
-	tile& get_tile(const location& loc);
-	bool is_loc_on_map(const location& loc) const;
-
-	const tile* closest_tile(GLfloat* x, GLfloat* y, bool return_null_outside_border=true) const;
-
-	struct parse_error {
-		parse_error(const std::string& msg)
-		{}
+    const tile* closest_tile(GLfloat* x, GLfloat* y, bool return_null_outside_border=true) const;
+    
+    struct parse_error {
+        parse_error(const std::string& msg)
+        {}
 	};
+    
+    void draw() const;
+    void draw_grid() const;
+    
+    const std::vector<tile>& tiles() const { return map_; }
+    
+    //map mutation functions
+    void adjust_height(const hex::location& loc, int adjust);
+    void set_terrain(const hex::location& loc, const std::string& terrain_id);
+    void set_feature(const hex::location& loc, const std::string& feature_id);
 
-	void draw() const;
-	void draw_grid() const;
-
-	const std::vector<tile>& tiles() const { return map_; }
-
-	//map mutation functions
-	void adjust_height(const hex::location& loc, int adjust);
-	void set_terrain(const hex::location& loc, const std::string& terrain_id);
-	void set_feature(const hex::location& loc, const std::string& feature_id);
-
+    bool has_line_of_sight(const location& a, const location& b,
+                           std::vector<location>* tiles=NULL,
+                           int range=-1) const;
+    location tile_in_the_way(const location& a, const location& b,
+                             std::vector<location>* tiles=NULL,
+                             int range=-1) const;
 private:
 	gamemap(const gamemap&);
 	void operator=(const gamemap&);
@@ -65,10 +71,8 @@ private:
 	location dim_;
 };
 
-bool line_of_sight(const gamemap& m,
-                   const location& a, const location& b,
-                   std::vector<const tile*>* tiles=NULL,
-				   int range=-1, bool draw=false);
+typedef boost::shared_ptr<gamemap> gamemap_ptr;
+typedef boost::shared_ptr<const gamemap> const_gamemap_ptr;
 
 }
 
