@@ -127,11 +127,15 @@ void dialog_label::recalculate_texture()
 	if(prog > stages_) prog = stages_;
 	std::string txt = current_text().substr(0, prog);
 
+#ifdef USE_PANGO
+	set_ft_texture(graphics::text::renderer::instance().render(txt, size() - 4));
+#else
 	if(prog > 0) {
 		set_texture(graphics::font::render_text(txt, size(), color()));
 	} else {
 		set_texture(graphics::texture());
 	}
+#endif
 }
 
 label_factory::label_factory(const SDL_Color& color, int size)
