@@ -54,6 +54,9 @@ protected:
 	std::string& current_text();
 	virtual void recalculate_texture();
 	void set_texture(graphics::texture t);
+#ifdef USE_PANGO
+	void set_ft_texture(graphics::text::ft_bitmap_ptr t) { ft_texture_ = t; }
+#endif
 private:
 	void handle_draw() const;
 	void inner_set_dim(int x, int y);
