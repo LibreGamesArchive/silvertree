@@ -3,6 +3,8 @@
 from os.path import join
 from glob import glob
 import sys
+
+EnsureSConsVersion(0, 98, 0)
 sys.path.insert(0, "./scons")
 from build_output import setup_build_output
 from cross_compile import setup_cross_compile

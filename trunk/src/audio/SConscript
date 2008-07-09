@@ -1,12 +1,8 @@
+# vi: syntax=python:et:ts=4
 Import("env")
 
 if env["AUDIO"]:
-    import glob
-    from os.path import join
-    from os.path import basename
-    abspath_sources = glob.glob(join(GetLaunchDir(), "src", "audio", "*.cpp"))
-    sources = map(basename, abspath_sources)
-    sources = map(lambda name: join("audio", name), sources)
+    sources = Glob("*.cpp", source = True)
 else:
     sources = []
 

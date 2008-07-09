@@ -1,11 +1,7 @@
 # vi: syntax=python:et:ts=4
 Import("env")
 
-import glob
-from os.path import join
-from os.path import basename
-abspath_sources = glob.glob(join(GetLaunchDir(), "src", "*.cpp"))
-sources = map(basename, abspath_sources)
+sources = Glob("*.cpp", source = True, strings = True)
 sources += ["tinyxml/tinyxml.cpp", "tinyxml/tinyxmlerror.cpp", "tinyxml/tinyxmlparser.cpp"]
 sources += SConscript("audio/SConscript")
 sources.remove("main.cpp")

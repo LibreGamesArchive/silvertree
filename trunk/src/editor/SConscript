@@ -1,15 +1,11 @@
+# vi: syntax=python:et:ts=4
 Import("editor_env")
 Import("lib_silvertree")
 
 if editor_env["HaveQt"]:
-    import glob
-    from os.path import join
-    from os.path import basename
-    abspath_sources = glob.glob(join(GetLaunchDir(), "src", "editor", "*.cpp"))
-    editor_sources = map(basename, abspath_sources)
+    editor_sources = Glob("*.cpp", source = True, strings = True)
     editor_sources.remove("oldmain.cpp")
-    abspath_uis = glob.glob(join(GetLaunchDir(), "src", "editor", "*.ui"))
-    editor_uis = map(basename, abspath_uis)
+    editor_uis = Glob("*.ui", source = True)
     editor_mocables = Split("""
         editorglwidget.hpp
         editormainwindow.hpp
