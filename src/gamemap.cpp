@@ -301,107 +301,79 @@ void gamemap::set_feature(const hex::location& loc, const std::string& feature_i
 	map_[index].set_feature(feature_id);
 }
 
-namespace {
-void draw_line_of_sight(GLfloat x1, GLfloat y1, GLfloat z1,
-                        GLfloat x2, GLfloat y2, GLfloat z2,
-                        GLfloat x3, GLfloat y3, GLfloat z3,
-						bool out_of_range=false) {
-	glDisable(GL_TEXTURE_2D);
-	glBegin(GL_LINES);
-	glColor4f(0.0,0.0,1.0,1.0);
-	glVertex3f(x1,y1,z1);
-	glVertex3f(x2,y2,z2);
-	if(out_of_range) {
-		glColor4f(1.0,1.0,0.0,1.0);
-	} else {
-		glColor4f(1.0,0.0,0.0,1.0);
-	}
-	glVertex3f(x2,y2,z2);
-	glVertex3f(x3,y3,z3);
-	glEnd();
-	glEnable(GL_TEXTURE_2D);
-}
+bool gamemap::has_line_of_sight(const location& a, const location& b, 
+                                std::vector<location>* tiles, int range) const {
+    location titw = tile_in_the_way(a,b,tiles,range);
+    return (!is_loc_on_map(titw));
 }
 
-bool line_of_sight(const gamemap& m,
-                   const location& a, const location& b,
-				   std::vector<const tile*>* tiles,
-				   int range, bool draw)
+location gamemap::tile_in_the_way(const location& a, const location& b,
+                         std::vector<location>* tiles,
+                         int range) const
 {
-	if(!m.is_loc_on_map(a) || !m.is_loc_on_map(b)) {
-		return false;
-	}
-
-	const tile& t1 = m.get_tile(a);
-	const tile& t2 = m.get_tile(b);
-
-	const GLfloat x1 = tile::translate_x(a);
-	const GLfloat y1 = tile::translate_y(a);
-	const GLfloat h1 = tile::translate_height(t1.height()+3);
-
-	const GLfloat x2 = tile::translate_x(b);
-	const GLfloat y2 = tile::translate_y(b);
-	const GLfloat h2 = tile::translate_height(t2.height()+3);
-
-	const GLfloat distance = std::sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
-
-	{
-	GLfloat x = x1;
-	GLfloat y = y1;
-	assert(m.closest_tile(&x,&y) == &t1);
-	x = x2;
-	y = y2;
-	assert(m.closest_tile(&x,&y) == &t2);
-	}
-
-	const GLfloat xdiff = x2 - x1;
-	const GLfloat ydiff = y2 - y1;
-	const GLfloat dist = std::sqrt(xdiff*xdiff + ydiff*ydiff);
-	const GLfloat increment = 0.5/dist;
-
-	assert(increment > 0.0);
-	for(GLfloat step = 0.0; step < 1.0; step += increment) {
-		const GLfloat scale1 = (1.0 - step);
-		const GLfloat scale2 = step;
-		GLfloat x = x1*scale1 + x2*scale2;
-		GLfloat y = y1*scale1 + y2*scale2;
-		const GLfloat h = h1*scale1 + h2*scale2;
-
-		GLfloat xloc = x;
-		GLfloat yloc = y;
-
-		const tile* t = m.closest_tile(&xloc,&yloc);
-		if(t == NULL || (range != -1 && distance*step > range)) {
-			if(draw) {
-				draw_line_of_sight(x1,y1,h1,x,y,h,x2,y2,h2,true);
-			}
-			return false;
-		}
-
-		if(t == &t2) {
-			if(draw) {
-				draw_line_of_sight(x1,y1,h1,x2,y2,h2,x2,y2,h2);
-			}
-			return true;
-		}
-
-		if(tiles != NULL && (tiles->empty() || tiles->back() != t)) {
-			tiles->push_back(t);
-		}
-
-
-		if(t->height_at_point_vision(x,y) > h) {
-			if(draw) {
-				draw_line_of_sight(x1,y1,h1,x,y,h,x2,y2,h2);
-			}
-			return false;
-		}
-	}
-
-	if(draw) {
-		draw_line_of_sight(x1,y1,h1,x2,y2,h2,x2,y2,h2,draw);
-	}
-	return true;
+    if(!is_loc_on_map(a) || !is_loc_on_map(b)) {
+        return location();
+    }
+    
+    const tile& t1 = get_tile(a);
+    const tile& t2 = get_tile(b);
+    
+    const GLfloat x1 = tile::translate_x(a);
+    const GLfloat y1 = tile::translate_y(a);
+    const GLfloat h1 = tile::translate_height(t1.height()+3);
+    
+    const GLfloat x2 = tile::translate_x(b);
+    const GLfloat y2 = tile::translate_y(b);
+    const GLfloat h2 = tile::translate_height(t2.height()+3);
+    
+    const GLfloat distance = std::sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+    
+    {
+        GLfloat x = x1;
+        GLfloat y = y1;
+        assert(closest_tile(&x,&y) == &t1);
+        x = x2;
+        y = y2;
+        assert(closest_tile(&x,&y) == &t2);
+    }
+    
+    const GLfloat xdiff = x2 - x1;
+    const GLfloat ydiff = y2 - y1;
+    const GLfloat dist = std::sqrt(xdiff*xdiff + ydiff*ydiff);
+    const GLfloat increment = 0.5/dist;
+    
+    assert(increment > 0.0);
+    for(GLfloat step = 0.0; step < 1.0; step += increment) {
+        const GLfloat scale1 = (1.0 - step);
+        const GLfloat scale2 = step;
+        GLfloat x = x1*scale1 + x2*scale2;
+        GLfloat y = y1*scale1 + y2*scale2;
+        const GLfloat h = h1*scale1 + h2*scale2;
+        
+        GLfloat xloc = x;
+        GLfloat yloc = y;
+        
+        const tile* t = closest_tile(&xloc,&yloc);
+        if(t == NULL || (range != -1 && distance*step > range)) {
+            return t->loc();
+        }
+        
+        if(t == &t2) {
+            break;
+        }
+        
+        if(tiles != NULL && 
+           (tiles->empty() || tiles->back() != t->loc())) {
+            tiles->push_back(t->loc());
+        }
+        
+        const GLfloat hapv = t->height_at_point_vision(x,y);
+        if(hapv > h) {
+            return t->loc();
+        }
+    }
+    
+    return location();
 }
 
 }

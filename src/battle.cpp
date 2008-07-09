@@ -60,149 +60,154 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
       skippy_(50, preference_maxfps()),
       tracked_tile_(NULL), 
       initiative_bar_(new gui::initiative_bar),
-      listener_(this)
+      listener_(this),
+      renderer_(map_, camera_),
+      selection_(renderer_)
 {
-	srand(SDL_GetTicks());
+    srand(SDL_GetTicks());
+    
+    for(std::vector<battle_character_ptr>::const_iterator i = chars_.begin();
+        i != chars_.end(); ++i) {
 
-	for(std::vector<battle_character_ptr>::const_iterator i = chars_.begin();
-	    i != chars_.end(); ++i) {
-		gui::widget_ptr w(new game_dialogs::status_bars_widget(*this, *i));
+        gui::widget_ptr w(new game_dialogs::status_bars_widget(*this, *i));
         add_widget(w);
-
-		initiative_bar_->add_character(*i);
-	}
-	time_cost_widget_.reset(new game_dialogs::time_cost_widget(*this));
+        
+        initiative_bar_->add_character(*i);
+    }
+    time_cost_widget_.reset(new game_dialogs::time_cost_widget(*this));
     add_widget(time_cost_widget_);
-
-	initiative_bar_->set_loc(graphics::screen_width() - 100, 50);
-	initiative_bar_->set_dim(30, graphics::screen_height()/2);
-
+    
+    initiative_bar_->set_loc(graphics::screen_width() - 100, 50);
+    initiative_bar_->set_dim(30, graphics::screen_height()/2);
+    
     add_widget(initiative_bar_);
-
-	std::sort(chars_.begin(), chars_.end(), battle_char_less);
+    
+    std::sort(chars_.begin(), chars_.end(), battle_char_less);
 
     pump_.register_listener(&listener_);
     pump_.register_listener(&camera_controller_);
+    pump_.register_listener(&selection_);
 }
 
 void battle::play()
 {
-	while(result_ == ONGOING) {
-		std::sort(chars_.begin(),chars_.end(),battle_char_less);
-		focus_ = chars_.begin();
-
-		// Update the initiative bar, moving the game time forward, until
-		// someone is ready to move.
-		while(current_time_ < (*focus_)->ready_to_move_at()) {
-			sub_time_ = 0.0;
-			while(sub_time_ < 1.0) {
-				initiative_bar_->set_current_time(current_time_ + sub_time_);
-				animation_frame(0.5);
-			}
-			// Check whether character modifications expired.
-			foreach(battle_character_ptr ch, chars_) {
-				ch->update_time(current_time_);
-			}
-
-			++current_time_;
-		}
-
-		initiative_bar_->set_current_time(current_time_);
-		sub_time_ = 0.0;
-		(*focus_)->play_turn(*this);
-	}
+    while(result_ == ONGOING) {
+        std::sort(chars_.begin(),chars_.end(),battle_char_less);
+        focus_ = chars_.begin();
+        
+        // Update the initiative bar, moving the game time forward, until
+        // someone is ready to move.
+        while(current_time_ < (*focus_)->ready_to_move_at()) {
+            sub_time_ = 0.0;
+            while(sub_time_ < 1.0) {
+                initiative_bar_->set_current_time(current_time_ + sub_time_);
+                animation_frame(0.5);
+            }
+            // Check whether character modifications expired.
+            foreach(battle_character_ptr ch, chars_) {
+                ch->update_time(current_time_);
+            }
+            
+            ++current_time_;
+        }
+        
+        initiative_bar_->set_current_time(current_time_);
+        sub_time_ = 0.0;
+        (*focus_)->play_turn(*this);
+    }
 
     if(result_ == QUIT) {
         graphics::floating_label::clear();
         return;
     }
-	const std::string message = result_ == PLAYER_WIN ?
-	     "Victory!" : "Defeat!";
-	gui::widget_ptr msg = gui::label::create(message, result_ == PLAYER_WIN ? graphics::color_blue() : graphics::color_red(), 60);
-	msg->set_loc((graphics::screen_width()-msg->width())/2,
-	             (graphics::screen_height()-msg->height())/2);
+    const std::string message = result_ == PLAYER_WIN ?
+        "Victory!" : "Defeat!";
+    gui::widget_ptr msg = gui::label::create(message, result_ == PLAYER_WIN ? graphics::color_blue() : graphics::color_red(), 60);
+    msg->set_loc((graphics::screen_width()-msg->width())/2,
+                 (graphics::screen_height()-msg->height())/2);
     add_widget(msg);
-
-	elapse_time(0.0, 100);
-
-	graphics::floating_label::clear();
+    
+    elapse_time(0.0, 100);
+    
+    graphics::floating_label::clear();
 }
 
 void battle::player_turn(battle_character& c)
 {
     listener_.set_character(c);
-	menu_.reset(new gui::battle_menu(*this,c));
+    menu_.reset(new gui::battle_menu(*this,c));
     add_widget(menu_);
-	move_done_ = false;
-	turn_done_ = false;
-	highlight_moves_ = false;
-	highlight_targets_ = false;
-
-	while(!turn_done_ && result_ == ONGOING) {
-		if(!highlight_moves_ && !highlight_targets_) {
-			const_battle_move_ptr move = menu_->highlighted_move();
-			if(move) {
-				//std::cerr << "highlighted move: " << move->name() << ": " << move->min_moves() << "\n";
-				initiative_bar_->focus_character(focus_->get(), move->min_moves() > 0 ? 0 : move->get_stat("initiative", **focus_));
-			}
-		}
-
-		if(!skippy_.skip_frame()) {
-			draw();
-			SDL_GL_SwapBuffers();
-			SDL_Delay(1);
-		}
+    move_done_ = false;
+    turn_done_ = false;
+    highlight_moves_ = false;
+    highlight_targets_ = false;
+    
+    while(!turn_done_ && result_ == ONGOING) {
+        if(!highlight_moves_ && !highlight_targets_) {
+            const_battle_move_ptr move = menu_->highlighted_move();
+            if(move) {
+                //std::cerr << "highlighted move: " << move->name() << ": " << move->min_moves() << "\n";
+                initiative_bar_->focus_character(focus_->get(), move->min_moves() > 0 ? 0 : move->get_stat("initiative", **focus_));
+            }
+        }
+        
+        if(!skippy_.skip_frame()) {
+            draw();
+            draw_widgets(NULL);
+            SDL_GL_SwapBuffers();
+            SDL_Delay(1);
+        }
         
         if(!pump_.process()) {
             turn_done_ = true;
             result_ = QUIT;
         }
         
-		if(!current_move_) {
-			current_move_ = menu_->selected_move();
-			if(current_move_) {
-				remove_widget(menu_);
-				menu_.reset();
-				bool input = false;
-				if(current_move_->max_moves() > 0) {
-					input = enter_move_mode();
-				}
-
-				if(!input && current_move_->can_attack()) {
-					input = enter_attack_mode();
-				}
-
-				if(!input) {
-					const battle_modification_ptr mod = current_move_->mod();
-					if(mod && mod->target() != battle_modification::TARGET_SELF) {
-						input = enter_target_mode();
-					}
-				}
-
-				if(!input) {
-					if(current_move_->mod()) {
-						if(current_move_->mod()->target() == battle_modification::TARGET_SELF) {
-							current_move_->mod()->apply(**focus_,**focus_,current_time_);
-						}
-					}
-
-					(*focus_)->use_energy(current_move_->energy_required());
-					(*focus_)->set_time_until_next_move(current_move_->get_stat("initiative",**focus_));
-					initiative_bar_->focus_character(NULL);
-					turn_done_ = true;
-				}
-			}
-		}
+        if(!current_move_) {
+            current_move_ = menu_->selected_move();
+            if(current_move_) {
+                remove_widget(menu_);
+                menu_.reset();
+                bool input = false;
+                if(current_move_->max_moves() > 0) {
+                    input = enter_move_mode();
+                }
+                
+                if(!input && current_move_->can_attack()) {
+                    input = enter_attack_mode();
+                }
+                
+                if(!input) {
+                    const battle_modification_ptr mod = current_move_->mod();
+                    if(mod && mod->target() != battle_modification::TARGET_SELF) {
+                        input = enter_target_mode();
+                    }
+                }
+                
+                if(!input) {
+                    if(current_move_->mod()) {
+                        if(current_move_->mod()->target() == battle_modification::TARGET_SELF) {
+                            current_move_->mod()->apply(**focus_,**focus_,current_time_);
+                        }
+                    }
+                    
+                    (*focus_)->use_energy(current_move_->energy_required());
+                    (*focus_)->set_time_until_next_move(current_move_->get_stat("initiative",**focus_));
+                    initiative_bar_->focus_character(NULL);
+                    turn_done_ = true;
+                }
+            }
+        }
         camera_controller_.update();
-	}
-
-	highlight_moves_ = false;
-	highlight_targets_ = false;
-	targets_.clear();
-	current_move_.reset();
-	remove_widget(menu_);
-	menu_.reset();
-	initiative_bar_->focus_character(NULL);
+    }
+    
+    highlight_moves_ = false;
+    highlight_targets_ = false;
+    targets_.clear();
+    current_move_.reset();
+    remove_widget(menu_);
+    menu_.reset();
+    initiative_bar_->focus_character(NULL);
 }
 
 void battle::add_widget(gui::widget_ptr w) 
@@ -213,7 +218,7 @@ void battle::add_widget(gui::widget_ptr w)
 
 void battle::remove_widget(gui::widget_ptr w)
 {
-	widgets_.erase(std::remove(widgets_.begin(),widgets_.end(),w),widgets_.end());
+    widgets_.erase(std::remove(widgets_.begin(),widgets_.end(),w),widgets_.end());
     pump_.deregister_listener(w);
 }
 
@@ -222,291 +227,249 @@ int battle::movement_duration()
 	return 10;
 }
 
-hex::location battle::selected_loc()
-{
-	if(tracked_tile_) {
-		tracked_tile_->clear_tracker();
-	}
-
-	using hex::tile;
-	camera_controller_.prepare_selection();
-	GLuint select_name = 0;
-	foreach(const tile* t, tiles_) {
-		glLoadName(select_name++);
-		t->draw();
-	}
-
-	select_name = camera_controller_.finish_selection();
-	if(select_name == GLuint(-1)) {
-		return hex::location();
-	}
-
-	tracked_tile_ = tiles_[select_name];
-	tracked_tile_->attach_tracker(&hex_tracker_);
-
-	return tiles_[select_name]->loc();
-}
-
 battle_character_ptr battle::mouse_selected_char() {
-	camera_controller_.prepare_selection();
-	GLuint select_name = 0;
-	foreach(const const_battle_character_ptr& c, chars_) {
-		glLoadName(select_name++);
-		c->draw();
-	}
-
-	select_name = camera_controller_.finish_selection();
-	if(select_name == GLuint(-1)) {
-		return battle_character_ptr();
-	}
-	return chars_[select_name];
+    int select_name = selection_.get_selected_avatar();
+    
+    if(select_name == GLuint(-1)) {
+        return battle_character_ptr();
+    }
+    return chars_[select_name];
 }
 
 battle_character_ptr battle::selected_char()
 {
-	using hex::tile;
-	battle_character_ptr ret;
-
-	ret = mouse_selected_char();
-	if(ret) {
-		return ret;
-	}
-
-	if(targets_.empty()) {
-		return battle_character_ptr();
-	}
-
-	while(keyed_selection_ < 0) {
-		keyed_selection_ += targets_.size();
-	}
-
-	keyed_selection_ = keyed_selection_%targets_.size();
-
-	std::set<hex::location>::const_iterator i = targets_.begin();
-	std::advance(i,keyed_selection_);
-	foreach(const battle_character_ptr& c, chars_) {
-		if(c->loc() == *i) {
-			return c;
-		}
-	}
-
-	return battle_character_ptr();
+    using hex::tile;
+    battle_character_ptr ret;
+    
+    ret = mouse_selected_char();
+    if(ret) {
+        return ret;
+    }
+    
+    if(targets_.empty()) {
+        return battle_character_ptr();
+    }
+    
+    while(keyed_selection_ < 0) {
+        keyed_selection_ += targets_.size();
+    }
+    
+    keyed_selection_ = keyed_selection_%targets_.size();
+    
+    std::set<hex::location>::const_iterator i = targets_.begin();
+    std::advance(i,keyed_selection_);
+    foreach(const battle_character_ptr& c, chars_) {
+        if(c->loc() == *i) {
+            return c;
+        }
+    }
+    
+    return battle_character_ptr();
 }
 
-void battle::draw(gui::slider* slider, bool draw_widgets)
+
+void battle::draw()
 {
-	using hex::tile;
-	using hex::location;
+    using hex::tile;
+    using hex::location;
 
-	if(focus_ == chars_.end()) {
-		focus_ = chars_.begin();
-	}
+    graphics::floating_label::update_labels();
+    
+    if(focus_ == chars_.end()) {
+        focus_ = chars_.begin();
+    }
+    
+    renderer_.reset();
+    
+    (*focus_)->get_party().game_world().set_lighting(renderer_);
 
-	GLfloat pos[3];
-	GLfloat rotate;
-	(*focus_)->get_pos(pos, &rotate);
-	camera_.set_pan(pos);
+    GLfloat pos[3];
+    GLfloat rotate;
+    (*focus_)->get_pos(pos, &rotate);
+    renderer_.set_pos(pos, (*focus_)->loc());
+    
+    battle_character::move_map::const_iterator selected_move = moves_.end();
+    hex::location selected_hex;
+    const_battle_character_ptr selected_character;
+    if(highlight_moves_) {
+        selected_move = moves_.find(selection_.get_selected_hex());
+        if(selected_move != moves_.end()) {
+            selected_hex = selected_move->first;
+        }
+    } else if(highlight_targets_) {
+        selected_hex = selection_.get_selected_hex();
+        if(targets_.count(selected_hex) == 0) {
+            selected_character = selected_char();
+            if(selected_character) {
+                selected_hex = selected_character->loc();
+                selected_character = const_battle_character_ptr();
+            } else {
+                selected_hex = hex::location();
+            }
+        }
+    } else {
+        selected_character = selected_char();
+    }
+    
 
-	battle_character::move_map::const_iterator selected_move = moves_.end();
-	hex::location selected_hex;
-	const_battle_character_ptr selected_character;
-	if(highlight_moves_) {
-		selected_move = moves_.find(selected_loc());
-		if(selected_move != moves_.end()) {
-			selected_hex = selected_move->first;
-		}
-	} else if(highlight_targets_) {
-		selected_hex = selected_loc();
-		if(targets_.count(selected_hex) == 0) {
-			selected_character = selected_char();
-			if(selected_character) {
-				selected_hex = selected_character->loc();
-				selected_character = const_battle_character_ptr();
-			} else {
-				selected_hex = hex::location();
-			}
-		}
-	} else {
-		selected_character = selected_char();
-	}
+    if(highlight_moves_) {
+        typedef battle_character::move_map::const_iterator itor_type;
+        for(itor_type itor = moves_.begin(); itor != moves_.end(); ++itor) {
+            renderer_.add_highlights(itor->second);
+        }
+        //draw possible attacks
+        if(selected_hex.valid()) {
+            foreach(const battle_character_ptr& c, chars_) {
+                if(c->loc() == selected_hex) {
+                    if((*focus_)->is_enemy(*c)) {
+                        const static GLfloat good_color[4] = { 0.0,0.0,1.0,1.0 };
+                        const int range = c->get_character().attack_range();
+                        GLfloat rotate;
+                        
+                        GLfloat from[3], to[3];
+                        (*focus_)->get_pos(from, &rotate);
+                        c->get_pos(to, &rotate);
+                        
+                        hex::location loc = 
+                            map_.tile_in_the_way((*focus_)->loc(), c->loc(), NULL, range);
 
-	camera_.prepare_frame();
-	if((focus_ != chars_.end() && current_focus_ != (*focus_)->loc()) || camera_.moved_since_last_check()) {
-		rebuild_visible_tiles();
-	}
+                        if(!map_.is_loc_on_map(loc)) {
+                            renderer_.add_sight_line(from, to, good_color);
+                        } else {
+                            const static GLfloat bad_color[4] = { 1.0, 1.0, 0.0, 1.0 };
+                            const static GLfloat range_color[4] = { 1.0, 0.0, 0.0, 1.0 };
+                            GLfloat middle[3];
 
-	participants().front()->get_party().game_world().set_lighting();
+                            middle[0] = hex::tile::translate_x(loc);
+                            middle[1] = hex::tile::translate_y(loc);
+                            middle[2] = hex::tile::translate_height(map_.get_tile(loc).height());
+                            
+                            renderer_.add_sight_line(from, middle, good_color);
 
-	tile::setup_drawing();
-	foreach(const tile* t, tiles_) {
-		const bool dim = (highlight_moves_ && moves_.count(t->loc()) == 0)
-		        || (highlight_targets_ && targets_.count(t->loc()) == 0);
-		if(dim) {
-			glEnable(GL_LIGHT2);
-			glDisable(GL_LIGHT0);
-		}
-		t->draw();
-		t->draw_model();
-		if(dim) {
-			glEnable(GL_LIGHT0);
-			glDisable(GL_LIGHT2);
-		}
-	}
+                            if(hex::distance_between((*focus_)->loc(), c->loc()) > range) {
+                                renderer_.add_sight_line(middle, to, range_color);
+                            } else {
+                                renderer_.add_sight_line(middle, to, bad_color);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-	foreach(const tile* t, tiles_) {
-		t->draw_cliffs();
-	}
-
-	foreach(const tile* t, tiles_) {
-		t->draw_model();
-	}
-
-	tile::finish_drawing();
-
-	glDisable(GL_LIGHTING);
-
-	//draw possible attacks
-	if(highlight_moves_ && selected_hex.valid()) {
-		foreach(const battle_character_ptr& c, chars_) {
-			if((*focus_)->is_enemy(*c)) {
-				(*focus_)->can_attack(*c, chars_, selected_hex, true);
-			}
-		}
-	}
-
-	glEnable(GL_LIGHTING);
-
-	if(selected_move != moves_.end()) {
-		draw_route(selected_move->second);
-	}
-
-	if(map_.is_loc_on_map(selected_hex)) {
-		glDisable(GL_LIGHTING);
-		int radius = 0;
-		if(current_move_ && current_move_->mod()) {
-			radius = current_move_->mod()->radius();
-		}
-
-		std::vector<hex::location> locs;
-		hex::get_tiles_in_radius(selected_hex, radius, locs);
-		foreach(const hex::location& loc, locs) {
-			if(map_.is_loc_on_map(loc)) {
-				map_.get_tile(loc).draw_highlight();
-			}
-		}
-		glEnable(GL_LIGHTING);
-	}
-
-	if(map_.is_loc_on_map((*focus_)->loc())) {
-		glDisable(GL_LIGHTING);
-		map_.get_tile((*focus_)->loc()).draw_highlight();
-		glEnable(GL_LIGHTING);
-	}
-
-	if(focus_ != chars_.end()) {
-		draw_route((*focus_)->movement_plan());
-	}
-
-	foreach(const_battle_character_ptr c, chars_) {
-		c->draw();
-	}
-
-	if(missile_) {
-		missile_->draw();
-	}
-
-	graphics::floating_label::update_labels();
-	graphics::floating_label::draw_labels();
-
-	particle_system_.draw();
-
-	graphics::prepare_raster();
-	if(!draw_widgets) {
-		return;
-	}
-
-	if(slider) {
-		slider->draw();
-	}
-
-	if(selected_character) {
-		SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
-		std::vector<graphics::texture> text;
-		graphics::font::render_multiline_text(selected_character->status_text(), 20, color, text);
-		int x = 50;
-		int y = 50;
-		foreach(graphics::texture& t, text) {
-			graphics::blit_texture(t,x,y);
-			y += t.height();
-		}
-	}
-
-	if(highlight_targets_ && targets_.count(selected_hex)) {
-		battle_character_ptr ch;
-		foreach(const battle_character_ptr& c, chars_) {
-			if(c->loc() == selected_hex) {
-				ch = c;
-				break;
-			}
-		}
-
-		if(ch) {
-			SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
-			std::string desc;
-			assert(current_move_);
-			get_attack_stats(**focus_, *ch, *current_move_, &desc);
-			graphics::texture text = graphics::font::render_text(desc, 20, color);
-			graphics::blit_texture(text,50,50);
-		}
-	}
-
-	foreach(const gui::widget_ptr& w, widgets_) {
-		w->draw();
-	}
-
-	for(std::map<battle_character_ptr, game_dialogs::mini_stats_dialog_ptr>::iterator i =
-		    stats_dialogs_.begin();
-	    i != stats_dialogs_.end(); ++i) {
-		i->second->draw();
-	}
+    if(highlight_targets_) {
+        std::vector<hex::location> vtargs;
+        foreach(hex::location loc, targets_) {
+            vtargs.push_back(loc);
+        }
+        renderer_.add_highlights(vtargs);
+    }
+    
+    if(selected_move != moves_.end()) {
+        renderer_.set_path(selected_move->second);
+    } else if(focus_ != chars_.end()) {
+        renderer_.set_path((*focus_)->movement_plan());
+    }
+    
+    if(map_.is_loc_on_map(selected_hex)) {
+        int radius = 0;
+        if(current_move_ && current_move_->mod()) {
+                radius = current_move_->mod()->radius();
+        }
+        
+        std::vector<hex::location> locs;
+        hex::get_locations_in_radius(selected_hex, radius, locs);
+        renderer_.add_highlights(locs);
+    }
+    
+    if(map_.is_loc_on_map((*focus_)->loc())) {
+        renderer_.add_highlight((*focus_)->loc());
+    }
+    
+    {
+        int char_index = 0;
+        foreach(const_battle_character_ptr c, chars_) {
+            renderer_.add_avatar(c->avatar(), char_index++);
+        }
+    }
+    
+    if(missile_) {
+        renderer_.add_avatar(missile_->avatar());
+    }
+    
+    renderer_.draw();
+    
 }
 
-void battle::draw_route(const battle_character::route& r)
-{
-	if(r.size() <= 1) {
-		return;
-	}
+void battle::draw_widgets(gui::slider* slider) {
+    hex::location selected_hex = selection_.get_selected_hex();
+    const_battle_character_ptr selected_character = selected_char();
 
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_LIGHTING);
+    graphics::prepare_raster();
+    
+    if(slider) {
+        slider->draw();
+    }
+    
+    
+    if(!selected_character) {
+        foreach(const battle_character_ptr& c, chars_) {
+            if(c->loc() == selected_hex) {
+                selected_character = c;
+                break;
+            }
+        }
+    }
+        
+    if(selected_character) {
+        if(highlight_targets_ && targets_.count(selected_character->loc())) {
+            SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
+            std::string desc;
+            assert(current_move_);
+            get_attack_stats(**focus_, *selected_character, *current_move_, &desc);
+            desc = selected_character->status_text() + "\n" + desc;
+            graphics::texture text = graphics::font::render_text(desc, 20, color);
+            graphics::blit_texture(text,50,50);
+        } else {
+            SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
+            std::vector<graphics::texture> text;
+            graphics::font::render_multiline_text(selected_character->status_text(), 20, color, text);
+            int x = 50;
+            int y = 50;
+            foreach(graphics::texture& t, text) {
+                graphics::blit_texture(t,x,y);
+                y += t.height();
+            }
+        }
+    }
 
-	glBegin(GL_LINE_STRIP);
-	glColor3f(1.0,1.0,1.0);
-	foreach(const hex::location& loc, r) {
-		assert(map_.is_loc_on_map(loc));
-		map_.get_tile(loc).draw_center();
-	}
-
-	glEnd();
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
+    foreach(const gui::widget_ptr& w, widgets_) {
+        w->draw();
+    }
+    
+    for(std::map<battle_character_ptr, game_dialogs::mini_stats_dialog_ptr>::iterator i =
+            stats_dialogs_.begin();
+        i != stats_dialogs_.end(); ++i) {
+        i->second->draw();
+    }
 }
 
 void battle::begin_animation() {
-	stats_dialogs_.clear();
-	time_cost_widget_->set_visible(false);
-	time_cost_widget_->clear_tracker();
+    stats_dialogs_.clear();
+    time_cost_widget_->set_visible(false);
+    time_cost_widget_->clear_tracker();
 }
 
 void battle::animation_frame(float t, gui::slider* slider) {
-	sub_time_ += t;
-
-	if(!skippy_.skip_frame()) {
-		draw(slider);
-		SDL_GL_SwapBuffers();
-	}
-
+    sub_time_ += t;
+    
+    if(!skippy_.skip_frame()) {
+        draw();
+        draw_widgets(slider);
+        SDL_GL_SwapBuffers();
+    }
+    
     pump_.process();
     camera_controller_.update();
 }
@@ -516,37 +479,37 @@ void battle::end_animation() {
 }
 
 void battle::elapse_time(GLfloat anim_elapse, int frames, bool in_anim) {
-	if(frames <= 0) {
-		return;
-	}
-	const GLfloat step = anim_elapse/frames;
-	if(!in_anim) {
-		begin_animation();
-	}
-	for(int frame = 0; frame<frames;++frame) {
-		animation_frame(step);
-	}
-	if(!in_anim) {
-		end_animation();
-	}
+    if(frames <= 0) {
+        return;
+    }
+    const GLfloat step = anim_elapse/frames;
+    if(!in_anim) {
+        begin_animation();
+    }
+    for(int frame = 0; frame<frames;++frame) {
+        animation_frame(step);
+    }
+    if(!in_anim) {
+        end_animation();
+    }
 }
 
 void battle::move_character(battle_character& c, const battle_character::route& r)
 {
-	begin_animation();
-
-	const GLfloat time = c.begin_move(r);
-
-	for(GLfloat t = 0; t < time; t += 0.1) {
-		initiative_bar_->focus_character(&c, t);
-		c.set_movement_time(t);
-		animation_frame(0.1);
-	}
-
-	initiative_bar_->focus_character(&c, 0.0);
-
-	c.end_move();
-	end_animation();
+    begin_animation();
+    
+    const GLfloat time = c.begin_move(r);
+    
+    for(GLfloat t = 0; t < time; t += 0.1) {
+        initiative_bar_->focus_character(&c, t);
+        c.set_movement_time(t);
+        animation_frame(0.1);
+    }
+    
+    initiative_bar_->focus_character(&c, 0.0);
+    
+    c.end_move();
+    end_animation();
 }
 
 battle::attack_stats battle::get_attack_stats(
@@ -779,63 +742,67 @@ void battle::target_mod(battle_character& caster,
                         const hex::location& target,
                         const battle_move& move)
 {
-	const int time_to_perform = move.get_stat("initiative",caster);
-	if(graphics::particle_emitter_ptr missile = move.create_missile_emitter()) {
-		using hex::tile;
-		const hex::location& src = caster.loc();
-		assert(map_.is_loc_on_map(src));
-		assert(map_.is_loc_on_map(target));
-		const hex::tile& src_tile = map_.get_tile(src);
-		const hex::tile& dst_tile = map_.get_tile(target);
-		GLfloat src_pos[] = {tile::translate_x(src), tile::translate_y(src), tile::translate_height(src_tile.height())};
-		GLfloat dst_pos[] = {tile::translate_x(target), tile::translate_y(target), tile::translate_height(dst_tile.height())};
+    const int time_to_perform = move.get_stat("initiative",caster);
+#if 0
+    // FIXME: move particle emitter to renderer usw
 
-		const GLfloat nframes = 100.0;
+    if(graphics::particle_emitter_ptr missile = move.create_missile_emitter()) {
+        using hex::tile;
+        const hex::location& src = caster.loc();
+        assert(map_.is_loc_on_map(src));
+        assert(map_.is_loc_on_map(target));
+        const hex::tile& src_tile = map_.get_tile(src);
+        const hex::tile& dst_tile = map_.get_tile(target);
+        GLfloat src_pos[] = {tile::translate_x(src), tile::translate_y(src), tile::translate_height(src_tile.height())};
+        GLfloat dst_pos[] = {tile::translate_x(target), tile::translate_y(target), tile::translate_height(dst_tile.height())};
+        
+        const GLfloat nframes = 100.0;
+        
+        begin_animation();
+        for(GLfloat frame = 0.0; frame <= nframes; frame += 1.0) {
+            GLfloat pos[3];
+            for(int n = 0; n != 3; ++n) {
+                pos[n] = dst_pos[n]*(frame/nframes) + src_pos[n]*((nframes-frame)/nframes);
+            }
+            
+            missile->set_pos(pos);
+            missile->emit_particle(particle_system_);
+            animation_frame(time_to_perform/static_cast<GLfloat>(nframes));
+        }
+        end_animation();
+    }
+#endif
 
-		begin_animation();
-		for(GLfloat frame = 0.0; frame <= nframes; frame += 1.0) {
-			GLfloat pos[3];
-			for(int n = 0; n != 3; ++n) {
-				pos[n] = dst_pos[n]*(frame/nframes) + src_pos[n]*((nframes-frame)/nframes);
-			}
-
-			missile->set_pos(pos);
-			missile->emit_particle(particle_system_);
-			animation_frame(time_to_perform/static_cast<GLfloat>(nframes));
-		}
-		end_animation();
-	}
-
-	assert(move.mod());
-	const battle_modification& mod = *move.mod();
-	caster.set_time_until_next_move(time_to_perform);
-	caster.use_energy(move.energy_required());
-	const battle_modification::TARGET_TYPE type = mod.target();
-	const int radius = mod.radius();
-	std::vector<hex::location> locs;
-	std::vector<battle_character_ptr> affected_chars;
-	get_tiles_in_radius(target, radius, locs);
-	foreach(battle_character_ptr ch, chars_) {
-		if(std::find(locs.begin(),locs.end(),ch->loc()) == locs.end()) {
-			continue;
-		}
-
-		if(type == battle_modification::TARGET_ENEMY &&
-		   !caster.is_enemy(*ch)) {
-			continue;
-		}
-
-		if(type == battle_modification::TARGET_FRIEND &&
-		   caster.is_enemy(*ch)) {
-			continue;
-		}
-		affected_chars.push_back(ch);
-	}
-	foreach(battle_character_ptr ch, affected_chars) {
-		mod.apply(caster, *ch, current_time_);
-		handle_dead_character(*ch);
-	}
-
+    assert(move.mod());
+    const battle_modification& mod = *move.mod();
+    caster.set_time_until_next_move(time_to_perform);
+    caster.use_energy(move.energy_required());
+    const battle_modification::TARGET_TYPE type = mod.target();
+    const int radius = mod.radius();
+    std::vector<hex::location> locs;
+    std::vector<battle_character_ptr> affected_chars;
+    get_locations_in_radius(target, radius, locs);
+    foreach(battle_character_ptr ch, chars_) {
+        if(std::find(locs.begin(),locs.end(),ch->loc()) == locs.end()) {
+            continue;
+        }
+        
+        if(type == battle_modification::TARGET_ENEMY &&
+           !caster.is_enemy(*ch)) {
+            continue;
+        }
+        
+        if(type == battle_modification::TARGET_FRIEND &&
+           caster.is_enemy(*ch)) {
+            continue;
+        }
+        affected_chars.push_back(ch);
+    }
+    foreach(battle_character_ptr ch, affected_chars) {
+        mod.apply(caster, *ch, current_time_);
+        handle_dead_character(*ch);
+    }
+    
 }
 
 bool battle::can_make_move(const battle_character& c,
@@ -902,7 +869,7 @@ bool battle::enter_target_mode()
 	}
 
 	std::vector<hex::location> locs;
-	hex::get_tiles_in_radius((*focus_)->loc(), mod->range(), locs);
+	hex::get_locations_in_radius((*focus_)->loc(), mod->range(), locs);
 	foreach(const hex::location& loc, locs) {
 		targets_.insert(loc);
 	}
@@ -928,81 +895,6 @@ const_battle_character_ptr battle::is_engaged(
 	return const_battle_character_ptr();
 }
 
-namespace {
-hex::frustum view_volume;
-}
-
-void battle::rebuild_visible_tiles()
-{
-	std::cerr << "rebuild visible tiles\n";
-	tiles_.clear();
-	hex::frustum::initialize();
-	view_volume.set_volume_clip_space(-1, 1, -1, 1, -1, 1);
-	const hex::location& loc = (*focus_)->loc();
-	current_focus_ = loc;
-
-	hex::location hex_dir[6];
-	hex::get_adjacent_tiles(loc, hex_dir);
-	int core_radius = 1;
-	bool done = false;
-	while(!done) {
-		for(int n = 0; n != 6; ++n) {
-			hex_dir[n] = hex::tile_in_direction(hex_dir[n], static_cast<hex::DIRECTION>(n));
-			if(!map_.is_loc_on_map(hex_dir[n])) {
-				done = true;
-				break;
-			}
-
-			const hex::tile& t = map_.get_tile(hex_dir[n]);
-			if(!view_volume.intersects(t)) {
-				done = true;
-				break;
-			}
-		}
-
-		++core_radius;
-	}
-
-	done = false;
-	std::vector<hex::location> hexes;
-	for(int radius = 0; !done; ++radius) {
-		hexes.clear();
-		hex::get_tile_ring(loc, radius, hexes);
-		done = true;
-		foreach(const hex::location& location, hexes) {
-			if(!map_.is_loc_on_map(location)) {
-				continue;
-			}
-
-			const hex::tile& t = map_.get_tile(location);
-			if(radius >= core_radius && !view_volume.intersects(t)) {
-				//see if this tile has a cliff which is visible, in which case ew should draw it
-				const hex::tile* cliffs[6];
-				const int num_cliffs = t.neighbour_cliffs(cliffs);
-				bool found = false;
-				for(int n = 0; n != num_cliffs; ++n) {
-					if(view_volume.intersects(*cliffs[n])) {
-						found = true;
-						break;
-					}
-				}
-
-				if(!found) {
-					continue;
-				}
-			} else {
-				done = false;
-			}
-
-			tiles_.push_back(&t);
-			tiles_.back()->load_texture();
-		}
-	}
-
-	std::sort(tiles_.begin(), tiles_.end(), hex::tile::compare_texture());
-}
-
-
 bool battle::listener::process_event(const SDL_Event& event, bool claimed) {
     if(claimed) {
         claimed |= handle_stats_dialogs(event, claimed);
@@ -1021,7 +913,7 @@ bool battle::listener::process_event(const SDL_Event& event, bool claimed) {
                 battle_->attack_character(**(battle_->focus_), *target_char, 
                                           *(battle_->current_move_));
             } else {
-                hex::location loc = battle_->selected_loc();
+                hex::location loc = battle_->selection_.get_selected_hex();
                 if(battle_->map_.is_loc_on_map(loc)) {
                     battle_->turn_done_ = true;
                     assert(battle_->current_move_->mod());
@@ -1071,126 +963,137 @@ bool battle::listener::process_event(const SDL_Event& event, bool claimed) {
 
 void battle::listener::handle_time_cost_popup()
 {
-	battle_character_ptr attacker = *(battle_->focus_);
-	assert(attacker);
-	assert(battle_->initiative_bar_);
-	assert(battle_->time_cost_widget_);
-
-	if(battle_->highlight_moves_ ) {
-		const battle_character::move_map::const_iterator move = battle_->moves_.find(battle_->selected_loc());
-		if(move != battle_->moves_.end()) {
-			int cost = attacker->route_cost(move->second);
-			battle_->initiative_bar_->focus_character(attacker.get(), cost);
-			battle_->time_cost_widget_->set_tracker(&(battle_->hex_tracker_));
-			battle_->time_cost_widget_->set_time_cost(cost);
-			battle_->time_cost_widget_->set_visible(true);
-			return;
-		} else {
-			battle_->initiative_bar_->focus_character(attacker.get(), 0);
-		}
-	} else if(battle_->highlight_targets_) {
-		battle_character_ptr defender = battle_->selected_char();
-		assert(battle_->current_move_);
-		if(battle_->current_move_->can_attack() && defender) {
-			/* attack cost */
-			attack_stats stats = 
+    battle_character_ptr attacker = *(battle_->focus_);
+    assert(attacker);
+    assert(battle_->initiative_bar_);
+#if 0
+    assert(battle_->time_cost_widget_);
+#endif
+    
+    if(battle_->highlight_moves_ ) {
+        const battle_character::move_map::const_iterator move = 
+            battle_->moves_.find(battle_->selection_.get_selected_hex());
+        if(move != battle_->moves_.end()) {
+            int cost = attacker->route_cost(move->second);
+            battle_->initiative_bar_->focus_character(attacker.get(), cost);
+#if 0
+            battle_->time_cost_widget_->set_tracker(&(battle_->hex_tracker_));
+            battle_->time_cost_widget_->set_time_cost(cost);
+            battle_->time_cost_widget_->set_visible(true);
+#endif
+            return;
+        } else {
+            battle_->initiative_bar_->focus_character(attacker.get(), 0);
+        }
+    } else if(battle_->highlight_targets_) {
+        battle_character_ptr defender = battle_->selected_char();
+        assert(battle_->current_move_);
+        if(battle_->current_move_->can_attack() && defender) {
+            /* attack cost */
+            attack_stats stats = 
                 battle_->get_attack_stats(*attacker, *defender, *(battle_->current_move_));
-			battle_->time_cost_widget_->set_tracker(&(defender->loc_tracker()));
-			battle_->time_cost_widget_->set_time_cost(stats.time_taken);
-			battle_->initiative_bar_->focus_character(attacker.get(), stats.time_taken);
-			battle_->time_cost_widget_->set_visible(true);
-			return;
-		} else {
-			/* SPELL cost */
-			hex::location loc = battle_->selected_loc();
-			if(battle_->map_.is_loc_on_map(loc)) {
-				/* move cost */
-				battle_->time_cost_widget_->set_tracker(&(battle_->hex_tracker_));
-				const int cost = battle_->current_move_->get_stat("initiative",*attacker);
-				battle_->time_cost_widget_->set_time_cost(cost);
-				battle_->initiative_bar_->focus_character(attacker.get(), cost);
-				battle_->time_cost_widget_->set_visible(true);
-				return;
-			}
-		}
-	}
-        
-	battle_->time_cost_widget_->clear_tracker();
-	battle_->time_cost_widget_->set_visible(false);
+#if 0
+            battle_->time_cost_widget_->set_tracker(&(defender->loc_tracker()));
+            battle_->time_cost_widget_->set_time_cost(stats.time_taken);
+            battle_->time_cost_widget_->set_visible(true);
+#endif
+            battle_->initiative_bar_->focus_character(attacker.get(), stats.time_taken);
+            return;
+        } else {
+            /* SPELL cost */
+            hex::location loc = battle_->selection_.get_selected_hex();
+            if(battle_->map_.is_loc_on_map(loc)) {
+                /* move cost */
+                battle_->time_cost_widget_->set_tracker(&(battle_->hex_tracker_));
+                const int cost = battle_->current_move_->get_stat("initiative",*attacker);
+                battle_->initiative_bar_->focus_character(attacker.get(), cost);
+#if 0
+                battle_->time_cost_widget_->set_time_cost(cost);
+                battle_->time_cost_widget_->set_visible(true);
+#endif
+                return;
+            }
+        }
+    }
+
+#if 0    
+    battle_->time_cost_widget_->clear_tracker();
+    battle_->time_cost_widget_->set_visible(false);
+#endif
 }
 
 bool battle::listener::handle_stats_dialogs(const SDL_Event& e, bool claimed) {
-	const bool has_dialogs = !battle_->stats_dialogs_.empty();
-
+    const bool has_dialogs = !battle_->stats_dialogs_.empty();
+    
     if(claimed) {
         if(has_dialogs) {
             battle_->stats_dialogs_.clear();
         }
         return claimed;
     }
-
-	bool clear;
-	switch(e.type) {
-	case SDL_KEYDOWN:
-		if(has_dialogs) {
-			clear = true;
-			claimed = true;
-		} else {
-			clear = false;
-			claimed = false;
-		}
-		break;
-	case SDL_MOUSEBUTTONDOWN:
-		if(e.button.button != SDL_BUTTON_RIGHT) {
-			if(has_dialogs) {
-				clear = true;
-				claimed = true;
-			} else {
-				clear = false;
-				claimed = false;
-			}
-			break;
-		}
-		{
-			battle_character_ptr target_char = battle_->mouse_selected_char();
-			if(target_char) {
-				claimed = true;
-				clear = false;
+    
+    bool clear;
+    switch(e.type) {
+    case SDL_KEYDOWN:
+        if(has_dialogs) {
+            clear = true;
+            claimed = true;
+        } else {
+            clear = false;
+            claimed = false;
+        }
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        if(e.button.button != SDL_BUTTON_RIGHT) {
+            if(has_dialogs) {
+                clear = true;
+                claimed = true;
+            } else {
+                clear = false;
+                claimed = false;
+            }
+            break;
+        }
+        {
+            battle_character_ptr target_char = battle_->mouse_selected_char();
+            if(target_char) {
+                claimed = true;
+                clear = false;
                 
-				game_dialogs::mini_stats_dialog_ptr ptr;
+                game_dialogs::mini_stats_dialog_ptr ptr;
                 
-				std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
-					battle_->stats_dialogs_.find(target_char);
-				if(i == battle_->stats_dialogs_.end()) {
-					ptr.reset(new game_dialogs::mini_stats_dialog(target_char, 200, 100));
-					battle_->stats_dialogs_[target_char] = ptr;
-					ptr->show();
-					ptr->set_frame(gui::frame_manager::make_frame(ptr, "mini-char-battle-stats"));
-				} else {
-					battle_->stats_dialogs_.erase(i);
-				}
-			} else {
-				if(has_dialogs) {
-					claimed = true;
-					clear = true;
-				} else {
-					claimed = false;
-					clear = false;
-				}
-			}
-		}
-		break;
-	default:
-		clear = false;
-		claimed = false;
-		break;
-	}
-
-	if(clear) {
-		battle_->stats_dialogs_.clear();
-	}
-
-	return claimed;
+                std::map<battle_character_ptr,game_dialogs::mini_stats_dialog_ptr>::iterator i =
+                    battle_->stats_dialogs_.find(target_char);
+                if(i == battle_->stats_dialogs_.end()) {
+                    ptr.reset(new game_dialogs::mini_stats_dialog(target_char, 200, 100));
+                    battle_->stats_dialogs_[target_char] = ptr;
+                    ptr->show();
+                    ptr->set_frame(gui::frame_manager::make_frame(ptr, "mini-char-battle-stats"));
+                } else {
+                    battle_->stats_dialogs_.erase(i);
+                }
+            } else {
+                if(has_dialogs) {
+                    claimed = true;
+                    clear = true;
+                } else {
+                    claimed = false;
+                    clear = false;
+                }
+            }
+        }
+        break;
+    default:
+        clear = false;
+        claimed = false;
+        break;
+    }
+    
+    if(clear) {
+        battle_->stats_dialogs_.clear();
+    }
+    
+    return claimed;
 }
 
 bool battle::listener::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
@@ -1200,7 +1103,7 @@ bool battle::listener::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
 	if(e.button == SDL_BUTTON_LEFT) {
 		if(battle_->highlight_moves_) {
 			const battle_character::move_map::const_iterator move = 
-                battle_->moves_.find(battle_->selected_loc());
+                battle_->moves_.find(battle_->selection_.get_selected_hex());
 			if(move != battle_->moves_.end()) {
 				battle_->move_character(**(battle_->focus_), move->second);
                 battle_->turn_done_ = !battle_->enter_attack_mode();
@@ -1223,7 +1126,7 @@ bool battle::listener::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
                 claimed =  true;
 			}
 		} else if(battle_->highlight_targets_) {
-			hex::location loc = battle_->selected_loc();
+			hex::location loc = battle_->selection_.get_selected_hex();
 			if(battle_->map_.is_loc_on_map(loc) && battle_->targets_.count(loc)) {
 				battle_->turn_done_ = true;
 				battle_->target_mod(**(battle_->focus_), loc, *(battle_->current_move_));

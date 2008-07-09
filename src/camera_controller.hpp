@@ -39,9 +39,6 @@ public:
                Uint8 state, Uint8 bstate, SDLMod mod);
     void drag();
 
-    void prepare_selection();
-    unsigned int finish_selection();
-
 private:
     camera& cam_;
 	bool keyboard_pan_;

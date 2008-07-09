@@ -865,47 +865,48 @@ void rollin_menu_widget::rebuild_options() {
 
 bool rollin_menu_widget::handle_event(const SDL_Event& e, bool claimed)
 {
-	if(state() == DISABLED || claimed) {
-		return claimed;
-	}
-	if(popped_out()) {
+    if(state() == DISABLED || claimed) {
+        return claimed;
+    }
+    if(popped_out()) {
         claimed = grab_option_event(e, claimed);
-	}
-
+    }
+    
     if(claimed) {
         return claimed;
     }
-
-	switch(e.type) {
-	case SDL_MOUSEBUTTONDOWN:
-	case SDL_MOUSEBUTTONUP:
-	case SDL_MOUSEMOTION:
-		if(hit_me(e)) {
-			set_state(ROLLED_OVER);
-			set_popped_out(true);
+    
+    switch(e.type) {
+    case SDL_MOUSEBUTTONDOWN:
+    case SDL_MOUSEBUTTONUP:
+    case SDL_MOUSEMOTION:
+        if(hit_me(e)) {
+            set_state(ROLLED_OVER);
+            set_popped_out(true);
             claimed = true;
-		} else {
-			set_state(NORMAL);
-			set_popped_out(false);
-		}
-		break;
-	case SDL_KEYDOWN:
-	case SDL_KEYUP:
-		if(has_hotkey() && e.key.keysym.sym == hotkey().sym && e.key.keysym.mod == hotkey().mod) {
-			if(!popped_out()) {
-				set_state(ROLLED_OVER);
-				set_popped_out(true);
-			} else {
-				set_state(NORMAL);
-				set_popped_out(false);
-			}
-			claimed = true;
-		}
-		break;
-	default:
-		break;
-	}
-	return claimed;
+        } else {
+            set_state(NORMAL);
+            set_popped_out(false);
+        }
+        break;
+    case SDL_KEYDOWN:
+    case SDL_KEYUP:
+        /* FIXME: conditional jump depends on uninitialized value */
+        if(has_hotkey() && e.key.keysym.sym == hotkey().sym && e.key.keysym.mod == hotkey().mod) {
+            if(!popped_out()) {
+                set_state(ROLLED_OVER);
+                set_popped_out(true);
+            } else {
+                set_state(NORMAL);
+                set_popped_out(false);
+            }
+            claimed = true;
+        }
+        break;
+    default:
+            break;
+    }
+    return claimed;
 }
 
 void framed_dialog::handle_draw() const

@@ -58,8 +58,8 @@ namespace hex
 
 	void get_tile_ring(const location& a, int radius,
 	                   std::vector<location>& res);
-	void get_tiles_in_radius(const location& center, int radius,
-	                   std::vector<location>& res);
+	void get_locations_in_radius(const location& center, int radius,
+                                 std::vector<location>& res);
 	void get_tile_strip(const location& center, DIRECTION dir,
 	                    int tiles_forward, int tiles_back, int tiles_side,
 						std::vector<location>& res);

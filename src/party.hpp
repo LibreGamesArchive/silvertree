@@ -35,7 +35,9 @@ namespace game_logic
 
 class world;
 
-class party : public formula_callable, public hex::path_cost_calculator
+class party : public formula_callable, 
+              public hex::path_cost_calculator,
+              public hex::basic_drawable
 {
 public:
 	party(wml::const_node_ptr node, world& gameworld);
@@ -53,7 +55,6 @@ public:
 
 	int id() const { return id_; }
 
-	void draw();
 	hex::DIRECTION last_move() const { return last_move_; }
 	const hex::location& previous_loc() const { return previous_loc_; }
 	const hex::location& loc() const { return loc_; }
@@ -126,6 +127,10 @@ public:
 	void pass(int minutes=1);
 	void finish_move();
 
+    hex::const_map_avatar_ptr avatar() const { return avatar_; }
+
+    void update_rotation(int key) const;
+    void update_position(int key) const;
 protected:
 	void move(hex::DIRECTION dir);
 	int movement_cost(const hex::location& src,

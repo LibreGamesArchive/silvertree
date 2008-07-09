@@ -83,26 +83,27 @@ am_libsilvertree_a_OBJECTS = titlescreen.$(OBJEXT) \
 	input.$(OBJEXT) item.$(OBJEXT) item_display_dialog.$(OBJEXT) \
 	keyboard.$(OBJEXT) label.$(OBJEXT) \
 	learn_skills_dialog.$(OBJEXT) map_avatar.$(OBJEXT) \
-	material.$(OBJEXT) message_dialog.$(OBJEXT) \
-	mini_stats_dialog.$(OBJEXT) model.$(OBJEXT) \
-	npc_party.$(OBJEXT) parse3ds.$(OBJEXT) parseark.$(OBJEXT) \
-	parsedae.$(OBJEXT) particle.$(OBJEXT) \
+	map_selection.$(OBJEXT) material.$(OBJEXT) \
+	message_dialog.$(OBJEXT) mini_stats_dialog.$(OBJEXT) \
+	model.$(OBJEXT) npc_party.$(OBJEXT) parse3ds.$(OBJEXT) \
+	parseark.$(OBJEXT) parsedae.$(OBJEXT) particle.$(OBJEXT) \
 	particle_emitter.$(OBJEXT) particle_system.$(OBJEXT) \
 	party.$(OBJEXT) party_status_dialog.$(OBJEXT) \
 	pathfind.$(OBJEXT) pc_party.$(OBJEXT) \
 	post_battle_dialog.$(OBJEXT) preferences.$(OBJEXT) \
-	raster.$(OBJEXT) sdl_algo.$(OBJEXT) settlement.$(OBJEXT) \
-	shop_dialog.$(OBJEXT) skill.$(OBJEXT) skill_dialog.$(OBJEXT) \
-	slider.$(OBJEXT) status_bars_widget.$(OBJEXT) \
-	string_utils.$(OBJEXT) surface_cache.$(OBJEXT) \
-	surface.$(OBJEXT) terrain_feature.$(OBJEXT) text_gui.$(OBJEXT) \
-	texture.$(OBJEXT) tile.$(OBJEXT) tile_logic.$(OBJEXT) \
-	tooltip.$(OBJEXT) tracks.$(OBJEXT) translate.$(OBJEXT) \
-	unicode.$(OBJEXT) variant.$(OBJEXT) widget.$(OBJEXT) \
-	wml_command.$(OBJEXT) wml_node.$(OBJEXT) wml_parser.$(OBJEXT) \
-	wml_utils.$(OBJEXT) wml_writer.$(OBJEXT) world.$(OBJEXT) \
-	tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
-	tinyxmlparser.$(OBJEXT) zoom_map_generator.$(OBJEXT)
+	raster.$(OBJEXT) renderer.$(OBJEXT) sdl_algo.$(OBJEXT) \
+	settlement.$(OBJEXT) shop_dialog.$(OBJEXT) skill.$(OBJEXT) \
+	skill_dialog.$(OBJEXT) slider.$(OBJEXT) \
+	status_bars_widget.$(OBJEXT) string_utils.$(OBJEXT) \
+	surface_cache.$(OBJEXT) surface.$(OBJEXT) \
+	terrain_feature.$(OBJEXT) text_gui.$(OBJEXT) texture.$(OBJEXT) \
+	tile.$(OBJEXT) tile_logic.$(OBJEXT) tooltip.$(OBJEXT) \
+	tracks.$(OBJEXT) translate.$(OBJEXT) unicode.$(OBJEXT) \
+	variant.$(OBJEXT) widget.$(OBJEXT) wml_command.$(OBJEXT) \
+	wml_node.$(OBJEXT) wml_parser.$(OBJEXT) wml_utils.$(OBJEXT) \
+	wml_writer.$(OBJEXT) world.$(OBJEXT) tinyxml.$(OBJEXT) \
+	tinyxmlerror.$(OBJEXT) tinyxmlparser.$(OBJEXT) \
+	zoom_map_generator.$(OBJEXT)
 libsilvertree_a_OBJECTS = $(am_libsilvertree_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -339,6 +340,7 @@ location_fwd.hpp \
 location_tracker.hpp \
 map_avatar.hpp \
 map_object.hpp \
+map_selection.hpp \
 map_utils.hpp \
 material.hpp \
 message_dialog.hpp \
@@ -362,6 +364,7 @@ post_battle_dialog.hpp \
 preferences.hpp \
 raster.hpp \
 reference_counted_object.hpp \
+renderer.hpp \
 scoped_resource.hpp \
 sdl_algo.hpp \
 settlement_fwd.hpp \
@@ -451,6 +454,7 @@ keyboard.cpp \
 label.cpp \
 learn_skills_dialog.cpp \
 map_avatar.cpp \
+map_selection.cpp \
 material.cpp \
 message_dialog.cpp \
 mini_stats_dialog.cpp \
@@ -469,6 +473,7 @@ pc_party.cpp \
 post_battle_dialog.cpp \
 preferences.cpp \
 raster.cpp \
+renderer.cpp \
 sdl_algo.cpp \
 settlement.cpp \
 shop_dialog.cpp \
@@ -624,6 +629,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/learn_skills_dialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/map_avatar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/map_selection.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/material.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/message_dialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mini_stats_dialog.Po@am__quote@
@@ -645,6 +651,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/post_battle_dialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/preferences.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/raster.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/renderer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdl_algo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/settlement.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shop_dialog.Po@am__quote@

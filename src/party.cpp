@@ -51,10 +51,6 @@ party::party(wml::const_node_ptr node, world& gameworld)
 		id_ = global_game_state::get().generate_new_party_id();
 	}
 
-	GLfloat pos[3];
-	get_pos(pos);
-	avatar_ = hex::map_avatar::create(node,pos);
-
 	for(wml::node::const_child_range i =
 	    node->get_child_range("character");
 	    i.first != i.second; ++i.first) {
@@ -72,8 +68,10 @@ party::party(wml::const_node_ptr node, world& gameworld)
 			members_.push_back(character::create(i.first->second));
 		}
 
-		if(!avatar_->valid()) {
-			avatar_ = hex::map_avatar::create(members_.back()->write(),pos);
+		if(!avatar_ || !avatar_->valid()) {
+			avatar_ = hex::map_avatar::create(
+                                static_cast<wml::const_node_ptr>(members_.back()->write()),
+                                this);
 		}
 	}
 
@@ -168,11 +166,14 @@ party_ptr party::create_party(wml::const_node_ptr node,
 	}
 }
 
-void party::draw()
+void party::update_rotation(int key) const
 {
-	avatar_->set_rotation(get_rotation());
-	get_pos(avatar_->position_buffer());
-	avatar_->draw();
+    rotation_s(0) = get_rotation();
+}
+
+void party::update_position(int key) const 
+{
+	get_pos(position_v());
 }
 
 party::TURN_RESULT party::play_turn()
@@ -468,9 +469,9 @@ const std::set<hex::location>& party::get_visible_locs() const
 		hex::get_tile_ring(loc_,radius,locs);
 		for(std::vector<hex::location>::const_iterator i = locs.begin();
 		    i != locs.end(); ++i) {
-			if(line_of_sight(world_->map(),loc_,*i)) {
-				found = true;
-				visible_locs_.insert(*i);
+			if(world_->map().has_line_of_sight(loc_,*i)) {
+                            found = true;
+                            visible_locs_.insert(*i);
 			}
 		}
 	}
@@ -484,7 +485,7 @@ void party::get_visible_parties(std::vector<const_party_ptr>& parties) const
 	world::party_map& all = world_->parties();
 	for(world::party_map::iterator i = all.begin(); i != all.end(); ++i) {
 		if(range >= hex::distance_between(loc_,i->first)) {
-			if(hex::line_of_sight(world_->map(),loc_,i->first)) {
+			if(world_->map().has_line_of_sight(loc_,i->first)) {
 				parties.push_back(i->second);
 			}
 		}
