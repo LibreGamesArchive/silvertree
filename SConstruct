@@ -18,7 +18,7 @@ opts.AddOptions(
     ("BOOSTDIR", "Root directory of boost installation.", "/usr/include"),
     ("BOOSTLIBS", "Directory where boost libs are located.", "/usr/lib"),
     ("BOOST_SUFFIX", "Suffix of the boost regex library.", ""),
-    BoolOption("use_pango", "Compile experemental pango based text renderer.", False),
+    BoolOption("use_pango", "Use experimental pango based text renderer.", False),
     BoolOption("AUDIO", "Whether sound support is enabled", False),
     EnumOption("Build", "Build variant: debug or release", "release", ["debug", "release"], ignorecase=1),
     ("EXTRA_FLAGS_RELEASE", "Extra compiler/linker flags to use in release build variant.(e.g. \"-O3 -march=prescott\")", ""),
