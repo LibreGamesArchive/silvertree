@@ -102,6 +102,7 @@ void battle::play()
             while(sub_time_ < 1.0) {
                 initiative_bar_->set_current_time(current_time_ + sub_time_);
                 animation_frame(0.5);
+				pump_.process();
             }
             // Check whether character modifications expired.
             foreach(battle_character_ptr ch, chars_) {
@@ -470,7 +471,6 @@ void battle::animation_frame(float t, gui::slider* slider) {
         SDL_GL_SwapBuffers();
     }
     
-    pump_.process();
     camera_controller_.update();
 }
 
@@ -488,6 +488,7 @@ void battle::elapse_time(GLfloat anim_elapse, int frames, bool in_anim) {
     }
     for(int frame = 0; frame<frames;++frame) {
         animation_frame(step);
+    	pump_.process();
     }
     if(!in_anim) {
         end_animation();
