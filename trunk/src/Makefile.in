@@ -96,14 +96,14 @@ am_libsilvertree_a_OBJECTS = titlescreen.$(OBJEXT) \
 	skill_dialog.$(OBJEXT) slider.$(OBJEXT) \
 	status_bars_widget.$(OBJEXT) string_utils.$(OBJEXT) \
 	surface_cache.$(OBJEXT) surface.$(OBJEXT) \
-	terrain_feature.$(OBJEXT) text_gui.$(OBJEXT) texture.$(OBJEXT) \
-	tile.$(OBJEXT) tile_logic.$(OBJEXT) tooltip.$(OBJEXT) \
-	tracks.$(OBJEXT) translate.$(OBJEXT) unicode.$(OBJEXT) \
-	variant.$(OBJEXT) widget.$(OBJEXT) wml_command.$(OBJEXT) \
-	wml_node.$(OBJEXT) wml_parser.$(OBJEXT) wml_utils.$(OBJEXT) \
-	wml_writer.$(OBJEXT) world.$(OBJEXT) tinyxml.$(OBJEXT) \
-	tinyxmlerror.$(OBJEXT) tinyxmlparser.$(OBJEXT) \
-	zoom_map_generator.$(OBJEXT)
+	terrain_feature.$(OBJEXT) text.$(OBJEXT) text_gui.$(OBJEXT) \
+	texture.$(OBJEXT) tile.$(OBJEXT) tile_logic.$(OBJEXT) \
+	tooltip.$(OBJEXT) tracks.$(OBJEXT) translate.$(OBJEXT) \
+	unicode.$(OBJEXT) variant.$(OBJEXT) widget.$(OBJEXT) \
+	wml_command.$(OBJEXT) wml_node.$(OBJEXT) wml_parser.$(OBJEXT) \
+	wml_utils.$(OBJEXT) wml_writer.$(OBJEXT) world.$(OBJEXT) \
+	tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
+	tinyxmlparser.$(OBJEXT) zoom_map_generator.$(OBJEXT)
 libsilvertree_a_OBJECTS = $(am_libsilvertree_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -194,7 +194,10 @@ PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
+PANGO_CFLAGS = @PANGO_CFLAGS@
+PANGO_LIBS = @PANGO_LIBS@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG = @PKG_CONFIG@
 PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
@@ -380,6 +383,7 @@ surface_cache.hpp \
 surface.hpp \
 terrain_feature_fwd.hpp \
 terrain_feature.hpp \
+text.hpp \
 text_gui.hpp \
 texture.hpp \
 tile.hpp \
@@ -485,6 +489,7 @@ string_utils.cpp \
 surface_cache.cpp \
 surface.cpp \
 terrain_feature.cpp \
+text.cpp \
 text_gui.cpp \
 texture.cpp \
 tile.cpp \
@@ -663,6 +668,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/surface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/surface_cache.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/terrain_feature.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/text.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/text_gui.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/texture.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tile.Po@am__quote@

@@ -54,6 +54,13 @@ AC_CHECK_LIB([GLEW], [glewInit], [LIBS="-lGLEW $LIBS"],
 CXXFLAGS="$GL_CFLAGS $GLU_CFLAGS $CXXFLAGS"
 LIBS="$GL_LIBS $GLU_LIBS $LIBS"
 
+PKG_CHECK_MODULES(PANGO, pangoft2 >= 1.14.8, [
+    CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS -DUSE_PANGO"
+    LIBS="$PANGO_LIBS $LIBS"
+], [
+    AC_MSG_ERROR([**** Pango with freetype2 backend not found !])
+])
+
 BNV_HAVE_QT
 AS_IF([test x$have_qt = xno], 
       [
