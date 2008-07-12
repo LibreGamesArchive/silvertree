@@ -46,6 +46,7 @@ Type "scons" to build the game.
 Additional options:
 """)
 Help(opts.GenerateHelpText(env))
+if GetOption("help") : Return()
 
 if env["PLATFORM"] == "win32": openal_lib = "openal32"
 else: openal_lib = "openal"
