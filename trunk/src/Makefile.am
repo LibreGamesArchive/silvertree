@@ -127,7 +127,6 @@ surface_cache.hpp \
 surface.hpp \
 terrain_feature_fwd.hpp \
 terrain_feature.hpp \
-text.hpp \
 text_gui.hpp \
 texture.hpp \
 tile.hpp \
@@ -233,7 +232,6 @@ string_utils.cpp \
 surface_cache.cpp \
 surface.cpp \
 terrain_feature.cpp \
-text.cpp \
 text_gui.cpp \
 texture.cpp \
 tile.cpp \
@@ -254,3 +252,10 @@ tinyxml/tinyxml.cpp \
 tinyxml/tinyxmlerror.cpp \
 tinyxml/tinyxmlparser.cpp \
 zoom_map_generator.cpp
+
+if HAVE_PANGO
+libsilvertree_a_SOURCES += \
+text.hpp \
+\
+text.cpp
+endif

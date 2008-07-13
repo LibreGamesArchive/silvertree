@@ -45,6 +45,11 @@ bin_PROGRAMS = silvertreerpg$(EXEEXT)
 @WANT_AUDIO_TRUE@audio/openal.hpp \
 @WANT_AUDIO_TRUE@audio/openalc.hpp 
 
+@HAVE_PANGO_TRUE@am__append_2 = \
+@HAVE_PANGO_TRUE@text.hpp \
+@HAVE_PANGO_TRUE@\
+@HAVE_PANGO_TRUE@text.cpp
+
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -60,6 +65,76 @@ AR = ar
 ARFLAGS = cru
 libsilvertree_a_AR = $(AR) $(ARFLAGS)
 libsilvertree_a_LIBADD =
+am__libsilvertree_a_SOURCES_DIST = base_terrain_fwd.hpp \
+	base_terrain.hpp battle_character_fwd.hpp battle_character.hpp \
+	battle_character_npc.hpp battle_character_pc.hpp battle.hpp \
+	battle_map_generator.hpp battle_menu_fwd.hpp battle_menu.hpp \
+	battle_missile.hpp battle_modification.hpp battle_move_fwd.hpp \
+	battle_move.hpp button.hpp callback.hpp camera_controller.hpp \
+	camera.hpp character_equip_dialog.hpp character_fwd.hpp \
+	character_generator.hpp character.hpp \
+	character_status_dialog.hpp dialog.hpp display_list.hpp \
+	encounter.hpp equipment.hpp event_handler.hpp filesystem.hpp \
+	floating_label.hpp font.hpp foreach.hpp formatter.hpp \
+	formula_callable_fwd.hpp formula_callable.hpp formula_fwd.hpp \
+	formula.hpp formula_registry.hpp formula_tokenizer.hpp \
+	frame.hpp frame_rate_utils.hpp frustum.hpp game_bar.hpp \
+	gamemap.hpp game_persistence.hpp game_time.hpp \
+	global_game_state.hpp graphics_logic.hpp grid_widget_fwd.hpp \
+	grid_widget.hpp gui_core.hpp image_widget_fwd.hpp \
+	image_widget.hpp initiative_bar.hpp initiative_bar_fwd.hpp \
+	input.hpp item_display_dialog.hpp item_fwd.hpp item.hpp \
+	keyboard.hpp label.hpp learn_skills_dialog.hpp \
+	location_fwd.hpp location_tracker.hpp map_avatar.hpp \
+	map_object.hpp map_selection.hpp map_utils.hpp material.hpp \
+	message_dialog.hpp mini_stats_dialog.hpp model_fwd.hpp \
+	model.hpp npc_party.hpp parse3ds.hpp parseark.hpp parsedae.hpp \
+	particle_emitter_fwd.hpp particle_emitter.hpp particle.hpp \
+	particle_system.hpp party_fwd.hpp party.hpp \
+	party_status_dialog.hpp pathfind.hpp pc_party.hpp \
+	post_battle_dialog.hpp preferences.hpp raster.hpp \
+	reference_counted_object.hpp renderer.hpp scoped_resource.hpp \
+	sdl_algo.hpp settlement_fwd.hpp settlement.hpp shop_dialog.hpp \
+	skill_dialog.hpp skill_fwd.hpp skill.hpp slider.hpp \
+	status_bars_widget.hpp string_utils.hpp surface_cache.hpp \
+	surface.hpp terrain_feature_fwd.hpp terrain_feature.hpp \
+	text_gui.hpp texture.hpp tile.hpp tile_logic.hpp \
+	time_cost_widget.hpp titlescreen.cpp titlescreen.hpp \
+	tooltip.hpp tracks.hpp translate.hpp unicode.hpp util.hpp \
+	variant.hpp widget.hpp wml_command_fwd.hpp wml_command.hpp \
+	wml_node_fwd.hpp wml_node.hpp wml_parser.hpp wml_utils.hpp \
+	wml_writer.hpp world_fwd.hpp world.hpp tinyxml/tinyxml.h \
+	zoom_map_generator.hpp base_terrain.cpp battle_character.cpp \
+	battle_character_npc.cpp battle_character_pc.cpp battle.cpp \
+	battle_map_generator.cpp battle_menu.cpp battle_missile.cpp \
+	battle_modification.cpp battle_move.cpp button.cpp \
+	camera_controller.cpp camera.cpp character.cpp \
+	character_equip_dialog.cpp character_generator.cpp \
+	character_status_dialog.cpp dialog.cpp display_list.cpp \
+	encounter.cpp equipment.cpp event_handler.cpp filesystem.cpp \
+	floating_label.cpp font.cpp formula.cpp formula_registry.cpp \
+	formula_tokenizer.cpp frame.cpp frame_manager.cpp frustum.cpp \
+	game_bar.cpp gamemap.cpp game_persistence.cpp game_time.cpp \
+	global_game_state.cpp graphics_logic.cpp grid_widget.cpp \
+	gui_core.cpp image_widget.cpp initiative_bar.cpp input.cpp \
+	item.cpp item_display_dialog.cpp keyboard.cpp label.cpp \
+	learn_skills_dialog.cpp map_avatar.cpp map_selection.cpp \
+	material.cpp message_dialog.cpp mini_stats_dialog.cpp \
+	model.cpp npc_party.cpp parse3ds.cpp parseark.cpp parsedae.cpp \
+	particle.cpp particle_emitter.cpp particle_system.cpp \
+	party.cpp party_status_dialog.cpp pathfind.cpp pc_party.cpp \
+	post_battle_dialog.cpp preferences.cpp raster.cpp renderer.cpp \
+	sdl_algo.cpp settlement.cpp shop_dialog.cpp skill.cpp \
+	skill_dialog.cpp slider.cpp status_bars_widget.cpp \
+	string_utils.cpp surface_cache.cpp surface.cpp \
+	terrain_feature.cpp text_gui.cpp texture.cpp tile.cpp \
+	tile_logic.cpp tooltip.cpp tracks.cpp translate.cpp \
+	unicode.cpp variant.cpp widget.cpp wml_command.cpp \
+	wml_node.cpp wml_parser.cpp wml_utils.cpp wml_writer.cpp \
+	world.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp \
+	tinyxml/tinyxmlparser.cpp zoom_map_generator.cpp text.hpp \
+	text.cpp
+@HAVE_PANGO_TRUE@am__objects_1 = text.$(OBJEXT)
 am_libsilvertree_a_OBJECTS = titlescreen.$(OBJEXT) \
 	base_terrain.$(OBJEXT) battle_character.$(OBJEXT) \
 	battle_character_npc.$(OBJEXT) battle_character_pc.$(OBJEXT) \
@@ -96,14 +171,14 @@ am_libsilvertree_a_OBJECTS = titlescreen.$(OBJEXT) \
 	skill_dialog.$(OBJEXT) slider.$(OBJEXT) \
 	status_bars_widget.$(OBJEXT) string_utils.$(OBJEXT) \
 	surface_cache.$(OBJEXT) surface.$(OBJEXT) \
-	terrain_feature.$(OBJEXT) text.$(OBJEXT) text_gui.$(OBJEXT) \
-	texture.$(OBJEXT) tile.$(OBJEXT) tile_logic.$(OBJEXT) \
-	tooltip.$(OBJEXT) tracks.$(OBJEXT) translate.$(OBJEXT) \
-	unicode.$(OBJEXT) variant.$(OBJEXT) widget.$(OBJEXT) \
-	wml_command.$(OBJEXT) wml_node.$(OBJEXT) wml_parser.$(OBJEXT) \
-	wml_utils.$(OBJEXT) wml_writer.$(OBJEXT) world.$(OBJEXT) \
-	tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
-	tinyxmlparser.$(OBJEXT) zoom_map_generator.$(OBJEXT)
+	terrain_feature.$(OBJEXT) text_gui.$(OBJEXT) texture.$(OBJEXT) \
+	tile.$(OBJEXT) tile_logic.$(OBJEXT) tooltip.$(OBJEXT) \
+	tracks.$(OBJEXT) translate.$(OBJEXT) unicode.$(OBJEXT) \
+	variant.$(OBJEXT) widget.$(OBJEXT) wml_command.$(OBJEXT) \
+	wml_node.$(OBJEXT) wml_parser.$(OBJEXT) wml_utils.$(OBJEXT) \
+	wml_writer.$(OBJEXT) world.$(OBJEXT) tinyxml.$(OBJEXT) \
+	tinyxmlerror.$(OBJEXT) tinyxmlparser.$(OBJEXT) \
+	zoom_map_generator.$(OBJEXT) $(am__objects_1)
 libsilvertree_a_OBJECTS = $(am_libsilvertree_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -112,9 +187,9 @@ am__silvertreerpg_SOURCES_DIST = main.cpp audio/audio.cpp \
 	audio/mpg123.cpp audio/openal.cpp audio/openalc.cpp \
 	audio/audio.hpp audio/mpg123.hpp audio/openal.hpp \
 	audio/openalc.hpp
-@WANT_AUDIO_TRUE@am__objects_1 = audio.$(OBJEXT) mpg123.$(OBJEXT) \
+@WANT_AUDIO_TRUE@am__objects_2 = audio.$(OBJEXT) mpg123.$(OBJEXT) \
 @WANT_AUDIO_TRUE@	openal.$(OBJEXT) openalc.$(OBJEXT)
-am_silvertreerpg_OBJECTS = main.$(OBJEXT) $(am__objects_1)
+am_silvertreerpg_OBJECTS = main.$(OBJEXT) $(am__objects_2)
 silvertreerpg_OBJECTS = $(am_silvertreerpg_OBJECTS)
 silvertreerpg_DEPENDENCIES = libsilvertree.a
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
@@ -130,7 +205,7 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libsilvertree_a_SOURCES) $(silvertreerpg_SOURCES)
-DIST_SOURCES = $(libsilvertree_a_SOURCES) \
+DIST_SOURCES = $(am__libsilvertree_a_SOURCES_DIST) \
 	$(am__silvertreerpg_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -201,6 +276,7 @@ PKG_CONFIG = @PKG_CONFIG@
 PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
+QT_CFLAGS = @QT_CFLAGS@
 QT_CXXFLAGS = @QT_CXXFLAGS@
 QT_DIR = @QT_DIR@
 QT_LIBS = @QT_LIBS@
@@ -260,6 +336,7 @@ mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
+pkgconfig_available = @pkgconfig_available@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
@@ -276,241 +353,75 @@ silvertreerpg_LDADD = libsilvertree.a
 AM_CPPFLAGS = -DDATADIR=\"$(pkgdatadir)\"
 AM_CXXFLAGS = -Wall -Werror -Wno-sign-compare -Wno-switch -Wno-switch-enum
 SUBDIRS = . editor
-libsilvertree_a_SOURCES = \
-base_terrain_fwd.hpp \
-base_terrain.hpp \
-battle_character_fwd.hpp \
-battle_character.hpp \
-battle_character_npc.hpp \
-battle_character_pc.hpp \
-battle.hpp \
-battle_map_generator.hpp \
-battle_menu_fwd.hpp \
-battle_menu.hpp \
-battle_missile.hpp \
-battle_modification.hpp \
-battle_move_fwd.hpp \
-battle_move.hpp \
-button.hpp \
-callback.hpp \
-camera_controller.hpp \
-camera.hpp \
-character_equip_dialog.hpp \
-character_fwd.hpp \
-character_generator.hpp \
-character.hpp \
-character_status_dialog.hpp \
-dialog.hpp \
-display_list.hpp \
-encounter.hpp \
-equipment.hpp \
-event_handler.hpp \
-filesystem.hpp \
-floating_label.hpp \
-font.hpp \
-foreach.hpp \
-formatter.hpp \
-formula_callable_fwd.hpp \
-formula_callable.hpp \
-formula_fwd.hpp \
-formula.hpp \
-formula_registry.hpp \
-formula_tokenizer.hpp \
-frame.hpp \
-frame_rate_utils.hpp \
-frustum.hpp \
-game_bar.hpp \
-gamemap.hpp \
-game_persistence.hpp \
-game_time.hpp \
-global_game_state.hpp \
-graphics_logic.hpp \
-grid_widget_fwd.hpp \
-grid_widget.hpp \
-gui_core.hpp \
-image_widget_fwd.hpp \
-image_widget.hpp \
-initiative_bar.hpp \
-initiative_bar_fwd.hpp \
-input.hpp \
-item_display_dialog.hpp \
-item_fwd.hpp \
-item.hpp \
-keyboard.hpp \
-label.hpp \
-learn_skills_dialog.hpp \
-location_fwd.hpp \
-location_tracker.hpp \
-map_avatar.hpp \
-map_object.hpp \
-map_selection.hpp \
-map_utils.hpp \
-material.hpp \
-message_dialog.hpp \
-mini_stats_dialog.hpp \
-model_fwd.hpp \
-model.hpp \
-npc_party.hpp \
-parse3ds.hpp \
-parseark.hpp \
-parsedae.hpp \
-particle_emitter_fwd.hpp \
-particle_emitter.hpp \
-particle.hpp \
-particle_system.hpp \
-party_fwd.hpp \
-party.hpp \
-party_status_dialog.hpp \
-pathfind.hpp \
-pc_party.hpp \
-post_battle_dialog.hpp \
-preferences.hpp \
-raster.hpp \
-reference_counted_object.hpp \
-renderer.hpp \
-scoped_resource.hpp \
-sdl_algo.hpp \
-settlement_fwd.hpp \
-settlement.hpp \
-shop_dialog.hpp \
-skill_dialog.hpp \
-skill_fwd.hpp \
-skill.hpp \
-slider.hpp \
-status_bars_widget.hpp \
-string_utils.hpp \
-surface_cache.hpp \
-surface.hpp \
-terrain_feature_fwd.hpp \
-terrain_feature.hpp \
-text.hpp \
-text_gui.hpp \
-texture.hpp \
-tile.hpp \
-tile_logic.hpp \
-time_cost_widget.hpp \
-titlescreen.cpp \
-titlescreen.hpp \
-tooltip.hpp \
-tracks.hpp \
-translate.hpp \
-unicode.hpp \
-util.hpp \
-variant.hpp \
-widget.hpp \
-wml_command_fwd.hpp \
-wml_command.hpp \
-wml_node_fwd.hpp \
-wml_node.hpp \
-wml_parser.hpp \
-wml_utils.hpp \
-wml_writer.hpp \
-world_fwd.hpp \
-world.hpp \
-tinyxml/tinyxml.h \
-zoom_map_generator.hpp \
-\
-base_terrain.cpp \
-battle_character.cpp \
-battle_character_npc.cpp \
-battle_character_pc.cpp \
-battle.cpp \
-battle_map_generator.cpp \
-battle_menu.cpp \
-battle_missile.cpp \
-battle_modification.cpp \
-battle_move.cpp \
-button.cpp \
-camera_controller.cpp \
-camera.cpp \
-character.cpp \
-character_equip_dialog.cpp \
-character_generator.cpp \
-character_status_dialog.cpp \
-dialog.cpp \
-display_list.cpp \
-encounter.cpp \
-equipment.cpp \
-event_handler.cpp \
-filesystem.cpp \
-floating_label.cpp \
-font.cpp \
-formula.cpp \
-formula_registry.cpp \
-formula_tokenizer.cpp \
-frame.cpp \
-frame_manager.cpp \
-frustum.cpp \
-game_bar.cpp \
-gamemap.cpp \
-game_persistence.cpp \
-game_time.cpp \
-global_game_state.cpp \
-graphics_logic.cpp \
-grid_widget.cpp \
-gui_core.cpp \
-image_widget.cpp \
-initiative_bar.cpp \
-input.cpp \
-item.cpp \
-item_display_dialog.cpp \
-keyboard.cpp \
-label.cpp \
-learn_skills_dialog.cpp \
-map_avatar.cpp \
-map_selection.cpp \
-material.cpp \
-message_dialog.cpp \
-mini_stats_dialog.cpp \
-model.cpp \
-npc_party.cpp \
-parse3ds.cpp \
-parseark.cpp \
-parsedae.cpp \
-particle.cpp \
-particle_emitter.cpp \
-particle_system.cpp \
-party.cpp \
-party_status_dialog.cpp \
-pathfind.cpp \
-pc_party.cpp \
-post_battle_dialog.cpp \
-preferences.cpp \
-raster.cpp \
-renderer.cpp \
-sdl_algo.cpp \
-settlement.cpp \
-shop_dialog.cpp \
-skill.cpp \
-skill_dialog.cpp \
-slider.cpp \
-status_bars_widget.cpp \
-string_utils.cpp \
-surface_cache.cpp \
-surface.cpp \
-terrain_feature.cpp \
-text.cpp \
-text_gui.cpp \
-texture.cpp \
-tile.cpp \
-tile_logic.cpp \
-tooltip.cpp \
-tracks.cpp  \
-translate.cpp \
-unicode.cpp \
-variant.cpp \
-widget.cpp \
-wml_command.cpp \
-wml_node.cpp \
-wml_parser.cpp \
-wml_utils.cpp \
-wml_writer.cpp \
-world.cpp \
-tinyxml/tinyxml.cpp \
-tinyxml/tinyxmlerror.cpp \
-tinyxml/tinyxmlparser.cpp \
-zoom_map_generator.cpp
-
+libsilvertree_a_SOURCES = base_terrain_fwd.hpp base_terrain.hpp \
+	battle_character_fwd.hpp battle_character.hpp \
+	battle_character_npc.hpp battle_character_pc.hpp battle.hpp \
+	battle_map_generator.hpp battle_menu_fwd.hpp battle_menu.hpp \
+	battle_missile.hpp battle_modification.hpp battle_move_fwd.hpp \
+	battle_move.hpp button.hpp callback.hpp camera_controller.hpp \
+	camera.hpp character_equip_dialog.hpp character_fwd.hpp \
+	character_generator.hpp character.hpp \
+	character_status_dialog.hpp dialog.hpp display_list.hpp \
+	encounter.hpp equipment.hpp event_handler.hpp filesystem.hpp \
+	floating_label.hpp font.hpp foreach.hpp formatter.hpp \
+	formula_callable_fwd.hpp formula_callable.hpp formula_fwd.hpp \
+	formula.hpp formula_registry.hpp formula_tokenizer.hpp \
+	frame.hpp frame_rate_utils.hpp frustum.hpp game_bar.hpp \
+	gamemap.hpp game_persistence.hpp game_time.hpp \
+	global_game_state.hpp graphics_logic.hpp grid_widget_fwd.hpp \
+	grid_widget.hpp gui_core.hpp image_widget_fwd.hpp \
+	image_widget.hpp initiative_bar.hpp initiative_bar_fwd.hpp \
+	input.hpp item_display_dialog.hpp item_fwd.hpp item.hpp \
+	keyboard.hpp label.hpp learn_skills_dialog.hpp \
+	location_fwd.hpp location_tracker.hpp map_avatar.hpp \
+	map_object.hpp map_selection.hpp map_utils.hpp material.hpp \
+	message_dialog.hpp mini_stats_dialog.hpp model_fwd.hpp \
+	model.hpp npc_party.hpp parse3ds.hpp parseark.hpp parsedae.hpp \
+	particle_emitter_fwd.hpp particle_emitter.hpp particle.hpp \
+	particle_system.hpp party_fwd.hpp party.hpp \
+	party_status_dialog.hpp pathfind.hpp pc_party.hpp \
+	post_battle_dialog.hpp preferences.hpp raster.hpp \
+	reference_counted_object.hpp renderer.hpp scoped_resource.hpp \
+	sdl_algo.hpp settlement_fwd.hpp settlement.hpp shop_dialog.hpp \
+	skill_dialog.hpp skill_fwd.hpp skill.hpp slider.hpp \
+	status_bars_widget.hpp string_utils.hpp surface_cache.hpp \
+	surface.hpp terrain_feature_fwd.hpp terrain_feature.hpp \
+	text_gui.hpp texture.hpp tile.hpp tile_logic.hpp \
+	time_cost_widget.hpp titlescreen.cpp titlescreen.hpp \
+	tooltip.hpp tracks.hpp translate.hpp unicode.hpp util.hpp \
+	variant.hpp widget.hpp wml_command_fwd.hpp wml_command.hpp \
+	wml_node_fwd.hpp wml_node.hpp wml_parser.hpp wml_utils.hpp \
+	wml_writer.hpp world_fwd.hpp world.hpp tinyxml/tinyxml.h \
+	zoom_map_generator.hpp base_terrain.cpp battle_character.cpp \
+	battle_character_npc.cpp battle_character_pc.cpp battle.cpp \
+	battle_map_generator.cpp battle_menu.cpp battle_missile.cpp \
+	battle_modification.cpp battle_move.cpp button.cpp \
+	camera_controller.cpp camera.cpp character.cpp \
+	character_equip_dialog.cpp character_generator.cpp \
+	character_status_dialog.cpp dialog.cpp display_list.cpp \
+	encounter.cpp equipment.cpp event_handler.cpp filesystem.cpp \
+	floating_label.cpp font.cpp formula.cpp formula_registry.cpp \
+	formula_tokenizer.cpp frame.cpp frame_manager.cpp frustum.cpp \
+	game_bar.cpp gamemap.cpp game_persistence.cpp game_time.cpp \
+	global_game_state.cpp graphics_logic.cpp grid_widget.cpp \
+	gui_core.cpp image_widget.cpp initiative_bar.cpp input.cpp \
+	item.cpp item_display_dialog.cpp keyboard.cpp label.cpp \
+	learn_skills_dialog.cpp map_avatar.cpp map_selection.cpp \
+	material.cpp message_dialog.cpp mini_stats_dialog.cpp \
+	model.cpp npc_party.cpp parse3ds.cpp parseark.cpp parsedae.cpp \
+	particle.cpp particle_emitter.cpp particle_system.cpp \
+	party.cpp party_status_dialog.cpp pathfind.cpp pc_party.cpp \
+	post_battle_dialog.cpp preferences.cpp raster.cpp renderer.cpp \
+	sdl_algo.cpp settlement.cpp shop_dialog.cpp skill.cpp \
+	skill_dialog.cpp slider.cpp status_bars_widget.cpp \
+	string_utils.cpp surface_cache.cpp surface.cpp \
+	terrain_feature.cpp text_gui.cpp texture.cpp tile.cpp \
+	tile_logic.cpp tooltip.cpp tracks.cpp translate.cpp \
+	unicode.cpp variant.cpp widget.cpp wml_command.cpp \
+	wml_node.cpp wml_parser.cpp wml_utils.cpp wml_writer.cpp \
+	world.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp \
+	tinyxml/tinyxmlparser.cpp zoom_map_generator.cpp \
+	$(am__append_2)
 all: all-recursive
 
 .SUFFIXES:
