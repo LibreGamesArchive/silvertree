@@ -166,46 +166,50 @@ texture render_text(const std::string& text, int font_size,
 
 std::string format_text(const std::string& text, int font_size, int width)
 {
-	const font_ptr font(get_font(font_size));
-	if(!font) {
-		return text;
-	}
+    const font_ptr font(get_font(font_size));
+    if(!font) {
+        return text;
+    }
+    
+    int space_width, junk;
+    TTF_SizeUTF8(font.get(), " ", &space_width, &junk);
+    
+    std::string formatted;
+    
+    std::vector<std::string> lines = util::split(text, '\n');
+    std::vector<std::string>::iterator itor;
+    for(itor = lines.begin(); itor != lines.end(); ++itor) {
+        int line_words = 0;
+        int line_width = 0;
+        std::string& text_line = *itor;
+        std::vector<std::string> words = util::split(text_line, "\n\t ");
+        foreach(const std::string& word, words) {
+            int w;
+            if(TTF_SizeUTF8(font.get(), word.c_str(), &w, &junk) < 0) {
+                std::cerr << "Warning: error rendering text \"" <<
+                    text_line << "\"\n";
+                return text;
+            }
+            if(line_words > 0) {
+                if(line_width + w > width) {
+                    formatted.append(1, '\n');
+                    line_width = 0;
+                    line_words = 0;
+                } else {
+                    formatted.append(1, ' ');
+                }
+            }
+            formatted.append(word);
+            line_width += w + space_width;
+            ++line_words;
+        }
+        if(!formatted.empty() && itor+1 != lines.end()) {
+            formatted.append(1,'\n');
+        }
+        
+    }
+    return formatted;
 
-	int space_width, junk;
-	TTF_SizeUTF8(font.get(), " ", &space_width, &junk);
-
-	std::string formatted;
-
-	std::vector<std::string> lines = util::split(text, '\n');
-	foreach(const std::string& text_line, lines) {
-		int line_words = 0;
-		int line_width = 0;
-		std::vector<std::string> words = util::split(text_line, "\n\t ");
-		foreach(const std::string& word, words) {
-			int w;
-			if(TTF_SizeUTF8(font.get(), word.c_str(), &w, &junk) < 0) {
-				std::cerr << "Warning: error rendering text \"" <<
-					text_line << "\"\n";
-				return text;
-			}
-			if(line_words > 0) {
-				if(line_width + w > width) {
-					formatted.append(1, '\n');
-					line_width = 0;
-					line_words = 0;
-				} else {
-					formatted.append(1, ' ');
-				}
-			}
-			formatted.append(word);
-			line_width += w + space_width;
-			++line_words;
-		}
-		if(!formatted.empty()) {
-		  formatted.append(1,'\n');
-		}
-	}
-	return formatted;
 }
 
 struct chunk_t {
