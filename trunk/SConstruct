@@ -18,6 +18,7 @@ opts.AddOptions(
     ("BOOSTDIR", "Root directory of boost installation.", "/usr/include"),
     ("BOOSTLIBS", "Directory where boost libs are located.", "/usr/lib"),
     ("BOOST_SUFFIX", "Suffix of the boost regex library.", ""),
+    ("GTKDIR", "Directory where GTK SDK is located.", ""),
     BoolOption("use_pango", "Use experimental pango based text renderer.", False),
     BoolOption("AUDIO", "Whether sound support is enabled", False),
     EnumOption("Build", "Build variant: debug or release", "release", ["debug", "release"], ignorecase=1),
