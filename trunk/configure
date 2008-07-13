@@ -4008,7 +4008,7 @@ else
 fi
 
 
-min_sdl_version=1.2.10
+min_sdl_version=1.2.9
 
 
 # Check whether --with-sdl-prefix was given.

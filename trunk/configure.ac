@@ -13,7 +13,7 @@ AC_ARG_ENABLE([audio],
               AC_HELP_STRING([--enable-audio], [enable sound (default is yes)]), 
               [want_audio=$enableval], [want_audio=check])
 
-min_sdl_version=1.2.10
+min_sdl_version=1.2.9
 AM_PATH_SDL($min_sdl_version, 
 	    [LIBS="$SDL_LIBS $LIBS" CXXFLAGS="$SDL_CFLAGS $CXXFLAGS"],
 	    AC_MSG_ERROR([**** SDL version $SDL_VERSION not found !]))
