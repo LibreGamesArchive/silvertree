@@ -105,7 +105,10 @@ def CheckQt4Libs(context, libs = ["QtCore", "QtGui"]):
     backup = env.Clone().Dictionary()
     if env["PLATFORM"] != "win32":
         for lib in libs:
-            env.ParseConfig("pkg-config --libs --cflags %s" % lib)
+            try:
+                env.ParseConfig("pkg-config --libs --cflags %s" % lib)
+            except OSError:
+                pass
     if env["PLATFORM"] == "win32":
         if not env.has_key("QT4DIR"): raise KeyError("QT4DIR MUST be specified on Windows.")
         env.AppendUnique(CPPPATH = [join("$QT4DIR", "include")])
