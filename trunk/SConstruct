@@ -91,7 +91,6 @@ if "gcc" in env["TOOLS"]:
     linkflags = []
     if env["Build"] == "release":
         ccflags.append("-O2")
-        linkflags.append("-s")
     if env["Build"] == "debug":
         ccflags.append("-ggdb")
     env.AppendUnique(CCFLAGS = ccflags, LINKFLAGS = linkflags)
