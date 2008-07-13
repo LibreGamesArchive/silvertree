@@ -58,7 +58,7 @@ conf.Finish()
 namegen_env = env.Clone()
 conf = env.Configure(custom_tests = env["config_checks"])
 conf.CheckGLEW() and \
-conf.CheckSDL(require_version = "1.2.10") and \
+conf.CheckSDL(require_version = "1.2.9") and \
 conf.CheckSDL("SDL_image") and \
 conf.CheckSDL("SDL_ttf") or Exit(1)
 if env["use_pango"]:
