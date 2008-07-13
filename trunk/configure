@@ -9181,7 +9181,7 @@ if test "${ac_cv_lib_QtGui_main+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lQtGui  $LIBS"
+LIBS="-lQtGui $QT_LIBS $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -9244,7 +9244,7 @@ if test "${ac_cv_lib_QtOpenGL_main+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lQtOpenGL  $LIBS"
+LIBS="-lQtOpenGL $QT_LIBS $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF

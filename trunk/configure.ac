@@ -69,10 +69,10 @@ AS_IF([test x$have_qt = xno],
       [
         AC_CHECK_LIB([QtGui], [main], [QT_LIBS="$QT_LIBS -lQtGui"],
 	             [AC_MSG_WARN([**** QtGui not found !])
-		      have_qt=no])
+		      have_qt=no], [$QT_LIBS])
         AC_CHECK_LIB([QtOpenGL], [main], [QT_LIBS="$QT_LIBS -lQtOpenGL"],
 	             [AC_MSG_WARN([**** QtOpenGL not found !])
-                      have_qt=no])
+                      have_qt=no], [$QT_LIBS])
       ]
 )
 
