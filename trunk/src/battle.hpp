@@ -85,8 +85,9 @@ public:
     hex::camera& camera() { return camera_; }
     const hex::camera& camera() const { return camera_; }
     
-    void draw();
+    bool draw();
     void draw_widgets(gui::slider *slider);
+    graphics::renderer& renderer() const { return renderer_; }
 private:
     void add_widget(gui::widget_ptr w);
     void remove_widget(gui::widget_ptr w);
@@ -133,7 +134,6 @@ private:
     int current_time_;
     GLfloat sub_time_;
     
-    graphics::frame_skipper skippy_;
     graphics::location_tracker hex_tracker_;
     const hex::tile* tracked_tile_;
     game_dialogs::time_cost_widget_ptr time_cost_widget_;
@@ -159,7 +159,7 @@ private:
 
     listener listener_;
 
-    graphics::renderer renderer_;
+    mutable graphics::renderer renderer_;
     input::map_selection selection_;
 };
 

@@ -101,7 +101,7 @@ public:
     
     void fire_event(const std::string& name, const formula_callable& info);
     void add_event_handler(const std::string& event, const event_handler& handler);
-    void draw() const;
+    bool draw() const;
     void draw_display(const_party_ptr selected_party) const;
     
     void quit() { done_ = true; quit_ = true; }
@@ -110,6 +110,8 @@ public:
     void set_lighting(graphics::renderer& renderer) const;
     
     party_ptr get_pc_party() const;
+
+    graphics::renderer& renderer() const { return renderer_; }
 private:
     friend class listener;
     
@@ -126,10 +128,6 @@ private:
     };
 
     bool remove_party(party_ptr p);
-    
-    bool show_grid_;
-    graphics::frame_rate_tracker fps_track_;
-    graphics::frame_skipper skippy_;
     graphics::texture compass_;
     
     gui::const_grid_ptr get_track_info() const;

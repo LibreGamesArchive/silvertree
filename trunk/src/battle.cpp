@@ -57,7 +57,6 @@ battle::battle(const std::vector<battle_character_ptr>& chars,
       camera_(battle_map), camera_controller_(camera_),
       result_(ONGOING), keyed_selection_(0),
       current_time_(0), sub_time_(0.0),
-      skippy_(50, preference_maxfps()),
       tracked_tile_(NULL), 
       initiative_bar_(new gui::initiative_bar),
       listener_(this),
@@ -152,12 +151,10 @@ void battle::player_turn(battle_character& c)
             }
         }
         
-        if(!skippy_.skip_frame()) {
-            draw();
+        if(draw()) {
             draw_widgets(NULL);
-            SDL_GL_SwapBuffers();
-            SDL_Delay(1);
         }
+        SDL_GL_SwapBuffers();
         
         if(!pump_.process()) {
             turn_done_ = true;
@@ -269,7 +266,7 @@ battle_character_ptr battle::selected_char()
 }
 
 
-void battle::draw()
+bool battle::draw()
 {
     using hex::tile;
     using hex::location;
@@ -280,7 +277,7 @@ void battle::draw()
         focus_ = chars_.begin();
     }
     
-    renderer_.reset();
+    renderer_.reset_state();
     
     (*focus_)->get_party().game_world().set_lighting(renderer_);
 
@@ -399,16 +396,21 @@ void battle::draw()
         renderer_.add_avatar(missile_->avatar());
     }
     
-    renderer_.draw();
-    
+    return renderer_.draw();
 }
 
 void battle::draw_widgets(gui::slider* slider) {
+    const SDL_Color white = {0xFF,0xFF,0x0,0};
+
     hex::location selected_hex = selection_.get_selected_hex();
     const_battle_character_ptr selected_character = selected_char();
 
     graphics::prepare_raster();
     
+    const graphics::texture text = 
+        graphics::font::render_text(renderer_.status_text(),20,white); 
+    graphics::blit_texture(text,50,50);
+   
     if(slider) {
         slider->draw();
     }
@@ -431,13 +433,13 @@ void battle::draw_widgets(gui::slider* slider) {
             get_attack_stats(**focus_, *selected_character, *current_move_, &desc);
             desc = selected_character->status_text() + "\n" + desc;
             graphics::texture text = graphics::font::render_text(desc, 20, color);
-            graphics::blit_texture(text,50,50);
+            graphics::blit_texture(text,50,100);
         } else {
             SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
             std::vector<graphics::texture> text;
             graphics::font::render_multiline_text(selected_character->status_text(), 20, color, text);
             int x = 50;
-            int y = 50;
+            int y = 100;
             foreach(graphics::texture& t, text) {
                 graphics::blit_texture(t,x,y);
                 y += t.height();
@@ -465,11 +467,10 @@ void battle::begin_animation() {
 void battle::animation_frame(float t, gui::slider* slider) {
     sub_time_ += t;
     
-    if(!skippy_.skip_frame()) {
-        draw();
+    if(draw()) {
         draw_widgets(slider);
-        SDL_GL_SwapBuffers();
     }
+    SDL_GL_SwapBuffers();
     
     camera_controller_.update();
 }
