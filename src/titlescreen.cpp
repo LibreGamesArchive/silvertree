@@ -76,6 +76,7 @@ void show(game_logic::world_ptr w, const std::string& logo,
     Uint32 time;
     Uint8 alpha;
 
+    w->renderer().reset_timing();
     while(!done) {
 #ifdef AUDIO
         if(audio::audio_available()) {

@@ -156,12 +156,11 @@ void message_dialog::construct_interface()
 
 void message_dialog::handle_draw() const
 {
-	world_.draw();
-
+    if(world_.draw()) {
 	graphics::prepare_raster();
 	dialog::handle_draw_children();
-
-	SDL_GL_SwapBuffers();
+    }
+    SDL_GL_SwapBuffers();
 }
 
 int message_dialog::find_option(int x, int y) {
@@ -185,15 +184,17 @@ int message_dialog::find_option(int x, int y) {
 
 void message_dialog::show_modal()
 {
-	fade_in();
-	if(options_ != NULL) {
-		ensure_fade_over();
-		if(selected_ == -1) {
-			selected_ = 0;
-			update_option(0);
-		}
-	}
-	dialog::show_modal();
+    world_.renderer().reset_timing();
+    
+    fade_in();
+    if(options_ != NULL) {
+        ensure_fade_over();
+        if(selected_ == -1) {
+            selected_ = 0;
+            update_option(0);
+        }
+    }
+    dialog::show_modal();
 }
 
 void message_dialog::ensure_fade_over() {
@@ -213,40 +214,41 @@ void message_dialog::ensure_fade_over() {
 
 void message_dialog::fade_in()
 {
-	bool done = false;
-	int count = 0;
-	foreach(dialog_label_ptr dlabel, dialog_labels_) {
-		int prog;
-		int max = dlabel->get_max_progress();
-		int start = SDL_GetTicks();
-		int end = start + max * fade_in_rate_;
-		int now = start;
+    bool done = false;
+    int count = 0;
 
-		if(count > 0) {
-			if(count == 1) {
-				if(pc_portrait_ != NULL) {
-					pc_portrait_->set_visible(true);
-				}
-				if(all_option_frame_ != NULL ){
-					all_option_frame_->set_visible(true);
-				}
-			}
-			option_frames_[count-1]->set_visible(true);
-		}
-
+    foreach(dialog_label_ptr dlabel, dialog_labels_) {
+        int prog;
+        int max = dlabel->get_max_progress();
+        int start = SDL_GetTicks();
+        int end = start + max * fade_in_rate_;
+        int now = start;
+        
+        if(count > 0) {
+            if(count == 1) {
+                if(pc_portrait_ != NULL) {
+                    pc_portrait_->set_visible(true);
+                }
+                if(all_option_frame_ != NULL ){
+                    all_option_frame_->set_visible(true);
+                }
+            }
+            option_frames_[count-1]->set_visible(true);
+        }
+        
         input::pump pump;
         fade_in_listener listener(done);
         pump.register_listener(&listener);
-
-		while(now < end && !done && pump.process()) {
-			prog = (now - start)/fade_in_rate_;
-			dlabel->set_progress(prog);
-			draw();
-			now = SDL_GetTicks();
-		}
-		dlabel->set_progress(max);
-		++count;
-	}
+        
+        while(now < end && !done && pump.process()) {
+            prog = (now - start)/fade_in_rate_;
+            dlabel->set_progress(prog);
+            draw();
+            now = SDL_GetTicks();
+        }
+        dlabel->set_progress(max);
+        ++count;
+    }
 }
 
 void message_dialog::update_option(int option) {

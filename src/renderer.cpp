@@ -99,7 +99,12 @@ void renderer::clear_sight_lines() {
     sight_lines_.clear();
 }
 
-void renderer::reset() {
+void renderer::reset_timing() {
+    skippy_.reset();
+    fps_track_.reset();
+}
+
+void renderer::reset_state() {
     clear_highlights();
     clear_path();
     clear_avatars();
@@ -119,8 +124,15 @@ void renderer::clear_avatars() {
     avatar_ids_.clear();
 }
 
-void renderer::draw() const
+bool renderer::draw() const
 {
+    if(skippy_.skip_frame()) {
+        fps_track_.register_frame(false);
+        return false;
+    }
+
+    fps_track_.register_frame(true);
+
     camera_.set_pan(centre_of_view_real_);
     
     camera_.prepare_frame();
@@ -202,6 +214,8 @@ void renderer::draw() const
 
     graphics::floating_label::draw_labels();
     particle_system_.draw();
+
+    return true;
 }
     
 const std::string renderer::status_text() {

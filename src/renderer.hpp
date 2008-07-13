@@ -49,7 +49,7 @@ public:
     void clear_path();
     void add_avatar(hex::const_map_avatar_ptr avatar, int id=-1);
     void clear_avatars();
-    void draw() const;
+    bool draw() const;
     const hex::location& get_selected_hex() const;
     int get_selected_avatar() const;
     void set_sky_color(GLfloat color[4]);
@@ -62,7 +62,10 @@ public:
                         const GLfloat to[3], 
                         const GLfloat color[4]);
     void clear_sight_lines();
-    void reset();
+    void reset_state();
+    void reset_timing();
+    void set_show_grid(bool show) { show_grid_ = show; }
+    bool get_show_grid() { return show_grid_; }
 private:
     void prepare_selection() const;
     unsigned int finish_selection() const;
@@ -89,9 +92,9 @@ private:
     std::vector<boost::shared_ptr<sight_line> > sight_lines_;
     bool show_grid_;
     std::vector<light> lights_;
-    frame_skipper skippy_;
-    frame_rate_tracker fps_track_;
     GLfloat sky_color_[4];
+    mutable frame_skipper skippy_;
+    mutable frame_rate_tracker fps_track_;
     mutable hex::location selected_hex_;
     mutable std::vector<const hex::tile*> tiles_;
     mutable hex::camera& camera_;

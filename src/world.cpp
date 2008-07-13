@@ -72,8 +72,7 @@ const std::vector<const world*>& world::current_world_stack()
 }
 
 world::world(wml::const_node_ptr node)
-    : skippy_(50, preference_maxfps()),
-      compass_(graphics::texture::get(graphics::surface_cache::get("compass-rose.png"))),
+    : compass_(graphics::texture::get(graphics::surface_cache::get("compass-rose.png"))),
       map_(get_map_data(node)), camera_(map_),
       camera_controller_(camera_), 
       scale_(wml::get_int(node, "scale", 1)),
@@ -84,8 +83,6 @@ world::world(wml::const_node_ptr node)
       renderer_(map_, camera_),
       selection_(renderer_)
 {
-    show_grid_ = false;
-    
     const std::string& sun_light = wml::get_str(node, "sun_light");
     if(!sun_light.empty()) {
         sun_light_.reset(new formula(sun_light));
@@ -315,15 +312,15 @@ void world::get_matching_parties(const formula* filter, std::vector<party_ptr>& 
 	}
 }
 
-void world::draw() const
+bool world::draw() const
 {
 
     // temporary fix
     if(!focus_) {
-        return;
+        return false;
     }
 
-    renderer_.reset();
+    renderer_.reset_state();
 
     assert(focus_);
     const std::set<hex::location>& visible =
@@ -393,9 +390,10 @@ void world::draw() const
     }
     
     set_lighting(renderer_);
-    renderer_.draw();
-    
-    draw_display(selected_party);
+    bool drew = renderer_.draw();
+    if(drew) {
+        draw_display(selected_party);
+    }
     
 #ifdef AUDIO
     if(audio::audio_available() && audio_) {
@@ -403,10 +401,11 @@ void world::draw() const
     }
 #endif
 
+    return drew;
 }
 
 void world::draw_display(const_party_ptr selected_party) const {
-	const SDL_Color white = {0xFF,0xFF,0x0,0};
+    const SDL_Color white = {0xFF,0xFF,0x0,0};
 
     graphics::prepare_raster();
 
@@ -416,7 +415,7 @@ void world::draw_display(const_party_ptr selected_party) const {
     
     track_info_grid_ = get_track_info();
     if(track_info_grid_) {
-		track_info_grid_->draw();
+        track_info_grid_->draw();
     }
     
     if(focus_) {
@@ -531,8 +530,7 @@ void world::play()
     
     party_ptr active_party;
     
-    skippy_.reset();
-    fps_track_.reset();
+    renderer_.reset_timing();
     
     input::pump input_pump;
     input_pump.register_listener(game_bar_);
@@ -560,15 +558,8 @@ void world::play()
             }
         }
         
-        {
-            bool draw_this_frame = !skippy_.skip_frame();
-            
-            if(draw_this_frame) {
-                draw();
-                SDL_GL_SwapBuffers();
-            }
-            fps_track_.register_frame(draw_this_frame);
-        }
+        draw();
+        SDL_GL_SwapBuffers();
         
         if(!input_pump.process()) {
             done_ = true;
@@ -592,7 +583,7 @@ void world::play()
                     .add("var", variant(&global_game_state::get().get_variables()));
                 script_.clear();
                 fire_event("finish_script", *script_callable);
-                skippy_.reset();
+                renderer_.reset_timing();
             }
         }
         
@@ -638,8 +629,7 @@ void world::play()
                         active_party->set_loc(start_loc);
                     }
                     if(were_encounters) {
-                        skippy_.reset();
-                        fps_track_.reset();
+                        renderer_.reset_timing();
                     }
                 }
                 
@@ -671,8 +661,7 @@ void world::play()
                         
                         //player has left the settlement, return to this world
                         active_party->new_world(*this,active_party->loc(),active_party->last_move());
-                        skippy_.reset();
-                        fps_track_.reset();
+                        renderer_.reset_timing();
                     }
                     
                     if(active_party->is_destroyed() == false) {
@@ -706,9 +695,9 @@ void world::play()
         }
         
         if(keys_.key(SHOW_GRID)) {
-            show_grid_ = true;
+            renderer_.set_show_grid(true);
         } else if(keys_.key(HIDE_GRID)) {
-            show_grid_ = false;
+            renderer_.set_show_grid(false);
         }
         
         camera_controller_.update();
@@ -1004,8 +993,7 @@ world::listener::listener(world *wld) : listener_(this), wld_(wld) {
 };
 
 void world::listener::reset() {
-    wld_->skippy_.reset();
-    wld_->fps_track_.reset();
+    wld_->renderer_.reset_timing();
 }
 
 bool world::listener::process_event(const SDL_Event& e, bool claimed) {

@@ -14,7 +14,6 @@
 #include "battle_character.hpp"
 #include "battle_map_generator.hpp"
 #include "global_game_state.hpp"
-#include "message_dialog.hpp"
 #include "foreach.hpp"
 #include "gamemap.hpp"
 #include "npc_party.hpp"
