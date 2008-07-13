@@ -724,18 +724,22 @@ GL_CFLAGS
 GL_LIBS
 GLU_CFLAGS
 GLU_LIBS
+pkgconfig_available
 PKG_CONFIG
 PANGO_CFLAGS
 PANGO_LIBS
+QT_CFLAGS
+QT_LIBS
 X_CFLAGS
 X_PRE_LIBS
 X_LIBS
 X_EXTRA_LIBS
 QT_CXXFLAGS
 QT_DIR
-QT_LIBS
 QT_UIC
 QT_MOC
+HAVE_PANGO_TRUE
+HAVE_PANGO_FALSE
 WANT_AUDIO_TRUE
 WANT_AUDIO_FALSE
 WANT_EDITOR_TRUE
@@ -759,7 +763,9 @@ CXXCPP
 CPP
 PKG_CONFIG
 PANGO_CFLAGS
-PANGO_LIBS'
+PANGO_LIBS
+QT_CFLAGS
+QT_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1390,6 +1396,8 @@ Some influential environment variables:
   PANGO_CFLAGS
               C compiler flags for PANGO, overriding pkg-config
   PANGO_LIBS  linker flags for PANGO, overriding pkg-config
+  QT_CFLAGS   C compiler flags for QT, overriding pkg-config
+  QT_LIBS     linker flags for QT, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -7288,6 +7296,46 @@ fi
 CXXFLAGS="$GL_CFLAGS $GLU_CFLAGS $CXXFLAGS"
 LIBS="$GL_LIBS $GLU_LIBS $LIBS"
 
+# Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_pkgconfig_available+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$pkgconfig_available"; then
+  ac_cv_prog_pkgconfig_available="$pkgconfig_available" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_pkgconfig_available="yes"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_pkgconfig_available" && ac_cv_prog_pkgconfig_available="no"
+fi
+fi
+pkgconfig_available=$ac_cv_prog_pkgconfig_available
+if test -n "$pkgconfig_available"; then
+  { echo "$as_me:$LINENO: result: $pkgconfig_available" >&5
+echo "${ECHO_T}$pkgconfig_available" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+
+have_pango=no
 
 
 if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
@@ -7408,6 +7456,7 @@ echo "${ECHO_T}no" >&6; }
 	fi
 
 fi
+if test "x$pkgconfig_available" = xyes; then
 
 pkg_failed=no
 { echo "$as_me:$LINENO: checking for PANGO" >&5
@@ -7470,15 +7519,13 @@ fi
 	{ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
 
-    { { echo "$as_me:$LINENO: error: **** Pango with freetype2 backend not found !" >&5
-echo "$as_me: error: **** Pango with freetype2 backend not found !" >&2;}
-   { (exit 1); exit 1; }; }
+      { echo "$as_me:$LINENO: WARNING: **** Pango with freetype2 backend not found !" >&5
+echo "$as_me: WARNING: **** Pango with freetype2 backend not found !" >&2;}
 
 elif test $pkg_failed = untried; then
 
-    { { echo "$as_me:$LINENO: error: **** Pango with freetype2 backend not found !" >&5
-echo "$as_me: error: **** Pango with freetype2 backend not found !" >&2;}
-   { (exit 1); exit 1; }; }
+      { echo "$as_me:$LINENO: WARNING: **** Pango with freetype2 backend not found !" >&5
+echo "$as_me: WARNING: **** Pango with freetype2 backend not found !" >&2;}
 
 else
 	PANGO_CFLAGS=$pkg_cv_PANGO_CFLAGS
@@ -7486,10 +7533,14 @@ else
         { echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
 
-    CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS -DUSE_PANGO"
-    LIBS="$PANGO_LIBS $LIBS"
+      CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS -DUSE_PANGO"
+      LIBS="$PANGO_LIBS $LIBS"
+      have_pango=yes
 
 fi
+
+fi
+
 
 if test "$no_x" = yes; then
   # Not all programs may use this symbol, but it does not hurt to define it.
@@ -8566,6 +8617,119 @@ fi
 
 fi
 
+if test "x$pkgconfig_available" = xyes; then
+
+pkg_failed=no
+{ echo "$as_me:$LINENO: checking for QT" >&5
+echo $ECHO_N "checking for QT... $ECHO_C" >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$QT_CFLAGS"; then
+        pkg_cv_QT_CFLAGS="$QT_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"QtCore > 4.0.0 QtOpenGL QtGui\"") >&5
+  ($PKG_CONFIG --exists --print-errors "QtCore > 4.0.0 QtOpenGL QtGui") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_QT_CFLAGS=`$PKG_CONFIG --cflags "QtCore > 4.0.0 QtOpenGL QtGui" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$QT_LIBS"; then
+        pkg_cv_QT_LIBS="$QT_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"QtCore > 4.0.0 QtOpenGL QtGui\"") >&5
+  ($PKG_CONFIG --exists --print-errors "QtCore > 4.0.0 QtOpenGL QtGui") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_QT_LIBS=`$PKG_CONFIG --libs "QtCore > 4.0.0 QtOpenGL QtGui" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        QT_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "QtCore > 4.0.0 QtOpenGL QtGui"`
+        else
+	        QT_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "QtCore > 4.0.0 QtOpenGL QtGui"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$QT_PKG_ERRORS" >&5
+
+	{ { echo "$as_me:$LINENO: error: Package requirements (QtCore > 4.0.0 QtOpenGL QtGui) were not met:
+
+$QT_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables QT_CFLAGS
+and QT_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+" >&5
+echo "$as_me: error: Package requirements (QtCore > 4.0.0 QtOpenGL QtGui) were not met:
+
+$QT_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables QT_CFLAGS
+and QT_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+" >&2;}
+   { (exit 1); exit 1; }; }
+elif test $pkg_failed = untried; then
+	{ { echo "$as_me:$LINENO: error: The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables QT_CFLAGS
+and QT_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://www.freedesktop.org/software/pkgconfig>.
+See \`config.log' for more details." >&5
+echo "$as_me: error: The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables QT_CFLAGS
+and QT_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://www.freedesktop.org/software/pkgconfig>.
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+	QT_CFLAGS=$pkg_cv_QT_CFLAGS
+	QT_LIBS=$pkg_cv_QT_LIBS
+        { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+	:
+fi
+else
 
 
 
@@ -9168,7 +9332,7 @@ echo "$as_me: error: Failed to find matching components of a complete
           bnv_qt_main.$ac_ext bnv_qt_main.o bnv_qt_main
   fi
 
-if test x$have_qt = xno; then
+       if test x$have_qt = xno; then
 
               { echo "$as_me:$LINENO: WARNING: **** Qt library not found." >&5
 echo "$as_me: WARNING: **** Qt library not found." >&2;}
@@ -9302,6 +9466,7 @@ echo "$as_me: WARNING: **** QtOpenGL not found !" >&2;}
 fi
 
 
+fi
 
 fi
 
@@ -9329,6 +9494,15 @@ _ACEOF
 
 fi
 
+fi
+
+
+ if test x$have_pango = xyes; then
+  HAVE_PANGO_TRUE=
+  HAVE_PANGO_FALSE='#'
+else
+  HAVE_PANGO_TRUE='#'
+  HAVE_PANGO_FALSE=
 fi
 
 
@@ -9477,6 +9651,13 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"am__fastdepCXX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_PANGO_TRUE}" && test -z "${HAVE_PANGO_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"HAVE_PANGO\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"HAVE_PANGO\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -10181,18 +10362,22 @@ GL_CFLAGS!$GL_CFLAGS$ac_delim
 GL_LIBS!$GL_LIBS$ac_delim
 GLU_CFLAGS!$GLU_CFLAGS$ac_delim
 GLU_LIBS!$GLU_LIBS$ac_delim
+pkgconfig_available!$pkgconfig_available$ac_delim
 PKG_CONFIG!$PKG_CONFIG$ac_delim
 PANGO_CFLAGS!$PANGO_CFLAGS$ac_delim
 PANGO_LIBS!$PANGO_LIBS$ac_delim
+QT_CFLAGS!$QT_CFLAGS$ac_delim
+QT_LIBS!$QT_LIBS$ac_delim
 X_CFLAGS!$X_CFLAGS$ac_delim
 X_PRE_LIBS!$X_PRE_LIBS$ac_delim
 X_LIBS!$X_LIBS$ac_delim
 X_EXTRA_LIBS!$X_EXTRA_LIBS$ac_delim
 QT_CXXFLAGS!$QT_CXXFLAGS$ac_delim
 QT_DIR!$QT_DIR$ac_delim
-QT_LIBS!$QT_LIBS$ac_delim
 QT_UIC!$QT_UIC$ac_delim
 QT_MOC!$QT_MOC$ac_delim
+HAVE_PANGO_TRUE!$HAVE_PANGO_TRUE$ac_delim
+HAVE_PANGO_FALSE!$HAVE_PANGO_FALSE$ac_delim
 WANT_AUDIO_TRUE!$WANT_AUDIO_TRUE$ac_delim
 WANT_AUDIO_FALSE!$WANT_AUDIO_FALSE$ac_delim
 WANT_EDITOR_TRUE!$WANT_EDITOR_TRUE$ac_delim
@@ -10201,7 +10386,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 30; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 34; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

@@ -54,15 +54,23 @@ AC_CHECK_LIB([GLEW], [glewInit], [LIBS="-lGLEW $LIBS"],
 CXXFLAGS="$GL_CFLAGS $GLU_CFLAGS $CXXFLAGS"
 LIBS="$GL_LIBS $GLU_LIBS $LIBS"
 
-PKG_CHECK_MODULES(PANGO, pangoft2 >= 1.14.8, [
-    CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS -DUSE_PANGO"
-    LIBS="$PANGO_LIBS $LIBS"
-], [
-    AC_MSG_ERROR([**** Pango with freetype2 backend not found !])
-])
+AC_CHECK_PROG([pkgconfig_available], [pkg-config], [yes], [no])
 
-BNV_HAVE_QT
-AS_IF([test x$have_qt = xno], 
+have_pango=no
+AS_IF([test "x$pkgconfig_available" = xyes],
+     [PKG_CHECK_MODULES(PANGO, pangoft2 >= 1.14.8, [
+      CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS -DUSE_PANGO"
+      LIBS="$PANGO_LIBS $LIBS"
+      have_pango=yes
+      ], [
+      AC_MSG_WARN([**** Pango with freetype2 backend not found !])
+      ])
+     ])
+
+AS_IF([test "x$pkgconfig_available" = xyes],
+      [PKG_CHECK_MODULES([QT], [QtCore > 4.0.0 QtOpenGL QtGui])],
+      [BNV_HAVE_QT
+       AS_IF([test x$have_qt = xno], 
       [
               AC_MSG_WARN([**** Qt library not found.])
       ],
@@ -73,8 +81,7 @@ AS_IF([test x$have_qt = xno],
         AC_CHECK_LIB([QtOpenGL], [main], [QT_LIBS="$QT_LIBS -lQtOpenGL"],
 	             [AC_MSG_WARN([**** QtOpenGL not found !])
                       have_qt=no], [$QT_LIBS])
-      ]
-)
+      ])])
 
 AS_IF([test x$want_audio = xno], [],
 AS_IF([test x$have_audio = xno],
@@ -84,6 +91,8 @@ AS_IF([test x$have_audio = xno],
       [AC_DEFINE([AUDIO], 1, [Audio enabled])
        LIBS="$AUDIO_LIBS $LIBS"]
 ))
+
+AM_CONDITIONAL([HAVE_PANGO], [test x$have_pango = xyes])
 
 AM_CONDITIONAL([WANT_AUDIO], [test x$have_audio = xyes])
 
