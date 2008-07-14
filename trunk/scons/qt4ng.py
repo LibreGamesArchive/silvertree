@@ -1,5 +1,6 @@
 # vi: syntax=python:et:ts=4
 from os.path import join
+from subprocess import Popen, PIPE
 from SCons.Script  import *
 from SCons.Builder import Builder
 from SCons.Action  import Action
@@ -80,14 +81,20 @@ def CheckQt4Tools(context, tools = ["moc", "uic"]):
         if tool not in qt4tools:
             raise KeyError("Unknown tool %s." % tool)
         tool_var = "QT4_" + tool.upper()
-        if env.has_key("QT4DIR"):
+        if env.get("QT4DIR") and not env["use_frameworked_qt"]:
             qt_bin_dir = join(env["QT4DIR"], "bin")
         else:
-            qt_bin_dir = ""
+            qt_bin_dir = "/usr/bin"
         if not env.has_key(tool_var):
             env[tool_var] = WhereIs(tool + "-qt4", qt_bin_dir) or \
                             WhereIs(tool + "4", qt_bin_dir) or \
                             WhereIs(tool, qt_bin_dir)
+            if not env["use_frameworked_qt"]:
+                try:
+                    env[tool_var] = Popen(Split("pkg-config --variable=" + tool + "_location QtCore"), stdout = PIPE).communicate()[0]
+                    env[tool_var] = env[tool_var].rstrip("\n")
+                except OSError:
+                    pass
 
         builder_method_name = tool.capitalize() + "4"
         env.Append(BUILDERS = { builder_method_name : qt4tools[tool][0] } )
@@ -103,12 +110,15 @@ def CheckQt4Libs(context, libs = ["QtCore", "QtGui"]):
     context.Message("Checking for Qt 4 libraries %s... " % ", ".join(libs))
     env = context.env
     backup = env.Clone().Dictionary()
-    if env["PLATFORM"] != "win32":
+    if env["PLATFORM"] != "win32" and not env["use_frameworked_qt"]:
         for lib in libs:
             try:
                 env.ParseConfig("pkg-config --libs --cflags %s" % lib)
             except OSError:
                 pass
+    if env["use_frameworked_qt"]:
+        env.Append(FRAMEWORKPATH = env.get("QT4DIR", "/Library/Frameworks/"))
+        env.Append(FRAMEWORKS = libs)
     if env["PLATFORM"] == "win32":
         if not env.has_key("QT4DIR"): raise KeyError("QT4DIR MUST be specified on Windows.")
         env.AppendUnique(CPPPATH = [join("$QT4DIR", "include")])
