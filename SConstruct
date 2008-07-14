@@ -13,7 +13,8 @@ opts = Options("options.cache")
 opts.AddOptions(
     ("PREFIX", "Install prefix.", "/usr/local"),
     ("STAGE_PREFIX", "Install stage prefix.", "$PREFIX"),
-    ("QT4DIR", "Root directory of Qt's installation.", "/usr/"),
+    ("QT4DIR", "Root directory of Qt's installation.", ""),
+    BoolOption("use_frameworked_qt", "Use Qt frameworks on Mac", False),
     ("SDLDIR", "Root directory of SDL's installation.", "/usr/"),
     ("BOOSTDIR", "Root directory of boost installation.", "/usr/include"),
     ("BOOSTLIBS", "Directory where boost libs are located.", "/usr/lib"),
