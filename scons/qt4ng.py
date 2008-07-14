@@ -117,7 +117,7 @@ def CheckQt4Libs(context, libs = ["QtCore", "QtGui"]):
             except OSError:
                 pass
     if env["use_frameworked_qt"]:
-        env.Append(FRAMEWORKPATH = env.get("QT4DIR", "/Library/Frameworks/"))
+        env.Append(FRAMEWORKPATH = env.get("QT4DIR") or "/Library/Frameworks/")
         env.Append(FRAMEWORKS = libs)
     if env["PLATFORM"] == "win32":
         if not env.has_key("QT4DIR"): raise KeyError("QT4DIR MUST be specified on Windows.")
