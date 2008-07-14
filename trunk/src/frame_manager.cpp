@@ -7,7 +7,6 @@
 #include "filesystem.hpp"
 #include "formula.hpp"
 #include "texture.hpp"
-#include "font.hpp"
 #include "wml_node.hpp"
 #include "wml_parser.hpp"
 #include "raster.hpp"
@@ -184,10 +183,10 @@ void rect_fdo::draw() const
 
 void text_fdo::draw() const
 {
-	if(!texture_.valid()) {
-		return;
+	if(!text_) {
+            return;
 	}
-	graphics::blit_texture(texture_, x_, y_);
+        text_->blit(x_, y_);
 }
 
 void frame_draw_builder::init_from_wml(const wml::const_node_ptr& node) {

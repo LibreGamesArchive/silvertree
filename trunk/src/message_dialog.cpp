@@ -9,7 +9,6 @@
 #include "raster.hpp"
 #include "surface_cache.hpp"
 #include "texture.hpp"
-#include "font.hpp"
 #include "foreach.hpp"
 #include "character.hpp"
 #include "image_widget.hpp"
@@ -158,8 +157,9 @@ void message_dialog::handle_draw() const
 {
     if(world_.draw()) {
 	graphics::prepare_raster();
-	dialog::handle_draw_children();
     }
+    dialog::handle_draw_children();
+    
     SDL_GL_SwapBuffers();
 }
 

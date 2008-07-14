@@ -1,136 +1,23 @@
-/***************************************************************************
- *  Copyright (C) 2008 by Sergey Popov <loonycyborg@gmail.com>             *
- *                                                                         *
- *  This file is part of Silver Tree.                                      *
- *                                                                         *
- *  Silver Tree is free software; you can redistribute it and/or modify    *
- *  it under the terms of the GNU General Public License as published by   *
- *  the Free Software Foundation; either version 3 of the License, or      *
- *  (at your option) any later version.                                    *
- *                                                                         *
- *  Silver Tree is distributed in the hope that it will be useful,         *
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of         *
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          *
- *  GNU General Public License for more details.                           *
- *                                                                         *
- *  You should have received a copy of the GNU General Public License      *
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>   *
- ***************************************************************************/
-
-#include <iostream>
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include <freetype/ftbitmap.h>
-#include <pango/pangoft2.h>
-#include <boost/lexical_cast.hpp>
-#include <string>
-
 #include "text.hpp"
-#include "gl_utils.hpp"
+#ifdef USE_PANGO
+#include "pango_text.hpp"
+#else
+#include "ttf_text.hpp"
+#endif
 
-using std::string;
+namespace text {
 
-namespace
-{
+renderer_ptr instance_;
 
-FT_Library library;
-PangoFT2FontMap* font_map;
-PangoContext* context;
-
-}
-
-namespace graphics
-{
-
-namespace text
-{
-
-boost::scoped_ptr<renderer> renderer::the_renderer;
-
-renderer& renderer::instance()
-{
-	if(!the_renderer) {
-		the_renderer.reset(new renderer);
-	}
-
-	return *the_renderer;
-}
-
-renderer::renderer()
-{
-	FT_Init_FreeType(&library);
-	font_map = (PangoFT2FontMap*)pango_ft2_font_map_new();
-	context = pango_ft2_font_map_create_context(font_map);
-	pango_ft2_font_map_set_resolution(PANGO_FT2_FONT_MAP(font_map), 96, 96);
-}
-
-renderer::~renderer()
-{
-	g_object_unref(context);
-	g_object_unref(font_map);
-}
-
-ft_bitmap_ptr renderer::render(std::string text, int size, bool markup)
-{
-	PangoLayout* layout = pango_layout_new(context);
-	if(markup)
-		pango_layout_set_markup(layout, text.data(), text.size());
-	else
-		pango_layout_set_text(layout, text.data(), text.size());
-
-	PangoFontDescription *desc = pango_font_description_new();
-	pango_font_description_set_family_static(desc, "FreeSans");
-	pango_font_description_set_size(desc, size * PANGO_SCALE);
-	pango_layout_set_font_description(layout, desc);
-	pango_font_description_free(desc);
-
-	PangoRectangle rect;
-	pango_layout_get_pixel_extents(layout, NULL, &rect);
-
-	ft_bitmap_ptr ptr(new ft_bitmap_handle(rect.width, rect.height));
-	FT_Bitmap& bitmap = ptr->bitmap;
-
-	pango_ft2_render_layout(&bitmap, layout, 0, 0);
-
-	g_object_unref(layout);
-
-	return ptr;
-}
-
-gl::texture2d_ptr renderer::render_to_texture(std::string text, int size, bool markup)
-{
-	ft_bitmap_ptr ptr(render(text, size, markup));
-	FT_Bitmap& bitmap = ptr->bitmap;
-
-	gl::texture2d_ptr texture(new gl::texture2d);
-	texture->bind();
-
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, bitmap.width, bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
-	//glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmap.width, bitmap.rows, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
-
-	return texture;
-}
-
-ft_bitmap_handle::ft_bitmap_handle(int width, int height)
-{
-	bitmap.width = width;
-	bitmap.rows = height;
-	bitmap.pitch = width;
-	bitmap.num_grays = 256;
-	bitmap.pixel_mode = FT_PIXEL_MODE_GRAY;
-	bitmap.buffer = new unsigned char[bitmap.pitch * bitmap.rows];
-	memset(bitmap.buffer, 0x00, bitmap.pitch * bitmap.rows);
-}
-
-ft_bitmap_handle::~ft_bitmap_handle()
-{
-	delete[] bitmap.buffer;
-}
-
+renderer_ptr renderer::instance() {
+    if(!instance_) {
+#ifdef USE_PANGO
+        instance_.reset(new pango::renderer());
+#else
+        instance_.reset(new ttf::renderer());
+#endif
+    }
+    return instance_;
 }
 
 }

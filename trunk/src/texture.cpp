@@ -230,33 +230,37 @@ void texture::set_as_current_texture() const
 	glBindTexture(GL_TEXTURE_2D,id_->id);
 }
 
+texture texture::build(int w, int h) {
+    texture t;
+
+    t.id_.reset(new ID(get_texture_id()));
+
+    int actual_width = w;
+    int actual_height = h;
+    t.ratio_w_ = 1.0;
+    t.ratio_h_ = 1.0;
+    
+    if(!npot_allowed) {
+        actual_width = actual_height =
+            std::max(next_power_of_2(actual_width),
+                     next_power_of_2(actual_height));
+        t.ratio_w_ = GLfloat(w)/GLfloat(actual_width);
+        t.ratio_h_ = GLfloat(h)/GLfloat(actual_height);
+    }
+    t.width_ = w;
+    t.height_ = h;
+
+    t.set_as_current_texture();
+
+    return t;
+}
+
 texture texture::get_frame_buffer()
 {
-	texture t;
-	t.id_.reset(new ID(get_texture_id()));
-	int width = screen_width();
-	int height = screen_height();
+    texture t = build(screen_width(), screen_height());
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, t.width_, t.height_, 0);
 
-	int actual_width = width;
-	int actual_height = height;
-	t.ratio_w_ = 1.0;
-	t.ratio_h_ = 1.0;
-
-	if(!npot_allowed) {
-		actual_width = actual_height =
-		   std::max(next_power_of_2(actual_width),
-		            next_power_of_2(actual_height));
-		t.ratio_w_ = GLfloat(width)/GLfloat(actual_width);
-		t.ratio_h_ = GLfloat(height)/GLfloat(actual_height);
-	}
-
-	t.width_ = actual_width;
-	t.height_ = actual_height;
-
-	t.set_as_current_texture();
-	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, actual_width, actual_height, 0);
-
-	return t;
+    return t;
 }
 
 texture texture::get(const std::string& str, options_type options)

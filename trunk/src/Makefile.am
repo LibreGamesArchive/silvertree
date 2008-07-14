@@ -51,7 +51,6 @@ equipment.hpp \
 event_handler.hpp \
 filesystem.hpp \
 floating_label.hpp \
-font.hpp \
 foreach.hpp \
 formatter.hpp \
 formula_callable_fwd.hpp \
@@ -127,6 +126,7 @@ surface_cache.hpp \
 surface.hpp \
 terrain_feature_fwd.hpp \
 terrain_feature.hpp \
+text.hpp \
 text_gui.hpp \
 texture.hpp \
 tile.hpp \
@@ -137,6 +137,7 @@ titlescreen.hpp \
 tooltip.hpp \
 tracks.hpp \
 translate.hpp \
+ttf_text.hpp \
 unicode.hpp \
 util.hpp \
 variant.hpp \
@@ -177,7 +178,6 @@ equipment.cpp \
 event_handler.cpp \
 filesystem.cpp \
 floating_label.cpp \
-font.cpp \
 formula.cpp \
 formula_registry.cpp \
 formula_tokenizer.cpp \
@@ -232,6 +232,7 @@ string_utils.cpp \
 surface_cache.cpp \
 surface.cpp \
 terrain_feature.cpp \
+text.cpp \
 text_gui.cpp \
 texture.cpp \
 tile.cpp \
@@ -239,6 +240,7 @@ tile_logic.cpp \
 tooltip.cpp \
 tracks.cpp  \
 translate.cpp \
+ttf_text.cpp \
 unicode.cpp \
 variant.cpp \
 widget.cpp \
@@ -255,7 +257,7 @@ zoom_map_generator.cpp
 
 if HAVE_PANGO
 libsilvertree_a_SOURCES += \
-text.hpp \
+pango_text.hpp \
 \
-text.cpp
+pango_text.cpp
 endif

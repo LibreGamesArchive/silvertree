@@ -36,7 +36,6 @@
 #include "../camera.hpp"
 #include "../character_generator.hpp"
 #include "../filesystem.hpp"
-#include "../font.hpp"
 #include "../foreach.hpp"
 #include "../gamemap.hpp"
 #include "../raster.hpp"
@@ -71,7 +70,6 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	graphics::font::manager font_manager;
 	graphics::texture::manager texture_manager;
 	wml::node_ptr game_cfg;
 

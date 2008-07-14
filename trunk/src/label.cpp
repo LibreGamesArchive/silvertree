@@ -12,13 +12,10 @@
 */
 #include <iostream>
 
-#include "font.hpp"
 #include "label.hpp"
 #include "raster.hpp"
 #include "translate.hpp"
-#ifdef USE_PANGO
 #include "text.hpp"
-#endif
 
 namespace gui {
 
@@ -76,40 +73,32 @@ void label::inner_set_dim(int w, int h) {
 
 void label::reformat_text()
 {
-	if(fixed_width_) {
-		formatted_ = graphics::font::format_text(text_, size_, width());
-	}
+    text::renderer_ptr renderer = text::renderer::instance();
+    if(fixed_width_) {
+        formatted_ = renderer->format(text_, size_, width());
+    }
 }
 
 void label::recalculate_texture()
 {
-#ifdef USE_PANGO
-	ft_texture_ = graphics::text::renderer::instance().render(current_text(), size_ - 4);
-	FT_Bitmap& bitmap = ft_texture_->bitmap;
-	inner_set_dim(bitmap.width, bitmap.rows);
-#else
-	texture_ = graphics::font::render_text(current_text(), size_, color_);
-	inner_set_dim(texture_.width(),texture_.height());
-#endif
+    text::renderer_ptr renderer = text::renderer::instance();
+    texture_ = renderer->render(current_text(), size_, color_)->as_texture();
+    inner_set_dim(texture_.width(),texture_.height());
 }
 
 void label::handle_draw() const
 {
-#ifdef USE_PANGO
-	graphics::blit_ft_bitmap(ft_texture_->bitmap, x(), y(), color_);
-#else
-	graphics::blit_texture(texture_, x(), y());
-#endif
+    graphics::blit_texture(texture_, x(), y());
 }
 
 void label::set_texture(graphics::texture t) {
-	texture_ = t;
+    texture_ = t;
 }
 
 dialog_label::dialog_label(const std::string& text, const SDL_Color& color, int size)
-	: label(text, color, size), progress_(0) {
-
-	recalculate_texture();
+    : label(text, color, size), progress_(0) {
+    
+    recalculate_texture();
 }
 
 void dialog_label::set_progress(int progress)
@@ -127,15 +116,12 @@ void dialog_label::recalculate_texture()
 	if(prog > stages_) prog = stages_;
 	std::string txt = current_text().substr(0, prog);
 
-#ifdef USE_PANGO
-	set_ft_texture(graphics::text::renderer::instance().render(txt, size() - 4));
-#else
+        text::renderer_ptr renderer = text::renderer::instance();
 	if(prog > 0) {
-		set_texture(graphics::font::render_text(txt, size(), color()));
+		set_texture(renderer->render(txt, size(), color())->as_texture());
 	} else {
 		set_texture(graphics::texture());
 	}
-#endif
 }
 
 label_factory::label_factory(const SDL_Color& color, int size)

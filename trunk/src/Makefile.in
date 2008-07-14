@@ -46,9 +46,9 @@ bin_PROGRAMS = silvertreerpg$(EXEEXT)
 @WANT_AUDIO_TRUE@audio/openalc.hpp 
 
 @HAVE_PANGO_TRUE@am__append_2 = \
-@HAVE_PANGO_TRUE@text.hpp \
+@HAVE_PANGO_TRUE@pango_text.hpp \
 @HAVE_PANGO_TRUE@\
-@HAVE_PANGO_TRUE@text.cpp
+@HAVE_PANGO_TRUE@pango_text.cpp
 
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -75,7 +75,7 @@ am__libsilvertree_a_SOURCES_DIST = base_terrain_fwd.hpp \
 	character_generator.hpp character.hpp \
 	character_status_dialog.hpp dialog.hpp display_list.hpp \
 	encounter.hpp equipment.hpp event_handler.hpp filesystem.hpp \
-	floating_label.hpp font.hpp foreach.hpp formatter.hpp \
+	floating_label.hpp foreach.hpp formatter.hpp \
 	formula_callable_fwd.hpp formula_callable.hpp formula_fwd.hpp \
 	formula.hpp formula_registry.hpp formula_tokenizer.hpp \
 	frame.hpp frame_rate_utils.hpp frustum.hpp game_bar.hpp \
@@ -98,26 +98,27 @@ am__libsilvertree_a_SOURCES_DIST = base_terrain_fwd.hpp \
 	skill_dialog.hpp skill_fwd.hpp skill.hpp slider.hpp \
 	status_bars_widget.hpp string_utils.hpp surface_cache.hpp \
 	surface.hpp terrain_feature_fwd.hpp terrain_feature.hpp \
-	text_gui.hpp texture.hpp tile.hpp tile_logic.hpp \
+	text.hpp text_gui.hpp texture.hpp tile.hpp tile_logic.hpp \
 	time_cost_widget.hpp titlescreen.cpp titlescreen.hpp \
-	tooltip.hpp tracks.hpp translate.hpp unicode.hpp util.hpp \
-	variant.hpp widget.hpp wml_command_fwd.hpp wml_command.hpp \
-	wml_node_fwd.hpp wml_node.hpp wml_parser.hpp wml_utils.hpp \
-	wml_writer.hpp world_fwd.hpp world.hpp tinyxml/tinyxml.h \
-	zoom_map_generator.hpp base_terrain.cpp battle_character.cpp \
-	battle_character_npc.cpp battle_character_pc.cpp battle.cpp \
-	battle_map_generator.cpp battle_menu.cpp battle_missile.cpp \
-	battle_modification.cpp battle_move.cpp button.cpp \
-	camera_controller.cpp camera.cpp character.cpp \
-	character_equip_dialog.cpp character_generator.cpp \
-	character_status_dialog.cpp dialog.cpp display_list.cpp \
-	encounter.cpp equipment.cpp event_handler.cpp filesystem.cpp \
-	floating_label.cpp font.cpp formula.cpp formula_registry.cpp \
-	formula_tokenizer.cpp frame.cpp frame_manager.cpp frustum.cpp \
-	game_bar.cpp gamemap.cpp game_persistence.cpp game_time.cpp \
-	global_game_state.cpp graphics_logic.cpp grid_widget.cpp \
-	gui_core.cpp image_widget.cpp initiative_bar.cpp input.cpp \
-	item.cpp item_display_dialog.cpp keyboard.cpp label.cpp \
+	tooltip.hpp tracks.hpp translate.hpp ttf_text.hpp unicode.hpp \
+	util.hpp variant.hpp widget.hpp wml_command_fwd.hpp \
+	wml_command.hpp wml_node_fwd.hpp wml_node.hpp wml_parser.hpp \
+	wml_utils.hpp wml_writer.hpp world_fwd.hpp world.hpp \
+	tinyxml/tinyxml.h zoom_map_generator.hpp base_terrain.cpp \
+	battle_character.cpp battle_character_npc.cpp \
+	battle_character_pc.cpp battle.cpp battle_map_generator.cpp \
+	battle_menu.cpp battle_missile.cpp battle_modification.cpp \
+	battle_move.cpp button.cpp camera_controller.cpp camera.cpp \
+	character.cpp character_equip_dialog.cpp \
+	character_generator.cpp character_status_dialog.cpp dialog.cpp \
+	display_list.cpp encounter.cpp equipment.cpp event_handler.cpp \
+	filesystem.cpp floating_label.cpp formula.cpp \
+	formula_registry.cpp formula_tokenizer.cpp frame.cpp \
+	frame_manager.cpp frustum.cpp game_bar.cpp gamemap.cpp \
+	game_persistence.cpp game_time.cpp global_game_state.cpp \
+	graphics_logic.cpp grid_widget.cpp gui_core.cpp \
+	image_widget.cpp initiative_bar.cpp input.cpp item.cpp \
+	item_display_dialog.cpp keyboard.cpp label.cpp \
 	learn_skills_dialog.cpp map_avatar.cpp map_selection.cpp \
 	material.cpp message_dialog.cpp mini_stats_dialog.cpp \
 	model.cpp npc_party.cpp parse3ds.cpp parseark.cpp parsedae.cpp \
@@ -127,14 +128,14 @@ am__libsilvertree_a_SOURCES_DIST = base_terrain_fwd.hpp \
 	sdl_algo.cpp settlement.cpp shop_dialog.cpp skill.cpp \
 	skill_dialog.cpp slider.cpp status_bars_widget.cpp \
 	string_utils.cpp surface_cache.cpp surface.cpp \
-	terrain_feature.cpp text_gui.cpp texture.cpp tile.cpp \
+	terrain_feature.cpp text.cpp text_gui.cpp texture.cpp tile.cpp \
 	tile_logic.cpp tooltip.cpp tracks.cpp translate.cpp \
-	unicode.cpp variant.cpp widget.cpp wml_command.cpp \
-	wml_node.cpp wml_parser.cpp wml_utils.cpp wml_writer.cpp \
-	world.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp \
-	tinyxml/tinyxmlparser.cpp zoom_map_generator.cpp text.hpp \
-	text.cpp
-@HAVE_PANGO_TRUE@am__objects_1 = text.$(OBJEXT)
+	ttf_text.cpp unicode.cpp variant.cpp widget.cpp \
+	wml_command.cpp wml_node.cpp wml_parser.cpp wml_utils.cpp \
+	wml_writer.cpp world.cpp tinyxml/tinyxml.cpp \
+	tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp \
+	zoom_map_generator.cpp pango_text.hpp pango_text.cpp
+@HAVE_PANGO_TRUE@am__objects_1 = pango_text.$(OBJEXT)
 am_libsilvertree_a_OBJECTS = titlescreen.$(OBJEXT) \
 	base_terrain.$(OBJEXT) battle_character.$(OBJEXT) \
 	battle_character_npc.$(OBJEXT) battle_character_pc.$(OBJEXT) \
@@ -147,7 +148,7 @@ am_libsilvertree_a_OBJECTS = titlescreen.$(OBJEXT) \
 	character_status_dialog.$(OBJEXT) dialog.$(OBJEXT) \
 	display_list.$(OBJEXT) encounter.$(OBJEXT) equipment.$(OBJEXT) \
 	event_handler.$(OBJEXT) filesystem.$(OBJEXT) \
-	floating_label.$(OBJEXT) font.$(OBJEXT) formula.$(OBJEXT) \
+	floating_label.$(OBJEXT) formula.$(OBJEXT) \
 	formula_registry.$(OBJEXT) formula_tokenizer.$(OBJEXT) \
 	frame.$(OBJEXT) frame_manager.$(OBJEXT) frustum.$(OBJEXT) \
 	game_bar.$(OBJEXT) gamemap.$(OBJEXT) \
@@ -171,14 +172,15 @@ am_libsilvertree_a_OBJECTS = titlescreen.$(OBJEXT) \
 	skill_dialog.$(OBJEXT) slider.$(OBJEXT) \
 	status_bars_widget.$(OBJEXT) string_utils.$(OBJEXT) \
 	surface_cache.$(OBJEXT) surface.$(OBJEXT) \
-	terrain_feature.$(OBJEXT) text_gui.$(OBJEXT) texture.$(OBJEXT) \
-	tile.$(OBJEXT) tile_logic.$(OBJEXT) tooltip.$(OBJEXT) \
-	tracks.$(OBJEXT) translate.$(OBJEXT) unicode.$(OBJEXT) \
-	variant.$(OBJEXT) widget.$(OBJEXT) wml_command.$(OBJEXT) \
-	wml_node.$(OBJEXT) wml_parser.$(OBJEXT) wml_utils.$(OBJEXT) \
-	wml_writer.$(OBJEXT) world.$(OBJEXT) tinyxml.$(OBJEXT) \
-	tinyxmlerror.$(OBJEXT) tinyxmlparser.$(OBJEXT) \
-	zoom_map_generator.$(OBJEXT) $(am__objects_1)
+	terrain_feature.$(OBJEXT) text.$(OBJEXT) text_gui.$(OBJEXT) \
+	texture.$(OBJEXT) tile.$(OBJEXT) tile_logic.$(OBJEXT) \
+	tooltip.$(OBJEXT) tracks.$(OBJEXT) translate.$(OBJEXT) \
+	ttf_text.$(OBJEXT) unicode.$(OBJEXT) variant.$(OBJEXT) \
+	widget.$(OBJEXT) wml_command.$(OBJEXT) wml_node.$(OBJEXT) \
+	wml_parser.$(OBJEXT) wml_utils.$(OBJEXT) wml_writer.$(OBJEXT) \
+	world.$(OBJEXT) tinyxml.$(OBJEXT) tinyxmlerror.$(OBJEXT) \
+	tinyxmlparser.$(OBJEXT) zoom_map_generator.$(OBJEXT) \
+	$(am__objects_1)
 libsilvertree_a_OBJECTS = $(am_libsilvertree_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
@@ -363,7 +365,7 @@ libsilvertree_a_SOURCES = base_terrain_fwd.hpp base_terrain.hpp \
 	character_generator.hpp character.hpp \
 	character_status_dialog.hpp dialog.hpp display_list.hpp \
 	encounter.hpp equipment.hpp event_handler.hpp filesystem.hpp \
-	floating_label.hpp font.hpp foreach.hpp formatter.hpp \
+	floating_label.hpp foreach.hpp formatter.hpp \
 	formula_callable_fwd.hpp formula_callable.hpp formula_fwd.hpp \
 	formula.hpp formula_registry.hpp formula_tokenizer.hpp \
 	frame.hpp frame_rate_utils.hpp frustum.hpp game_bar.hpp \
@@ -386,26 +388,27 @@ libsilvertree_a_SOURCES = base_terrain_fwd.hpp base_terrain.hpp \
 	skill_dialog.hpp skill_fwd.hpp skill.hpp slider.hpp \
 	status_bars_widget.hpp string_utils.hpp surface_cache.hpp \
 	surface.hpp terrain_feature_fwd.hpp terrain_feature.hpp \
-	text_gui.hpp texture.hpp tile.hpp tile_logic.hpp \
+	text.hpp text_gui.hpp texture.hpp tile.hpp tile_logic.hpp \
 	time_cost_widget.hpp titlescreen.cpp titlescreen.hpp \
-	tooltip.hpp tracks.hpp translate.hpp unicode.hpp util.hpp \
-	variant.hpp widget.hpp wml_command_fwd.hpp wml_command.hpp \
-	wml_node_fwd.hpp wml_node.hpp wml_parser.hpp wml_utils.hpp \
-	wml_writer.hpp world_fwd.hpp world.hpp tinyxml/tinyxml.h \
-	zoom_map_generator.hpp base_terrain.cpp battle_character.cpp \
-	battle_character_npc.cpp battle_character_pc.cpp battle.cpp \
-	battle_map_generator.cpp battle_menu.cpp battle_missile.cpp \
-	battle_modification.cpp battle_move.cpp button.cpp \
-	camera_controller.cpp camera.cpp character.cpp \
-	character_equip_dialog.cpp character_generator.cpp \
-	character_status_dialog.cpp dialog.cpp display_list.cpp \
-	encounter.cpp equipment.cpp event_handler.cpp filesystem.cpp \
-	floating_label.cpp font.cpp formula.cpp formula_registry.cpp \
-	formula_tokenizer.cpp frame.cpp frame_manager.cpp frustum.cpp \
-	game_bar.cpp gamemap.cpp game_persistence.cpp game_time.cpp \
-	global_game_state.cpp graphics_logic.cpp grid_widget.cpp \
-	gui_core.cpp image_widget.cpp initiative_bar.cpp input.cpp \
-	item.cpp item_display_dialog.cpp keyboard.cpp label.cpp \
+	tooltip.hpp tracks.hpp translate.hpp ttf_text.hpp unicode.hpp \
+	util.hpp variant.hpp widget.hpp wml_command_fwd.hpp \
+	wml_command.hpp wml_node_fwd.hpp wml_node.hpp wml_parser.hpp \
+	wml_utils.hpp wml_writer.hpp world_fwd.hpp world.hpp \
+	tinyxml/tinyxml.h zoom_map_generator.hpp base_terrain.cpp \
+	battle_character.cpp battle_character_npc.cpp \
+	battle_character_pc.cpp battle.cpp battle_map_generator.cpp \
+	battle_menu.cpp battle_missile.cpp battle_modification.cpp \
+	battle_move.cpp button.cpp camera_controller.cpp camera.cpp \
+	character.cpp character_equip_dialog.cpp \
+	character_generator.cpp character_status_dialog.cpp dialog.cpp \
+	display_list.cpp encounter.cpp equipment.cpp event_handler.cpp \
+	filesystem.cpp floating_label.cpp formula.cpp \
+	formula_registry.cpp formula_tokenizer.cpp frame.cpp \
+	frame_manager.cpp frustum.cpp game_bar.cpp gamemap.cpp \
+	game_persistence.cpp game_time.cpp global_game_state.cpp \
+	graphics_logic.cpp grid_widget.cpp gui_core.cpp \
+	image_widget.cpp initiative_bar.cpp input.cpp item.cpp \
+	item_display_dialog.cpp keyboard.cpp label.cpp \
 	learn_skills_dialog.cpp map_avatar.cpp map_selection.cpp \
 	material.cpp message_dialog.cpp mini_stats_dialog.cpp \
 	model.cpp npc_party.cpp parse3ds.cpp parseark.cpp parsedae.cpp \
@@ -415,13 +418,13 @@ libsilvertree_a_SOURCES = base_terrain_fwd.hpp base_terrain.hpp \
 	sdl_algo.cpp settlement.cpp shop_dialog.cpp skill.cpp \
 	skill_dialog.cpp slider.cpp status_bars_widget.cpp \
 	string_utils.cpp surface_cache.cpp surface.cpp \
-	terrain_feature.cpp text_gui.cpp texture.cpp tile.cpp \
+	terrain_feature.cpp text.cpp text_gui.cpp texture.cpp tile.cpp \
 	tile_logic.cpp tooltip.cpp tracks.cpp translate.cpp \
-	unicode.cpp variant.cpp widget.cpp wml_command.cpp \
-	wml_node.cpp wml_parser.cpp wml_utils.cpp wml_writer.cpp \
-	world.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp \
-	tinyxml/tinyxmlparser.cpp zoom_map_generator.cpp \
-	$(am__append_2)
+	ttf_text.cpp unicode.cpp variant.cpp widget.cpp \
+	wml_command.cpp wml_node.cpp wml_parser.cpp wml_utils.cpp \
+	wml_writer.cpp world.cpp tinyxml/tinyxml.cpp \
+	tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp \
+	zoom_map_generator.cpp $(am__append_2)
 all: all-recursive
 
 .SUFFIXES:
@@ -520,7 +523,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event_handler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filesystem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/floating_label.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formula.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formula_registry.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formula_tokenizer.Po@am__quote@
@@ -554,6 +556,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/npc_party.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/openal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/openalc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pango_text.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse3ds.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parseark.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parsedae.Po@am__quote@
@@ -591,6 +594,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tooltip.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tracks.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/translate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ttf_text.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unicode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/variant.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget.Po@am__quote@

@@ -2,9 +2,9 @@
 #include "battle_modification.hpp"
 #include "character.hpp"
 #include "floating_label.hpp"
-#include "font.hpp"
 #include "formatter.hpp"
 #include "formula.hpp"
+#include "text.hpp"
 #include "wml_node.hpp"
 
 namespace game_logic
@@ -88,8 +88,11 @@ void battle_modification::apply(battle_character& src,
 		const int value = i->second->execute(callable).as_int();
 
 		if(i->first == "inflict_damage") {
-			target.get_character().take_damage(value);
-			graphics::floating_label::add(graphics::font::render_text(formatter() << value, 20, value <= 0 ? blue : red), pos, move, 1000);
+                    text::renderer_ptr renderer = text::renderer::instance();
+                    target.get_character().take_damage(value);
+                    graphics::floating_label::add(renderer->render(formatter() << value, 20, 
+                                                                   value <= 0 ? blue : red)->as_texture(), 
+                                                  pos, move, 1000);
 		} else {
 			target.add_modification(i->first, current_time+duration, value);
 		}

@@ -12,6 +12,10 @@ AC_PROG_RANLIB
 AC_ARG_ENABLE([audio], 
               AC_HELP_STRING([--enable-audio], [enable sound (default is yes)]), 
               [want_audio=$enableval], [want_audio=check])
+AC_ARG_ENABLE([pango],
+              AC_HELP_STRING([--enable-pango], [use pango backend (default is no)]), 
+              [want_pango=$enableval], [want_pango=no])
+              
 
 min_sdl_version=1.2.9
 AM_PATH_SDL($min_sdl_version, 
@@ -56,16 +60,17 @@ LIBS="$GL_LIBS $GLU_LIBS $LIBS"
 
 AC_CHECK_PROG([pkgconfig_available], [pkg-config], [yes], [no])
 
-have_pango=no
-AS_IF([test "x$pkgconfig_available" = xyes],
-     [PKG_CHECK_MODULES(PANGO, pangoft2 >= 1.14.8, [
-      CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS -DUSE_PANGO"
-      LIBS="$PANGO_LIBS $LIBS"
-      have_pango=yes
-      ], [
-      AC_MSG_WARN([**** Pango with freetype2 backend not found !])
-      ])
-     ])
+AS_IF([test x$want_pango = xno], 
+      [have_pango=no],
+      [AS_IF([test "x$pkgconfig_available" = xyes],
+        [PKG_CHECK_MODULES(PANGO, pangoft2 >= 1.14.8, [
+        CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS -DUSE_PANGO"
+        LIBS="$PANGO_LIBS $LIBS"
+        have_pango=yes
+        ], [
+         AC_MSG_WARN([**** Pango with freetype2 backend not found !])
+        ])
+     ])])
 
 AS_IF([test "x$pkgconfig_available" = xyes],
       [PKG_CHECK_MODULES([QT], [QtCore > 4.0.0 QtOpenGL QtGui])],

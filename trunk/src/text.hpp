@@ -19,53 +19,52 @@
 #ifndef TEXT_HPP_INCLUDED
 #define TEXT_HPP_INCLUDED
 
-#include <memory>
-#include <string>
-#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include "SDL.h"
+#include "texture.hpp"
 
-#include "gl_utils.hpp"
+namespace text {
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include <freetype/ftbitmap.h>
-
-namespace graphics
-{
-
-namespace text
-{
-
-struct ft_bitmap_handle
-{
-	FT_Bitmap bitmap;
-
-	ft_bitmap_handle(int width, int height);
-	~ft_bitmap_handle();
-
-	private:
-	ft_bitmap_handle(const ft_bitmap_handle&);
+class rendered_text {
+public:
+    virtual ~rendered_text() {}
+    virtual void blit(int x=0, int y=0) =0;
+    virtual int width()=0;
+    virtual int height()=0;
+    virtual graphics::texture as_texture()=0;
 };
 
-typedef boost::shared_ptr<ft_bitmap_handle> ft_bitmap_ptr;
+typedef boost::shared_ptr<rendered_text> rendered_text_ptr;
 
 class renderer
 {
-	static boost::scoped_ptr<renderer> the_renderer;
+public:
+    virtual ~renderer() {}
 
-	protected:
-	renderer();
-
-	public:
-	~renderer();
-
-	static renderer& instance();
-
-	gl::texture2d_ptr render_to_texture(std::string text, int size = 14, bool markup = false);
-	ft_bitmap_ptr render(std::string text, int size = 14, bool markup = false);
+    static boost::shared_ptr<renderer> instance();
+    virtual rendered_text_ptr render(const std::string& text, 
+                                     int size, 
+                                     const SDL_Color& color) =0;
+    virtual std::string format(const std::string& text, 
+                               int font_size, 
+                               int width)=0;
+    virtual void get_text_size(const std::string& text, 
+                               int font_size,
+                               int *width = NULL, int *height =NULL) =0;
+    virtual rendered_text_ptr render_complex_text(const std::string& text, 
+                                                  int font_size,
+                                                  const SDL_Color& text_color,
+                                                  const SDL_Color& caret_fg, const 
+                                                  SDL_Color& caret_bg,
+                                                  bool opaque_caret,
+                                                  const SDL_Color& selection_fg, const SDL_Color& selection_bg,
+                                                  bool opaque_selection,
+                                                  int caret, int selection_start, int selection_end)=0;
+protected:
+    renderer() {};
 };
 
-}
+typedef boost::shared_ptr<renderer> renderer_ptr;
 
 }
 

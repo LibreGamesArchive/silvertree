@@ -48,13 +48,14 @@ public:
     void set_coord(GLfloat x, GLfloat y) const;
 	bool valid() const { return id_; }
 
-	static texture get_frame_buffer();
-	static texture get(const std::string& str, options_type options=options_type());
-	static texture get(const key& k, options_type options=options_type());
-	static texture get(const surface& surf, options_type options=options_type());
-	static texture get_no_cache(const key& k, options_type options=options_type());
-	static texture get_no_cache(const surface& surf, options_type options=options_type());
-	static void set_current_texture(const key& k);	
+    static texture build(int w, int h);
+    static texture get_frame_buffer();
+    static texture get(const std::string& str, options_type options=options_type());
+    static texture get(const key& k, options_type options=options_type());
+    static texture get(const surface& surf, options_type options=options_type());
+    static texture get_no_cache(const key& k, options_type options=options_type());
+    static texture get_no_cache(const surface& surf, options_type options=options_type());
+    static void set_current_texture(const key& k);	
     static void set_coord_manual(const key& k, GLfloat& x, GLfloat& y);
     static void set_coord(const key& k, GLfloat x, GLfloat y);
 

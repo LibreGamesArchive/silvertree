@@ -22,7 +22,7 @@
 #include "widget.hpp"
 #include "formula.hpp"
 #include "formula_callable.hpp"
-#include "font.hpp"
+#include "text.hpp"
 #include "wml_node.hpp"
 
 namespace gui {
@@ -77,13 +77,14 @@ private:
 class text_fdo: public frame_draw_object {
 public:
 	text_fdo(int x, int y, int size, SDL_Color& color, const std::string& text) :
-		x_(x), y_(y), texture_() {
-		texture_ = graphics::font::render_text(text, size, color);
+            x_(x), y_(y), text_() {
+            text::renderer_ptr renderer = text::renderer::instance();
+            text_ = renderer->render(text, size, color);
 	}
 	void draw() const;
 private:
 	int x_, y_;
-	graphics::texture texture_;
+	text::rendered_text_ptr text_;
 };
 
 typedef boost::shared_ptr<frame_draw_object> fdo_ptr;

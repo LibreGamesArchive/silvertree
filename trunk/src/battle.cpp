@@ -18,7 +18,6 @@
 #include "equipment.hpp"
 #include "floating_label.hpp"
 #include "formatter.hpp"
-#include "font.hpp"
 #include "foreach.hpp"
 #include "frustum.hpp"
 #include "initiative_bar.hpp"
@@ -30,6 +29,7 @@
 #include "slider.hpp"
 #include "status_bars_widget.hpp"
 #include "surface_cache.hpp"
+#include "text.hpp"
 #include "world.hpp"
 
 #include <boost/lexical_cast.hpp>
@@ -405,11 +405,13 @@ void battle::draw_widgets(gui::slider* slider) {
     hex::location selected_hex = selection_.get_selected_hex();
     const_battle_character_ptr selected_character = selected_char();
 
+    text::renderer_ptr text_renderer = text::renderer::instance();
+
     graphics::prepare_raster();
     
-    const graphics::texture text = 
-        graphics::font::render_text(renderer_.status_text(),20,white); 
-    graphics::blit_texture(text,50,50);
+    const text::rendered_text_ptr text =
+        text_renderer->render(renderer_.status_text(),20,white); 
+    text->blit(50,50);
    
     if(slider) {
         slider->draw();
@@ -432,18 +434,12 @@ void battle::draw_widgets(gui::slider* slider) {
             assert(current_move_);
             get_attack_stats(**focus_, *selected_character, *current_move_, &desc);
             desc = selected_character->status_text() + "\n" + desc;
-            graphics::texture text = graphics::font::render_text(desc, 20, color);
-            graphics::blit_texture(text,50,100);
+            text::rendered_text_ptr text = text_renderer->render(desc, 20, color);
+            text->blit(50,100);
         } else {
             SDL_Color color = {0xFF,0xFF,0xFF,0xFF};
-            std::vector<graphics::texture> text;
-            graphics::font::render_multiline_text(selected_character->status_text(), 20, color, text);
-            int x = 50;
-            int y = 100;
-            foreach(graphics::texture& t, text) {
-                graphics::blit_texture(t,x,y);
-                y += t.height();
-            }
+            text::rendered_text_ptr text = text_renderer->render(selected_character->status_text(), 20, color);
+            text->blit(50,100);
         }
     }
 
@@ -694,12 +690,14 @@ void battle::attack_character(battle_character& attacker,
 	const GLfloat move[3] = {0.0,0.0,0.01};
 	GLfloat rotate;
 	defender.get_pos(pos,&rotate);
+
+        text::renderer_ptr text_renderer = text::renderer::instance();
 	if(damage) {
-		graphics::texture damage_tex = graphics::font::render_text(boost::lexical_cast<std::string>(damage), 20, red);
-		graphics::floating_label::add(damage_tex,pos,move,50);
+            text::rendered_text_ptr damage_tex = text_renderer->render(boost::lexical_cast<std::string>(damage), 20, red);
+            graphics::floating_label::add(damage_tex->as_texture(),pos,move,50);
 	} else {
-		graphics::texture damage_tex = graphics::font::render_text("miss!", 20, blue);
-		graphics::floating_label::add(damage_tex,pos,move,50);
+            text::rendered_text_ptr damage_tex = text_renderer->render("miss!", 20, blue);
+            graphics::floating_label::add(damage_tex->as_texture(),pos,move,50);
 	}
 
 	defender.get_character().take_damage(damage);
