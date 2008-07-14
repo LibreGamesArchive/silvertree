@@ -12,8 +12,8 @@
 */
 #include "SDL.h"
 
-#include "font.hpp"
 #include "raster.hpp"
+#include "text.hpp"
 #include "tooltip.hpp"
 
 namespace gui {
@@ -26,8 +26,8 @@ graphics::texture text;
 void set_tooltip(const boost::shared_ptr<std::string>& tip)
 {
 	cur_tooltip = tip;
-	text = graphics::font::render_text(
-	                  *cur_tooltip, 18, graphics::color_yellow());
+        text::renderer_ptr renderer = text::renderer::instance();
+	text = renderer->render(*cur_tooltip, 18, graphics::color_yellow())->as_texture();
 }
 
 void remove_tooltip(const boost::shared_ptr<std::string>& tip)

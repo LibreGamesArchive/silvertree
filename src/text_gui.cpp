@@ -3,8 +3,8 @@
 #include <iterator>
 #include "SDL_ttf.h"
 
-#include "font.hpp"
 #include "foreach.hpp"
+#include "text.hpp"
 #include "text_gui.hpp"
 #include "userevents.h"
 
@@ -670,8 +670,9 @@ void text_box::inner_draw() const
 		if(tw > width()) {
 			/* place the caret as close to the center of area as possible */
 			int w,h;
-			graphics::font::get_text_size(cached_text_.substr(0, edit_->caret_index()),
-						      font_size_, &w, &h);
+                        ::text::renderer_ptr renderer = ::text::renderer::instance();
+			renderer->get_text_size(cached_text_.substr(0, edit_->caret_index()),
+                                                font_size_, &w, &h);
 			pos_x = width()/2 - w;
 			if(pos_x > 0) { /* would underrun to the left */
 				pos_x = 0;
@@ -702,10 +703,11 @@ void text_box::recalculate_texture() const
 		edit_->get_selection(&sel_start, &sel_end);
 	}
 
-	texture_ = graphics::font::render_complex_text(cached_text_, font_size_, color_,
-						       caret_fg_, caret_bg_, opaque_caret_,
-						       selection_fg_, selection_bg_, opaque_selection_,
-						       caret, sel_start, sel_end);
+        ::text::renderer_ptr renderer = ::text::renderer::instance();
+	texture_ = renderer->render_complex_text(cached_text_, font_size_, color_,
+                                                 caret_fg_, caret_bg_, opaque_caret_,
+                                                 selection_fg_, selection_bg_, opaque_selection_,
+                                                 caret, sel_start, sel_end)->as_texture();
 
 }
 

@@ -29,7 +29,6 @@
 #include "../base_terrain.hpp"
 #include "../camera.hpp"
 #include "../filesystem.hpp"
-#include "../font.hpp"
 #include "../foreach.hpp"
 #include "../formatter.hpp"
 #include "../gamemap.hpp"

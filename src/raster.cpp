@@ -50,63 +50,36 @@ void prepare_raster()
 
 void blit_texture(const texture& tex, int x, int y, GLfloat rotate)
 {
-	if(!tex.valid()) {
-		return;
-	}
-
-	int h = tex.height();
-	int w = tex.width();
-	const int w_odd = w % 2;
-	const int h_odd = h % 2;
-	h /= 2;
-	w /= 2;
-
-	glPushMatrix();
-
-	glTranslatef(x+w,y+h,0.0);
-	glRotatef(rotate,0.0,0.0,1.0);
-
-	tex.set_as_current_texture();
-
-	glBegin(GL_QUADS);
-	tex.set_coord(0.0,0.0);
-	glVertex3i(-w,-h,0);
-	tex.set_coord(0.0,1.0);
-	glVertex3i(-w,h+h_odd,0);
-	tex.set_coord(1.0,1.0);
-	glVertex3i(w+w_odd,h+h_odd,0);
-	tex.set_coord(1.0,0.0);
-	glVertex3i(w+w_odd,-h,0);
-	glEnd();
-
-	glPopMatrix();
-}
-
-void blit_gl_texture(gl::texture2d_ptr tex, int x, int y, int w, int h, GLfloat rotate)
-{
-	tex->bind();
-	const int w_odd = w % 2;
-	const int h_odd = h % 2;
-	h /= 2;
-	w /= 2;
-
-	glPushMatrix();
-
-	glTranslatef(x+w,y+h,0.0);
-	glRotatef(rotate,0.0,0.0,1.0);
-
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0,0.0);
-	glVertex3i(-w,-h,0);
-	glTexCoord2f(0.0,1.0);
-	glVertex3i(-w,h+h_odd,0);
-	glTexCoord2f(1.0,1.0);
-	glVertex3i(w+w_odd,h+h_odd,0);
-	glTexCoord2f(1.0,0.0);
-	glVertex3i(w+w_odd,-h,0);
-	glEnd();
-
-	glPopMatrix();
+    if(!tex.valid()) {
+        return;
+    }
+    
+    int h = tex.height();
+    int w = tex.width();
+    const int w_odd = w % 2;
+    const int h_odd = h % 2;
+    h /= 2;
+    w /= 2;
+    
+    glPushMatrix();
+    
+    glTranslatef(x+w,y+h,0.0);
+    glRotatef(rotate,0.0,0.0,1.0);
+    
+    tex.set_as_current_texture();
+    
+    glBegin(GL_QUADS);
+    tex.set_coord(0.0,0.0);
+    glVertex3i(-w,-h,0);
+    tex.set_coord(0.0,1.0);
+    glVertex3i(-w,h+h_odd,0);
+    tex.set_coord(1.0,1.0);
+    glVertex3i(w+w_odd,h+h_odd,0);
+    tex.set_coord(1.0,0.0);
+    glVertex3i(w+w_odd,-h,0);
+    glEnd();
+    
+    glPopMatrix();
 }
 
 void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate)
@@ -136,22 +109,6 @@ void blit_texture(const texture& tex, int x, int y, int w, int h, GLfloat rotate
 	glEnd();
 	glPopMatrix();
 }
-
-#ifdef USE_PANGO
-void blit_ft_bitmap(const FT_Bitmap& bitmap, int x, int y, const SDL_Color& color)
-{
-	glPushAttrib(GL_CURRENT_BIT | GL_PIXEL_MODE_BIT);
-	glDisable(GL_TEXTURE_2D);
-	glRasterPos2i(x,y);
-	glPixelZoom(1, -1);
-	glPixelTransferf(GL_RED_BIAS, (float)color.r/255.);
-	glPixelTransferf(GL_GREEN_BIAS, (float)color.g/255.);
-	glPixelTransferf(GL_BLUE_BIAS, (float)color.b/255.);
-	glDrawPixels(bitmap.width, bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer);
-	glEnable(GL_TEXTURE_2D);
-	glPopAttrib();
-}
-#endif
 
 void draw_rect(const SDL_Rect& r, const SDL_Color& color,
                unsigned char alpha)

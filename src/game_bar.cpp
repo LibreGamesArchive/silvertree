@@ -7,13 +7,13 @@
 
 #include "character_equip_dialog.hpp"
 #include "character_status_dialog.hpp"
-#include "font.hpp"
 #include "game_bar.hpp"
 #include "game_persistence.hpp"
 #include "image_widget.hpp"
 #include "learn_skills_dialog.hpp"
 #include "party_status_dialog.hpp"
 #include "raster.hpp"
+#include "text.hpp"
 #include "widget.hpp"
 #include "world.hpp"
 
@@ -242,17 +242,18 @@ void draw_bar(int x, int y, int w, int h, int level, int max_level,
 		SDL_Rect r = { x, y, level_px, h };
 		graphics::draw_rect(r, level_bar_color, 255);
 	}
+        text::renderer_ptr renderer = text::renderer::instance();
 	{
-		std::stringstream s;
-		s << max_level;
-		graphics::texture t = graphics::font::render_text(s.str(), 12, max_text_color);
-		graphics::blit_texture(t, x + w - t.width() - 4, y + (h - t.height())/2);
+            std::stringstream s;
+            s << max_level;
+            text::rendered_text_ptr t = renderer->render(s.str(), 12, max_text_color);
+            t->blit(x + w - t->width() - 4, y + (h - t->height())/2);
 	}
 	{
-		std::stringstream s;
-		s << level;
-		graphics::texture t = graphics::font::render_text(s.str(), 12, level_text_color);
-		graphics::blit_texture(t, x + 4, y + (h - t.height())/2);
+            std::stringstream s;
+            s << level;
+            text::rendered_text_ptr t = renderer->render(s.str(), 12, level_text_color);
+            t->blit(x + 4, y + (h - t->height())/2);
 	}
 }
 }

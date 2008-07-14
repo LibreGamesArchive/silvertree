@@ -16,7 +16,6 @@
 #include <iostream>
 
 #include "dialog.hpp"
-#include "font.hpp"
 #include "foreach.hpp"
 #include "raster.hpp"
 #include "surface_cache.hpp"

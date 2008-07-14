@@ -26,7 +26,6 @@
 #include "character.hpp"
 #include "character_generator.hpp"
 #include "filesystem.hpp"
-#include "font.hpp"
 #include "formula_registry.hpp"
 #include "gamemap.hpp"
 #include "global_game_state.hpp"
@@ -72,7 +71,6 @@ extern "C" int main(int argc, char** argv)
 	}
 	}
 
-	graphics::font::manager font_manager;
 	graphics::texture::manager texture_manager;
 	gui::text::init();
 

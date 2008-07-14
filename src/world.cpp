@@ -13,7 +13,6 @@
 
 #include "encounter.hpp"
 #include "filesystem.hpp"
-#include "font.hpp"
 #include "foreach.hpp"
 #include "frustum.hpp"
 #include "global_game_state.hpp"
@@ -28,6 +27,7 @@
 #include "settlement.hpp"
 #include "surface.hpp"
 #include "surface_cache.hpp"
+#include "text.hpp"
 #include "wml_parser.hpp"
 #include "wml_utils.hpp"
 #include "world.hpp"
@@ -408,10 +408,11 @@ void world::draw_display(const_party_ptr selected_party) const {
     const SDL_Color white = {0xFF,0xFF,0x0,0};
 
     graphics::prepare_raster();
-
-    const graphics::texture text = 
-        graphics::font::render_text(renderer_.status_text(),20,white); 
-    graphics::blit_texture(text,50,50);
+    text::renderer_ptr text_renderer = text::renderer::instance();
+    
+    const text::rendered_text_ptr text = 
+        text_renderer->render(renderer_.status_text(),20,white); 
+    text->blit(50,10);
     
     track_info_grid_ = get_track_info();
     if(track_info_grid_) {
@@ -425,12 +426,13 @@ void world::draw_display(const_party_ptr selected_party) const {
             const int height = t.height();
             std::ostringstream stream;
             stream << height << " elevation";
-            const graphics::texture text =
-                graphics::font::render_text(stream.str(),20,white);
-            graphics::blit_texture(text,50,80);
+            const text::rendered_text_ptr text =
+                text_renderer->render(stream.str(),20,white);
+            text->blit(50,50);
             
-            graphics::texture fatigue_text = graphics::font::render_text(focus_->fatigue_status_text(), 20, white);
-            graphics::blit_texture(fatigue_text,50,140);
+            text::rendered_text_ptr fatigue_text = 
+                text_renderer->render(focus_->fatigue_status_text(), 20, white);
+            fatigue_text->blit(50,140);
         }
     }
     
@@ -440,15 +442,15 @@ void world::draw_display(const_party_ptr selected_party) const {
         std::ostringstream stream;
         stream << (hour < 10 ? "0" : "") << hour << ":"
                << (min < 10 ? "0" : "") << min;
-        const graphics::texture text = graphics::font::render_text(stream.str(),20,white);
-        graphics::blit_texture(text,50,110);
+        text::rendered_text_ptr text = text_renderer->render(stream.str(),20,white);
+        text->blit(50,110);
     }
     
     blit_texture(compass_, 1024-compass_.height(),0,-camera_.current_rotation());
     
     if(selected_party) {
-        graphics::texture text = graphics::font::render_text(selected_party->status_text(), 20, white);
-        graphics::blit_texture(text,1024 - 50 - text.width(),200);
+        text::rendered_text_ptr text = text_renderer->render(selected_party->status_text(), 20, white);
+        text->blit(1024 - 50 - text->width(),200);
     }
     
     if(!chat_labels_.empty()) {
