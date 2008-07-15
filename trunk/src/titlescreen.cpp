@@ -16,23 +16,25 @@ static void draw(game_logic::world_ptr w, const graphics::texture& title, Uint8 
     const SDL_Color c = { 0,0,0,0};
 
     bool was_blending = glIsEnabled(GL_BLEND);
+    bool drew_frame = true;
     glEnable(GL_BLEND);
 
     glClearColor(0.0,0.0,0.0,0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if(alpha < 255) {
-        w->draw();
+        drew_frame = w->draw();
     }
-	graphics::prepare_raster();
-
-    if(alpha > 0) {
-        graphics::draw_rect(r, c, alpha);
+    if(drew_frame) {
+        graphics::prepare_raster();
+        
+        if(alpha > 0) {
+            graphics::draw_rect(r, c, alpha);
+        }
+        graphics::blit_texture(title, (graphics::screen_width() - title.width()) / 2,
+                               (graphics::screen_height() - title.height())/2);
+        SDL_GL_SwapBuffers();
     }
-    graphics::blit_texture(title, (graphics::screen_width() - title.width()) / 2,
-                           (graphics::screen_height() - title.height())/2);
-    SDL_GL_SwapBuffers();
-
     if(!was_blending) {
         glDisable(GL_BLEND);
     }
