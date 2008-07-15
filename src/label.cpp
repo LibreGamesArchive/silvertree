@@ -88,6 +88,7 @@ void label::recalculate_texture()
 
 void label::handle_draw() const
 {
+	glColor3ub(color_.r, color_.g, color_.b);
     graphics::blit_texture(texture_, x(), y());
 }
 
