@@ -73,16 +73,16 @@ void label::inner_set_dim(int w, int h) {
 
 void label::reformat_text()
 {
-    text::renderer_ptr renderer = text::renderer::instance();
+    text::renderer& renderer = text::renderer::instance();
     if(fixed_width_) {
-        formatted_ = renderer->format(text_, size_, width());
+        formatted_ = renderer.format(text_, size_, width());
     }
 }
 
 void label::recalculate_texture()
 {
-    text::renderer_ptr renderer = text::renderer::instance();
-    texture_ = renderer->render(current_text(), size_, color_)->as_texture();
+    text::renderer& renderer = text::renderer::instance();
+    texture_ = renderer.render(current_text(), size_, color_)->as_texture();
     inner_set_dim(texture_.width(),texture_.height());
 }
 
@@ -116,9 +116,9 @@ void dialog_label::recalculate_texture()
 	if(prog > stages_) prog = stages_;
 	std::string txt = current_text().substr(0, prog);
 
-        text::renderer_ptr renderer = text::renderer::instance();
+        text::renderer& renderer = text::renderer::instance();
 	if(prog > 0) {
-		set_texture(renderer->render(txt, size(), color())->as_texture());
+		set_texture(renderer.render(txt, size(), color())->as_texture());
 	} else {
 		set_texture(graphics::texture());
 	}

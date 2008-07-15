@@ -26,8 +26,8 @@ graphics::texture text;
 void set_tooltip(const boost::shared_ptr<std::string>& tip)
 {
 	cur_tooltip = tip;
-        text::renderer_ptr renderer = text::renderer::instance();
-	text = renderer->render(*cur_tooltip, 18, graphics::color_yellow())->as_texture();
+        text::renderer& renderer = text::renderer::instance();
+	text = renderer.render(*cur_tooltip, 18, graphics::color_yellow())->as_texture();
 }
 
 void remove_tooltip(const boost::shared_ptr<std::string>& tip)

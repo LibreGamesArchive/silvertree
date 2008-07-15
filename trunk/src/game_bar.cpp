@@ -242,17 +242,17 @@ void draw_bar(int x, int y, int w, int h, int level, int max_level,
 		SDL_Rect r = { x, y, level_px, h };
 		graphics::draw_rect(r, level_bar_color, 255);
 	}
-        text::renderer_ptr renderer = text::renderer::instance();
+        text::renderer& renderer = text::renderer::instance();
 	{
             std::stringstream s;
             s << max_level;
-            text::rendered_text_ptr t = renderer->render(s.str(), 12, max_text_color);
+            text::rendered_text_ptr t = renderer.render(s.str(), 12, max_text_color);
             t->blit(x + w - t->width() - 4, y + (h - t->height())/2);
 	}
 	{
             std::stringstream s;
             s << level;
-            text::rendered_text_ptr t = renderer->render(s.str(), 12, level_text_color);
+            text::rendered_text_ptr t = renderer.render(s.str(), 12, level_text_color);
             t->blit(x + 4, y + (h - t->height())/2);
 	}
 }

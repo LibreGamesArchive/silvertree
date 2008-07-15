@@ -19,6 +19,7 @@
 #ifndef TEXT_HPP_INCLUDED
 #define TEXT_HPP_INCLUDED
 
+#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include "SDL.h"
 #include "texture.hpp"
@@ -41,7 +42,7 @@ class renderer
 public:
     virtual ~renderer() {}
 
-    static boost::shared_ptr<renderer> instance();
+    static renderer& instance();
     virtual rendered_text_ptr render(const std::string& text, 
                                      int size, 
                                      const SDL_Color& color) =0;
@@ -62,6 +63,8 @@ public:
                                                   int caret, int selection_start, int selection_end)=0;
 protected:
     renderer() {};
+private:
+	static boost::scoped_ptr<renderer> renderer_;
 };
 
 typedef boost::shared_ptr<renderer> renderer_ptr;
