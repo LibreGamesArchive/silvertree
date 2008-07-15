@@ -20,10 +20,6 @@
 #include "texture.hpp"
 #include "widget.hpp"
 
-#ifdef USE_PANGO
-#include "text.hpp"
-#endif
-
 namespace gui {
 
 class label;
