@@ -65,6 +65,9 @@ protected:
     renderer() {};
 private:
 	static boost::scoped_ptr<renderer> renderer_;
+
+	renderer(const renderer&);
+	renderer& operator=(const renderer&);
 };
 
 typedef boost::shared_ptr<renderer> renderer_ptr;
