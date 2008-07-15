@@ -86,7 +86,7 @@ rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_
     
     PangoFontDescription *desc = pango_font_description_new();
     pango_font_description_set_family_static(desc, "FreeSans");
-    pango_font_description_set_size(desc, size * PANGO_SCALE);
+    pango_font_description_set_absolute_size(desc, size * PANGO_SCALE);
     pango_layout_set_font_description(layout, desc);
     pango_font_description_free(desc);
     
