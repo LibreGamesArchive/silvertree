@@ -7,13 +7,13 @@ my $id = "$uclass" . "_FWD_HPP_INCLUDED";
 print "#ifndef $id
 #define $id
 
-#include <boost/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 
 namespace $namespace {
 
 class $class;
-typedef boost::shared_ptr<$class> $class" . "_ptr;
-typedef boost::shared_ptr<const $class> const_" . $class . "_ptr;
+typedef boost::intrusive_ptr<$class> $class" . "_ptr;
+typedef boost::intrusive_ptr<const $class> const_" . $class . "_ptr;
 
 }
 

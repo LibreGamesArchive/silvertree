@@ -69,6 +69,8 @@ public:
     void keyboard_control();
     
     GLfloat current_rotation() const { return rotate_; }
+
+	void set_rotation(const camera& c) { rotate_ = c.rotate_; dir_ = c.dir_; }
     
     void set_debug_adjust(bool val) { debug_adjust_ = val; }
     

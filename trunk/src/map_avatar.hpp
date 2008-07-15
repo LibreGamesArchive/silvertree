@@ -14,7 +14,6 @@
 #define MAP_AVATAR_HPP_INCLUDED
 
 #include <GL/glew.h>
-#include <GL/gl.h>
 
 #include "location_tracker.hpp"
 #include "model_fwd.hpp"

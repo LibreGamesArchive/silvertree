@@ -10,8 +10,8 @@ while(<>) {
 			my $scale = 1.0;
 			$x *= $scale;
 			$y *= $scale;
-			$z *= $scale;
-			print "      $y $x $z $a $c $b $u $v\n";
+			$z *= -$scale;
+			print "      $x $z $y $a $c $b $u $v\n";
 		}
 	}
 

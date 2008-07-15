@@ -110,16 +110,14 @@ bool play_battle(party_ptr p1, party_ptr p2, const std::vector<character_ptr>& c
 {
     //zoom in to the battle
     const GLfloat start_zoom = p1->game_world().camera().zoom();
-    graphics::texture framebuffer = graphics::texture::get_frame_buffer();
     p1->game_world().renderer().reset_timing();
     for(int n = 0; n != 100 && p1->game_world().camera().zoom() < p1->game_world().camera().max_zoom(); ++n) {
+		std::cerr << "draw with zoom " << p1->game_world().camera().zoom() << "\n";
         p1->game_world().camera().zoom_in();
         p1->game_world().camera().zoom_in();
         p1->game_world().draw();
-        glColor4f(1.0,1.0,1.0,0.8);
-        graphics::blit_texture(framebuffer, 0, 0, graphics::screen_width(), -graphics::screen_height());
-        framebuffer = graphics::texture::get_frame_buffer();
         SDL_GL_SwapBuffers();
+		p1->game_world().update_camera_controller();
     }
     
     boost::shared_ptr<hex::gamemap> battle_map =
@@ -153,14 +151,9 @@ bool play_battle(party_ptr p1, party_ptr p2, const std::vector<character_ptr>& c
         b.camera().zoom_in();
         b.camera().zoom_in();
         b.draw();
-        glColor4f(1.0,1.0,1.0,0.8);
-        graphics::blit_texture(framebuffer, 0, 0, graphics::screen_width(), -graphics::screen_height());
-        framebuffer = graphics::texture::get_frame_buffer();
         SDL_GL_SwapBuffers();
+		b.update_camera_controller();
     }
-    
-    //free up the space taken by the frame buffer texture
-    framebuffer = graphics::texture();
     
     b.play();
     return p2->is_destroyed();

@@ -651,9 +651,9 @@ void battle::attack_character(battle_character& attacker,
 
 		if(use_slider && !applied_slider_result && slider.result() != gui::slider::PENDING) {
 			if(slider.result() == gui::slider::RED) {
-				random /= 2;
-			} else if(slider.result() == gui::slider::BLUE) {
 				random *= 2;
+			} else if(slider.result() == gui::slider::BLUE) {
+				random /= 2;
 			}
 
 			begin_hit = t;
