@@ -83,9 +83,6 @@ if env["AUDIO"]:
 else:
     env.Replace(CPPDEFINES = dict())
 
-if env["use_pango"]:
-    env.Append(CPPDEFINES = "USE_PANGO")
-
 if "gcc" in env["TOOLS"]:
     ccflags = Split("-Wall -Wno-sign-compare -Wno-switch -Wno-switch-enum")
     if env["STRICT"]:
