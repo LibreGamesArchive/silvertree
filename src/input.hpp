@@ -83,6 +83,8 @@ namespace input {
         virtual bool unbind_key(const SDL_keysym& sym);
         int bound_key(const SDL_keysym& sym) const;
         bool process_event(const SDL_Event& event, bool claimed);
+        bool shares_keys() { return shares_keys_; }
+        void set_shares_keys(bool s) { shares_keys_ = s; }
     protected:
         bool check_keys(const SDL_keysym& sym, Uint8 event_type);
         virtual void do_keydown(int key) =0;
@@ -96,6 +98,7 @@ namespace input {
         typedef std::map<SDLKey,mod_map> binding_map;
 
         binding_map bindings_;
+        bool shares_keys_;
     };
 
     class key_down_listener: public key_listener {
