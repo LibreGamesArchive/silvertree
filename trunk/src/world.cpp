@@ -682,6 +682,7 @@ void world::play()
         
         if(!active_party) {
             double increase = scale_ * game_speed;
+
             if(keys_.key(SUPER_ACCEL_TIME_KEY)) {
                 increase *= 4;
             } else if(keys_.key(ACCEL_TIME_KEY) || !script_.empty()) {
@@ -859,9 +860,9 @@ void world::fire_event(const std::string& name, const formula_callable& info)
 	std::pair<event_map::iterator,event_map::iterator> range =
 	     handlers_.equal_range(name);
 	while(range.first != range.second) {
-		std::cerr << "calling handler...\n";
-		range.first->second.handle(info, *this);
-		++range.first;
+            //std::cerr << "calling handler...\n";
+            range.first->second.handle(info, *this);
+            ++range.first;
 	}
 }
 

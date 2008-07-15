@@ -384,7 +384,7 @@ namespace input {
                 reset();
                 break;
             }
-            if(check_keys(event.key.keysym, event.type)) {
+            if(check_keys(event.key.keysym, event.type) && !shares_keys_) {
                 claimed = true;
             }
             break;

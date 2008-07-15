@@ -46,6 +46,8 @@ controls::controls() : input::delegate_listener(&keys_) {
 
     keys_.bind_key(PASS, SDLK_SPACE, KMOD_NONE);
     keys_.bind_key(PASS, SDLK_SPACE, (SDLMod)KMOD_SHIFT);
+
+    keys_.set_shares_keys(true);
 }
         
     
