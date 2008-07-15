@@ -6,7 +6,7 @@ sources += ["tinyxml/tinyxml.cpp", "tinyxml/tinyxmlerror.cpp", "tinyxml/tinyxmlp
 sources += SConscript("audio/SConscript")
 sources.remove("main.cpp")
 if not env["use_pango"]:
-    sources.remove("text.cpp")
+    sources.remove("pango_text.cpp")
 lib_silvertree = env.StaticLibrary("libsilvertree", sources)
 silvertree = env.Program("silvertreerpg", ["main.cpp", lib_silvertree])
 

@@ -43,7 +43,7 @@ public:
 	void entry_points(std::vector<hex::location>& result) const;
 	bool has_entry_point(const hex::location& loc) const;
 	game_time enter(party_ptr pty, const hex::location& loc,
-					const game_time& t);
+					const game_time& t, const world& from);
 	void play();
 	const world& get_world() const;
     const std::vector<hex::const_map_avatar_ptr>& avatars() { return avatars_; }

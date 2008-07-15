@@ -659,10 +659,11 @@ void world::play()
                     if(s != settlements_.end() && active_party->is_human_controlled()) {
                         remove_party(active_party);
                         //enter the new world
-                        time_ = s->second->enter(active_party, active_party->loc(), time_);
+                        time_ = s->second->enter(active_party, active_party->loc(), time_, *this);
                         
                         //player has left the settlement, return to this world
                         active_party->new_world(*this,active_party->loc(),active_party->last_move());
+						camera_.set_rotation(s->second->get_world().camera_);
                         renderer_.reset_timing();
                     }
                     

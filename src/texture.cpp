@@ -15,7 +15,6 @@
 #include "surface_cache.hpp"
 #include "texture.hpp"
 #include <GL/glew.h>
-#include <GL/glu.h>
 #include <map>
 #include <iostream>
 #include <cstring>

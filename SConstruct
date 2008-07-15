@@ -53,6 +53,7 @@ if GetOption("help") : Return()
 if env["PLATFORM"] == "win32": openal_lib = "openal32"
 else: openal_lib = "openal"
 
+env.Append(LIBPATH = "/usr/X11R6/lib")
 conf = env.Configure(custom_tests = env["config_checks"])
 conf.CheckBoost("regex", "1.20") or Exit(1)
 conf.Finish()

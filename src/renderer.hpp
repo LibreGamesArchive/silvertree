@@ -2,7 +2,6 @@
 #define RENDERER_HPP_INCLUDED
 
 #include <GL/glew.h>
-#include <GL/gl.h>
 
 #include <map>
 #include <vector>

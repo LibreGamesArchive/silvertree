@@ -34,7 +34,7 @@ namespace ttf {
 typedef boost::shared_ptr<TTF_Font> font_ptr;
 
 typedef std::map<int,font_ptr> font_map;
-font_map fonts;
+font_map* fonts = NULL;
 bool fonts_initialized = false;
 
 struct release_font
@@ -53,8 +53,8 @@ font_ptr get_font(int size)
         return font_ptr();
     }
     
-    const font_map::iterator i = fonts.find(size);
-    if(i != fonts.end()) {
+    const font_map::iterator i = fonts->find(size);
+    if(i != fonts->end()) {
         return i->second;
     } else {
         font_ptr new_font(TTF_OpenFont(sys::find_file("FreeSans.ttf").c_str(),size),
@@ -63,20 +63,21 @@ font_ptr get_font(int size)
             std::cerr << "ttf open failed: " << TTF_GetError() << "\n";
         }
         
-        fonts.insert(std::pair<int,font_ptr>(size,new_font));
+        fonts->insert(std::pair<int,font_ptr>(size,new_font));
         return new_font;
     }
 }
 
 renderer::renderer()
 {
+	fonts = new font_map;
     TTF_Init();
     fonts_initialized = true;
 }
 
 renderer::~renderer()
 {
-    fonts.clear();
+	delete fonts;
     TTF_Quit();
     fonts_initialized = false;
 }

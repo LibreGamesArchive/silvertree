@@ -88,6 +88,8 @@ public:
     bool draw();
     void draw_widgets(gui::slider *slider);
     graphics::renderer& renderer() const { return renderer_; }
+
+	void update_camera_controller() { camera_controller_.update(); }
 private:
     void add_widget(gui::widget_ptr w);
     void remove_widget(gui::widget_ptr w);

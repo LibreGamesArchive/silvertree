@@ -112,6 +112,8 @@ public:
     party_ptr get_pc_party() const;
 
     graphics::renderer& renderer() const { return renderer_; }
+
+	void update_camera_controller() { camera_controller_.update(); }
 private:
     friend class listener;
     
