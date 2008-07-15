@@ -88,9 +88,9 @@ void battle_modification::apply(battle_character& src,
 		const int value = i->second->execute(callable).as_int();
 
 		if(i->first == "inflict_damage") {
-                    text::renderer_ptr renderer = text::renderer::instance();
+                    text::renderer& renderer = text::renderer::instance();
                     target.get_character().take_damage(value);
-                    graphics::floating_label::add(renderer->render(formatter() << value, 20, 
+                    graphics::floating_label::add(renderer.render(formatter() << value, 20, 
                                                                    value <= 0 ? blue : red)->as_texture(), 
                                                   pos, move, 1000);
 		} else {

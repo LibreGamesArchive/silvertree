@@ -408,10 +408,10 @@ void world::draw_display(const_party_ptr selected_party) const {
     const SDL_Color white = {0xFF,0xFF,0x0,0};
 
     graphics::prepare_raster();
-    text::renderer_ptr text_renderer = text::renderer::instance();
+    text::renderer& text_renderer = text::renderer::instance();
     
     const text::rendered_text_ptr text = 
-        text_renderer->render(renderer_.status_text(),20,white); 
+        text_renderer.render(renderer_.status_text(),20,white); 
     text->blit(50,10);
     
     track_info_grid_ = get_track_info();
@@ -427,11 +427,11 @@ void world::draw_display(const_party_ptr selected_party) const {
             std::ostringstream stream;
             stream << height << " elevation";
             const text::rendered_text_ptr text =
-                text_renderer->render(stream.str(),20,white);
+                text_renderer.render(stream.str(),20,white);
             text->blit(50,50);
             
             text::rendered_text_ptr fatigue_text = 
-                text_renderer->render(focus_->fatigue_status_text(), 20, white);
+                text_renderer.render(focus_->fatigue_status_text(), 20, white);
             fatigue_text->blit(50,140);
         }
     }
@@ -442,14 +442,14 @@ void world::draw_display(const_party_ptr selected_party) const {
         std::ostringstream stream;
         stream << (hour < 10 ? "0" : "") << hour << ":"
                << (min < 10 ? "0" : "") << min;
-        text::rendered_text_ptr text = text_renderer->render(stream.str(),20,white);
+        text::rendered_text_ptr text = text_renderer.render(stream.str(),20,white);
         text->blit(50,110);
     }
     
     blit_texture(compass_, 1024-compass_.height(),0,-camera_.current_rotation());
     
     if(selected_party) {
-        text::rendered_text_ptr text = text_renderer->render(selected_party->status_text(), 20, white);
+        text::rendered_text_ptr text = text_renderer.render(selected_party->status_text(), 20, white);
         text->blit(1024 - 50 - text->width(),200);
     }
     

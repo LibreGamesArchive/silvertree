@@ -78,8 +78,8 @@ class text_fdo: public frame_draw_object {
 public:
 	text_fdo(int x, int y, int size, SDL_Color& color, const std::string& text) :
             x_(x), y_(y), text_() {
-            text::renderer_ptr renderer = text::renderer::instance();
-            text_ = renderer->render(text, size, color);
+            text::renderer& renderer = text::renderer::instance();
+            text_ = renderer.render(text, size, color);
 	}
 	void draw() const;
 private:
