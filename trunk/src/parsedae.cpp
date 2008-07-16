@@ -85,6 +85,12 @@ void scale_translation_vector(MatrixP3f& mat)
 #define CALLBACK
 #endif
 
+#if defined(__APPLE__) && defined(__MACH__)
+typedef CALLBACK GLvoid (*CALLBACKFUNC)(...);
+#else
+typedef CALLBACK GLvoid (*CALLBACKFUNC)();
+#endif
+
 class Tesselator
 {
 	GLUtesselator* tesselator_;
@@ -108,10 +114,10 @@ class Tesselator
 	{
 		tesselator_ = gluNewTess();
 
-		gluTessCallback(tesselator_, GLU_TESS_BEGIN_DATA, (CALLBACK GLvoid (*)(...))begin);
-		gluTessCallback(tesselator_, GLU_TESS_EDGE_FLAG_DATA, (CALLBACK GLvoid (*)(...))edge_flag);
-		gluTessCallback(tesselator_, GLU_TESS_VERTEX_DATA, (CALLBACK GLvoid (*)(...))vertex);
-		gluTessCallback(tesselator_, GLU_TESS_END_DATA, (CALLBACK GLvoid (*)(...))end);
+		gluTessCallback(tesselator_, GLU_TESS_BEGIN_DATA, (CALLBACKFUNC)begin);
+		gluTessCallback(tesselator_, GLU_TESS_EDGE_FLAG_DATA, (CALLBACKFUNC)edge_flag);
+		gluTessCallback(tesselator_, GLU_TESS_VERTEX_DATA, (CALLBACKFUNC)vertex);
+		gluTessCallback(tesselator_, GLU_TESS_END_DATA, (CALLBACKFUNC)end);
 	}
 	~Tesselator()
 	{
