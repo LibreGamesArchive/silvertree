@@ -68,7 +68,6 @@ map_avatar::map_avatar(graphics::const_model_ptr model,
     
 
 void map_avatar::init() {
-    std::cout<<"map_avatar::init\n";
     loc_tracker_.add_vertex(0.5, 0, 0.0);
     loc_tracker_.add_vertex(-0.5, 0, 0.0);
     loc_tracker_.add_vertex(0.5, 0, 1.0);

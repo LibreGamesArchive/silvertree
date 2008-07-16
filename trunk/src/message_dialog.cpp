@@ -157,10 +157,9 @@ void message_dialog::handle_draw() const
 {
     if(world_.draw()) {
 	graphics::prepare_raster();
+        dialog::handle_draw_children();
+        SDL_GL_SwapBuffers();
     }
-    dialog::handle_draw_children();
-    
-    SDL_GL_SwapBuffers();
 }
 
 int message_dialog::find_option(int x, int y) {
