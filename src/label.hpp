@@ -51,9 +51,9 @@ protected:
 	std::string& current_text();
 	void set_rendered_text(text::rendered_text_ptr);
 	virtual void recalculate_texture();
+    void inner_set_dim(int w, int h);
 private:
 	void handle_draw() const;
-	void inner_set_dim(int x, int y);
 	void reformat_text();
 
 	std::string text_, formatted_;

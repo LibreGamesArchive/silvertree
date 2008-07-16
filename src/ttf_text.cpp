@@ -18,13 +18,8 @@
 
 #include "filesystem.hpp"
 #include "foreach.hpp"
-#include "sdl_algo.hpp"
 #include "string_utils.hpp"
 #include "ttf_text.hpp"
-
-//#ifdef __APPLE__
-#define SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-//#endif
 
 namespace text
 {
@@ -113,49 +108,26 @@ rendered_text_ptr renderer::render(const std::string& text, int font_size,
     std::vector<graphics::surface> surfs;
     unsigned int width = 0, height = 0;
     
-#ifndef SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
     const unsigned int lineskip = TTF_FontLineSkip(font.get());
-    std::vector<int> heights;
-    int ascent = TTF_FontAscent(font.get());
-#endif
+
     foreach(const std::string& s, v) {
-        graphics::surface surf(graphics::get_non_transparent_portion(
-                                TTF_RenderUTF8_Blended(font.get(),s.c_str(),color)));
+        graphics::surface surf(TTF_RenderUTF8_Blended(font.get(),s.c_str(),color));
         surfs.push_back(surf);
         if(surf->w > width) {
             width = surf->w;
         }
-#ifndef SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-        heights.push_back(get_string_height(s, font_size));
         height += lineskip;
-#else
-        height += surf->h;
-#endif
-	}
-
-	graphics::surface res(SDL_CreateRGBSurface(SDL_SWSURFACE,width,height,
+    }
+    graphics::surface res(SDL_CreateRGBSurface(SDL_SWSURFACE,width,height,
                                                    32,SURFACE_MASK));
-	int y = 0;
-#ifndef SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-	std::vector<int>::iterator iter = heights.begin();
-#endif
-	foreach(const graphics::surface& surf, surfs) {
-		SDL_SetAlpha(surf.get(), 0, SDL_ALPHA_OPAQUE);
-
-#ifndef SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-		int y_adjust = ascent - *(iter++);
-		SDL_Rect rect = {0,y + y_adjust,surf->w,surf->h};
-#else
-		SDL_Rect rect = {0,y,surf->w,surf->h};
-#endif
-		SDL_BlitSurface(surf.get(), NULL, res.get(), &rect);
-#ifndef SDL_TTF_RENDERS_TO_CONSTANT_SIZE_BOX
-		y += lineskip;
-#else
-		y += surf->h;
-#endif
-	}
-	return rendered_text_ptr(new rendered_text(graphics::texture::get_no_cache(res, 1 << graphics::texture::NO_MIPMAP)));
+    int y = 0;
+    foreach(const graphics::surface& surf, surfs) {
+        SDL_SetAlpha(surf.get(), 0, SDL_ALPHA_OPAQUE);
+        SDL_Rect rect = {0,y,surf->w,surf->h};
+        SDL_BlitSurface(surf.get(), NULL, res.get(), &rect);
+        y += lineskip;
+    }
+    return rendered_text_ptr(new rendered_text(graphics::texture::get_no_cache(res, 1 << graphics::texture::NO_MIPMAP)));
 }
 
 std::string renderer::format(const std::string& text, int font_size, int width)
@@ -330,7 +302,22 @@ rendered_text_ptr renderer::render_complex_text(const std::string& text, int fon
 void renderer::get_text_size(const std::string& text, int font_size, int *w, int *h)
 {
     const font_ptr font(get_font(font_size));
-    TTF_SizeUTF8(font.get(), text.c_str(), w ,h);
+    std::vector<std::string> lines = util::split(text, '\n');
+    int res_w, res_h;
+    const unsigned int lineskip = TTF_FontLineSkip(font.get());
+
+    res_w = 0;
+    res_h = 0;
+    foreach(std::string& line, lines) {
+        int line_w, line_h;
+        TTF_SizeUTF8(font.get(), line.c_str(), &line_w, &line_h);
+        if(line_w > res_w) {
+            res_w = line_w;
+        }
+        res_h += lineskip;            
+    }
+    *w = res_w;
+    *h = res_h;
 }
 
 } //end namespace ttf
