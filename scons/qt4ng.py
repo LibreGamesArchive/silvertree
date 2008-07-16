@@ -135,7 +135,7 @@ def CheckQt4Libs(context, libs = ["QtCore", "QtGui"]):
 
     test_program = ""
     for lib in libs:
-        test_program += "#include <%s>\n" % qt4libs[lib] or lib
+        test_program += "#include <%s/%s>\n" % (lib, qt4libs[lib]) or lib
     test_program += "int main() {}\n"
     if context.TryLink(test_program, ".cpp"):
             context.Result("yes")
