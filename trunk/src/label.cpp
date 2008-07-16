@@ -118,7 +118,7 @@ void dialog_label::recalculate_texture()
 	std::string txt = current_text().substr(0, prog);
 
         text::renderer& renderer = text::renderer::instance();
-	if(prog > 0) {
+	if(prog < stages_) {
 		set_rendered_text(renderer.render(txt, size(), color()));
 	}
 }
