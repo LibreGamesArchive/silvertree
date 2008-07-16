@@ -73,7 +73,10 @@ AS_IF([test x$want_pango = xno],
      ])])
 
 AS_IF([test "x$pkgconfig_available" = xyes],
-      [PKG_CHECK_MODULES([QT], [QtCore > 4.0.0 QtOpenGL QtGui])],
+      [PKG_CHECK_MODULES([QT], [QtCore > 4.0.0 QtOpenGL QtGui], 
+                         [have_qt=yes
+                          QT_CXXFLAGS="$QT_CFLAGS $QT_CXXFLAGS"], 
+                         [have_qt=no])],
       [BNV_HAVE_QT
        AS_IF([test x$have_qt = xno], 
       [
