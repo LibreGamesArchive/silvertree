@@ -59,7 +59,6 @@ protected:
 	virtual void finish_draw() const {}
 	virtual void inner_set_loc(int x, int y);
 	virtual void inner_set_dim(int w, int h);
-	virtual bool hit_me(const SDL_Event &e);
 private:
 	void handle_draw() const;
 	bool valid_frame() const;

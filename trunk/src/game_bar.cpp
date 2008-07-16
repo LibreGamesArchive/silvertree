@@ -43,7 +43,12 @@ void game_bar::inner_draw() const
 
 bool game_bar::handle_event(const SDL_Event &e, bool claimed)
 {
-	claimed = handle_event_children(e, claimed);
+    claimed = handle_event_children(e, claimed);
+
+    if(!claimed && hit_me(e)) {
+        claimed = true;
+    }
+
     return claimed;
 }
 
