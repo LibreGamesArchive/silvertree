@@ -184,6 +184,8 @@ private:
 	int money_;
 
 	std::deque<hex::location> scripted_moves_;
+
+	mutable std::map<std::string, variant> party_vars_;
 };
 
 }

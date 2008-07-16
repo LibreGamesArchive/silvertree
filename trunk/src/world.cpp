@@ -665,6 +665,13 @@ void world::play()
                         active_party->new_world(*this,active_party->loc(),active_party->last_move());
 						camera_.set_rotation(s->second->get_world().camera_);
                         renderer_.reset_timing();
+					    map_formula_callable_ptr standard_callable(new map_formula_callable);
+						//since we've left the settlement we fire a 'start'
+						//event, since we're in this world again.
+					    standard_callable->add("world", variant(this))
+				            .add("pc", variant(get_pc_party().get()))
+					        .add("var", variant(&global_game_state::get().get_variables()));
+    					fire_event("start", *standard_callable);
                     }
                     
                     if(active_party->is_destroyed() == false) {

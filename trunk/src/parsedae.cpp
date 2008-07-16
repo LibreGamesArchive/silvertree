@@ -108,10 +108,10 @@ class Tesselator
 	{
 		tesselator_ = gluNewTess();
 
-		gluTessCallback(tesselator_, GLU_TESS_BEGIN_DATA, (CALLBACK GLvoid (*)())begin);
-		gluTessCallback(tesselator_, GLU_TESS_EDGE_FLAG_DATA, (CALLBACK GLvoid (*)())edge_flag);
-		gluTessCallback(tesselator_, GLU_TESS_VERTEX_DATA, (CALLBACK GLvoid (*)())vertex);
-		gluTessCallback(tesselator_, GLU_TESS_END_DATA, (CALLBACK GLvoid (*)())end);
+		gluTessCallback(tesselator_, GLU_TESS_BEGIN_DATA, (CALLBACK GLvoid (*)(...))begin);
+		gluTessCallback(tesselator_, GLU_TESS_EDGE_FLAG_DATA, (CALLBACK GLvoid (*)(...))edge_flag);
+		gluTessCallback(tesselator_, GLU_TESS_VERTEX_DATA, (CALLBACK GLvoid (*)(...))vertex);
+		gluTessCallback(tesselator_, GLU_TESS_END_DATA, (CALLBACK GLvoid (*)(...))end);
 	}
 	~Tesselator()
 	{

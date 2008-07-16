@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>EditPartyDialog</class>
  <widget class="QDialog" name="EditPartyDialog" >
   <property name="geometry" >
@@ -393,8 +390,20 @@
     <string>Edit WML...</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="editEncounterButton" >
+   <property name="geometry" >
+    <rect>
+     <x>120</x>
+     <y>300</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Encounter...</string>
+   </property>
+  </widget>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections>
   <connection>
