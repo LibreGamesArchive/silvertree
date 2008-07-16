@@ -82,17 +82,18 @@ void label::reformat_text()
 void label::recalculate_texture()
 {
     text::renderer& renderer = text::renderer::instance();
-    texture_ = renderer.render(current_text(), size_, color_)->as_texture();
-    inner_set_dim(texture_.width(),texture_.height());
+    rendered_text_ = renderer.render(current_text(), size_, color_);
+    inner_set_dim(rendered_text_->width(), rendered_text_->height());
 }
 
 void label::handle_draw() const
 {
-    graphics::blit_texture(texture_, x(), y());
+    rendered_text_->blit(x(), y());
 }
 
-void label::set_texture(graphics::texture t) {
-    texture_ = t;
+void label::set_rendered_text(text::rendered_text_ptr t)
+{
+	rendered_text_ = t;
 }
 
 dialog_label::dialog_label(const std::string& text, const SDL_Color& color, int size)
@@ -118,9 +119,7 @@ void dialog_label::recalculate_texture()
 
         text::renderer& renderer = text::renderer::instance();
 	if(prog > 0) {
-		set_texture(renderer.render(txt, size(), color())->as_texture());
-	} else {
-		set_texture(graphics::texture());
+		set_rendered_text(renderer.render(txt, size(), color()));
 	}
 }
 

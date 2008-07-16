@@ -19,6 +19,7 @@
 
 #include "texture.hpp"
 #include "widget.hpp"
+#include "text.hpp"
 
 namespace gui {
 
@@ -48,15 +49,15 @@ public:
 	std::string text() { return text_; }
 protected:
 	std::string& current_text();
+	void set_rendered_text(text::rendered_text_ptr);
 	virtual void recalculate_texture();
-	void set_texture(graphics::texture t);
 private:
 	void handle_draw() const;
 	void inner_set_dim(int x, int y);
 	void reformat_text();
 
 	std::string text_, formatted_;
-	graphics::texture texture_;
+	text::rendered_text_ptr rendered_text_;
 	SDL_Color color_;
 	int size_;
 	bool fixed_width_;
