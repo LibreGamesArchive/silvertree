@@ -315,7 +315,7 @@ AC_DEFUN([BNV_HAVE_QT],
      test x"$with_Qt_lib_dir" = x"no" ||
      test x"$with_Qt_lib" = x"no"; then
     # user disabled Qt. Leave cache alone.
-    have_qt="User disabled Qt."
+    have_qt=no
   else
     # "yes" is a bogus option
     if test x"$with_Qt_dir" = xyes; then
@@ -389,32 +389,72 @@ AC_DEFUN([BNV_HAVE_QT],
     fi
     QT_DIR="$bnv_qt_dir"
     QT_LIBS="$bnv_qt_LIBS"
-    # If bnv_qt_dir is defined, utilities are expected to be in the
-    # bin subdirectory
-    if test x"$bnv_qt_dir" != x; then
-        if test -x "$bnv_qt_dir/bin/uic"; then
-          QT_UIC="$bnv_qt_dir/bin/uic"
-        else
-          # Old versions of Qt don't have uic
-          QT_UIC=
-        fi
-      QT_MOC="$bnv_qt_dir/bin/moc"
-    else
-      # Or maybe we are told where to look for the utilities
-      if test x"$bnv_qt_bin_dir" != x; then
-        if test -x "$bnv_qt_bin_dir/uic"; then
+    # Were we  told where to look for the utilities?
+    if test x"$bnv_qt_bin_dir" != x; then
+        if test -x "$bnv_qt_bin_dir/uic-qt4"; then
+          QT_UIC="$bnv_qt_bin_dir/uic-qt4"
+        elif test -x "$bnv_qt_dir/uic4"; then
+          QT_UIC="$bnv_qt_bin_dir/uic4"
+        elif test -x "$bnv_qt_bin_dir/uic"; then
           QT_UIC="$bnv_qt_bin_dir/uic"
         else
           # Old versions of Qt don't have uic
           QT_UIC=
         fi
-        QT_MOC="$bnv_qt_bin_dir/moc"
-      else
+        
+        if test -x "$bnv_qt_bin_dir/moc-qt4"; then
+          QT_MOC="$bnv_qt_bin_dir/moc-qt4"
+        elif test -x "$bnv_qt_bin_dir/moc4"; then
+          QT_MOC="$bnv_qt_bin_dir/moc4"
+        elif test -x "$bnv_qt_bin_dir/moc"; then
+          QT_MOC="$bnv_qt_bin_dir/moc"
+        else
+          # moc not found
+          QT_MOC=
+        fi
+    # If bnv_qt_dir is defined, utilities are expected to be in the
+    # bin subdirectory
+    elif test x"$bnv_qt_dir" != x; then
+        if test -x "$bnv_qt_dir/bin/uic-qt4"; then
+          QT_UIC="$bnv_qt_dir/bin/uic-qt4"
+        elif test -x "$bnv_qt_dir/bin/uic4"; then
+          QT_UIC="$bnv_qt_dir/bin/uic4"
+        elif test -x "$bnv_qt_dir/bin/uic"; then
+          QT_UIC="$bnv_qt_dir/bin/uic"
+        else
+          # Old versions of Qt don't have uic
+          QT_UIC=
+        fi
+        
+        if test -x "$bnv_qt_dir/bin/moc-qt4"; then
+          QT_MOC="$bnv_qt_dir/bin/moc-qt4"
+        elif test -x "$bnv_qt_dir/bin/moc4"; then
+          QT_MOC="$bnv_qt_dir/bin/moc4"
+        elif test -x "$bnv_qt_dir/bin/moc"; then
+          QT_MOC="$bnv_qt_dir/bin/moc"
+        else
+          # moc not found
+          QT_MOC=
+        fi
+    else
       # Last possibility is that they are in $PATH
-        QT_UIC="`which uic`"
-        QT_MOC="`which moc`"
-      fi
+        QT_UIC="`which uic-qt4`"
+        if test $? = 1; then
+          QT_UIC="`which uic4`"
+          if test $? = 1; then
+            QT_UIC="`which uic`"
+          fi
+        fi
+         
+        QT_MOC="`which moc-qt4`"
+        if test $? = 1; then
+          QT_MOC="`which moc4`"
+          if test $? = 1; then
+            QT_MOC="`which moc`"
+          fi
+        fi
     fi
+
     # All variables are defined, report the result
     AC_MSG_RESULT([$have_qt:
     QT_CXXFLAGS=$QT_CXXFLAGS
