@@ -110,17 +110,20 @@ void dialog_label::set_progress(int progress)
 
 void dialog_label::recalculate_texture()
 {
-	label::recalculate_texture();
-	stages_ = current_text().size();
-	int prog = progress_;
-	if(prog < 0) prog = 0;
-	if(prog > stages_) prog = stages_;
-	std::string txt = current_text().substr(0, prog);
+    int w, h;
 
-        text::renderer& renderer = text::renderer::instance();
-	if(prog < stages_) {
-		set_rendered_text(renderer.render(txt, size(), color()));
-	}
+    text::renderer& renderer = text::renderer::instance();
+
+    renderer.get_text_size(current_text(), size(), &w, &h);
+    inner_set_dim(w, h);
+
+    stages_ = current_text().size();
+    int prog = progress_;
+    if(prog < 0) prog = 0;
+    if(prog > stages_) prog = stages_;
+
+    std::string txt = current_text().substr(0, prog);
+    set_rendered_text(renderer.render(txt, size(), color()));
 }
 
 label_factory::label_factory(const SDL_Color& color, int size)
