@@ -25,6 +25,7 @@ const hex::location& map_selection::get_selected_hex() {
 }
 
 bool map_selection::process_event(const SDL_Event& e, bool claimed) {
+    bool no_selection = false;
     switch(e.type) {
     case SDL_MOUSEMOTION:
         if(!claimed) {
@@ -32,12 +33,23 @@ bool map_selection::process_event(const SDL_Event& e, bool claimed) {
             avatar_up_to_date_ = false;
             claimed = true;
         } else {
-            hex_up_to_date_ = true;
-            avatar_up_to_date_ = true;
-            selected_hex_ = hex::location(-1,-1);
-            selected_avatar_ = -1;
+            no_selection = true;
         }
         break;
+    case SDL_ACTIVEEVENT:
+        if((e.active.gain == 0) && (e.active.state & SDL_APPMOUSEFOCUS)) {
+            // even if wasn't claimed it is now
+            // either way, need to clear the selection
+            no_selection = true;
+            claimed = true;
+        }
+        break;
+    }
+    if(no_selection) {
+        hex_up_to_date_ = true;
+        avatar_up_to_date_ = true;
+        selected_hex_ = hex::location(-1,-1);
+        selected_avatar_ = -1;
     }
     return claimed;
 }
