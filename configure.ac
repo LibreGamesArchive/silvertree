@@ -72,13 +72,8 @@ AS_IF([test x$want_pango = xno],
         ])
      ])])
 
-AS_IF([test "x$pkgconfig_available" = xyes],
-      [PKG_CHECK_MODULES([QT], [QtCore > 4.0.0 QtOpenGL QtGui], 
-                         [have_qt=yes
-                          QT_CXXFLAGS="$QT_CFLAGS $QT_CXXFLAGS"], 
-                         [have_qt=no])],
-      [BNV_HAVE_QT
-       AS_IF([test x$have_qt = xno], 
+BNV_HAVE_QT
+AS_IF([test x$have_qt = xno], 
       [
               AC_MSG_WARN([**** Qt library not found.])
       ],
@@ -89,7 +84,7 @@ AS_IF([test "x$pkgconfig_available" = xyes],
         AC_CHECK_LIB([QtOpenGL], [main], [QT_LIBS="$QT_LIBS -lQtOpenGL"],
 	             [AC_MSG_WARN([**** QtOpenGL not found !])
                       have_qt=no], [$QT_LIBS])
-      ])])
+      ])
 
 AS_IF([test x$want_audio = xno], [],
 AS_IF([test x$have_audio = xno],

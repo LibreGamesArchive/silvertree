@@ -728,14 +728,13 @@ pkgconfig_available
 PKG_CONFIG
 PANGO_CFLAGS
 PANGO_LIBS
-QT_CFLAGS
-QT_LIBS
 X_CFLAGS
 X_PRE_LIBS
 X_LIBS
 X_EXTRA_LIBS
 QT_CXXFLAGS
 QT_DIR
+QT_LIBS
 QT_UIC
 QT_MOC
 HAVE_PANGO_TRUE
@@ -763,9 +762,7 @@ CXXCPP
 CPP
 PKG_CONFIG
 PANGO_CFLAGS
-PANGO_LIBS
-QT_CFLAGS
-QT_LIBS'
+PANGO_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1397,8 +1394,6 @@ Some influential environment variables:
   PANGO_CFLAGS
               C compiler flags for PANGO, overriding pkg-config
   PANGO_LIBS  linker flags for PANGO, overriding pkg-config
-  QT_CFLAGS   C compiler flags for QT, overriding pkg-config
-  QT_LIBS     linker flags for QT, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -8630,80 +8625,6 @@ fi
 
 fi
 
-if test "x$pkgconfig_available" = xyes; then
-
-pkg_failed=no
-{ echo "$as_me:$LINENO: checking for QT" >&5
-echo $ECHO_N "checking for QT... $ECHO_C" >&6; }
-
-if test -n "$PKG_CONFIG"; then
-    if test -n "$QT_CFLAGS"; then
-        pkg_cv_QT_CFLAGS="$QT_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"QtCore > 4.0.0 QtOpenGL QtGui\"") >&5
-  ($PKG_CONFIG --exists --print-errors "QtCore > 4.0.0 QtOpenGL QtGui") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_QT_CFLAGS=`$PKG_CONFIG --cflags "QtCore > 4.0.0 QtOpenGL QtGui" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$QT_LIBS"; then
-        pkg_cv_QT_LIBS="$QT_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"QtCore > 4.0.0 QtOpenGL QtGui\"") >&5
-  ($PKG_CONFIG --exists --print-errors "QtCore > 4.0.0 QtOpenGL QtGui") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_QT_LIBS=`$PKG_CONFIG --libs "QtCore > 4.0.0 QtOpenGL QtGui" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        QT_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "QtCore > 4.0.0 QtOpenGL QtGui"`
-        else
-	        QT_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "QtCore > 4.0.0 QtOpenGL QtGui"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$QT_PKG_ERRORS" >&5
-
-	{ echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-                have_qt=no
-elif test $pkg_failed = untried; then
-	have_qt=no
-else
-	QT_CFLAGS=$pkg_cv_QT_CFLAGS
-	QT_LIBS=$pkg_cv_QT_LIBS
-        { echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; }
-	have_qt=yes
-                          QT_CXXFLAGS="$QT_CFLAGS $QT_CXXFLAGS"
-fi
-else
 
 
 
@@ -8748,7 +8669,7 @@ fi
      test x"$with_Qt_lib_dir" = x"no" ||
      test x"$with_Qt_lib" = x"no"; then
     # user disabled Qt. Leave cache alone.
-    have_qt="User disabled Qt."
+    have_qt=no
   else
     # "yes" is a bogus option
     if test x"$with_Qt_dir" = xyes; then
@@ -9152,32 +9073,72 @@ fi
     fi
     QT_DIR="$bnv_qt_dir"
     QT_LIBS="$bnv_qt_LIBS"
-    # If bnv_qt_dir is defined, utilities are expected to be in the
-    # bin subdirectory
-    if test x"$bnv_qt_dir" != x; then
-        if test -x "$bnv_qt_dir/bin/uic"; then
-          QT_UIC="$bnv_qt_dir/bin/uic"
-        else
-          # Old versions of Qt don't have uic
-          QT_UIC=
-        fi
-      QT_MOC="$bnv_qt_dir/bin/moc"
-    else
-      # Or maybe we are told where to look for the utilities
-      if test x"$bnv_qt_bin_dir" != x; then
-        if test -x "$bnv_qt_bin_dir/uic"; then
+    # Were we  told where to look for the utilities?
+    if test x"$bnv_qt_bin_dir" != x; then
+        if test -x "$bnv_qt_bin_dir/uic-qt4"; then
+          QT_UIC="$bnv_qt_bin_dir/uic-qt4"
+        elif test -x "$bnv_qt_dir/uic4"; then
+          QT_UIC="$bnv_qt_bin_dir/uic4"
+        elif test -x "$bnv_qt_bin_dir/uic"; then
           QT_UIC="$bnv_qt_bin_dir/uic"
         else
           # Old versions of Qt don't have uic
           QT_UIC=
         fi
-        QT_MOC="$bnv_qt_bin_dir/moc"
-      else
+
+        if test -x "$bnv_qt_bin_dir/moc-qt4"; then
+          QT_MOC="$bnv_qt_bin_dir/moc-qt4"
+        elif test -x "$bnv_qt_bin_dir/moc4"; then
+          QT_MOC="$bnv_qt_bin_dir/moc4"
+        elif test -x "$bnv_qt_bin_dir/moc"; then
+          QT_MOC="$bnv_qt_bin_dir/moc"
+        else
+          # moc not found
+          QT_MOC=
+        fi
+    # If bnv_qt_dir is defined, utilities are expected to be in the
+    # bin subdirectory
+    elif test x"$bnv_qt_dir" != x; then
+        if test -x "$bnv_qt_dir/bin/uic-qt4"; then
+          QT_UIC="$bnv_qt_dir/bin/uic-qt4"
+        elif test -x "$bnv_qt_dir/bin/uic4"; then
+          QT_UIC="$bnv_qt_dir/bin/uic4"
+        elif test -x "$bnv_qt_dir/bin/uic"; then
+          QT_UIC="$bnv_qt_dir/bin/uic"
+        else
+          # Old versions of Qt don't have uic
+          QT_UIC=
+        fi
+
+        if test -x "$bnv_qt_dir/bin/moc-qt4"; then
+          QT_MOC="$bnv_qt_dir/bin/moc-qt4"
+        elif test -x "$bnv_qt_dir/bin/moc4"; then
+          QT_MOC="$bnv_qt_dir/bin/moc4"
+        elif test -x "$bnv_qt_dir/bin/moc"; then
+          QT_MOC="$bnv_qt_dir/bin/moc"
+        else
+          # moc not found
+          QT_MOC=
+        fi
+    else
       # Last possibility is that they are in $PATH
-        QT_UIC="`which uic`"
-        QT_MOC="`which moc`"
-      fi
+        QT_UIC="`which uic-qt4`"
+        if test $? = 1; then
+          QT_UIC="`which uic4`"
+          if test $? = 1; then
+            QT_UIC="`which uic`"
+          fi
+        fi
+
+        QT_MOC="`which moc-qt4`"
+        if test $? = 1; then
+          QT_MOC="`which moc4`"
+          if test $? = 1; then
+            QT_MOC="`which moc`"
+          fi
+        fi
     fi
+
     # All variables are defined, report the result
     { echo "$as_me:$LINENO: result: $have_qt:
     QT_CXXFLAGS=$QT_CXXFLAGS
@@ -9306,7 +9267,7 @@ echo "$as_me: error: Failed to find matching components of a complete
           bnv_qt_main.$ac_ext bnv_qt_main.o bnv_qt_main
   fi
 
-       if test x$have_qt = xno; then
+if test x$have_qt = xno; then
 
               { echo "$as_me:$LINENO: WARNING: **** Qt library not found." >&5
 echo "$as_me: WARNING: **** Qt library not found." >&2;}
@@ -9439,8 +9400,6 @@ echo "$as_me: WARNING: **** QtOpenGL not found !" >&2;}
                       have_qt=no
 fi
 
-
-fi
 
 fi
 
@@ -10340,14 +10299,13 @@ pkgconfig_available!$pkgconfig_available$ac_delim
 PKG_CONFIG!$PKG_CONFIG$ac_delim
 PANGO_CFLAGS!$PANGO_CFLAGS$ac_delim
 PANGO_LIBS!$PANGO_LIBS$ac_delim
-QT_CFLAGS!$QT_CFLAGS$ac_delim
-QT_LIBS!$QT_LIBS$ac_delim
 X_CFLAGS!$X_CFLAGS$ac_delim
 X_PRE_LIBS!$X_PRE_LIBS$ac_delim
 X_LIBS!$X_LIBS$ac_delim
 X_EXTRA_LIBS!$X_EXTRA_LIBS$ac_delim
 QT_CXXFLAGS!$QT_CXXFLAGS$ac_delim
 QT_DIR!$QT_DIR$ac_delim
+QT_LIBS!$QT_LIBS$ac_delim
 QT_UIC!$QT_UIC$ac_delim
 QT_MOC!$QT_MOC$ac_delim
 HAVE_PANGO_TRUE!$HAVE_PANGO_TRUE$ac_delim
@@ -10360,7 +10318,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 34; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 33; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
