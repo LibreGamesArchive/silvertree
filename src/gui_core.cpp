@@ -180,29 +180,6 @@ void skinned_widget::inner_set_loc(int x, int y)
 	widget::set_loc(x,y);
 }
 
-bool skinned_widget::hit_me(const SDL_Event &e) {
-	switch(e.type) {
-	case SDL_MOUSEBUTTONUP:
-	case SDL_MOUSEBUTTONDOWN:
-		if(e.button.x >  x() && e.button.y > y() &&
-		   e.button.x < x() + width() && e.button.y < y() + height())
-		{
-			return true;
-		}
-		return false;
-	case SDL_MOUSEMOTION:
-		if(e.motion.x >  x() && e.motion.y > y() &&
-		   e.motion.x < x() + width() && e.motion.y < y() + height())
-		{
-			return true;
-		}
-		return false;
-	default:
-		return false;
-	}
-}
-
-
 void button_widget::do_click()
 {
 	// NB heuristic since finding mouse pos is hard

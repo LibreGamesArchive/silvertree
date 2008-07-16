@@ -43,6 +43,7 @@ protected:
 	virtual ~widget();
 
 	void normalize_event(SDL_Event* event);
+	virtual bool hit_me(const SDL_Event &e);
 private:
 	virtual void handle_draw() const = 0;
 	virtual bool handle_event(const SDL_Event& event, bool claimed) { return claimed; }
