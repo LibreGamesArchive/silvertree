@@ -145,11 +145,11 @@ graphics::texture rendered_text::as_texture()
     glPixelTransferf(GL_RED_BIAS, (float)color_.r/255.);
     glPixelTransferf(GL_GREEN_BIAS, (float)color_.g/255.);
     glPixelTransferf(GL_BLUE_BIAS, (float)color_.b/255.);
-    //gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, hnd_->bitmap_.width, hnd_->bitmap_.rows, 
-    //                GL_ALPHA, GL_UNSIGNED_BYTE, hnd_->bitmap_.buffer);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, hnd_->bitmap_.width, hnd_->bitmap_.rows, 
+                    GL_ALPHA, GL_UNSIGNED_BYTE, hnd_->bitmap_.buffer);
     //glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hnd_->bitmap_.width, hnd_->bitmap_.rows, 0, 
-                 GL_ALPHA, GL_UNSIGNED_BYTE, hnd_->bitmap_.buffer);
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hnd_->bitmap_.width, hnd_->bitmap_.rows, 0, 
+//                 GL_ALPHA, GL_UNSIGNED_BYTE, hnd_->bitmap_.buffer);
     glPopAttrib();
     
     return texture;

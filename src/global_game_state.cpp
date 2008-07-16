@@ -7,6 +7,7 @@
 #include "formula.hpp"
 #include "formula_callable.hpp"
 #include "global_game_state.hpp"
+#include "variables_callable.hpp"
 #include "variant.hpp"
 #include "wml_node.hpp"
 #include "wml_utils.hpp"
@@ -15,40 +16,8 @@ namespace game_logic {
 
 namespace {
 int current_party_id = 1;
-typedef std::map<std::string, variant> variable_map;
 variable_map variables;
 variable_map tmp_variables;
-
-class variables_callable : public formula_callable
-{
-public:
-	explicit variables_callable(variable_map& var) : var_(var) {
-	}
-private:
-	void get_inputs(std::vector<formula_input>* inputs) const {
-		for(variable_map::const_iterator i = var_.begin(); i != var_.end(); ++i) {
-			inputs->push_back(formula_input(i->first, FORMULA_READ_WRITE));
-		}
-	}
-
-	variant get_value(const std::string& key) const {
-		variable_map::const_iterator i = var_.find(key);
-		if(i != var_.end()) {
-			return i->second;
-		} else {
-			return variant();
-		}
-	}
-
-	void set_value(const std::string& key, const variant& value) {
-		if(key == "tmp") {
-			return;
-		}
-		var_[key] = value;
-	}
-
-	variable_map& var_;
-};
 }
 
 global_game_state& global_game_state::get()

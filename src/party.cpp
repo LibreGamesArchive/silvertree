@@ -25,6 +25,7 @@
 #include "string_utils.hpp"
 #include "tile.hpp"
 #include "tile_logic.hpp"
+#include "variables_callable.hpp"
 #include "world.hpp"
 #include "wml_node.hpp"
 #include "wml_utils.hpp"
@@ -107,6 +108,14 @@ party::party(wml::const_node_ptr node, world& gameworld)
 		event_handler handler(event);
 		gameworld.add_event_handler("encounter", handler);
 	}
+
+	wml::const_node_ptr var_node = node->get_child("vars");
+	if(var_node) {
+		for(wml::node::const_attr_iterator i = var_node->begin_attr();
+		    i != var_node->end_attr(); ++i) {
+			party_vars_[i->first].serialize_from_string(i->second);
+		}
+	}
 }
 
 party::~party()
@@ -138,6 +147,17 @@ wml::node_ptr party::write() const
 	}
 
 	res->set_attr("items", items);
+
+	if(party_vars_.empty() == false) {
+		wml::node_ptr node(new wml::node("vars"));
+		for(std::map<std::string,variant>::const_iterator i = party_vars_.begin(); i != party_vars_.end(); ++i) {
+			std::string value;
+			i->second.serialize_to_string(value);
+			node->set_attr(i->first, value);
+		}
+
+		res->add_child(node);
+	}
 
 	return res;
 }
@@ -602,6 +622,8 @@ variant party::get_value(const std::string& key) const
 		return variant(this);
 	} else if(key == "var") {
 		return variant(&global_game_state::get().get_variables());
+	} else if(key == "party_var") {
+		return variant(new variables_callable(party_vars_));
 	} else if(key == "is_npc") {
 		return variant(is_human_controlled() ? 0 : 1);
 	} else if(key == "is_pc") {
