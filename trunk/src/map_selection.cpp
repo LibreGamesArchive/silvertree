@@ -38,7 +38,9 @@ bool map_selection::process_event(const SDL_Event& e, bool claimed) {
         }
         break;
     case SDL_ACTIVEEVENT:
-        if((e.active.gain == 0) && (e.active.state & SDL_APPMOUSEFOCUS)) {
+        // any active event where we lost 
+        // focus causes us to reset the selection
+        if(e.active.gain == 0) {
             // even if wasn't claimed it is now
             // either way, need to clear the selection
             reset();
