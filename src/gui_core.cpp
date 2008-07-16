@@ -501,8 +501,8 @@ int menu_widget::find_option(const SDL_Event &e)
 	int count = 0;
 	for(const_iterator i = begin_options();  i != end_options(); ++i) {
 		const menu_option_ptr opt = i->second;
-		if(mx > opt->x() && mx < opt->x() + opt->width() &&
-		   my > opt->y() && my < opt->y() + opt->height()) {
+		if(mx >= opt->x() && mx < opt->x() + opt->width() &&
+		   my >= opt->y() && my < opt->y() + opt->height()) {
 			return count;
 		}
 		++count;
