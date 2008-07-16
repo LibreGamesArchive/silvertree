@@ -1,5 +1,5 @@
 # vi: syntax=python:et:ts=4
-from os.path import join
+from os.path import join, exists
 from subprocess import Popen, PIPE
 from SCons.Script  import *
 from SCons.Builder import Builder
@@ -91,8 +91,10 @@ def CheckQt4Tools(context, tools = ["moc", "uic"]):
                             WhereIs(tool, qt_bin_dir)
             if not env["use_frameworked_qt"]:
                 try:
-                    env[tool_var] = Popen(Split("pkg-config --variable=" + tool + "_location QtCore"), stdout = PIPE).communicate()[0]
-                    env[tool_var] = env[tool_var].rstrip("\n")
+                    tool_location = Popen(Split("pkg-config --variable=" + tool + "_location QtCore"), stdout = PIPE).communicate()[0]
+                    tool_location = tool_location.rstrip("\n")
+                    if exists(tool_location):
+                        env[tool_var]
                 except OSError:
                     pass
 
