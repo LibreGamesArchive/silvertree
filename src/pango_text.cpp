@@ -35,6 +35,34 @@ namespace
 FT_Library library;
 PangoFT2FontMap* font_map;
 PangoContext* context;
+PangoFontDescription* game_font;
+
+struct layout
+{
+	PangoLayout* layout_;
+	explicit layout(int size)
+	{
+		layout_ = pango_layout_new(context);
+
+		pango_font_description_set_absolute_size(game_font, size * PANGO_SCALE);
+		pango_layout_set_font_description(layout_, game_font);
+	}
+	~layout()
+	{
+		g_object_unref(layout_);
+	}
+	void set_text(string text, bool markup = false)
+	{
+		if(markup)
+			pango_layout_set_markup(layout_, text.data(), text.size());
+		else
+			pango_layout_set_text(layout_, text.data(), text.size());
+	}
+	void extents(PangoRectangle* ink, PangoRectangle* logical)
+	{
+		 pango_layout_get_pixel_extents(layout_, ink, logical);
+	}
+};
 
 }
 
@@ -48,10 +76,13 @@ renderer::renderer()
     font_map = (PangoFT2FontMap*)pango_ft2_font_map_new();
     context = pango_ft2_font_map_create_context(font_map);
     pango_ft2_font_map_set_resolution(PANGO_FT2_FONT_MAP(font_map), 96, 96);
+    game_font = pango_font_description_new();
+    pango_font_description_set_family_static(game_font, "FreeSans");
 }
 
 renderer::~renderer()
 {
+    pango_font_description_free(game_font);
     g_object_unref(context);
     g_object_unref(font_map);
 }
@@ -81,26 +112,18 @@ void renderer::get_text_size(const std::string& text,
 
 rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_Color& color)
 {
-    PangoLayout* layout = pango_layout_new(context);
-    pango_layout_set_text(layout, text.data(), text.size());
+	::layout layout(size);
+	layout.set_text(text);
     
-    PangoFontDescription *desc = pango_font_description_new();
-    pango_font_description_set_family_static(desc, "FreeSans");
-    pango_font_description_set_absolute_size(desc, size * PANGO_SCALE);
-    pango_layout_set_font_description(layout, desc);
-    pango_font_description_free(desc);
-    
-    PangoRectangle rect;
-    pango_layout_get_pixel_extents(layout, NULL, &rect);
-    
-    ft_bitmap_ptr ptr(new ft_bitmap_handle(rect.width, rect.height));
-    FT_Bitmap& bitmap = ptr->bitmap_;
-    
-    pango_ft2_render_layout(&bitmap, layout, 0, 0);
-    
-    g_object_unref(layout);
-    
-    return rendered_text_ptr(new rendered_text(ptr, color));
+	PangoRectangle rect;
+	layout.extents(NULL, &rect);
+
+	ft_bitmap_ptr ptr(new ft_bitmap_handle(rect.width, rect.height));
+	FT_Bitmap& bitmap = ptr->bitmap_;
+
+	pango_ft2_render_layout(&bitmap, layout.layout_, 0, 0);
+
+	return rendered_text_ptr(new rendered_text(ptr, color));
 }
 
 ft_bitmap_handle::ft_bitmap_handle(int width, int height)
