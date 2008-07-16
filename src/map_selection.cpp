@@ -20,7 +20,6 @@ int map_selection::get_selected_avatar() {
 
 const hex::location& map_selection::get_selected_hex() {
     if(!hex_up_to_date_) {
-        std::cout << "Asked renderer for selected_hex\n";
         selected_hex_ = renderer_.get_selected_hex();
         hex_up_to_date_ = true;
     }
