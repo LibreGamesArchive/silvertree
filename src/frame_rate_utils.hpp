@@ -13,6 +13,7 @@
 #ifndef FRAME_SKIPPER_HPP_INCLUDED
 #define FRAME_SKIPPER_HPP_INCLUDED
 
+#include <iostream>
 #include <string>
 #include <sstream>
 #include "SDL.h"
@@ -21,38 +22,45 @@ namespace graphics {
 
 class frame_skipper {
 public:
-	frame_skipper(int rate=50, bool maxfps=false)
-		: maxfps_(maxfps), frame_time_(1000/rate),
-		  last_(0), accum_(0)  {
-		last_ = SDL_GetTicks();
-	}
-	bool skip_frame();
-	void reset();
+    frame_skipper(int rate=50, bool maxfps=false)
+        : maxfps_(maxfps), frame_time_(1000/rate),
+          last_(0), accum_(0), 
+          skipped_last_frame_(false)
+    {
+        last_ = SDL_GetTicks();
+    }
+    bool skip_frame();
+    void reset();
 private:
-	const bool maxfps_;
-	const int frame_time_;
-	int last_;
-	int accum_;
+    const bool maxfps_;
+    const int frame_time_;
+    int last_;
+    int accum_;
+    bool skipped_last_frame_;
 };
 
 inline bool frame_skipper::skip_frame() {
-	const int start = SDL_GetTicks();
-	bool ret = false;
+    const int start = SDL_GetTicks();
+    bool ret = false;
+    int elapsed = 0;
+    
+    if(!skipped_last_frame_) {
+        elapsed = start - last_;
+    }
+    accum_ += (elapsed - frame_time_);
 
-	const int elapsed = start - last_;
-	accum_ += (elapsed - frame_time_);
-	if(!maxfps_) {
-		if(accum_ < 0) {
-			SDL_Delay(-accum_);
-		} else {
-			SDL_Delay(1);
-		}
-	}
-	if(accum_ > frame_time_) {
-		ret = true;
-	}
-	last_ = start;
-	return ret;
+    if(!maxfps_) {
+        if(accum_ < 0) {
+            SDL_Delay(-accum_);
+        } else {
+            SDL_Delay(1);
+        }
+    }
+
+    ret = accum_ > frame_time_;
+    skipped_last_frame_ = ret;
+    last_ = start;
+    return ret;
 }
 
 inline void frame_skipper::reset() {
