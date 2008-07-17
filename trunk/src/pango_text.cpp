@@ -24,10 +24,13 @@
 #include <pango/pangoft2.h>
 #include <boost/lexical_cast.hpp>
 #include <string>
+#include <sstream>
 
 #include "pango_text.hpp"
 
 using std::string;
+using std::ostringstream;
+using std::endl;
 
 namespace
 {
@@ -120,7 +123,23 @@ rendered_text_ptr renderer::render_complex_text(const std::string& text, int fon
 std::string renderer::format(const std::string& text, 
                              int font_size, 
                              int width) {
-    return legacy_renderer_.format(text, font_size, width);
+	::layout layout(font_size);
+	layout.set_text(text);
+	pango_layout_set_width(layout.get(), width * PANGO_SCALE);
+
+	PangoLayoutIter* iter = pango_layout_get_iter(layout.get());
+	ostringstream formatted_text;
+
+	do {
+		PangoLayoutLine* line = pango_layout_iter_get_line(iter);
+		formatted_text << text.substr(line->start_index, line->length);
+		if(!pango_layout_iter_at_last_line(iter))
+			formatted_text << endl;
+	} while(pango_layout_iter_next_line(iter));
+
+	pango_layout_iter_free(iter);
+
+	return formatted_text.str();
 }
 void renderer::get_text_size(const std::string& text, 
                              int font_size,
