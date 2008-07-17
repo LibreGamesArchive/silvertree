@@ -27,6 +27,7 @@
 #include "tile_logic.hpp"
 #include "variables_callable.hpp"
 #include "world.hpp"
+#include "wml_command.hpp"
 #include "wml_node.hpp"
 #include "wml_utils.hpp"
 
@@ -116,6 +117,14 @@ party::party(wml::const_node_ptr node, world& gameworld)
 			party_vars_[i->first].serialize_from_string(i->second);
 		}
 	}
+
+	wml_dialog_commands_ = node->get_child("dialog_commands");
+	if(wml_dialog_commands_) {
+		for(wml::node::const_all_child_iterator i = wml_dialog_commands_->begin_children(); i != wml_dialog_commands_->end_children(); ++i) {
+			dialog_commands_[(*i)->attr("label")] = wml_command::create(*i);
+		}
+		
+	}
 }
 
 party::~party()
@@ -159,6 +168,10 @@ wml::node_ptr party::write() const
 		res->add_child(node);
 	}
 
+	if(wml_dialog_commands_) {
+		res->add_child(wml::deep_copy(wml_dialog_commands_));
+	}
+
 	return res;
 }
 
@@ -194,6 +207,16 @@ void party::update_rotation(int key) const
 void party::update_position(int key) const 
 {
 	get_pos(position_v());
+}
+
+void party::execute_dialog_command(const std::string& cmd,
+                                   const formula_callable& info,
+								   world& world) const
+{
+	std::map<std::string, const_wml_command_ptr>::const_iterator i = dialog_commands_.find(cmd);
+	if(i != dialog_commands_.end()) {
+		i->second->execute(info, world);
+	}
 }
 
 party::TURN_RESULT party::play_turn()

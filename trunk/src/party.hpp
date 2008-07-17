@@ -28,6 +28,7 @@
 #include "party_fwd.hpp"
 #include "pathfind.hpp"
 #include "tile_logic.hpp"
+#include "wml_command_fwd.hpp"
 #include "wml_node.hpp"
 
 namespace game_logic
@@ -131,6 +132,10 @@ public:
 
     void update_rotation(int key) const;
     void update_position(int key) const;
+
+	void execute_dialog_command(const std::string& cmd,
+	                            const formula_callable& info,
+								world& world) const;
 protected:
 	void move(hex::DIRECTION dir);
 	int movement_cost(const hex::location& src,
@@ -186,6 +191,9 @@ private:
 	std::deque<hex::location> scripted_moves_;
 
 	mutable std::map<std::string, variant> party_vars_;
+
+	std::map<std::string, const_wml_command_ptr> dialog_commands_;
+	wml::const_node_ptr wml_dialog_commands_;
 };
 
 }

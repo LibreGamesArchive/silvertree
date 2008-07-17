@@ -160,6 +160,26 @@ public:
         }
     }
 };
+
+class goto_command : public wml_command {
+	std::string goto_;
+    formula npc_formula_;
+
+    void do_execute(const formula_callable& info, world& world) const {
+        const variant npc = npc_formula_.execute(info);
+        const party* npc_party = npc.try_convert<const party>();
+		if(!npc_party) {
+			std::cerr << "ERROR: Party not found for goto!\n";
+			return;
+		}
+
+		npc_party->execute_dialog_command(goto_, info, world);
+	}
+public:
+	explicit goto_command(wml::const_node_ptr node) : goto_(node->attr("goto")),
+          npc_formula_(wml::get_str(node, "npc", "npc"))
+	{}
+};
     
 class scripted_moves_command : public wml_command {
     formula filter_;
@@ -340,6 +360,7 @@ class dialog_command : public wml_command {
     std::vector<std::string> options_;
     std::vector<const_formula_ptr> option_conditions_;
     std::vector<std::vector<const_wml_command_ptr> > consequences_;
+	std::vector<std::string> command_consequences_;
     void do_execute(const formula_callable& info, world& world) const {
         if(condition_) {
             variant res = condition_->execute(info);
@@ -402,6 +423,12 @@ class dialog_command : public wml_command {
                     c->execute(info, world);
                 }
             }
+
+			if(option >= 0 && option < command_consequences_.size() &&
+			   command_consequences_[option].empty() == false && npc_party) {
+				npc_party->execute_dialog_command(command_consequences_[option],
+				                                  info, world);
+			}
         }
     }
 public:
@@ -429,6 +456,7 @@ public:
                 }
             }
             consequences_.push_back(consequences);
+			command_consequences_.push_back(wml::get_str(op, "goto"));
             ++options.first;
         }
     }
@@ -598,6 +626,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	DEFINE_COMMAND(destroy_party);
 	DEFINE_COMMAND(if);
 	DEFINE_COMMAND(while);
+	DEFINE_COMMAND(goto);
 	DEFINE_COMMAND(scripted_moves);
 	DEFINE_COMMAND(execute_script);
 	DEFINE_COMMAND(modify_objects);

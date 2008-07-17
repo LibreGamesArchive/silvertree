@@ -7,6 +7,7 @@ if editor_env["HaveQt"]:
     editor_sources.remove("oldmain.cpp")
     editor_uis = Glob("*.ui", source = True)
     editor_mocables = Split("""
+        dialogeditordialog.hpp
         editorglwidget.hpp
         editormainwindow.hpp
         terrainhandler.hpp
