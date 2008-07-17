@@ -30,6 +30,20 @@ struct sight_line {
     GLfloat color[4];
 };
 
+class decal {
+public:
+    // ALLOW implicit please
+    decal(const texture& t, int priority=0);
+    void draw(const hex::tile& pos, const hex::gamemap& gmap) const;
+    int priority() const { return priority_; }
+private:
+    const static int hex_texture_width = 128;
+    const static int hex_texture_height = 128;
+    texture texture_;
+    int radius_;
+    int priority_;
+};
+
 class renderer {
 public:
     explicit renderer(const hex::gamemap& gmap, hex::camera& camera) 
@@ -44,6 +58,9 @@ public:
     void add_highlight(const hex::location& highlight);
     void add_highlights(const std::vector<hex::location>& highlights);
     void clear_highlights();
+    void add_decal(const hex::location& loc, const decal& dec);
+    void add_decals(const std::vector<hex::location>& locs, const decal& dec);
+    void clear_decals();
     void set_path(const std::vector<hex::location>& path);
     void clear_path();
     void add_avatar(hex::const_map_avatar_ptr avatar, int id=-1);
@@ -85,6 +102,7 @@ private:
     std::vector<const hex::tile*> visible_tiles_;
     std::set<const hex::tile*> highlighted_tiles_;
     std::vector<const hex::tile*> path_tiles_;
+    std::map<const hex::tile*,decal> decals_;
     const hex::gamemap& map_;
     std::vector<hex::const_map_avatar_ptr> avatars_;
     std::vector<int> avatar_ids_;

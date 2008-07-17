@@ -56,7 +56,7 @@ public:
 	static void setup_drawing();
 	static void finish_drawing();
 	void load_texture() const;
-	void draw() const;
+	void draw(bool own_texture=true) const;
 	void draw_cliffs() const;
 	void draw_cliff_transitions() const;
 	void draw_model() const;
