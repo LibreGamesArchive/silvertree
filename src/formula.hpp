@@ -13,6 +13,10 @@
 #ifndef FORMULA_HPP_INCLUDED
 #define FORMULA_HPP_INCLUDED
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <map>
 #include <string>
 
@@ -56,6 +60,10 @@ private:
 struct formula_error
 {
 };
+
+#ifdef UNIT_TEST_FORMULA
+    void unit_test_formulae();
+#endif
 
 }
 
