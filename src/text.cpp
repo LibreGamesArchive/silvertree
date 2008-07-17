@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "text.hpp"
 #ifdef USE_PANGO
 #include "pango_text.hpp"

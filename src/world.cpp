@@ -10,6 +10,9 @@
 
    See the COPYING file for more details.
 */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include "encounter.hpp"
 #include "filesystem.hpp"

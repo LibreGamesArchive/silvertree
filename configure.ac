@@ -16,6 +16,7 @@ AC_ARG_ENABLE([pango],
               AC_HELP_STRING([--enable-pango], [use pango backend (default is no)]), 
               [want_pango=$enableval], [want_pango=no])
               
+CXXFLAGS="-I. -I.. $CXXFLAGS"
 
 min_sdl_version=1.2.9
 AM_PATH_SDL($min_sdl_version, 
@@ -64,7 +65,8 @@ AS_IF([test x$want_pango = xno],
       [have_pango=no],
       [AS_IF([test "x$pkgconfig_available" = xyes],
         [PKG_CHECK_MODULES(PANGO, pangoft2 >= 1.14.8, [
-        CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS -DUSE_PANGO"
+        CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS"
+        AC_DEFINE([USE_PANGO], 1, [Pango backend enabled.])
         LIBS="$PANGO_LIBS $LIBS"
         have_pango=yes
         ], [

@@ -4019,6 +4019,7 @@ else
 fi
 
 
+CXXFLAGS="-I. -I.. $CXXFLAGS"
 
 min_sdl_version=1.2.9
 
@@ -7539,7 +7540,12 @@ else
         { echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
 
-        CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS -DUSE_PANGO"
+        CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS"
+
+cat >>confdefs.h <<\_ACEOF
+#define USE_PANGO 1
+_ACEOF
+
         LIBS="$PANGO_LIBS $LIBS"
         have_pango=yes
 
