@@ -108,7 +108,10 @@ rendered_text_ptr renderer::render(const std::string& text, int font_size,
     std::vector<graphics::surface> surfs;
     unsigned int width = 0, height = 0;
     
-    const unsigned int lineskip = TTF_FontLineSkip(font.get());
+    /* workaround: on MacOS TTF_FontLineSkip is completely bogus;
+       on linux it is TTF_FontHeight+1 (for our font anyway); this 
+       represents a best approximation */
+    const unsigned int lineskip = TTF_FontHeight(font.get())+1;
 
     foreach(const std::string& s, v) {
         graphics::surface surf(TTF_RenderUTF8_Blended(font.get(),s.c_str(),color));
