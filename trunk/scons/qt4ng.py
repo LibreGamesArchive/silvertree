@@ -94,7 +94,7 @@ def CheckQt4Tools(context, tools = ["moc", "uic"]):
                     tool_location = Popen(Split("pkg-config --variable=" + tool + "_location QtCore"), stdout = PIPE).communicate()[0]
                     tool_location = tool_location.rstrip("\n")
                     if exists(tool_location):
-                        env[tool_var]
+                        env[tool_var] = tool_location
                 except OSError:
                     pass
 
