@@ -22,6 +22,7 @@
 #include "wml_utils.hpp"
 
 #include <iostream>
+#include <cstdlib>
 
 namespace hex
 {
@@ -55,10 +56,13 @@ namespace {
 
 int prandom(const location& loc, int height)
 {
+#if 0
 	const unsigned int a = (loc.x() + 92872973) ^ 918273;
 	const unsigned int b = (loc.y() + 1672517) ^ 128123;
 	const unsigned int c = (height + 127390) ^ 13923787;
 	const unsigned int random = a*b*c + a*b + b*c + a*c + a + b + c;
+#endif
+        const int random = std::rand();
 	return random;
 }
 
