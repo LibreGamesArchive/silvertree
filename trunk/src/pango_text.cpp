@@ -37,9 +37,11 @@ PangoFT2FontMap* font_map;
 PangoContext* context;
 PangoFontDescription* game_font;
 
-struct layout
+class layout
 {
 	PangoLayout* layout_;
+
+	public:
 	explicit layout(int size)
 	{
 		layout_ = pango_layout_new(context);
@@ -51,6 +53,10 @@ struct layout
 	{
 		g_object_unref(layout_);
 	}
+	PangoLayout* get() const
+	{
+		return layout_;
+	}
 	void set_text(string text, bool markup = false)
 	{
 		if(markup)
@@ -61,6 +67,18 @@ struct layout
 	void extents(PangoRectangle* ink, PangoRectangle* logical)
 	{
 		 pango_layout_get_pixel_extents(layout_, ink, logical);
+	}
+	PangoRectangle ink_extents()
+	{
+		PangoRectangle rect;
+		pango_layout_get_pixel_extents(layout_, &rect, NULL);
+		return rect;
+	}
+	PangoRectangle logical_extents()
+	{
+		PangoRectangle rect;
+		pango_layout_get_pixel_extents(layout_, NULL, &rect);
+		return rect;
 	}
 };
 
@@ -107,7 +125,10 @@ std::string renderer::format(const std::string& text,
 void renderer::get_text_size(const std::string& text, 
                              int font_size,
                              int *width, int *height) {
-    return legacy_renderer_.get_text_size(text, font_size, width, height);
+	::layout layout(font_size);
+	layout.set_text(text);
+	PangoRectangle rect(layout.logical_extents());
+	*width = rect.width; *height = rect.height;
 }
 
 rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_Color& color)
@@ -115,13 +136,12 @@ rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_
 	::layout layout(size);
 	layout.set_text(text);
     
-	PangoRectangle rect;
-	layout.extents(NULL, &rect);
+	PangoRectangle rect(layout.logical_extents());
 
 	ft_bitmap_ptr ptr(new ft_bitmap_handle(rect.width, rect.height));
 	FT_Bitmap& bitmap = ptr->bitmap_;
 
-	pango_ft2_render_layout(&bitmap, layout.layout_, 0, 0);
+	pango_ft2_render_layout(&bitmap, layout.get(), 0, 0);
 
 	return rendered_text_ptr(new rendered_text(ptr, color));
 }
