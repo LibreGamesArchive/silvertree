@@ -15,8 +15,12 @@ AC_ARG_ENABLE([audio],
 AC_ARG_ENABLE([pango],
               AC_HELP_STRING([--enable-pango], [use pango backend (default is no)]), 
               [want_pango=$enableval], [want_pango=no])
-              
-CXXFLAGS="-I. -I.. $CXXFLAGS"
+  
+AC_ARG_ENABLE([formula_test],
+              AC_HELP_STRING([--enable-formula-test] [unit test formula code on startup (default is no)]),
+              [want_formula_test=$enableval], [want_formula_test=no])
+            
+CXXFLAGS="-I.. $CXXFLAGS"
 
 min_sdl_version=1.2.9
 AM_PATH_SDL($min_sdl_version, 
@@ -104,6 +108,9 @@ AM_CONDITIONAL([WANT_AUDIO], [test x$have_audio = xyes])
 AS_IF([test x$have_qt = xno],
      AC_MSG_WARN([**** Editor will not be built.])
 )
+
+AS_IF([test x$want_formula_test = xyes],
+      [AC_DEFINE([UNIT_TEST_FORMULA], 1, [Formula unit testing enabled in formula.cpp])])
 
 AM_CONDITIONAL([WANT_EDITOR], [test x$have_qt = xyes])
 

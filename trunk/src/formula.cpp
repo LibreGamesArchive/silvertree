@@ -10,6 +10,10 @@
 
    See the COPYING file for more details.
 */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include <cmath>
@@ -916,7 +920,7 @@ int operator_precedence(const token& t)
 		precedence_map["+"]     = ++n;
 		precedence_map["-"]     = n;
 		precedence_map["*"]     = ++n;
-		precedence_map["/"]     = ++n;
+		precedence_map["/"]     = n;
 		precedence_map["%"]     = ++n;
 		precedence_map["^"]     = ++n;
 		precedence_map["d"]     = ++n;
@@ -1026,8 +1030,7 @@ expression_ptr parse_expression(const token* i1, const token* i2)
 		} else if(i->type == TOKEN_RPARENS || i->type == TOKEN_RSQUARE) {
 			--parens;
 		} else if(parens == 0 && i->type == TOKEN_OPERATOR) {
-			if(op == NULL || operator_precedence(*op) >
-			                 operator_precedence(*i)) {
+			if(op == NULL || operator_precedence(*op) >= operator_precedence(*i)) {
 				op = i;
 			}
 		}
@@ -1169,10 +1172,8 @@ variant formula::execute() const
 	return execute(null_callable);
 }
 
-}
-
 #ifdef UNIT_TEST_FORMULA
-using namespace game_logic;
+
 class mock_char : public formula_callable {
 	variant get_value(const std::string& key) const {
 		if(key == "strength") {
@@ -1183,6 +1184,7 @@ class mock_char : public formula_callable {
 
 		return variant(10);
 	}
+    void get_inputs(std::vector<formula_input>* in) const {}
 };
 class mock_party : public formula_callable {
 	variant get_value(const std::string& key) const {
@@ -1203,6 +1205,7 @@ class mock_party : public formula_callable {
 		}
 	}
 
+    void get_inputs(std::vector<formula_input>* in) const {}
 	mock_char c_;
 	mutable map_formula_callable i_[3];
 
@@ -1210,7 +1213,7 @@ class mock_party : public formula_callable {
 
 #include <time.h>
 
-int main()
+void unit_test_formulae()
 {
 	srand(time(NULL));
 	mock_char c;
@@ -1250,6 +1253,11 @@ int main()
 		assert(formula("'abcd' = 'acd'").execute(p).as_bool() == false);
 		assert(formula("'strength, agility: {strength}, {agility}'").execute(c).as_string() ==
 		               "strength, agility: 15, 12");
+                assert(formula("400/1/10").execute().as_int() == 40);
+                assert(formula("400/10+1").execute().as_int() == 41);
+                assert(formula("400+1/10").execute().as_int() == 400);
+                std::cout << "val is "<< formula("400*2/3").execute().as_int()<<"\n";
+                assert(formula("400*2/3").execute().as_int() == 400*2/3);
 		const int dice_roll = formula("3d6").execute().as_int();
 		assert(dice_roll >= 3 && dice_roll <= 18);
 
@@ -1265,3 +1273,5 @@ int main()
 	}
 }
 #endif
+
+}

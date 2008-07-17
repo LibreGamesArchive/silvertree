@@ -70,6 +70,9 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* Formula unit testing enabled in formula.cpp */
+#undef UNIT_TEST_FORMULA
+
 /* Pango backend enabled. */
 #undef USE_PANGO
 

@@ -30,6 +30,7 @@
 #include "character.hpp"
 #include "character_generator.hpp"
 #include "filesystem.hpp"
+#include "formula.hpp"
 #include "formula_registry.hpp"
 #include "gamemap.hpp"
 #include "global_game_state.hpp"
@@ -80,6 +81,10 @@ extern "C" int main(int argc, char** argv)
 
 #ifdef AUDIO
     audio::init_audio();
+#endif
+
+#ifdef UNIT_TEST_FORMULA
+    game_logic::unit_test_formulae();
 #endif
 
 	wml::node_ptr rules_cfg;
