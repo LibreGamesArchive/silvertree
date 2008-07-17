@@ -13,6 +13,10 @@
 #ifndef WORLD_HPP_INCLUDED
 #define WORLD_HPP_INCLUDED
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <functional>
 #include <map>
 #include <queue>

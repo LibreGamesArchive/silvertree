@@ -70,6 +70,9 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* Pango backend enabled. */
+#undef USE_PANGO
+
 /* Version number of package */
 #undef VERSION
 

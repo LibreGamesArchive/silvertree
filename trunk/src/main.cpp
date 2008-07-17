@@ -10,6 +10,10 @@
 
    See the COPYING file for more details.
 */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <GL/glew.h>
 #include <SDL.h>
 
