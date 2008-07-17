@@ -485,11 +485,6 @@ void world::draw_display(const_party_ptr selected_party) const {
     if(game_bar_) {
         game_bar_->draw();
     }
-#ifdef AUDIO
-    if(audio::audio_available() && audio_) {
-        audio_->pump_sound();
-    }
-#endif
 }
 
 namespace {
@@ -526,6 +521,16 @@ void world::play()
         }
     }
 
+#ifdef AUDIO
+    if(audio::audio_available() && !music_file_.empty()) {
+        source = my_audio->make_source();
+        music = my_audio->make_stream(sys::find_file(music_file_));
+        music->set_looping(true);
+        source->set_sound(music.get());
+        source->play();
+    }
+#endif
+      
     map_formula_callable_ptr standard_callable(new map_formula_callable);
     standard_callable->add("world", variant(this))
         .add("pc", variant(get_pc_party().get()))
@@ -545,16 +550,6 @@ void world::play()
     input_pump.register_listener(&camera_controller_);
     input_pump.register_listener(&selection_);
 
-#ifdef AUDIO
-    if(audio::audio_available() && !music_file_.empty()) {
-        source = my_audio->make_source();
-        music = my_audio->make_stream(sys::find_file(music_file_));
-        music->set_looping(true);
-        source->set_sound(music.get());
-        source->play();
-    }
-#endif
-      
     while(!done_) {
         if(!focus_) {
             find_focus();
