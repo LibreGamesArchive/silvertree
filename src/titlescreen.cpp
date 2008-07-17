@@ -55,6 +55,7 @@ void show(game_logic::world_ptr w, const std::string& logo,
     if(audio::audio_available()) {
         ac.reset(new audio::audio_context());
         music = ac->make_stream(music_file);
+        music->set_looping(true);
         source = ac->make_source();
         
         source->set_sound(music.get());
