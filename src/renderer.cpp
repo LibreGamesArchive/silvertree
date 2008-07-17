@@ -14,6 +14,73 @@ namespace {
 hex::frustum view_volume;
 }
 
+decal::decal(const texture& t, int priority) : 
+    texture_(t), priority_(priority) {
+
+    int radius_x, radius_y;
+    radius_x = 
+        texture_.width() / hex_texture_width + 
+        (texture_.width() % hex_texture_width > 0 ? 1 : 0);
+    radius_y = 
+        texture_.height() / hex_texture_height + 
+        (texture_.height() % hex_texture_height > 0 ? 1 : 0);
+
+    radius_ = std::max(radius_x, radius_y);
+}
+
+void decal::draw(const hex::tile& tile, const hex::gamemap& gmap) const {
+    if(radius_ == 0) {
+        return;
+    }
+
+    std::vector<const hex::tile*> tiles;
+    {
+        std::vector<hex::location> locs;
+
+	get_locations_in_radius(tile.loc(), radius_-1, locs);
+        foreach(hex::location& loc, locs) {
+            tiles.push_back(&(gmap.get_tile(loc)));
+        }
+    }
+
+    const GLfloat scale_x = texture_.width() / static_cast<GLfloat>(hex_texture_width);
+    const GLfloat scale_y = texture_.height() / static_cast<GLfloat>(hex_texture_height);
+    const GLfloat tile_x = hex::tile::translate_x(tile.loc());
+    const GLfloat tile_y = hex::tile::translate_y(tile.loc());
+
+    texture_.set_as_current_texture();
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+    glMatrixMode(GL_TEXTURE);
+    glPushMatrix();
+    glLoadIdentity();
+    glScalef(1/scale_x, 1/scale_y, 1);
+
+    foreach(const hex::tile* t, tiles) {
+        glPushMatrix();
+        glTranslatef((hex::tile::translate_x(t->loc()) - tile_x)*scale_x,
+                     (hex::tile::translate_y(t->loc()) - tile_y)*scale_y,
+                     0);
+        /*
+        std::cout << "TILE AT "<<(t->loc().x() - tile.loc().x())<<","
+                  <<(t->loc().y() - tile.loc().y())
+                  <<" with texcoords from "
+                  <<((hex::tile::translate_x(t->loc()) - tile_x)*scale_x)<<","
+                  <<((hex::tile::translate_y(t->loc()) - tile_y)*scale_y)<<"\n";
+        */
+            
+        glMatrixMode(GL_MODELVIEW);
+        t->draw(false);
+        glMatrixMode(GL_TEXTURE);
+        glPopMatrix();
+    }
+
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+}
+
 void renderer::set_pos(const GLfloat pos[3], const hex::location& loc) {
     bool changed = false;
     for(int i=0;i<3;++i) {
@@ -84,6 +151,32 @@ void renderer::add_highlight(const hex::location& loc) {
     }
 }
 
+void renderer::clear_decals() {
+    decals_.clear();
+}
+
+void renderer::add_decal(const hex::location& loc, const decal& dec) {
+    if(map_.is_loc_on_map(loc)) {
+        const hex::tile* tile = &(map_.get_tile(loc));
+        std::map<const hex::tile*,decal>::iterator itor = decals_.find(tile);
+        if(itor == decals_.end() || itor->second.priority() < dec.priority()) {
+            decals_.insert(decals_.begin(), std::pair<const hex::tile*,decal>(tile,dec)) ;
+        }
+    }
+}
+
+void renderer::add_decals(const std::vector<hex::location>& locs, const decal& dec) {
+    foreach(const hex::location loc, locs) {
+        if(map_.is_loc_on_map(loc)) {
+            const hex::tile* tile = &(map_.get_tile(loc));
+            std::map<const hex::tile*,decal>::iterator itor = decals_.find(tile);
+            if(itor == decals_.end() || itor->second.priority() < dec.priority()) {
+                decals_.insert(decals_.begin(), std::pair<const hex::tile*,decal>(tile,dec)) ;
+            }
+        }
+    }
+}
+
 void renderer::add_sight_line(const GLfloat from[3], const GLfloat to[3], const GLfloat color[4]) {
     boost::shared_ptr<sight_line> sl(new sight_line());  
     for(int i=0;i<3;++i) {
@@ -110,6 +203,7 @@ void renderer::reset_state() {
     clear_avatars();
     clear_sight_lines();
     clear_lights();
+    clear_decals();
 }
 
 void renderer::add_avatar(hex::const_map_avatar_ptr avatar, int id) {
@@ -173,6 +267,12 @@ bool renderer::draw() const
     
     foreach(const hex::tile* t, highlighted_tiles_) {
         t->draw_highlight();
+    }
+
+    for(std::map<const hex::tile*,decal>::const_iterator itor = decals_.begin();
+        itor != decals_.end();
+        ++itor) {
+        itor->second.draw(*(itor->first), map_);
     }
 
     if(path_tiles_.empty() == false) {

@@ -329,10 +329,12 @@ void tile::load_texture() const
 	}
 }
 
-void tile::draw() const
+void tile::draw(bool own_texture) const
 {
+    if(own_texture) {
 	load_texture();
 	texture_.set_as_current_texture();
+    }
 
 #ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
 	bool translucent = pc_frustum.intersects(*this);

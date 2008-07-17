@@ -353,7 +353,9 @@ bool world::draw() const
     }
     
     if(map_.is_loc_on_map(selected_loc)) {
-        renderer_.add_highlight(selected_loc);
+        //renderer_.add_highlight(selected_loc);
+        renderer_.add_decal(selected_loc, 
+                            graphics::texture::get(graphics::surface_cache::get("gui/hex-border-newmap.png")));
     }
     
     std::vector<const_party_ptr> enemies;
