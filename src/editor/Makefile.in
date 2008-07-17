@@ -49,17 +49,19 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am__silvertree_editor_SOURCES_DIST = editorglwidget.cpp \
 	editormainwindow.cpp editpartydialog.cpp editwmldialog.cpp \
-	derivemapdialog.cpp main.cpp terrainhandler.cpp \
-	ui_mainwindow.ui ui_editpartydialog.ui ui_editwml.ui \
-	ui_derivemapdialog.ui editorglwidget.hpp editormainwindow.hpp \
-	terrainhandler.hpp editpartydialog.hpp editwmldialog.hpp \
-	derivemapdialog.hpp
+	derivemapdialog.cpp dialogeditordialog.cpp main.cpp \
+	terrainhandler.cpp ui_mainwindow.ui ui_editpartydialog.ui \
+	ui_editwml.ui ui_derivemapdialog.ui ui_dialogeditordialog.ui \
+	editorglwidget.hpp editormainwindow.hpp terrainhandler.hpp \
+	editpartydialog.hpp editwmldialog.hpp derivemapdialog.hpp \
+	dialogeditordialog.hpp
 @WANT_EDITOR_TRUE@am_silvertree_editor_OBJECTS =  \
 @WANT_EDITOR_TRUE@	editorglwidget.$(OBJEXT) \
 @WANT_EDITOR_TRUE@	editormainwindow.$(OBJEXT) \
 @WANT_EDITOR_TRUE@	editpartydialog.$(OBJEXT) \
 @WANT_EDITOR_TRUE@	editwmldialog.$(OBJEXT) \
-@WANT_EDITOR_TRUE@	derivemapdialog.$(OBJEXT) main.$(OBJEXT) \
+@WANT_EDITOR_TRUE@	derivemapdialog.$(OBJEXT) \
+@WANT_EDITOR_TRUE@	dialogeditordialog.$(OBJEXT) main.$(OBJEXT) \
 @WANT_EDITOR_TRUE@	terrainhandler.$(OBJEXT)
 silvertree_editor_OBJECTS = $(am_silvertree_editor_OBJECTS)
 @WANT_EDITOR_TRUE@silvertree_editor_DEPENDENCIES = ../libsilvertree.a
@@ -213,30 +215,35 @@ top_srcdir = @top_srcdir@
 @WANT_EDITOR_TRUE@editpartydialog.cpp \
 @WANT_EDITOR_TRUE@editwmldialog.cpp \
 @WANT_EDITOR_TRUE@derivemapdialog.cpp \
+@WANT_EDITOR_TRUE@dialogeditordialog.cpp \
 @WANT_EDITOR_TRUE@main.cpp \
 @WANT_EDITOR_TRUE@terrainhandler.cpp \
 @WANT_EDITOR_TRUE@ui_mainwindow.ui \
 @WANT_EDITOR_TRUE@ui_editpartydialog.ui \
 @WANT_EDITOR_TRUE@ui_editwml.ui \
 @WANT_EDITOR_TRUE@ui_derivemapdialog.ui \
+@WANT_EDITOR_TRUE@ui_dialogeditordialog.ui \
 @WANT_EDITOR_TRUE@editorglwidget.hpp \
 @WANT_EDITOR_TRUE@editormainwindow.hpp \
 @WANT_EDITOR_TRUE@terrainhandler.hpp \
 @WANT_EDITOR_TRUE@editpartydialog.hpp \
 @WANT_EDITOR_TRUE@editwmldialog.hpp \
-@WANT_EDITOR_TRUE@derivemapdialog.hpp
+@WANT_EDITOR_TRUE@derivemapdialog.hpp \
+@WANT_EDITOR_TRUE@dialogeditordialog.hpp
 
 @WANT_EDITOR_TRUE@BUILT_SOURCES = \
 @WANT_EDITOR_TRUE@ui_mainwindow.hpp \
 @WANT_EDITOR_TRUE@ui_editpartydialog.hpp \
 @WANT_EDITOR_TRUE@ui_editwml.hpp \
 @WANT_EDITOR_TRUE@ui_derivemapdialog.hpp \
+@WANT_EDITOR_TRUE@ui_dialogeditordialog.hpp \
 @WANT_EDITOR_TRUE@editorglwidget.moc \
 @WANT_EDITOR_TRUE@editormainwindow.moc \
 @WANT_EDITOR_TRUE@terrainhandler.moc \
 @WANT_EDITOR_TRUE@editpartydialog.moc \
 @WANT_EDITOR_TRUE@editwmldialog.moc \
-@WANT_EDITOR_TRUE@derivemapdialog.moc
+@WANT_EDITOR_TRUE@derivemapdialog.moc \
+@WANT_EDITOR_TRUE@dialogeditordialog.moc
 
 @WANT_EDITOR_TRUE@AM_CPPFLAGS = -DDATADIR=\"$(pkgdatadir)\" -DVERSION=\"$(VERSION)\"
 @WANT_EDITOR_TRUE@AM_CXXFLAGS = @QT_CXXFLAGS@ -Wall -Werror -Wno-sign-compare -Wno-switch -Wno-switch-enum
@@ -308,6 +315,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/derivemapdialog.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dialogeditordialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/editorglwidget.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/editormainwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/editpartydialog.Po@am__quote@
