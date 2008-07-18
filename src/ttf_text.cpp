@@ -307,7 +307,7 @@ void renderer::get_text_size(const std::string& text, int font_size, int *w, int
     const font_ptr font(get_font(font_size));
     std::vector<std::string> lines = util::split(text, '\n');
     int res_w, res_h;
-    const unsigned int lineskip = TTF_FontLineSkip(font.get());
+    const unsigned int lineskip = TTF_FontHeight(font.get());
 
     res_w = 0;
     res_h = 0;
