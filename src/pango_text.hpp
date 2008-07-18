@@ -23,6 +23,7 @@
 #include <string>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -50,14 +51,18 @@ typedef boost::shared_ptr<ft_bitmap_handle> ft_bitmap_ptr;
 
 class rendered_text: public text::rendered_text {
 public:
-    rendered_text(ft_bitmap_ptr hnd, const SDL_Color& col) :
-        hnd_(hnd), color_(col) {}
+    rendered_text(boost::shared_array<unsigned char> pixels, int width, int height, bool colored, const SDL_Color& color) :
+        pixels_(pixels), width_(width), height_(height), colored_(colored), color_(color) {}
     graphics::texture as_texture();
     void blit(int x=0, int y=0);
-    int width() { return hnd_->bitmap_.width; }
-    int height() { return hnd_->bitmap_.rows; }
+    int width() { return width_; }
+    int height() { return height_; }
 private:
-    ft_bitmap_ptr hnd_;
+    rendered_text();
+
+    boost::shared_array<unsigned char> pixels_;
+    int width_, height_;
+    bool colored_;
     SDL_Color color_;
 };
 
