@@ -40,6 +40,14 @@ PangoFT2FontMap* font_map;
 PangoContext* context;
 PangoFontDescription* game_font;
 
+gboolean filter_background(PangoAttribute *attribute, gpointer data)
+{
+	if(attribute->klass->type == PANGO_ATTR_BACKGROUND) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
 class layout
 {
 	PangoLayout* layout_;
@@ -150,21 +158,87 @@ void renderer::get_text_size(const std::string& text,
 	*width = rect.width; *height = rect.height;
 }
 
-rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_Color& color)
+rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_Color& color, bool markup)
 {
 	::layout layout(size);
-	layout.set_text(text);
+	layout.set_text(text, markup);
     
 	PangoRectangle rect(layout.logical_extents());
 
 	ft_bitmap_ptr ptr(new ft_bitmap_handle(rect.width, rect.height));
 	FT_Bitmap& bitmap = ptr->bitmap_;
 
+	PangoAttrList* attrs = pango_layout_get_attributes(layout.get());
+	PangoAttrList* bg_attrs = pango_attr_list_copy(attrs);
+	if(attrs)
+		pango_attr_list_filter(attrs, filter_background, NULL);
+	pango_layout_set_attributes(layout.get(), attrs);
 	pango_ft2_render_layout(&bitmap, layout.get(), 0, 0);
+	pango_layout_set_attributes(layout.get(), bg_attrs);
 
-	boost::shared_array<unsigned char> pixels(new unsigned char[rect.width * rect.height]);
-	memcpy(pixels.get(), bitmap.buffer, rect.width * rect.height);
-	return rendered_text_ptr(new rendered_text(pixels, rect.width, rect.height, false, color));
+	int image_size = rect.width * rect.height * (markup ? 4 : 1);
+	boost::shared_array<unsigned char> pixels(new unsigned char[image_size]);
+
+	if(!markup)
+		memcpy(pixels.get(), bitmap.buffer, image_size);
+	else {
+		memset(pixels.get(), 0x00, image_size);
+
+		PangoLayoutIter* iter = pango_layout_get_iter(layout.get());
+		do {
+			PangoRectangle ink_rect, logical_rect;
+			PangoLayoutRun* run = pango_layout_iter_get_run(iter);
+			if(run) {
+				GSList *attrs = run->item->analysis.extra_attrs;
+				PangoColor fgcolor = {}, bgcolor = {};
+				bool have_fg = false, have_bg = false;
+				while (attrs) {
+					PangoAttribute *attr = (PangoAttribute*)attrs->data;
+					if(attr->klass->type == PANGO_ATTR_FOREGROUND) {
+						fgcolor = ((PangoAttrColor*)attr)->color;
+						std::cout << "color\n";
+						have_fg = true;
+					}
+					if(attr->klass->type == PANGO_ATTR_BACKGROUND) {
+						bgcolor = ((PangoAttrColor*)attr)->color;
+						have_bg = true;
+					}
+					attrs = attrs->next;
+				}
+				unsigned char fg[3] = { 0xFF, 0xFF, 0xFF };
+				if(have_fg) {
+					fg[0] = fgcolor.red / 0x100;
+					fg[1] = fgcolor.green / 0x100;
+					fg[2] = fgcolor.blue / 0x100;
+				}
+				unsigned char bg[3] = { 0xFF, 0xFF, 0xFF };
+				if(have_bg) {
+					bg[0] = bgcolor.red / 0x100;
+					bg[1] = bgcolor.green / 0x100;
+					bg[2] = bgcolor.blue / 0x100;
+				}
+				pango_layout_iter_get_run_extents(iter, &ink_rect, &logical_rect);
+				int x =  ink_rect.x / PANGO_SCALE, y = ink_rect.y / PANGO_SCALE;
+				int width = ink_rect.width / PANGO_SCALE, height = ink_rect.height / PANGO_SCALE;
+				for(int row = y; row < y + height; row++) {
+					for(int col = x; col < x + width; col++) {
+						int pos = col + rect.width * row;
+						if(!have_bg) {
+							memcpy(&pixels[pos * 4], fg, 3);
+							pixels[pos * 4 + 3] = bitmap.buffer[pos];
+						} else {
+							float alpha = bitmap.buffer[pos]/255.;
+							pixels[pos * 4]     = static_cast<unsigned char>(fg[0] * alpha + bg[0] * (1 - alpha));
+							pixels[pos * 4 + 1] = static_cast<unsigned char>(fg[1] * alpha + bg[1] * (1 - alpha));
+							pixels[pos * 4 + 2] = static_cast<unsigned char>(fg[2] * alpha + bg[2] * (1 - alpha));
+							pixels[pos * 4 + 3] = 0xFF;
+						}
+					}
+				}
+			}
+		} while(pango_layout_iter_next_run(iter));
+	}
+	return rendered_text_ptr(new rendered_text(pixels, rect.width, rect.height, markup, color));
 }
 
 ft_bitmap_handle::ft_bitmap_handle(int width, int height)
@@ -189,10 +263,12 @@ void rendered_text::blit(int x, int y)
     glDisable(GL_TEXTURE_2D);
     glRasterPos2i(x,y);
     glPixelZoom(1, -1);
-    glPixelTransferf(GL_RED_BIAS, (float)color_.r/255.);
-    glPixelTransferf(GL_GREEN_BIAS, (float)color_.g/255.);
-    glPixelTransferf(GL_BLUE_BIAS, (float)color_.b/255.);
-    glDrawPixels(width_, height_, GL_ALPHA, GL_UNSIGNED_BYTE, pixels_.get());
+    if(!colored_) {
+    	glPixelTransferf(GL_RED_BIAS, (float)color_.r/255.);
+    	glPixelTransferf(GL_GREEN_BIAS, (float)color_.g/255.);
+    	glPixelTransferf(GL_BLUE_BIAS, (float)color_.b/255.);
+    }
+    glDrawPixels(width_, height_, colored_ ? GL_RGBA : GL_ALPHA, GL_UNSIGNED_BYTE, pixels_.get());
     glEnable(GL_TEXTURE_2D);
     glPopAttrib();
 }
@@ -205,11 +281,13 @@ graphics::texture rendered_text::as_texture()
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     glPushAttrib(GL_CURRENT_BIT | GL_PIXEL_MODE_BIT);
-    glPixelTransferf(GL_RED_BIAS, (float)color_.r/255.);
-    glPixelTransferf(GL_GREEN_BIAS, (float)color_.g/255.);
-    glPixelTransferf(GL_BLUE_BIAS, (float)color_.b/255.);
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, width_, height_, 
-                    GL_ALPHA, GL_UNSIGNED_BYTE, pixels_.get());
+    if(!colored_) {
+    	glPixelTransferf(GL_RED_BIAS, (float)color_.r/255.);
+    	glPixelTransferf(GL_GREEN_BIAS, (float)color_.g/255.);
+    	glPixelTransferf(GL_BLUE_BIAS, (float)color_.b/255.);
+    }
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width_, height_, 
+                    colored_ ? GL_RGBA : GL_ALPHA, GL_UNSIGNED_BYTE, pixels_.get());
     //glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 //    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hnd_->bitmap_.width, hnd_->bitmap_.rows, 0, 
 //                 GL_ALPHA, GL_UNSIGNED_BYTE, hnd_->bitmap_.buffer);

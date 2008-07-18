@@ -97,7 +97,7 @@ int renderer::get_string_height(const std::string& text, int font_size) {
 }
 
 rendered_text_ptr renderer::render(const std::string& text, int font_size,
-                                           const SDL_Color& color)
+                                           const SDL_Color& color, bool markup)
 {
     const font_ptr font(get_font(font_size));
     if(!font) {

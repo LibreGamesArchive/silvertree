@@ -45,7 +45,7 @@ public:
     static renderer& instance();
     virtual rendered_text_ptr render(const std::string& text, 
                                      int size, 
-                                     const SDL_Color& color) =0;
+                                     const SDL_Color& color, bool markup = false) =0;
     virtual std::string format(const std::string& text, 
                                int font_size, 
                                int width)=0;
