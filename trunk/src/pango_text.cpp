@@ -162,7 +162,9 @@ rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_
 
 	pango_ft2_render_layout(&bitmap, layout.get(), 0, 0);
 
-	return rendered_text_ptr(new rendered_text(ptr, color));
+	boost::shared_array<unsigned char> pixels(new unsigned char[rect.width * rect.height]);
+	memcpy(pixels.get(), bitmap.buffer, rect.width * rect.height);
+	return rendered_text_ptr(new rendered_text(pixels, rect.width, rect.height, false, color));
 }
 
 ft_bitmap_handle::ft_bitmap_handle(int width, int height)
@@ -190,15 +192,14 @@ void rendered_text::blit(int x, int y)
     glPixelTransferf(GL_RED_BIAS, (float)color_.r/255.);
     glPixelTransferf(GL_GREEN_BIAS, (float)color_.g/255.);
     glPixelTransferf(GL_BLUE_BIAS, (float)color_.b/255.);
-    glDrawPixels(hnd_->bitmap_.width, hnd_->bitmap_.rows, 
-                 GL_ALPHA, GL_UNSIGNED_BYTE, hnd_->bitmap_.buffer);
+    glDrawPixels(width_, height_, GL_ALPHA, GL_UNSIGNED_BYTE, pixels_.get());
     glEnable(GL_TEXTURE_2D);
     glPopAttrib();
 }
 
 graphics::texture rendered_text::as_texture()
 {
-    graphics::texture texture = graphics::texture::build(hnd_->bitmap_.width, hnd_->bitmap_.rows);
+    graphics::texture texture = graphics::texture::build(width_, height_);
     
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -207,8 +208,8 @@ graphics::texture rendered_text::as_texture()
     glPixelTransferf(GL_RED_BIAS, (float)color_.r/255.);
     glPixelTransferf(GL_GREEN_BIAS, (float)color_.g/255.);
     glPixelTransferf(GL_BLUE_BIAS, (float)color_.b/255.);
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, hnd_->bitmap_.width, hnd_->bitmap_.rows, 
-                    GL_ALPHA, GL_UNSIGNED_BYTE, hnd_->bitmap_.buffer);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, width_, height_, 
+                    GL_ALPHA, GL_UNSIGNED_BYTE, pixels_.get());
     //glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 //    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hnd_->bitmap_.width, hnd_->bitmap_.rows, 0, 
 //                 GL_ALPHA, GL_UNSIGNED_BYTE, hnd_->bitmap_.buffer);
