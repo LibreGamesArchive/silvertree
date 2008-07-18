@@ -51,7 +51,7 @@ public:
 
     text::rendered_text_ptr render(const std::string& text, 
                                    int font_size,
-                                   const SDL_Color& color);
+                                   const SDL_Color& color, bool markup = false);
     std::string format(const std::string& text, 
                        int font_size,
                        int width);

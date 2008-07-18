@@ -73,7 +73,7 @@ public:
     ~renderer();
     text::rendered_text_ptr render(const std::string& text, 
                              int size, 
-                             const SDL_Color& color);
+                             const SDL_Color& color, bool markup = false);
     text::rendered_text_ptr render_complex_text(const std::string& text, int font_size,
                                                 const SDL_Color& text_color,
                                                 const SDL_Color& caret_fg, const SDL_Color& caret_bg,
