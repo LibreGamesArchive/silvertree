@@ -177,7 +177,7 @@ class goto_command : public wml_command {
 	}
 public:
 	explicit goto_command(wml::const_node_ptr node) : goto_(node->attr("goto")),
-          npc_formula_(wml::get_str(node, "npc", "npc"))
+          npc_formula_(wml::get_str(node, "target", "npc"))
 	{}
 };
     
@@ -221,6 +221,10 @@ class modify_objects_command : public wml_command {
     std::map<std::string,const_formula_ptr> modify_;
     void do_execute(const formula_callable& info, world& world) const {
         const variant objects = object_finder_.execute(info);
+		if(objects.is_null()) {
+			return;
+		}
+
         map_formula_callable_ptr callable(new map_formula_callable(&info));
         for(int n = 0; n != objects.num_elements(); ++n) {
             variant obj = objects[n];
@@ -357,6 +361,7 @@ class dialog_command : public wml_command {
     formula pc_formula_, npc_formula_;
     const_formula_ptr condition_;
     const_formula_ptr text_;
+	std::string goto_;
     std::vector<std::string> options_;
     std::vector<const_formula_ptr> option_conditions_;
     std::vector<std::vector<const_wml_command_ptr> > consequences_;
@@ -430,13 +435,18 @@ class dialog_command : public wml_command {
 				                                  info, world);
 			}
         }
+
+		if(npc_party && goto_.empty() == false) {
+			npc_party->execute_dialog_command(goto_, info, world);
+		}
     }
 public:
     explicit dialog_command(wml::const_node_ptr node)
         : pc_formula_(wml::get_str(node, "pc", "pc")),
           npc_formula_(wml::get_str(node, "npc", "npc")),
           condition_(formula::create_optional_formula(wml::get_str(node, "condition"))),
-          text_(formula::create_string_formula(wml::get_str(node, "text")))
+          text_(formula::create_string_formula(wml::get_str(node, "text"))),
+		  goto_(node->attr("goto"))
     {
         wml::node::const_child_range options = node->get_child_range("option");
         while(options.first != options.second) {
@@ -621,6 +631,7 @@ const_wml_command_ptr wml_command::create(wml::const_node_ptr node)
 	
     
     try {
+	DEFINE_COMMAND_SYNONYM(compound, commands)
 	DEFINE_COMMAND(debug);
 	DEFINE_COMMAND(debug_console);
 	DEFINE_COMMAND(destroy_party);
