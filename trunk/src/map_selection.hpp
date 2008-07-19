@@ -1,7 +1,7 @@
 #ifndef MAP_SELECTION_HPP_INCLUDED
 #define MAP_SELECTION_HPP_INCLUDED
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "input.hpp"
 #include "renderer.hpp"
