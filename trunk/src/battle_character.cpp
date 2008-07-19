@@ -508,6 +508,9 @@ void battle_character::add_modification(const std::string& stat,
 	if(stat == "energy") {
 		energy_ += mod;
 		return;
+	} else if(stat == "move_at") {
+		move_at_ += mod;
+		return;
 	}
 
 	std::multimap<std::string,stat_mod>::iterator i = mods_.insert(std::pair<std::string,stat_mod>(stat,stat_mod()));
