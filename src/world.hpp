@@ -75,7 +75,7 @@ public:
     explicit world(wml::const_node_ptr node);
     wml::node_ptr write() const;
     
-    void play();
+    world_ptr play();
     
     void set_script(const std::string& script) { script_ = script; }
     
@@ -183,8 +183,13 @@ private:
     game_time time_;
     GLfloat subtime_;
     tracks tracks_;
+
+	struct destination {
+		std::string level;
+		hex::location loc;
+	};
     
-    std::map<hex::location,hex::location> exits_;
+    std::map<hex::location,destination> exits_;
     
     const_formula_ptr sun_light_, ambient_light_, party_light_, party_light_power_;
     

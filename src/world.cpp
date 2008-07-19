@@ -150,7 +150,9 @@ world::world(wml::const_node_ptr node)
                 for(int y = 0; y != map_.size().y(); ++y) {
                     *loc_ptr = hex::location(x,y);
                     if(f.execute(*loc_ptr).as_bool()) {
-                        exits_[*loc_ptr] = loc2;
+                        destination& dst = exits_[*loc_ptr];
+						dst.loc = loc2;
+						dst.level = wml::get_str(e1->second, "level");
                     }
                 }
             }
@@ -160,7 +162,9 @@ world::world(wml::const_node_ptr node)
         }
         
         if(loc1.valid()) {
-            exits_[loc1] = loc2;
+        	destination& dst = exits_[loc1];
+			dst.loc = loc2;
+			dst.level = wml::get_str(e1->second, "level");
         }
     }
     
@@ -170,7 +174,8 @@ world::world(wml::const_node_ptr node)
                            wml::get_attr<int>(portal,"ydst"));
         hex::location loc2(wml::get_attr<int>(portal,"xsrc"),
                            wml::get_attr<int>(portal,"ysrc"));
-        exits_[loc1] = loc2;
+		destination& dst = exits_[loc1];
+		dst.loc = loc2;
     }
     
     const std::vector<wml::const_node_ptr> events = wml::child_nodes(node, "event");
@@ -224,12 +229,13 @@ wml::node_ptr world::write() const
 		res->add_child(i->second->write());
 	}
 
-	for(std::map<hex::location,hex::location>::const_iterator i = exits_.begin(); i != exits_.end(); ++i) {
+	for(std::map<hex::location,destination>::const_iterator i = exits_.begin(); i != exits_.end(); ++i) {
 		wml::node_ptr portal(new wml::node("exit"));
 		portal->set_attr("x", boost::lexical_cast<std::string>(i->first.x()));
 		portal->set_attr("y", boost::lexical_cast<std::string>(i->first.y()));
-		portal->set_attr("xdst", boost::lexical_cast<std::string>(i->second.x()));
-		portal->set_attr("ydst", boost::lexical_cast<std::string>(i->second.y()));
+		portal->set_attr("xdst", boost::lexical_cast<std::string>(i->second.loc.x()));
+		portal->set_attr("ydst", boost::lexical_cast<std::string>(i->second.loc.y()));
+		portal->set_attr("level", i->second.level);
 		res->add_child(portal);
 	}
 
@@ -518,7 +524,7 @@ void world::find_focus() {
     }
 }
 
-void world::play()
+world_ptr world::play()
 {
     world_context context(this);
 #ifdef AUDIO
@@ -662,13 +668,22 @@ void world::play()
                 }
                 
                 if(active_party->is_destroyed() == false) {
-                    std::map<hex::location,hex::location>::const_iterator exit = exits_.find(active_party->loc());
+                    std::map<hex::location,destination>::const_iterator exit = exits_.find(active_party->loc());
                     if(script_.empty() && exit != exits_.end() && active_party->is_human_controlled()) {
                         std::cerr << "exiting through exit at " << active_party->loc().x() << "," << active_party->loc().y() << "\n";
-                        active_party->set_loc(exit->second);
+                        active_party->set_loc(exit->second.loc);
                         remove_party(active_party);
                         std::cerr << "returning from world...\n";
-                        return;
+
+						world_ptr res;
+						if(exit->second.level.empty() == false) {
+							res = new world(wml::parse_wml(sys::read_file(exit->second.level)));
+							res->camera().set_rotation(camera());
+							res->advance_time_until(time_);
+							active_party->new_world(*res, exit->second.loc);
+							res->add_party(active_party);
+						}
+                        return res;
                     }
                     
                     settlement_map::iterator s = settlements_.find(active_party->loc());
@@ -732,6 +747,8 @@ void world::play()
     if(quit_) {
         throw quit_exception();
     }
+
+	return world_ptr();
 }
 
 world::party_map::iterator world::find_party(const_party_ptr p)
