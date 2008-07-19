@@ -3,8 +3,9 @@
 
 #include "SDL.h"
 #include <boost/shared_ptr.hpp>
-#include <vector>
 #include <map>
+#include <set>
+#include <vector>
 
 namespace input {
 
@@ -81,12 +82,15 @@ namespace input {
                               bool collapse_doubles = true);
         virtual bool unbind_key(int logical_key);
         virtual bool unbind_key(const SDL_keysym& sym);
+        virtual ~key_listener() {}
         int bound_key(const SDL_keysym& sym) const;
         bool process_event(const SDL_Event& event, bool claimed);
         bool shares_keys() { return shares_keys_; }
         void set_shares_keys(bool s) { shares_keys_ = s; }
     protected:
+        key_listener() : shares_keys_(false), last_mod_(KMOD_NONE) {}
         bool check_keys(const SDL_keysym& sym, Uint8 event_type);
+        bool check_specials(const SDL_keysym& mod, Uint8 type, bool claimed);
         virtual void do_keydown(int key) =0;
         virtual void do_keyup(int key) =0;
     private:
@@ -99,6 +103,8 @@ namespace input {
 
         binding_map bindings_;
         bool shares_keys_;
+        SDLMod last_mod_;
+        std::set<SDLKey> raw_keys_;
     };
 
     class key_down_listener: public key_listener {

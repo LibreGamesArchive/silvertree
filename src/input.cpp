@@ -343,6 +343,49 @@ namespace input {
         return mod_itor->second;
     }
 
+    bool key_listener::check_specials(const SDL_keysym& sym, Uint8 type, bool claimed) {
+        bool changed = false;
+        SDLMod newmod;
+
+        newmod = get_mod_change_state(sym.sym);
+        switch(type) {
+        case SDL_KEYDOWN:
+            newmod = static_cast<SDLMod>(sym.mod | newmod);
+            break;
+        case SDL_KEYUP:
+            newmod = static_cast<SDLMod>(sym.mod & ~newmod);
+            break;
+        }
+
+        
+        if(newmod != last_mod_) {
+            for(binding_map::iterator binding_itor=bindings_.begin();
+                binding_itor != bindings_.end();++binding_itor) {
+                std::set<SDLKey>::iterator key_itor = raw_keys_.find(binding_itor->first);
+                mod_map::iterator mod_itor;
+                if(key_itor == raw_keys_.end()) {
+                    // if the base key isn't down, there's no state change possible
+                    continue;
+                }
+                mod_itor = binding_itor->second.find(last_mod_);
+                if(mod_itor != binding_itor->second.end()) {
+                    do_keyup(mod_itor->second);
+                    changed = true;
+                }
+                mod_itor = binding_itor->second.find(newmod);
+                if(mod_itor != binding_itor->second.end()) {
+                    if(!claimed) {
+                        do_keydown(mod_itor->second);
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        last_mod_ = newmod;
+        return claimed | changed;
+    }
+
     bool key_listener::check_keys(const SDL_keysym& sym, Uint8 type) {
         binding_map::iterator binding_itor;
         binding_itor = bindings_.find(sym.sym);
@@ -354,6 +397,7 @@ namespace input {
             if(binding_itor != bindings_.end()) {
                 mod_map::iterator mod_itor = binding_itor->second.find(sym.mod);
                 if(mod_itor != binding_itor->second.end()) {
+                    raw_keys_.insert(raw_keys_.begin(), sym.sym);
                     do_keydown(mod_itor->second);
                     changed = true;
                 }
@@ -361,38 +405,47 @@ namespace input {
             break;
         case SDL_KEYUP:
             if(binding_itor != bindings_.end()) {
-                for(mod_map::iterator mod_itor = binding_itor->second.begin();
-                    mod_itor != binding_itor->second.end();
-                    ++mod_itor) {
-                    do_keyup(mod_itor->second);
+                std::set<SDLKey>::iterator key_itor = raw_keys_.find(sym.sym);
+                if(key_itor != raw_keys_.end()) {
+                    raw_keys_.erase(key_itor);
+                    for(mod_map::iterator mod_itor = binding_itor->second.begin();
+                        mod_itor != binding_itor->second.end();
+                        ++mod_itor) {
+                        if(mod_itor->first == sym.mod) {
+                            do_keyup(mod_itor->second);
+                            changed = true;
+                        }
+                    }
                 }
-                changed = true;
             }
             break;
         default:
             break;
        }
 
+
         return changed;
     }
     
     bool key_listener::process_event(const SDL_Event& event, bool claimed) {
+        bool changed = false;
+
         switch(event.type) {
         case SDL_KEYDOWN:
         case SDL_KEYUP:
+            changed |= check_specials(event.key.keysym, event.type, claimed);
+
             if(claimed) {
                 reset();
                 break;
             }
-            if(check_keys(event.key.keysym, event.type) && !shares_keys_) {
-                claimed = true;
-            }
+            changed |= check_keys(event.key.keysym, event.type);
             break;
         default:
             break;
         }
         
-        return claimed;
+        return claimed | (changed  && !shares_keys_);
     }
 
     void key_down_listener::bind_key(int logical_key, const SDL_keysym& sym,
