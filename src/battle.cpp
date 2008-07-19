@@ -361,7 +361,7 @@ bool battle::draw()
         foreach(hex::location loc, targets_) {
             vtargs.push_back(loc);
         }
-        renderer_.add_highlights(vtargs);
+        renderer_.add_decals(vtargs, graphics::decal("gui/hex-target.png"));
     }
     
     if(selected_move != moves_.end()) {
@@ -378,11 +378,11 @@ bool battle::draw()
         
         std::vector<hex::location> locs;
         hex::get_locations_in_radius(selected_hex, radius, locs);
-        renderer_.add_highlights(locs);
+        renderer_.add_decals(locs, graphics::decal("gui/hex-area-bad.png"));
     }
     
     if(map_.is_loc_on_map((*focus_)->loc())) {
-        renderer_.add_highlight((*focus_)->loc());
+        renderer_.add_decal((*focus_)->loc(), graphics::decal("gui/hex-active-unit.png"));
     }
     
     {
