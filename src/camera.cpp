@@ -138,7 +138,23 @@ GLuint camera::finish_selection(std::vector<GLuint>* items)
     glPopMatrix();
     glFlush();
     GLint hits = glRenderMode(GL_RENDER);
-    selection_.resize(hits);
+#if 0
+    {
+        std::cout << "SELECTION:";
+        int offset,hit;
+        offset= 0;
+        for(hit=0;hit<hits && offset<selection_.size()-4; ++hit) {
+            GLuint names = selection_[offset++];
+            GLuint z1 = selection_[offset++];
+            GLuint z2 = selection_[offset++];
+            std::cout <<" ("<<hit<<") ["<< names <<"] ["<<z1<<","<<z2<<"]";
+            for(int i=0;i<names && offset < selection_.size();++i) {
+                std::cout <<" "<< selection_[offset++];
+            }
+        }
+        std::cout <<"\n";
+    }
+#endif
     std::vector<GLuint>::const_iterator itor = selection_.begin();
     GLuint res = GLuint(-1);
     GLuint closest = GLuint(-1);
@@ -146,13 +162,13 @@ GLuint camera::finish_selection(std::vector<GLuint>* items)
         GLuint names = *itor++;
         const GLuint z1 = *itor++;
         ++itor;
-        if(names > 0 && (closest == GLuint(-1) || z1 > closest)) {
+        if(names > 0 && (closest == GLuint(-1) || z1 < closest)) {
             res = *itor;
             closest = z1;
         }
-        
+         
         if(items) {
-            items->push_back(res);
+            items->push_back(*itor);
         }
         
         itor += names;

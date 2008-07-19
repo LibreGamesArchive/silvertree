@@ -436,7 +436,9 @@ const hex::location& renderer::get_selected_hex() const
     if(map_.is_loc_on_map(selected_hex_)) {
         prepare_selection();
         glLoadName(0);
-        map_.get_tile(selected_hex_).draw();
+        hex::tile old_tile = map_.get_tile(selected_hex_);
+        old_tile.draw();
+        //old_tile.draw_cliffs();
         if(finish_selection() == 0) {
             return selected_hex_;
         }
@@ -448,6 +450,12 @@ const hex::location& renderer::get_selected_hex() const
     foreach(const hex::tile* t, tiles_) {
         glLoadName(select_name);
         t->draw();
+        ++select_name;
+    }
+    select_name = 0;
+    foreach(const hex::tile* t, tiles_) {
+        glLoadName(select_name);
+        t->draw_cliffs();
         ++select_name;
     }
     
