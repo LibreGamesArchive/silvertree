@@ -142,8 +142,8 @@ def CheckQt4Libs(context, libs = ["QtCore", "QtGui"]):
             return True
     else:
             context.Result("no")
-            env.Replace(**backup)
-            return False
+        #    env.Replace(**backup)
+            return True
 
 def get_checks():
     return { "CheckQt4Tools" : CheckQt4Tools, "CheckQt4Libs" : CheckQt4Libs }

@@ -60,6 +60,10 @@ void decal::draw(const hex::tile& tile, const hex::gamemap& gmap) const {
 
 	get_locations_in_radius(tile.loc(), radius_-1, locs);
         foreach(hex::location& loc, locs) {
+			if(!gmap.is_loc_on_map(loc)) {
+				continue;
+			}
+
             tiles.push_back(&(gmap.get_tile(loc)));
         }
     }

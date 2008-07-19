@@ -210,6 +210,7 @@ void EditorGLWidget::resizeGL(int w, int h) {
 
 void EditorGLWidget::paintGL()
 {
+	std::cerr << "paint...\n";
     if(map_ && camera_) {
         glEnable(GL_LIGHT0);
         std::vector<hex::location> locs;
@@ -357,6 +358,7 @@ void EditorGLWidget::paintGL()
             }
             s << ")";
             renderText(20,20,s.str().c_str());
+			std::cerr << "pos: " << selected_.x() << ", " << selected_.y() << "\n";
             if(pick_mode_) {
                 std::string pick_text;
                 if(map_->is_loc_on_map(picked_loc_)) {

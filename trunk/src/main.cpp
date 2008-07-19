@@ -214,7 +214,9 @@ extern "C" int main(int argc, char** argv)
 		game_logic::world_ptr w(new game_logic::world(world_cfg));
 		try {
             title::show(w, "logo-title-screen.png", "music/silvertree-theme.mp3", 2000);
-			w->play();
+			while(w) {
+				w = w->play();
+			}
 		} catch(game_logic::world::new_game_exception new_game) {
 			save_file = new_game.filename();
 			continue;
