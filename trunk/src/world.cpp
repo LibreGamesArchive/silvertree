@@ -691,7 +691,7 @@ void world::play()
             double increase = scale_ * game_speed;
 
             if(keys_.key(SUPER_ACCEL_TIME_KEY)) {
-                increase *= 4;
+                increase *= 6;
             } else if(keys_.key(ACCEL_TIME_KEY) || !script_.empty()) {
                 increase *= 2;
             } 
