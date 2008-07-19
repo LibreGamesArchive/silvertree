@@ -336,6 +336,8 @@ bool world::draw() const
         const bool adjacent_only = visible.count(selected_loc) && parties_.count(selected_loc);
         hex::find_path(focus_->loc(), selected_loc, *focus_, &path, 500, adjacent_only);
     }
+
+    const_settlement_ptr selected_settlement = settlement_at(selected_loc);
     
     if(path.empty() && focus_->get_current_path()) {
         path = *focus_->get_current_path();
@@ -354,8 +356,22 @@ bool world::draw() const
     
     if(map_.is_loc_on_map(selected_loc)) {
         //renderer_.add_highlight(selected_loc);
+        std::string decal;
+        if(selected_party) {
+            if(selected_party->is_enemy(*focus_)) {
+                decal = "gui/hex-active-enemy.png";
+            } else {
+                decal = "gui/hex-active-unit.png";
+            }
+        } else if(selected_settlement) {
+            decal = "gui/hex-action.png";
+        } else if(!path.empty()) {
+            decal = "gui/hex-select.png";
+        } else {
+            decal = "gui/hex-select-cannot.png";
+        }
         renderer_.add_decal(selected_loc, 
-                            graphics::texture::get(graphics::surface_cache::get("gui/hex-select.png")));
+                            graphics::texture::get(graphics::surface_cache::get(decal)));
     }
     
     std::vector<const_party_ptr> enemies;

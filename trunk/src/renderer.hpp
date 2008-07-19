@@ -34,6 +34,7 @@ class decal {
 public:
     // ALLOW implicit please
     decal(const texture& t, int priority=0);
+    explicit decal(const std::string& s, int priority=0);
     void draw(const hex::tile& pos, const hex::gamemap& gmap) const;
     int priority() const { return priority_; }
 private:
@@ -47,6 +48,7 @@ private:
     const static int hex_border_height = hex_border_top + hex_border_bottom;
     const static int hex_real_width = hex_texture_width - hex_border_width;
     const static int hex_real_height = hex_texture_height - hex_border_height;
+    void init();
 
     texture texture_;
     int radius_;

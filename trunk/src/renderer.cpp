@@ -5,6 +5,7 @@
 #include "frustum.hpp"
 #include "map_avatar.hpp"
 #include "renderer.hpp"
+#include "surface_cache.hpp"
 #include "tile.hpp"
 #include "tile_logic.hpp"
 
@@ -14,9 +15,18 @@ namespace {
 hex::frustum view_volume;
 }
 
+decal::decal(const std::string& s, int priority) :
+    texture_(graphics::texture::get(graphics::surface_cache::get(s))),
+    priority_(priority) {
+    init();
+}
+
 decal::decal(const texture& t, int priority) : 
     texture_(t), priority_(priority) {
+    init();
+}
 
+void decal::init() {
     int radius_x, radius_y;
     radius_x = 
         texture_.width() / hex_texture_width + 

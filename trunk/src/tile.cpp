@@ -461,78 +461,78 @@ void cliff_normal(int n, GLfloat& normalx, GLfloat& normaly)
 
 void tile::draw_cliffs() const
 {
-	const hex::camera* cam = camera::current_camera();
-	if(!cam) {
-		return;
-	}
+    const hex::camera* cam = camera::current_camera();
+    if(!cam) {
+        return;
+    }
+    
+    if(!terrain_) {
+        return;
+    }
 
-	if(!terrain_) {
-		return;
-	}
-
-	if(cliff_textures_.empty()) {
-		terrain_->get_cliff_textures(cliff_textures_);
-	}
-
-	graphics::texture& cliff_texture = cliff_textures_[frame_number%cliff_textures_.size()];
-
-	cliff_texture.set_as_current_texture();
-
-	for(int n = 0; n < 6; ++n) {
-		if(!cliffs_[n]) {
-			continue;
-		}
-
-		const int next = (n+1)%6;
-		const int prev = n == 0 ? 5 : n-1;
-
-		const point *points[4] = { &cliffs_[n]->corners_[(n+3)%6],
-		                           &cliffs_[n]->corners_[(n+2)%6],
-				                   &corners_[(n)%6], &corners_[n == 0 ? 5 : n-1]};
-		const GLfloat sixth = 1.0/6.0;
-		const GLfloat left = sixth*GLfloat(loc_.x()*2 + loc_.y()*2 + n);
-		const GLfloat right = left + sixth;
-		glBegin(GL_QUADS);
-		for(int m = 0; m != 4; ++m) {
-			const bool is_left = m == 0 || m == 3;
-			const GLfloat u = is_left ? left : right;
-			const GLfloat v = points[m]->position.z() * sixth;
-			glTexCoord2f(u,v);
-
-			GLfloat normalx = 0.0, normaly = 0.0;
-			cliff_normal(n,normalx,normaly);
-			cliff_normal(is_left ? prev : next,normalx,normaly);
-			glNormal3f(normalx,normaly,0.0);
-			glVertex3fv(points[m]->position.array());
-		}
-		glEnd();
-
-		if(neighbours_[next] && neighbours_[next]->neighbours_[prev]) {
-			glNormal3f(0.6666*next,-1.0+0.6666*next,0.0);
-			const Eigen::Vector3f& corner = neighbours_[next]->corners_[prev].position;
-			glBegin(GL_TRIANGLES);
-			glTexCoord2f(right+sixth,corner.z() * sixth);
-			glVertex3fv(corner.array());
-			glTexCoord2f(right,points[2]->position.z() * sixth);
-			glVertex3fv(points[2]->position.array());
-			glTexCoord2f(right,points[1]->position.z() * sixth);
-			glVertex3fv(points[1]->position.array());
-			glEnd();
-		}
-
-		if(neighbours_[prev] && neighbours_[prev]->neighbours_[next]) {
-			glNormal3f(0.6666*prev,-1.0+0.6666*prev,0.0);
-			const Eigen::Vector3f& corner = corners_[prev == 0 ? 5 : prev-1].position;
-			glBegin(GL_TRIANGLES);
-			glTexCoord2f(left - sixth,corner.z() * sixth);
-			glVertex3fv(corner.array());
-			glTexCoord2f(left,points[0]->position.z() * sixth);
-			glVertex3fv(points[0]->position.array());
-			glTexCoord2f(left,points[3]->position.z() * sixth);
-			glVertex3fv(points[3]->position.array());
-			glEnd();
-		}
-	}
+    if(cliff_textures_.empty()) {
+        terrain_->get_cliff_textures(cliff_textures_);
+    }
+    
+    graphics::texture& cliff_texture = cliff_textures_[frame_number%cliff_textures_.size()];
+    
+    cliff_texture.set_as_current_texture();
+    
+    for(int n = 0; n < 6; ++n) {
+        if(!cliffs_[n]) {
+            continue;
+        }
+        
+        const int next = (n+1)%6;
+        const int prev = n == 0 ? 5 : n-1;
+        
+        const point *points[4] = { &cliffs_[n]->corners_[(n+3)%6],
+                                   &cliffs_[n]->corners_[(n+2)%6],
+                                   &corners_[(n)%6], &corners_[n == 0 ? 5 : n-1]};
+        const GLfloat sixth = 1.0/6.0;
+        const GLfloat left = sixth*GLfloat(loc_.x()*2 + loc_.y()*2 + n);
+        const GLfloat right = left + sixth;
+        glBegin(GL_QUADS);
+        for(int m = 0; m != 4; ++m) {
+            const bool is_left = m == 0 || m == 3;
+            const GLfloat u = is_left ? left : right;
+            const GLfloat v = points[m]->position.z() * sixth;
+            glTexCoord2f(u,v);
+            
+            GLfloat normalx = 0.0, normaly = 0.0;
+            cliff_normal(n,normalx,normaly);
+            cliff_normal(is_left ? prev : next,normalx,normaly);
+            glNormal3f(normalx,normaly,0.0);
+            glVertex3fv(points[m]->position.array());
+        }
+        glEnd();
+        
+        if(neighbours_[next] && neighbours_[next]->neighbours_[prev]) {
+            glNormal3f(0.6666*next,-1.0+0.6666*next,0.0);
+            const Eigen::Vector3f& corner = neighbours_[next]->corners_[prev].position;
+            glBegin(GL_TRIANGLES);
+            glTexCoord2f(right+sixth,corner.z() * sixth);
+            glVertex3fv(corner.array());
+            glTexCoord2f(right,points[2]->position.z() * sixth);
+            glVertex3fv(points[2]->position.array());
+            glTexCoord2f(right,points[1]->position.z() * sixth);
+            glVertex3fv(points[1]->position.array());
+            glEnd();
+        }
+        
+        if(neighbours_[prev] && neighbours_[prev]->neighbours_[next]) {
+            glNormal3f(0.6666*prev,-1.0+0.6666*prev,0.0);
+            const Eigen::Vector3f& corner = corners_[prev == 0 ? 5 : prev-1].position;
+            glBegin(GL_TRIANGLES);
+            glTexCoord2f(left - sixth,corner.z() * sixth);
+            glVertex3fv(corner.array());
+            glTexCoord2f(left,points[0]->position.z() * sixth);
+            glVertex3fv(points[0]->position.array());
+            glTexCoord2f(left,points[3]->position.z() * sixth);
+            glVertex3fv(points[3]->position.array());
+            glEnd();
+        }
+    }
 }
 
 /*
