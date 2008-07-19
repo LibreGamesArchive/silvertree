@@ -329,52 +329,50 @@ void tile::load_texture() const
 	}
 }
 
-void tile::draw(bool own_texture) const
+void tile::draw(const graphics::texture& texture) const
 {
-    if(own_texture) {
-	load_texture();
-	texture_.set_as_current_texture();
+    load_texture();
+    texture.set_as_current_texture();
+
+#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
+    bool translucent = pc_frustum.intersects(*this);
+    if(translucent) {
+        glDisable(GL_LIGHTING);
+        glDisable(GL_TEXTURE_2D);
+        glDepthMask(GL_FALSE);
+        glBegin(GL_TRIANGLE_FAN);
+        glColor4ub(255, 255, 255, 64);
+        draw_point(center_);
+        for(int i=0;i<7;++i) {
+            const int n = i%6;
+            draw_point(corners_[n]);
+        }
+        glEnd();
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_LIGHTING);
+        glDepthMask(GL_TRUE);
+    } else {
+#endif
+        glBegin(GL_TRIANGLE_FAN);
+        
+        texture.set_coord(UVCenter[0],UVCenter[1]);
+        
+        draw_point(center_);
+        
+        for(int i = 0; i != 7; ++i) {
+            const int n = i%6;
+            texture.set_coord(UVCorners[n][0],UVCorners[n][1]);
+            draw_point(corners_[n]);
+        }
+        
+        glEnd();
+#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
     }
-
-#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
-	bool translucent = pc_frustum.intersects(*this);
-	if(translucent) {
-		glDisable(GL_LIGHTING);
-		glDisable(GL_TEXTURE_2D);
-		glDepthMask(GL_FALSE);
-		glBegin(GL_TRIANGLE_FAN);
-		glColor4ub(255, 255, 255, 64);
-		draw_point(center_);
-		for(int i=0;i<7;++i) {
-			const int n = i%6;
-			draw_point(corners_[n]);
-		}
-		glEnd();
-		glEnable(GL_TEXTURE_2D);
-		glEnable(GL_LIGHTING);
-		glDepthMask(GL_TRUE);
-	} else {
-#endif
-		glBegin(GL_TRIANGLE_FAN);
-
-		texture_.set_coord(UVCenter[0],UVCenter[1]);
-
-		draw_point(center_);
-
-		for(int i = 0; i != 7; ++i) {
-			const int n = i%6;
-			texture_.set_coord(UVCorners[n][0],UVCorners[n][1]);
-			draw_point(corners_[n]);
-		}
-
-		glEnd();
-#ifdef PROTOTYPE_FRUSTUM_CULLING_ENABLED
-	}
 #endif
 
-	if(active_tracker_) {
-		active_tracker_->update();
-	}
+    if(active_tracker_) {
+        active_tracker_->update();
+    }
 }
 
 void tile::draw_model() const

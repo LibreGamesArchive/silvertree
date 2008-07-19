@@ -28,25 +28,25 @@ namespace graphics
 class texture
 {
 public:
-	//create an instance of this object before using the first texture,
-	//and destroy it before the program exits
-	struct manager {
-		manager();
-		~manager();
-	};
+    //create an instance of this object before using the first texture,
+    //and destroy it before the program exits
+    struct manager {
+        manager();
+        ~manager();
+    };
+    
+    enum OPTION { NO_MIPMAP, NUM_OPTIONS };
+    typedef std::bitset<NUM_OPTIONS> options_type;
+    static void clear_textures();
+    
+    texture() : width_(0), height_(0) {}
 
-	enum OPTION { NO_MIPMAP, NUM_OPTIONS };
-	typedef std::bitset<NUM_OPTIONS> options_type;
-	static void clear_textures();
-
-	texture() : width_(0), height_(0) {}
-
-	typedef std::vector<surface> key;
-
-	void set_as_current_texture() const;
+    typedef std::vector<surface> key;
+    
+    void set_as_current_texture() const;
     void set_coord_manual(GLfloat& x, GLfloat &y) const;
     void set_coord(GLfloat x, GLfloat y) const;
-	bool valid() const { return id_; }
+    bool valid() const { return id_; }
 
     static texture build(int w, int h);
     static texture get_frame_buffer();
@@ -59,26 +59,28 @@ public:
     static void set_coord_manual(const key& k, GLfloat& x, GLfloat& y);
     static void set_coord(const key& k, GLfloat x, GLfloat y);
 
-	unsigned int width() const { return width_; }
-	unsigned int height() const { return height_; }
-    
-	friend bool operator==(const texture&, const texture&);
-	friend bool operator<(const texture&, const texture&);
+    int width() const { return width_; }
+    int height() const { return height_; }
+    GLfloat ratio_w() const { return ratio_w_; }
+    GLfloat ratio_h() const { return ratio_h_; }
+  
+    friend bool operator==(const texture&, const texture&);
+    friend bool operator<(const texture&, const texture&);
 
 private:
-	explicit texture(const key& surfs, options_type options=options_type());
-
-	struct ID {
-		explicit ID(GLuint id) : id(id) {
-		}
-
-		~ID();
-
-		GLuint id;
-	};
-	boost::shared_ptr<ID> id_;
-	unsigned int width_, height_;
-	GLfloat ratio_w_, ratio_h_;
+    explicit texture(const key& surfs, options_type options=options_type());
+    
+    struct ID {
+        explicit ID(GLuint id) : id(id) {
+        }
+        
+        ~ID();
+        
+        GLuint id;
+    };
+    boost::shared_ptr<ID> id_;
+    int width_, height_;
+    GLfloat ratio_w_, ratio_h_;
 };
 
 inline bool operator==(const texture& a, const texture& b)
