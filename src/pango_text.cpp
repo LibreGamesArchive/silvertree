@@ -21,11 +21,13 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <freetype/ftbitmap.h>
+#include <fontconfig/fontconfig.h>
 #include <pango/pangoft2.h>
 #include <boost/lexical_cast.hpp>
 #include <string>
 #include <sstream>
 
+#include "filesystem.hpp"
 #include "pango_text.hpp"
 
 using std::string;
@@ -106,6 +108,8 @@ renderer::renderer()
     context = pango_ft2_font_map_create_context(font_map);
     pango_ft2_font_map_set_resolution(PANGO_FT2_FONT_MAP(font_map), 96, 96);
     game_font = pango_font_description_new();
+    FcConfig* fc_config = FcConfigGetCurrent();
+    FcConfigAppFontAddFile(fc_config, (const FcChar8*)sys::find_file("FreeSans.ttf").c_str());
     pango_font_description_set_family_static(game_font, "FreeSans");
 }
 
