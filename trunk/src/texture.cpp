@@ -310,9 +310,9 @@ void texture::set_coord_manual(const key& k, GLfloat& x, GLfloat &y)
 
 void texture::set_coord_manual(GLfloat& x, GLfloat& y) const
 {
-	if(!npot_allowed) {
-		x*= ratio_w_;
-		y*= ratio_h_;
+    if(!npot_allowed) {
+        x*= ratio_w_;
+        y*= ratio_h_;
     }
 }
 

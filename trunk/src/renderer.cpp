@@ -26,6 +26,17 @@ decal::decal(const texture& t, int priority) :
         (texture_.height() % hex_texture_height > 0 ? 1 : 0);
 
     radius_ = std::max(radius_x, radius_y);
+
+    scale_x_ = static_cast<GLfloat>(hex_texture_width)/texture_.width();
+    scale_y_ = static_cast<GLfloat>(hex_texture_height)/texture_.height();
+    normed_width_ = texture_.ratio_w()*hex_real_width/static_cast<GLfloat>(hex_texture_width);
+    normed_height_ = texture_.ratio_h()*hex_real_height/static_cast<GLfloat>(hex_texture_height);
+
+    woff_ = (texture_.width() - hex_texture_width)/2.0;
+    woff_ /= static_cast<GLfloat>(hex_texture_width);
+    hoff_ = (texture_.height()- hex_texture_height)/2.0;
+    hoff_ /= static_cast<GLfloat>(hex_texture_height);
+    
 }
 
 void decal::draw(const hex::tile& tile, const hex::gamemap& gmap) const {
@@ -43,41 +54,37 @@ void decal::draw(const hex::tile& tile, const hex::gamemap& gmap) const {
         }
     }
 
-    const GLfloat scale_x = texture_.width() / static_cast<GLfloat>(hex_texture_width);
-    const GLfloat scale_y = texture_.height() / static_cast<GLfloat>(hex_texture_height);
     const GLfloat tile_x = hex::tile::translate_x(tile.loc());
     const GLfloat tile_y = hex::tile::translate_y(tile.loc());
 
-    texture_.set_as_current_texture();
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glPushAttrib(GL_TEXTURE_BIT);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
     glLoadIdentity();
-    glScalef(1/scale_x, 1/scale_y, 1);
+    glScalef(texture_.ratio_w(), texture_.ratio_h(), 1);
+    glScalef(scale_x_,scale_y_, 1);
+    glTranslatef(woff_, hoff_, 0);
+    glScalef(1.0/texture_.ratio_w(), 1.0/texture_.ratio_h(), 1);
 
     foreach(const hex::tile* t, tiles) {
         glPushMatrix();
-        glTranslatef((hex::tile::translate_x(t->loc()) - tile_x)*scale_x,
-                     (hex::tile::translate_y(t->loc()) - tile_y)*scale_y,
-                     0);
-        /*
-        std::cout << "TILE AT "<<(t->loc().x() - tile.loc().x())<<","
-                  <<(t->loc().y() - tile.loc().y())
-                  <<" with texcoords from "
-                  <<((hex::tile::translate_x(t->loc()) - tile_x)*scale_x)<<","
-                  <<((hex::tile::translate_y(t->loc()) - tile_y)*scale_y)<<"\n";
-        */
-            
+        const GLfloat off_x = hex::tile::translate_x(t->loc()) - tile_x;
+        const GLfloat off_y = hex::tile::translate_y(t->loc()) - tile_y;
+
+        glTranslatef(off_x*normed_width_, -off_y*normed_height_, 0);
+        
         glMatrixMode(GL_MODELVIEW);
-        t->draw(false);
+        t->draw(texture_);
         glMatrixMode(GL_TEXTURE);
         glPopMatrix();
     }
 
     glPopMatrix();
+    glPopAttrib();
     glMatrixMode(GL_MODELVIEW);
 }
 

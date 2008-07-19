@@ -39,9 +39,19 @@ public:
 private:
     const static int hex_texture_width = 128;
     const static int hex_texture_height = 128;
+    const static int hex_border_left = 16;
+    const static int hex_border_right = 10;
+    const static int hex_border_top = 10;
+    const static int hex_border_bottom = 12;
+    const static int hex_border_width = hex_border_left + hex_border_right;
+    const static int hex_border_height = hex_border_top + hex_border_bottom;
+    const static int hex_real_width = hex_texture_width - hex_border_width;
+    const static int hex_real_height = hex_texture_height - hex_border_height;
+
     texture texture_;
     int radius_;
     int priority_;
+    GLfloat scale_x_, scale_y_, normed_width_, normed_height_, hoff_, woff_;
 };
 
 class renderer {
