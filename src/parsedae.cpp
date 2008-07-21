@@ -423,7 +423,8 @@ tuple<vector<model::face>, vector<model::bone>, bool > COLLADA::get_faces_and_bo
 			int vcount = vcounts[i];
 			vector<pair<int, float> > influences;
 			for(int j = 0; j < vcount; j++) {
-				influences.push_back(make_pair(v_indices[v + j*(max_offset+1) + joint_offset], weights[v_indices[v + j*(max_offset+1) + weight_offset]]));
+				influences.push_back(make_pair(v_indices[v + j*(max_offset+1) + joint_offset], 
+                                                               weights[v_indices[v + j*(max_offset+1) + weight_offset]]));
 			}
 			multimap<int, model::vertex_ptr>::iterator vertex, v_end;
 			tie(vertex, v_end) = vertices.equal_range(i);
