@@ -24,6 +24,7 @@
 #include <fontconfig/fontconfig.h>
 #include <pango/pangoft2.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/scoped_array.hpp>
 #include <string>
 #include <sstream>
 
@@ -290,11 +291,19 @@ graphics::texture rendered_text::as_texture()
     	glPixelTransferf(GL_GREEN_BIAS, (float)color_.g/255.);
     	glPixelTransferf(GL_BLUE_BIAS, (float)color_.b/255.);
     }
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, width_, height_, 
-                    colored_ ? GL_RGBA : GL_ALPHA, GL_UNSIGNED_BYTE, pixels_.get());
-    //glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, hnd_->bitmap_.width, hnd_->bitmap_.rows, 0, 
-//                 GL_ALPHA, GL_UNSIGNED_BYTE, hnd_->bitmap_.buffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	if(texture.ratio_w() != 1 || texture.ratio_h() != 1) {
+		int extended_size = (int)(width_/texture.ratio_w() * height_/texture.ratio_h() * (colored_ ? 4 : 1));
+		boost::scoped_array<unsigned char> pixels(new unsigned char[extended_size]);
+		memset(pixels.get(), 0x00, extended_size);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int)(width_/texture.ratio_w()), (int)(height_/texture.ratio_h()), 0, 
+			colored_ ? GL_RGBA : GL_ALPHA, GL_UNSIGNED_BYTE, pixels.get());
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width_, height_,
+			colored_ ? GL_RGBA : GL_ALPHA, GL_UNSIGNED_BYTE, pixels_.get());
+	} else {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0,
+			colored_ ? GL_RGBA : GL_ALPHA, GL_UNSIGNED_BYTE, pixels_.get());
+	}
     glPopAttrib();
     
     return texture;
