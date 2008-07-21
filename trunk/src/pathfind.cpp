@@ -52,28 +52,29 @@ struct partial_result_comparer : public std::binary_function<const_partial_resul
 
 }
 
-int find_path(const location& src, const location& dst, const path_cost_calculator& calc, std::vector<location>* result, int max_cost, bool adjacent_only, bool find_partial_result)
+int find_path(const location& src, const location& dst, const path_cost_calculator& calc, 
+              std::vector<location>* result, int max_cost, bool adjacent_only, bool find_partial_result)
 {
 	//sanity check to make sure the destination is reachable from
 	//an adjacent hex
 	if(!adjacent_only) {
-		if(!calc.allowed_to_move(dst)) {
-			return -1;
-		}
-
-		location adj[6];
-		get_adjacent_tiles(dst, adj);
-		bool found = false;
-		for(int n = 0; n != 6; ++n) {
-			if(calc.allowed_to_move(adj[n]) && calc.movement_cost(adj[n],dst) >= 0) {
-				found = true;
-				break;
-			}
-		}
-
-		if(!found) {
-			return -1;
-		}
+            if(!calc.allowed_to_move(dst)) {
+                return -1;
+            }
+            
+            location adj[6];
+            get_adjacent_tiles(dst, adj);
+            bool found = false;
+            for(int n = 0; n != 6; ++n) {
+                if(calc.allowed_to_move(adj[n]) && calc.movement_cost(adj[n],dst) >= 0) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if(!found) {
+                return -1;
+            }
 	}
 
 	const_partial_result_ptr best_partial_result;

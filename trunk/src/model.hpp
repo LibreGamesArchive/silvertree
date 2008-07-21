@@ -32,7 +32,6 @@ public:
 	const std::string& id() const { return id_; }
 
 	static const_model_ptr get_model(const std::string& key);
-	struct bone;
 
 	struct vertex {
 		vertex() : uvmap_valid(false) { influences.push_back(std::make_pair(-1,1.0)); }
