@@ -232,7 +232,7 @@ model_ptr parseark(const char* i1, const char* i2)
 
                 Eigen::MatrixP3f default_matrix;
                 default_matrix.loadIdentity();
-                default_matrix.setTranslationVector(default_pos);
+                //default_matrix.setTranslationVector(default_pos);
 
                 // TODO: pull out into quaternion class
                 const GLfloat sz1 = sinf(z1);
@@ -258,7 +258,7 @@ model_ptr parseark(const char* i1, const char* i2)
                 default_matrix(2,2) = 1 - 2*q_x*q_x - 2*q_y*q_y;
                 // end of quaternion horror
 
-                b.transform = default_matrix.matrix();
+                b.transform.loadIdentity();
                 b.inv_bind_matrix.loadIdentity();
                 
                 parents.insert(std::pair<std::string,int>(parent,bones.size()-1));
