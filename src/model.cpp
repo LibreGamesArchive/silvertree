@@ -219,7 +219,7 @@ void model::update_arrays()
                     } else {
                         bone_matrix = bones_[v->influences[i].first].skinning_matrix.matrix();
                     }
-                    skinning_matrix.matrix() += bone_matrix.matrix() * v->influences[i].second;
+                    skinning_matrix.matrix() += bone_matrix.matrix()*v->influences[i].second;
                 }
                 Eigen::Matrix3f transpose_normal_matrix = skinning_matrix.linearComponent().inverse();
                 Eigen::Matrix3f normal_matrix;
@@ -326,57 +326,7 @@ void model::draw(const const_material_ptr& mat) const
         }
         face_elements += num_vertices;
     }
-#if 0
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
-    static int frame = 0;
-    static int bone_idx = 0;
-    
-    if(bones_.size() > 0) {
-        if(frame % 250 == 0) {
-            bone_idx = (bone_idx + 1) % bones_.size();
-            std::cout <<bones_[bone_idx].name<<"\n";
-        }
-        ++frame;
-        
-        foreach(const bone& b, bones_) {
-            if(b.parent == -1) {
-                continue;
-            }
-            
-            glColor3f(1.0,0.0,0.0);
-            
-            Eigen::Vector3f start(0,0,0);
-            Eigen::Vector3f end(0,0,0);
-            start = bones_[b.parent].skinning_matrix * start;
-            end = b.skinning_matrix * end;
-            
-            glBegin(GL_POINTS);
-            glVertex3fv(start.array());
-            glVertex3fv(end.array());
-            glEnd();
-        }
-        const bone& b = bones_[bone_idx];
-        if(b.parent != -1) {
-            glColor3f(1.0,1.0,1.0);
-            
-            Eigen::Vector3f start(0,0,0);
-            Eigen::Vector3f end(0,0,0);
-            start = bones_[b.parent].skinning_matrix * start;
-            end = b.skinning_matrix * end;
-            
-            glBegin(GL_LINES);
-            glVertex3fv(start.array());
-            glVertex3fv(end.array());
-            glEnd();
-        }
-        
-    }
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_DEPTH_TEST);
-#endif
+
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);

@@ -258,8 +258,8 @@ model_ptr parseark(const char* i1, const char* i2)
                 default_matrix(2,2) = 1 - 2*q_x*q_x - 2*q_y*q_y;
                 // end of quaternion horror
 
-                b.transform = default_matrix.matrix();
-                b.inv_bind_matrix = default_matrix.matrix();
+                b.transform = default_matrix;
+                b.inv_bind_matrix = b.transform;
                 
                 parents.insert(std::pair<std::string,int>(parent,bones.size()-1));
             }
@@ -278,11 +278,11 @@ model_ptr parseark(const char* i1, const char* i2)
     foreach(model::bone& b, bones) {
         int parent = b.parent;
         while(parent != -1) {
-            b.inv_bind_matrix = bones[parent].transform * b.transform;
+            b.inv_bind_matrix = bones[parent].transform * b.inv_bind_matrix;
             parent = bones[parent].parent;
         }
-        b.inv_bind_matrix.matrix().inverse();
-        b.inv_bind_matrix *= rootMatrix;
+        b.inv_bind_matrix = b.inv_bind_matrix * rootMatrix;
+        b.inv_bind_matrix = b.inv_bind_matrix.matrix().inverse();
     }
 
     std::cout << "loaded model with " << faces.size() << "," << bones.size() << "\n";
