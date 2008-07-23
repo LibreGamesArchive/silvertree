@@ -58,76 +58,76 @@ void pc_party::encounter(party& p, const std::string& type)
 
 party::TURN_RESULT pc_party::do_turn()
 {
-	std::vector<const_party_ptr> now_visible;
-	get_visible_parties(now_visible);
-	foreach(const_party_ptr& p, now_visible) {
-		if(p.get() == this) {
-			continue;
-		}
-
-		if(std::find(seen_.begin(), seen_.end(), p) == seen_.end()) {
-			map_formula_callable_ptr callable(new map_formula_callable);
-			callable->add("world", variant(&game_world()))
-			         .add("var", variant(&global_game_state::get().get_variables()))
-					 .add("pc", variant(this))
-					 .add("npc", variant(p.get()));
-			game_world().fire_event("sight", *callable);
-		}
-	}
-
-	seen_.swap(now_visible);
-
+    std::vector<const_party_ptr> now_visible;
+    get_visible_parties(now_visible);
+    foreach(const_party_ptr& p, now_visible) {
+        if(p.get() == this) {
+            continue;
+        }
+        
+        if(std::find(seen_.begin(), seen_.end(), p) == seen_.end()) {
+            map_formula_callable_ptr callable(new map_formula_callable);
+            callable->add("world", variant(&game_world()))
+                .add("var", variant(&global_game_state::get().get_variables()))
+                .add("pc", variant(this))
+                .add("npc", variant(p.get()));
+            game_world().fire_event("sight", *callable);
+        }
+    }
+    
+    seen_.swap(now_visible);
+    
     bool run, should_pass;
-	const hex::DIRECTION dir = keyboard::global_controls.dir(
-	               game_world().camera().direction(),
-                   run, should_pass);
+    const hex::DIRECTION dir = keyboard::global_controls.dir(
+          game_world().camera().direction(),
+          run, should_pass);
+    
+    if(dir != hex::NULL_DIRECTION) {
+        path_.clear();
+        const hex::location dst = tile_in_direction(loc(),dir);
+        if(movement_cost(loc(),dst) >= 0) {
+            set_movement_mode(run ? RUN : WALK);
+            move(dir);
+            return TURN_COMPLETE;
+        }
+    } else if(should_pass) {
+        path_.clear();
+        pass();
+        return TURN_COMPLETE;
+    }
+    
+    if(!path_.empty()) {
+        if(path_.back() == loc()) {
+            path_.pop_back();
+        }
 
-	if(dir != hex::NULL_DIRECTION) {
-		path_.clear();
-		const hex::location dst = tile_in_direction(loc(),dir);
-		if(movement_cost(loc(),dst) >= 0) {
-			set_movement_mode(run ? RUN : WALK);
-			move(dir);
-			return TURN_COMPLETE;
-		}
-	} else if(should_pass) {
-		path_.clear();
-		pass();
-		return TURN_COMPLETE;
-	}
-
-	if(!path_.empty()) {
-		if(path_.back() == loc()) {
-			path_.pop_back();
-		}
-
-		if(path_.size() > 1 && game_world().get_party_at(path_.back())) {
-			const hex::location loc = path_.back();
-			set_destination(path_.front());
-			if(path_.empty()) {
-				path_.push_back(loc);
-			}
-		}
-
-		if(!path_.empty()) {
-
-			const hex::DIRECTION dir = hex::get_adjacent_direction(loc(), path_.back());
-			if(dir == hex::NULL_DIRECTION) {
-				path_.clear();
-			} else {
-				move(dir);
-				path_.pop_back();
-			}
-			return TURN_COMPLETE;
-		}
-	}
-
-	return TURN_STILL_THINKING;
+        if(path_.size() > 1 && game_world().get_party_at(path_.back())) {
+            const hex::location loc = path_.back();
+            set_destination(path_.front());
+            if(path_.empty()) {
+                path_.push_back(loc);
+            }
+        }
+        
+        if(!path_.empty()) {
+            
+            const hex::DIRECTION dir = hex::get_adjacent_direction(loc(), path_.back());
+            if(dir == hex::NULL_DIRECTION) {
+                path_.clear();
+            } else {
+                move(dir);
+                path_.pop_back();
+            }
+            return TURN_COMPLETE;
+        }
+    }
+    
+    return TURN_STILL_THINKING;
 }
 
 void pc_party::enter_new_world(const world& w)
 {
-	path_.clear();
+    path_.clear();
 }
 
 }
