@@ -77,11 +77,13 @@ void draw_labels()
 {
     hex::camera* cam = hex::camera::current_camera();
     foreach(const label_ptr& lb, labels) {
+#if 0
         std::cout << "Camera is "<<cam<<"\n";
         std::cout << "Drawing label at "
                   <<lb->pos[0]<<","
                   <<lb->pos[1]<<","
                   <<lb->pos[2]<<"\n";
+#endif
         glPushMatrix();
         const texture& t = lb->tex;
         glTranslatef(lb->pos[0],lb->pos[1],lb->pos[2]);
