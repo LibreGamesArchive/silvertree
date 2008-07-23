@@ -236,9 +236,7 @@ texture texture::build(int w, int h) {
 
     int actual_width = w;
     int actual_height = h;
-    t.ratio_w_ = 1.0;
-    t.ratio_h_ = 1.0;
-    
+
     if(!npot_allowed) {
         actual_width = actual_height =
             std::max(next_power_of_2(actual_width),
@@ -318,7 +316,7 @@ void texture::set_coord_manual(GLfloat& x, GLfloat& y) const
 
 void texture::set_coord(const key& k, GLfloat x, GLfloat y) 
 {
-	texture t(get(k));
+    texture t(get(k));
     t.set_coord(x,y);
 }
 

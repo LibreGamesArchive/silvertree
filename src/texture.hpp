@@ -39,7 +39,7 @@ public:
     typedef std::bitset<NUM_OPTIONS> options_type;
     static void clear_textures();
     
-    texture() : width_(0), height_(0) {}
+    texture() : width_(0), height_(0), ratio_w_(1.0), ratio_h_(1.0) {}
 
     typedef std::vector<surface> key;
     

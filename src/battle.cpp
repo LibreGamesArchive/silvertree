@@ -532,7 +532,7 @@ battle::attack_stats battle::get_attack_stats(
 
 	const int height_diff = map_.get_tile(from_loc).height() -
 	                        map_.get_tile(defender.loc()).height();
-	std::cerr << "height diff: " << height_diff << "\n";
+	//std::cerr << "height diff: " << height_diff << "\n";
 	const character& ch = attacker.get_character();
 	static const std::string AttackStat = "attack";
 	static const std::string DefenseStat = "defense";
@@ -1108,41 +1108,41 @@ bool battle::listener::handle_stats_dialogs(const SDL_Event& e, bool claimed) {
 bool battle::listener::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
 {
     bool claimed = false;
-
-	if(e.button == SDL_BUTTON_LEFT) {
-		if(battle_->highlight_moves_) {
-			const battle_character::move_map::const_iterator move = 
+    
+    if(e.button == SDL_BUTTON_LEFT) {
+        if(battle_->highlight_moves_) {
+            const battle_character::move_map::const_iterator move = 
                 battle_->moves_.find(battle_->selection_.get_selected_hex());
-			if(move != battle_->moves_.end()) {
-				battle_->move_character(**(battle_->focus_), move->second);
+            if(move != battle_->moves_.end()) {
+                battle_->move_character(**(battle_->focus_), move->second);
                 battle_->turn_done_ = !battle_->enter_attack_mode();
-				battle_->move_done_ = true;
+                battle_->move_done_ = true;
                 claimed = true;
-			}
-		} else if(battle_->highlight_targets_ && battle_->current_move_->can_attack()) {
-			battle_character_ptr target_char = battle_->selected_char();
-
-			if(target_char && battle_->targets_.count(target_char->loc())) {
-				battle_->turn_done_ = true;
-				battle_->attack_character(**(battle_->focus_), *target_char, *(battle_->current_move_));
-				if(battle_->move_done_) {
-					battle_->turn_done_ = true;
-				}
-
-				battle_->highlight_targets_ = false;
+            }
+        } else if(battle_->highlight_targets_ && battle_->current_move_->can_attack()) {
+            battle_character_ptr target_char = battle_->selected_char();
+            
+            if(target_char && battle_->targets_.count(target_char->loc())) {
+                battle_->turn_done_ = true;
+                battle_->attack_character(**(battle_->focus_), *target_char, *(battle_->current_move_));
+                if(battle_->move_done_) {
+                    battle_->turn_done_ = true;
+                }
+                
+                battle_->highlight_targets_ = false;
                 battle_->highlight_moves_ = false;
-				battle_->targets_.clear();
+                battle_->targets_.clear();
                 claimed =  true;
-			}
-		} else if(battle_->highlight_targets_) {
-			hex::location loc = battle_->selection_.get_selected_hex();
-			if(battle_->map_.is_loc_on_map(loc) && battle_->targets_.count(loc)) {
-				battle_->turn_done_ = true;
-				battle_->target_mod(**(battle_->focus_), loc, *(battle_->current_move_));
+            }
+        } else if(battle_->highlight_targets_) {
+            hex::location loc = battle_->selection_.get_selected_hex();
+            if(battle_->map_.is_loc_on_map(loc) && battle_->targets_.count(loc)) {
+                battle_->turn_done_ = true;
+                battle_->target_mod(**(battle_->focus_), loc, *(battle_->current_move_));
                 claimed = true;
-			}
-		}
-	}
+            }
+        }
+    }
     return claimed;
 }
 
