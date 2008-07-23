@@ -12,7 +12,23 @@
 namespace graphics {
 
 namespace {
-hex::frustum view_volume;
+    hex::frustum view_volume;
+
+    const static int hex_texture_width = 128;
+    const static int hex_texture_height = 128;
+    const static int hex_border_left = 6;
+    const static int hex_border_right = 0;
+    const static int hex_tess_border_left = 39;
+    const static int hex_tess_border_right = 33;
+    const static int hex_border_top = 10;
+    const static int hex_border_bottom = 12;
+    const static int hex_border_width = hex_border_left + hex_border_right;
+    const static int hex_border_height = hex_border_top + hex_border_bottom;
+    const static int hex_tess_border_width = hex_tess_border_left + hex_tess_border_right;
+    const static int hex_real_width = hex_texture_width - hex_border_width;
+    const static int hex_real_height = hex_texture_height - hex_border_height;
+    const static int hex_tess_height = hex_texture_height - hex_border_top - hex_border_bottom;
+    const static int hex_tess_width = hex_texture_width - hex_tess_border_right + hex_border_left + 2;
 }
 
 decal::decal(const std::string& s, int priority) :
@@ -38,9 +54,9 @@ void decal::init() {
     radius_ = std::max(radius_x, radius_y);
 
     scale_x_ = texture_.ratio_w() * static_cast<GLfloat>(hex_texture_width)/texture_.width();
-    scale_y_ = texture_.ratio_h() * static_cast<GLfloat>(hex_texture_height)/(texture_.height()-1);
-    normed_width_ = texture_.ratio_w()*hex_real_width/static_cast<GLfloat>(hex_texture_width);
-    normed_height_ = texture_.ratio_h()*hex_real_height/static_cast<GLfloat>(hex_texture_height);
+    scale_y_ = texture_.ratio_h() * static_cast<GLfloat>(hex_texture_height)/(texture_.height());
+    normed_width_ = texture_.ratio_w()*hex_tess_width/static_cast<GLfloat>(hex_texture_width);
+    normed_height_ = texture_.ratio_h()*hex_tess_height/static_cast<GLfloat>(hex_texture_height);
 
     woff_ = (texture_.width() - hex_texture_width)/2.0;
     woff_ /= static_cast<GLfloat>(hex_texture_width);
