@@ -71,9 +71,7 @@ private:
     explicit texture(const key& surfs, options_type options=options_type());
     
     struct ID {
-        explicit ID(GLuint id) : id(id) {
-        }
-        
+        explicit ID();
         ~ID();
         
         GLuint id;
