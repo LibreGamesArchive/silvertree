@@ -25,31 +25,9 @@ namespace graphics
 namespace {
 	typedef std::map<texture::key,graphics::texture> texture_map;
 	texture_map texture_cache;
-	const size_t TextureBufSize = 128;
-	GLuint texture_buf[TextureBufSize];
-	size_t texture_buf_pos = TextureBufSize;
-	std::vector<GLuint> avail_textures;
 	bool graphics_initialized = false;
 
 	GLuint current_texture = 0;
-
-	GLuint get_texture_id() {
-		if(!avail_textures.empty()) {
-			const GLuint res = avail_textures.back();
-			avail_textures.pop_back();
-			return res;
-		}
-
-		if(texture_buf_pos == TextureBufSize) {
-			glGenTextures(TextureBufSize, texture_buf);
-			for(int i = 0; i != TextureBufSize; ++i) {
-				std::cerr << "texture_buf[" << i << "] = " << texture_buf[i] << "\n";
-			}
-			texture_buf_pos = 0;
-		}
-
-		return texture_buf[texture_buf_pos++];
-	}
 
 	bool npot_allowed = true;
 
@@ -188,7 +166,7 @@ texture::texture(const key& surfs, options_type options)
 		SDL_BlitSurface(i->get(),NULL,s.get(),NULL);
 	}
 
-	id_.reset(new ID(get_texture_id()));
+	id_.reset(new ID);
 
 	glBindTexture(GL_TEXTURE_2D,id_->id);
 	if(preference_mipmapping() && !options[NO_MIPMAP]) {
@@ -232,7 +210,7 @@ void texture::set_as_current_texture() const
 texture texture::build(int w, int h) {
     texture t;
 
-    t.id_.reset(new ID(get_texture_id()));
+    t.id_.reset(new ID);
 
     int actual_width = w;
     int actual_height = h;
@@ -326,11 +304,14 @@ void texture::set_coord(GLfloat x, GLfloat y) const
 	glTexCoord2f(x,y);
 }
 
+texture::ID::ID()
+{
+	glGenTextures(1, &id);
+}
+
 texture::ID::~ID()
 {
-	if(graphics_initialized) {
-		avail_textures.push_back(id);
-	}
+	glDeleteTextures(1, &id);
 }
 
 }
