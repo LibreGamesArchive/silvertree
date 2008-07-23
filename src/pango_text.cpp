@@ -174,12 +174,14 @@ rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_
 	FT_Bitmap& bitmap = ptr->bitmap_;
 
 	PangoAttrList* attrs = pango_layout_get_attributes(layout.get());
-	PangoAttrList* bg_attrs = pango_attr_list_copy(attrs);
-	if(attrs)
-		pango_attr_list_filter(attrs, filter_background, NULL);
-	pango_layout_set_attributes(layout.get(), attrs);
-	pango_ft2_render_layout(&bitmap, layout.get(), 0, 0);
-	pango_layout_set_attributes(layout.get(), bg_attrs);
+        PangoAttrList* bg_attrs = NULL;
+	if(attrs) {
+            bg_attrs = pango_attr_list_copy(attrs);
+            pango_attr_list_filter(attrs, filter_background, NULL);
+        }
+        pango_layout_set_attributes(layout.get(), attrs);
+        pango_ft2_render_layout(&bitmap, layout.get(), 0, 0);
+        pango_layout_set_attributes(layout.get(), bg_attrs);
 
 	int image_size = rect.width * rect.height * (markup ? 4 : 1);
 	boost::shared_array<unsigned char> pixels(new unsigned char[image_size]);
