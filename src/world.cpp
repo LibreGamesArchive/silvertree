@@ -634,8 +634,7 @@ world_ptr world::play()
             
             if(party_result != party::TURN_STILL_THINKING) {
                 if(start_loc != active_party->loc()) {
-                    party_map_range range = parties_.equal_range(
-                                                                 active_party->loc());
+                    party_map_range range = parties_.equal_range(active_party->loc());
                     bool path_cleared = true;
                     bool were_encounters = false;
                     
@@ -648,6 +647,7 @@ world_ptr world::play()
                         if(range.first->second->is_destroyed()) {
                             parties_.erase(range.first++);
                         } else {
+                            range.first->second->set_destination(range.first->second->loc());
                             path_cleared = false;
                             ++range.first;
                         }
@@ -658,6 +658,7 @@ world_ptr world::play()
                     if(were_encounters) {
                         renderer_.reset_timing();
                         input_pump.reset();
+                        active_party->set_destination(active_party->loc());
                     }
                 }
                 
@@ -679,14 +680,14 @@ world_ptr world::play()
                         remove_party(active_party);
                         std::cerr << "returning from world...\n";
 
-						world_ptr res;
-						if(exit->second.level.empty() == false) {
-							res = new world(wml::parse_wml(sys::read_file(exit->second.level)));
-							res->camera().set_rotation(camera());
-							res->advance_time_until(time_);
-							active_party->new_world(*res, exit->second.loc);
-							res->add_party(active_party);
-						}
+                        world_ptr res;
+                        if(exit->second.level.empty() == false) {
+                            res = new world(wml::parse_wml(sys::read_file(exit->second.level)));
+                            res->camera().set_rotation(camera());
+                            res->advance_time_until(time_);
+                            active_party->new_world(*res, exit->second.loc);
+                            res->add_party(active_party);
+                        }
                         return res;
                     }
                     
