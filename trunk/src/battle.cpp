@@ -279,7 +279,16 @@ bool battle::draw()
     
     renderer_.reset_state();
     
-    (*focus_)->get_party().game_world().set_lighting(renderer_);
+    {
+        foreach(const battle_character_ptr& c, chars_) {
+            if(c->is_human_controlled()) {
+                GLfloat position[3];
+                GLfloat rotate;
+                c->get_pos(position, &rotate);
+                c->get_party().game_world().set_lighting(renderer_, position);
+            }
+        }
+    }
 
     GLfloat pos[3];
     GLfloat rotate;

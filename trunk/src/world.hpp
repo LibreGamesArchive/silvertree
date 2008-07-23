@@ -111,7 +111,7 @@ public:
     void quit() { done_ = true; quit_ = true; }
     
     void add_chat_label(gui::label_ptr label, const_character_ptr ch, int delay);
-    void set_lighting(graphics::renderer& renderer) const;
+    void set_lighting(graphics::renderer& renderer, const GLfloat *focus_pos) const;
     
     party_ptr get_pc_party() const;
 
