@@ -415,8 +415,11 @@ bool world::draw() const
             renderer_.add_sight_line(from, to, color);
         }
     }
-    
-    set_lighting(renderer_);
+    {
+        GLfloat position[3];
+        focus_->get_pos(position);
+        set_lighting(renderer_, position);
+    }
     bool drew = renderer_.draw();
     if(drew) {
         draw_display(selected_party);
@@ -841,7 +844,7 @@ gui::const_grid_ptr world::get_track_info() const
 	return g;
 }
 
-void world::set_lighting(graphics::renderer& renderer) const {
+void world::set_lighting(graphics::renderer& renderer, const GLfloat *focus_pos) const {
     GLfloat direction[4] = {0.0,0.0,0.0,0.0};
 
     if(time_.hour() >= 6 && time_.hour() <= 17) {
@@ -880,11 +883,10 @@ void world::set_lighting(graphics::renderer& renderer) const {
     }
     
     if(party_light && party_light_power) {
-        GLfloat position[] = { 0.0, 0.0, 0.0, 1.0 };
         GLfloat ambient[] = {0.0,0.0,0.0,0.0};
         GLfloat diffuse[] = {1.0,1.0,1.0,1.0};
-        
-        focus_->get_pos(position);
+        GLfloat position[] = {focus_pos[0], focus_pos[1], focus_pos[2], 1.0};
+
         position[2] += 1.0;
         diffuse[0] = GLfloat((party_light/10000)%100)/100.0;
         diffuse[1] = GLfloat((party_light/100)%100)/100.0;
