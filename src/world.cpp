@@ -654,6 +654,7 @@ world_ptr world::play()
                     }
                     if(were_encounters) {
                         renderer_.reset_timing();
+                        input_pump.reset();
                     }
                 }
                 
@@ -696,13 +697,14 @@ world_ptr world::play()
                         active_party->new_world(*this,active_party->loc(),active_party->last_move());
 						camera_.set_rotation(s->second->get_world().camera_);
                         renderer_.reset_timing();
-					    map_formula_callable_ptr standard_callable(new map_formula_callable);
-						//since we've left the settlement we fire a 'start'
-						//event, since we're in this world again.
-					    standard_callable->add("world", variant(this))
-				            .add("pc", variant(get_pc_party().get()))
-					        .add("var", variant(&global_game_state::get().get_variables()));
-    					fire_event("start", *standard_callable);
+                        input_pump.reset();
+                        map_formula_callable_ptr standard_callable(new map_formula_callable);
+                        //since we've left the settlement we fire a 'start'
+                        //event, since we're in this world again.
+                        standard_callable->add("world", variant(this))
+                            .add("pc", variant(get_pc_party().get()))
+                            .add("var", variant(&global_game_state::get().get_variables()));
+                        fire_event("start", *standard_callable);
                     }
                     
                     if(active_party->is_destroyed() == false) {
@@ -1033,7 +1035,7 @@ void world::add_chat_label(gui::label_ptr label, const_character_ptr ch, int del
 
 world::listener::listener(world *wld) : listener_(this), wld_(wld) {
     listener_.set_target_state(SDL_BUTTON(SDL_BUTTON_LEFT), 
-                               input::mouse_listener::STATE_MASK_NONE);
+                               KMOD_SHIFT);
 };
 
 void world::listener::reset() {
@@ -1047,15 +1049,9 @@ bool world::listener::process_event(const SDL_Event& e, bool claimed) {
 
 void world::listener::click(Sint32 x, Sint32 y, int clicks, 
                             Uint8 state, Uint8 bstate, SDLMod mod) {
-#if 0
-    hex::location click_hex = wld_->selected_hex_;
-
-    wld_->selected_hex_up_to_date_ = false;
-    if(wld_->selection_.get_selected_hex() != click_hex) {
-        return;
-    }
-#endif
-    wld_->focus_->set_destination(wld_->selection_.get_selected_hex());        
+    
+    wld_->focus_->set_destination(wld_->selection_.get_selected_hex());
+    wld_->focus_->set_movement_mode(mod & KMOD_SHIFT ? party::RUN: party::WALK);
 }
 
 }
