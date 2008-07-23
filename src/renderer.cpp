@@ -37,8 +37,8 @@ void decal::init() {
 
     radius_ = std::max(radius_x, radius_y);
 
-    scale_x_ = static_cast<GLfloat>(hex_texture_width)/texture_.width();
-    scale_y_ = static_cast<GLfloat>(hex_texture_height)/texture_.height();
+    scale_x_ = texture_.ratio_w() * static_cast<GLfloat>(hex_texture_width)/texture_.width();
+    scale_y_ = texture_.ratio_h() * static_cast<GLfloat>(hex_texture_height)/(texture_.height()-1);
     normed_width_ = texture_.ratio_w()*hex_real_width/static_cast<GLfloat>(hex_texture_width);
     normed_height_ = texture_.ratio_h()*hex_real_height/static_cast<GLfloat>(hex_texture_height);
 
@@ -72,14 +72,15 @@ void decal::draw(const hex::tile& tile, const hex::gamemap& gmap) const {
     const GLfloat tile_y = hex::tile::translate_y(tile.loc());
 
     glPushAttrib(GL_TEXTURE_BIT);
+
+    texture_.set_as_current_texture();
+    
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
-    glLoadIdentity();
-    glScalef(texture_.ratio_w(), texture_.ratio_h(), 1);
     glScalef(scale_x_,scale_y_, 1);
     glTranslatef(woff_, hoff_, 0);
     glScalef(1.0/texture_.ratio_w(), 1.0/texture_.ratio_h(), 1);
