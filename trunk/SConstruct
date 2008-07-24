@@ -77,6 +77,8 @@ editor_conf = editor_env.Configure(custom_tests = editor_env["config_checks"])
 editor_env["HaveQt"] = editor_conf.CheckQt4Tools() and \
                        editor_conf.CheckQt4Libs(["QtCore", "QtGui", "QtOpenGL"])
 editor_conf.Finish()
+if "-mms-bitfields" in editor_env["CCFLAGS"]:
+    editor_env["CCFLAGS"].remove("-mms-bitfields")
 
 if env["AUDIO"]:
     env.Replace(CPPDEFINES = { "AUDIO" : None })
