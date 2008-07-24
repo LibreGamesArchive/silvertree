@@ -153,4 +153,5 @@ if not GetOption("silent"):
     print env.subst("""
 Build variant:          $Build
 Text rendering backend: ${use_pango and 'pango' or 'sdl-ttf'}
+Audio support: ${ AUDIO and 'enabled' or 'disabled' }
 """)
