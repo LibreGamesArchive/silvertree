@@ -64,7 +64,7 @@ conf.CheckSDL(require_version = "1.2.9") and \
 conf.CheckSDL("SDL_image") and \
 conf.CheckSDL("SDL_ttf") or Exit(1)
 if env["use_pango"]:
-    conf.CheckPango("ft2") or Exit(1)
+    env["use_pango"] = conf.CheckPango("ft2")
 if env["AUDIO"]:
     env["AUDIO"] = conf.CheckLibWithHeader(openal_lib, "AL/al.h", "C") and \
                    conf.CheckLibWithHeader("mpg123", "mpg123.h", "C")
@@ -148,3 +148,9 @@ if HaveNSIS:
 setup_build_output([env, editor_env, namegen_env])
 
 SConsignFile("sconsign")
+
+if not GetOption("silent"):
+    print env.subst("""
+Build variant:          $Build
+Text rendering backend: ${use_pango and 'pango' or 'sdl-ttf'}
+""")
