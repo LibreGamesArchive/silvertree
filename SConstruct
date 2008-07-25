@@ -61,10 +61,11 @@ namegen_env = env.Clone()
 conf = env.Configure(custom_tests = env["config_checks"])
 conf.CheckGLEW() and \
 conf.CheckSDL(require_version = "1.2.9") and \
-conf.CheckSDL("SDL_image") and \
-conf.CheckSDL("SDL_ttf") or Exit(1)
+conf.CheckSDL("SDL_image") or Return()
 if env["use_pango"]:
     env["use_pango"] = conf.CheckPango("ft2")
+if not env["use_pango"]:
+    conf.CheckSDL("SDL_ttf") or Return()
 if env["AUDIO"]:
     env["AUDIO"] = conf.CheckLibWithHeader(openal_lib, "AL/al.h", "C") and \
                    conf.CheckLibWithHeader("mpg123", "mpg123.h", "C")
