@@ -22,7 +22,7 @@ public:
 	{}
 
 	void mousePressEvent(QGraphicsSceneMouseEvent* e) {
-		dialog_.selectItem(e->scenePos().x(), e->scenePos().y());
+		dialog_.selectItem(static_cast<int>(e->scenePos().x()), static_cast<int>(e->scenePos().y()));
 	}
 private:
 };
@@ -78,7 +78,7 @@ int DialogEditorDialog::build_graphics_items(double x, double y, Command& cmd) {
 		}
 
 		if(ypos - y > max_height) {
-			max_height = ypos - y;
+			max_height = static_cast<int>(ypos - y);
 		}
 	}
 	
