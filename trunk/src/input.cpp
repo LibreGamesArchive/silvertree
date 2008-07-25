@@ -52,10 +52,8 @@ namespace input {
         {
             scoped_int_stack stack_fixer(&(++process_event_stack_));
 
-			// iterate over in reverse order, so the most recent listener
-			// gets the first opportunity to claim the event.
-            std::vector<listener*>::reverse_iterator raw_itor;
-            for(raw_itor = raw_listeners_.rbegin(); raw_itor != raw_listeners_.rend(); ++raw_itor) {
+            std::vector<listener*>::iterator raw_itor;
+            for(raw_itor = raw_listeners_.begin(); raw_itor != raw_listeners_.end(); ++raw_itor) {
                 claimed |= (*raw_itor)->process_event(event, claimed);
             }
         }
