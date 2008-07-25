@@ -1,7 +1,6 @@
 #include <stack>
 #include <algorithm>
 #include <iterator>
-#include "SDL_ttf.h"
 
 #include "foreach.hpp"
 #include "text.hpp"

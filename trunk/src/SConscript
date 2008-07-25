@@ -7,6 +7,7 @@ sources += SConscript("audio/SConscript")
 sources.remove("main.cpp")
 if env["use_pango"]:
     sources.remove("text.cpp")
+    sources.remove("ttf_text.cpp")
     pango_env = env.Clone()
     pango_env.Append(CPPDEFINES = "USE_PANGO")
     sources.extend(pango_env.Object(source = "text.cpp"))
