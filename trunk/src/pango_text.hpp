@@ -29,8 +29,7 @@
 #include FT_FREETYPE_H
 #include <freetype/ftbitmap.h>
 
-// Just until this is feature complete
-#include "ttf_text.hpp"
+#include "text.hpp"
 
 namespace text
 {
@@ -89,7 +88,6 @@ public:
                        int *width = NULL, int *height =NULL);
     
 private:
-    text::ttf::renderer legacy_renderer_;
 };
 
 }

@@ -43,6 +43,15 @@ PangoFT2FontMap* font_map;
 PangoContext* context;
 PangoFontDescription* game_font;
 
+PangoColor SDL_color_to_pango(const SDL_Color& color)
+{
+	PangoColor result;
+	result.red = (guint16)((float)color.r / 255. * 65535.);
+	result.green = (guint16)((float)color.g / 255. * 65535.);
+	result.blue = (guint16)((float)color.b / 255. * 65535.);
+	return result;
+}
+
 gboolean filter_background(PangoAttribute *attribute, gpointer data)
 {
 	if(attribute->klass->type == PANGO_ATTR_BACKGROUND) {
@@ -128,9 +137,25 @@ rendered_text_ptr renderer::render_complex_text(const std::string& text, int fon
                                                 const SDL_Color& selection_fg, const SDL_Color& selection_bg,
                                                 bool opaque_selection,
                                                 int caret, int selection_start, int selection_end) {
-    return legacy_renderer_.render_complex_text(text, font_size, text_color, caret_fg, caret_bg,
-                                                opaque_caret, selection_fg, selection_bg, opaque_selection,
-                                                caret, selection_start, selection_end);
+	ostringstream markup;
+	PangoColor fgcolor, bgcolor;
+	fgcolor = SDL_color_to_pango(caret_fg);
+	bgcolor = SDL_color_to_pango(caret_bg);
+	if(caret != -1) {
+		markup << text.substr(0, caret);
+		markup << "<span color='" << pango_color_to_string(&fgcolor) << "' " <<
+                  "background='" << pango_color_to_string(&bgcolor) << "'>";
+		if(caret == -1 || caret == text.size())
+			markup << " ";
+		else
+			markup << text[caret];
+		markup << "</span>";
+		if(caret != text.size())
+			markup << text.substr(caret+1, string::npos);
+	} else {
+		markup << text;
+	}
+	return render(markup.str(), font_size, text_color, true);
 }
 
 std::string renderer::format(const std::string& text, 
@@ -203,7 +228,6 @@ rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_
 					PangoAttribute *attr = (PangoAttribute*)attrs->data;
 					if(attr->klass->type == PANGO_ATTR_FOREGROUND) {
 						fgcolor = ((PangoAttrColor*)attr)->color;
-						std::cout << "color\n";
 						have_fg = true;
 					}
 					if(attr->klass->type == PANGO_ATTR_BACKGROUND) {
@@ -212,7 +236,7 @@ rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_
 					}
 					attrs = attrs->next;
 				}
-				unsigned char fg[3] = { 0xFF, 0xFF, 0xFF };
+				unsigned char fg[3] = { color.r, color.g, color.b };
 				if(have_fg) {
 					fg[0] = fgcolor.red / 0x100;
 					fg[1] = fgcolor.green / 0x100;
@@ -225,8 +249,8 @@ rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_
 					bg[2] = bgcolor.blue / 0x100;
 				}
 				pango_layout_iter_get_run_extents(iter, &ink_rect, &logical_rect);
-				int x =  ink_rect.x / PANGO_SCALE, y = ink_rect.y / PANGO_SCALE;
-				int width = ink_rect.width / PANGO_SCALE, height = ink_rect.height / PANGO_SCALE;
+				int x =  logical_rect.x / PANGO_SCALE, y = logical_rect.y / PANGO_SCALE;
+				int width = logical_rect.width / PANGO_SCALE, height = logical_rect.height / PANGO_SCALE;
 				for(int row = y; row < y + height; row++) {
 					for(int col = x; col < x + width; col++) {
 						int pos = col + rect.width * row;
