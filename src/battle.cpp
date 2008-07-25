@@ -618,7 +618,8 @@ void battle::attack_character(battle_character& attacker,
 	const SDL_Rect slider_rect = {100, 650, 800, 100};
 	const bool use_slider = preference_sliders() && attacker.is_human();
 	bool applied_slider_result = false;
-	gui::slider slider(slider_rect, stats.attack, stats.defense, use_slider);
+	input::pump local_pump;
+	gui::slider slider(local_pump, slider_rect, stats.attack, stats.defense, use_slider);
 
 	GLfloat highlight[] = {1.0,0.0,0.0,0.5};
 	const GLfloat elapsed_time = stats.time_taken;
@@ -643,6 +644,7 @@ void battle::attack_character(battle_character& attacker,
 
 	begin_animation();
 	for(GLfloat t = 0.0; t < anim_time; t += 0.08) {
+		local_pump.process();
 		slider.process();
 		slider.set_time(t);
 		initiative_bar_->focus_character(&attacker, t*(elapsed_time/anim_time));
@@ -711,6 +713,9 @@ void battle::attack_character(battle_character& attacker,
 
 	defender.get_character().take_damage(damage);
 	handle_dead_character(defender);
+
+	//flush any remaining events
+	local_pump.process();
 }
 
 void battle::handle_dead_character(const battle_character& c)
@@ -916,7 +921,7 @@ bool battle::listener::process_event(const SDL_Event& event, bool claimed) {
            (event.key.keysym.sym == SDLK_RETURN ||
             event.key.keysym.sym == SDLK_SPACE)) {
             assert(battle_->current_move_);
-            if(battle_->current_move_->can_attack()) {
+            if(!battle_->turn_done_ && battle_->current_move_->can_attack()) {
                 battle_->turn_done_ = true;
                 battle_character_ptr target_char = battle_->selected_char();
                 battle_->attack_character(**(battle_->focus_), *target_char, 
@@ -1119,7 +1124,7 @@ bool battle::listener::handle_mouse_button_down(const SDL_MouseButtonEvent& e)
                 battle_->move_done_ = true;
                 claimed = true;
             }
-        } else if(battle_->highlight_targets_ && battle_->current_move_->can_attack()) {
+        } else if(!battle_->turn_done_ && battle_->highlight_targets_ && battle_->current_move_->can_attack()) {
             battle_character_ptr target_char = battle_->selected_char();
             
             if(target_char && battle_->targets_.count(target_char->loc())) {

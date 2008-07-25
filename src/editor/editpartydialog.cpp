@@ -1,3 +1,4 @@
+#include "dialogeditordialog.hpp"
 #include "editpartydialog.moc"
 #include "editpartydialog.hpp"
 #include "editwmldialog.hpp"
@@ -57,6 +58,7 @@ EditPartyDialog::EditPartyDialog(wml::node_ptr party, QWidget* parent)
 	QApplication::connect(ui_.addButton, SIGNAL(pressed()), this, SLOT(addMember()));
 	QApplication::connect(ui_.removeButton, SIGNAL(pressed()), this, SLOT(removeMember()));
 	QApplication::connect(ui_.editWMLButton, SIGNAL(pressed()), this, SLOT(editWml()));
+	QApplication::connect(ui_.editEncounterButton, SIGNAL(pressed()), this, SLOT(editEncounter()));
 	QApplication::connect(ui_.membersListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(memberChanged(int)));
 	QApplication::connect(ui_.characterGeneratorComboBox, SIGNAL(activated(int)), this, SLOT(changeGenerator(int)));
 	QApplication::connect(ui_.levelLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(changeStats(const QString&)));
@@ -175,6 +177,17 @@ void EditPartyDialog::editWml()
 {
 	writeParty();
 	EditWmlDialog d(party_);
+	d.exec();
+	if(d.result()) {
+		accept();
+	}
+}
+
+void EditPartyDialog::editEncounter()
+{
+	std::cerr << "EDIT ENCOUNTERS!\n";
+	writeParty();
+	DialogEditorDialog d(party_);
 	d.exec();
 	if(d.result()) {
 		accept();

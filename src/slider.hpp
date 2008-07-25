@@ -17,24 +17,29 @@
 
 #include "SDL.h"
 
+#include "input.hpp"
+
 namespace gui {
 
-class slider
+class slider : public input::listener
 {
 public:
-	slider(const SDL_Rect& rect, int attack, int defense,
-	       bool use_slider);
+	slider(input::pump& pump, const SDL_Rect& rect,
+	       int attack, int defense, bool use_slider);
+	~slider();
 
 	GLfloat duration() const;
 	GLfloat critical_section() const;
 	void set_time(GLfloat time) { time_ = time; }
 	void draw();
 	void process();
+	virtual bool process_event(const SDL_Event& e, bool is_claimed);
 
 	enum RESULT { PENDING, BLUE, YELLOW, RED };
 	RESULT result() const;
 
 private:
+	input::pump& pump_;
 	SDL_Rect rect_;
 	int attack_;
 	int defense_;
