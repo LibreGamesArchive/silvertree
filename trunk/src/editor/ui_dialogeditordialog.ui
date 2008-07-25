@@ -28,16 +28,6 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QGraphicsView" name="dialogGraphicsView" >
-   <property name="geometry" >
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>521</width>
-     <height>571</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QPushButton" name="addButton" >
    <property name="geometry" >
     <rect>
@@ -49,6 +39,16 @@
    </property>
    <property name="text" >
     <string>Add</string>
+   </property>
+  </widget>
+  <widget class="QGraphicsView" name="dialogGraphicsView" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>521</width>
+     <height>571</height>
+    </rect>
    </property>
   </widget>
  </widget>

@@ -23,6 +23,7 @@ public slots:
 	void changeGenerator(int index);
 	void changeStats(const QString& text);
 	void editWml();
+	void editEncounter();
 
 private:
 	void loadCharacterStats();

@@ -21,12 +21,21 @@ namespace {
 	const GLfloat hit_section = 0.8;
 }
 
-slider::slider(const SDL_Rect& rect, int attack, int defense,
-               bool use_slider)
- : rect_(rect), attack_(attack), defense_(std::max<int>(4,defense)),
+slider::slider(input::pump& pump, const SDL_Rect& rect,
+               int attack, int defense, bool use_slider)
+ : pump_(pump),
+   rect_(rect), attack_(attack), defense_(std::max<int>(4,defense)),
    time_(0.0), stopped_(-1.0),
    use_slider_(use_slider), result_(PENDING)
-{}
+{
+	std::cerr << "register listener\n";
+	pump_.register_listener(this);
+}
+
+slider::~slider()
+{
+	pump_.deregister_listener(this);
+}
 
 GLfloat slider::duration() const
 {
@@ -71,20 +80,24 @@ void slider::draw()
 
 void slider::process()
 {
+}
+
+bool slider::process_event(const SDL_Event& e, bool is_claimed)
+{
+	std::cerr << "slider intercept\n";
 	if(!use_slider_) {
-		return;
+		return false;
 	}
-	const GLfloat pos = time_ < lead_time ? 0.0 : (time_ - lead_time)/(duration() - lead_time);
-	SDL_Event event;
-	while(SDL_PollEvent(&event)) {
-		switch(event.type) {
-		case SDL_KEYDOWN:
-			if(stopped_ < 0.0 && pos > 0.0) {
-				stopped_ = pos;
-			}
-			break;
+
+	if(e.type == SDL_KEYDOWN) {
+		const GLfloat pos = time_ < lead_time ? 0.0 : (time_ - lead_time)/(duration() - lead_time);
+		if(stopped_ < 0.0 && pos > 0.0) {
+			stopped_ = pos;
 		}
 	}
+
+	std::cerr << "slider return\n";
+	return true;
 }
 
 slider::RESULT slider::result() const
