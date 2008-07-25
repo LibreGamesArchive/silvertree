@@ -1,0 +1,16 @@
+/config.log
+/config.cache
+/config.status
+/autom4te.cache
+/Makefile
+/build
+/config.h
+/stamp-h1
+/.deps
+/options.cache
+/.sconsign.dblite
+/.sconf_temp
+/silvertreerpg
+/silvertreerpg-debug
+/silvertreeedit
+/silvertreeedit-debug
