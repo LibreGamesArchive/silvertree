@@ -4,8 +4,13 @@ from os.path import join
 from os import environ
 from SCons.Util import AppendPath
 
-def CheckPango(context, backend):
-    context.Message("Checking for Pango with " + backend + " backend... ")
+def CheckPango(context, backend, require_version = None):
+    if require_version:
+        version_string = " >= " + require_version
+    else:
+        version_string = ""
+    context.Message("Checking for Pango" + version_string + " with " + backend + " backend... ")
+    version_string = version_string.replace(">=", "'>='")
     env = context.env
     gtkdir = env.get("GTKDIR", os.environ.get("GTK_BASEPATH"))
     if gtkdir:
@@ -13,7 +18,7 @@ def CheckPango(context, backend):
         environ["PKG_CONFIG_PATH"] = AppendPath(environ.get("PKG_CONFIG_PATH", ""), join(gtkdir, "lib/pkgconfig"))
 
     try:
-        env.ParseConfig("pkg-config --libs --cflags pango" + backend)
+        env.ParseConfig("pkg-config --libs --cflags pango" + backend + version_string)
         context.Result("yes")
         return True
     except OSError:

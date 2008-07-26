@@ -63,7 +63,7 @@ conf.CheckGLEW() and \
 conf.CheckSDL(require_version = "1.2.9") and \
 conf.CheckSDL("SDL_image") or Return()
 if env["use_pango"]:
-    env["use_pango"] = conf.CheckPango("ft2")
+    env["use_pango"] = conf.CheckPango("ft2", require_version = "1.16.0")
 if not env["use_pango"]:
     conf.CheckSDL("SDL_ttf") or Return()
 if env["AUDIO"]:
