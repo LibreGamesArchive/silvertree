@@ -108,18 +108,13 @@ rendered_text_ptr renderer::render(const std::string& text, int font_size,
     std::vector<graphics::surface> surfs;
     unsigned int width = 0, height = 0;
     
-    /* workaround: on MacOS TTF_FontLineSkip is completely bogus;
-       on linux it is TTF_FontHeight+1 (for our font anyway); this 
-       represents a best approximation */
-    const unsigned int lineskip = TTF_FontHeight(font.get())+1;
-
     foreach(const std::string& s, v) {
         graphics::surface surf(TTF_RenderUTF8_Blended(font.get(),s.c_str(),color));
         surfs.push_back(surf);
         if(surf->w > width) {
             width = surf->w;
         }
-        height += lineskip;
+        height += surf->h+1;
     }
     graphics::surface res(SDL_CreateRGBSurface(SDL_SWSURFACE,width,height,
                                                    32,SURFACE_MASK));
@@ -128,7 +123,7 @@ rendered_text_ptr renderer::render(const std::string& text, int font_size,
         SDL_SetAlpha(surf.get(), 0, SDL_ALPHA_OPAQUE);
         SDL_Rect rect = {0,y,surf->w,surf->h};
         SDL_BlitSurface(surf.get(), NULL, res.get(), &rect);
-        y += lineskip;
+        y += surf->h+1;
     }
     return rendered_text_ptr(new rendered_text(graphics::texture::get_no_cache(res, 1 << graphics::texture::NO_MIPMAP)));
 }
@@ -307,7 +302,6 @@ void renderer::get_text_size(const std::string& text, int font_size, int *w, int
     const font_ptr font(get_font(font_size));
     std::vector<std::string> lines = util::split(text, '\n');
     int res_w, res_h;
-    const unsigned int lineskip = TTF_FontHeight(font.get())+1;
 
     res_w = 0;
     res_h = 0;
@@ -317,7 +311,7 @@ void renderer::get_text_size(const std::string& text, int font_size, int *w, int
         if(line_w > res_w) {
             res_w = line_w;
         }
-        res_h += lineskip;            
+        res_h += line_h+1;
     }
     *w = res_w;
     *h = res_h;

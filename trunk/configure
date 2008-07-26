@@ -1349,7 +1349,7 @@ Optional Features:
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-audio          enable sound (default is yes)
-  --enable-pango          use pango backend (default is no)
+  --enable-pango          use pango backend (default is yes)
   --enable-formula-test unit test formula code on startup (default is no)
 
   --disable-sdltest       Do not try to compile and run a test SDL program
@@ -4017,7 +4017,7 @@ fi
 if test "${enable_pango+set}" = set; then
   enableval=$enable_pango; want_pango=$enableval
 else
-  want_pango=no
+  want_pango=yes
 fi
 
 
@@ -7484,12 +7484,12 @@ if test -n "$PKG_CONFIG"; then
         pkg_cv_PANGO_CFLAGS="$PANGO_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"pangoft2 >= 1.14.8\"") >&5
-  ($PKG_CONFIG --exists --print-errors "pangoft2 >= 1.14.8") 2>&5
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"pangoft2 >= 1.16.0\"") >&5
+  ($PKG_CONFIG --exists --print-errors "pangoft2 >= 1.16.0") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_PANGO_CFLAGS=`$PKG_CONFIG --cflags "pangoft2 >= 1.14.8" 2>/dev/null`
+  pkg_cv_PANGO_CFLAGS=`$PKG_CONFIG --cflags "pangoft2 >= 1.16.0" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -7502,12 +7502,12 @@ if test -n "$PKG_CONFIG"; then
         pkg_cv_PANGO_LIBS="$PANGO_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"pangoft2 >= 1.14.8\"") >&5
-  ($PKG_CONFIG --exists --print-errors "pangoft2 >= 1.14.8") 2>&5
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"pangoft2 >= 1.16.0\"") >&5
+  ($PKG_CONFIG --exists --print-errors "pangoft2 >= 1.16.0") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_PANGO_LIBS=`$PKG_CONFIG --libs "pangoft2 >= 1.14.8" 2>/dev/null`
+  pkg_cv_PANGO_LIBS=`$PKG_CONFIG --libs "pangoft2 >= 1.16.0" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -7526,9 +7526,9 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        PANGO_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "pangoft2 >= 1.14.8"`
+	        PANGO_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "pangoft2 >= 1.16.0"`
         else
-	        PANGO_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "pangoft2 >= 1.14.8"`
+	        PANGO_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "pangoft2 >= 1.16.0"`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$PANGO_PKG_ERRORS" >&5
