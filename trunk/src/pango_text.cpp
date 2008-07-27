@@ -132,25 +132,30 @@ rendered_text_ptr renderer::render_complex_text(const std::string& text, int fon
                                                 const SDL_Color& selection_fg, const SDL_Color& selection_bg,
                                                 bool opaque_selection,
                                                 int caret, int selection_start, int selection_end) {
-	ostringstream markup;
+	::layout layout(font_size);
+	string the_text(text);
+
+	PangoAttrList* attrs = pango_attr_list_new();
 	PangoColor fgcolor, bgcolor;
-	fgcolor = SDL_color_to_pango(caret_fg);
-	bgcolor = SDL_color_to_pango(caret_bg);
+	PangoAttribute *foreground, *background;
 	if(caret != -1) {
-		markup << text.substr(0, caret);
-		markup << "<span color='" << pango_color_to_string(&fgcolor) << "' " <<
-                  "background='" << pango_color_to_string(&bgcolor) << "'>";
-		if(caret == -1 || caret == text.size())
-			markup << " ";
-		else
-			markup << text[caret];
-		markup << "</span>";
-		if(caret != text.size())
-			markup << text.substr(caret+1, string::npos);
-	} else {
-		markup << text;
+		if(caret == text.size())
+			the_text.append(1, ' ');
+		fgcolor = SDL_color_to_pango(caret_fg);
+		bgcolor = SDL_color_to_pango(caret_bg);
+		foreground = pango_attr_foreground_new(fgcolor.red, fgcolor.green, fgcolor.blue);
+		foreground->start_index = caret; foreground->end_index = caret + 1;
+		background = pango_attr_background_new(bgcolor.red, bgcolor.green, bgcolor.blue);
+		background->start_index = caret; background->end_index = caret + 1;
+		pango_attr_list_insert(attrs, foreground);
+		pango_attr_list_insert(attrs, background);
+		pango_layout_set_attributes(layout.get(), attrs);
+		pango_attr_list_unref(attrs);
 	}
-	return render(markup.str(), font_size, text_color, true);
+
+	layout.set_text(the_text);
+
+	return render(layout.get(), text_color, true);
 }
 
 std::string renderer::format(const std::string& text, 
