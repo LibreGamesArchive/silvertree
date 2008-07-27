@@ -138,6 +138,20 @@ rendered_text_ptr renderer::render_complex_text(const std::string& text, int fon
 	PangoAttrList* attrs = pango_attr_list_new();
 	PangoColor fgcolor, bgcolor;
 	PangoAttribute *foreground, *background;
+
+	if(selection_start != -1 && selection_end != -1) {
+		fgcolor = SDL_color_to_pango(selection_fg);
+		bgcolor = SDL_color_to_pango(selection_bg);
+		foreground = pango_attr_foreground_new(fgcolor.red, fgcolor.green, fgcolor.blue);
+		foreground->start_index = selection_start; foreground->end_index = selection_end + 1;
+		pango_attr_list_insert(attrs, foreground);
+		if(opaque_selection) {
+			background = pango_attr_background_new(bgcolor.red, bgcolor.green, bgcolor.blue);
+			background->start_index = selection_start; background->end_index = selection_end + 1;
+			pango_attr_list_insert(attrs, background);
+		}
+	}
+
 	if(caret != -1) {
 		if(caret == text.size())
 			the_text.append(1, ' ');
@@ -145,13 +159,16 @@ rendered_text_ptr renderer::render_complex_text(const std::string& text, int fon
 		bgcolor = SDL_color_to_pango(caret_bg);
 		foreground = pango_attr_foreground_new(fgcolor.red, fgcolor.green, fgcolor.blue);
 		foreground->start_index = caret; foreground->end_index = caret + 1;
-		background = pango_attr_background_new(bgcolor.red, bgcolor.green, bgcolor.blue);
-		background->start_index = caret; background->end_index = caret + 1;
 		pango_attr_list_insert(attrs, foreground);
-		pango_attr_list_insert(attrs, background);
-		pango_layout_set_attributes(layout.get(), attrs);
-		pango_attr_list_unref(attrs);
+		if(opaque_caret) {
+			background = pango_attr_background_new(bgcolor.red, bgcolor.green, bgcolor.blue);
+			background->start_index = caret; background->end_index = caret + 1;
+			pango_attr_list_insert(attrs, background);
+		}
 	}
+
+	pango_layout_set_attributes(layout.get(), attrs);
+	pango_attr_list_unref(attrs);
 
 	layout.set_text(the_text);
 
