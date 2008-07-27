@@ -18,11 +18,6 @@
  ***************************************************************************/
 
 #include <iostream>
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include <freetype/ftbitmap.h>
-#include <fontconfig/fontconfig.h>
-#include <pango/pangoft2.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_array.hpp>
 #include <string>
@@ -188,35 +183,33 @@ void renderer::get_text_size(const std::string& text,
 	*width = rect.width; *height = rect.height;
 }
 
-rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_Color& color, bool markup)
+rendered_text_ptr renderer::render(PangoLayout* layout, const SDL_Color& color, bool colored)
 {
-	::layout layout(size);
-	layout.set_text(text, markup);
-    
-	PangoRectangle rect(layout.logical_extents());
+	PangoRectangle rect;
+	pango_layout_get_pixel_extents(layout, NULL, &rect);
 
 	ft_bitmap_ptr ptr(new ft_bitmap_handle(rect.width, rect.height));
 	FT_Bitmap& bitmap = ptr->bitmap_;
 
-	PangoAttrList* attrs = pango_layout_get_attributes(layout.get());
+	PangoAttrList* attrs = pango_layout_get_attributes(layout);
         PangoAttrList* bg_attrs = NULL;
 	if(attrs) {
             bg_attrs = pango_attr_list_copy(attrs);
             pango_attr_list_filter(attrs, filter_background, NULL);
         }
-        pango_layout_set_attributes(layout.get(), attrs);
-        pango_ft2_render_layout(&bitmap, layout.get(), 0, 0);
-        pango_layout_set_attributes(layout.get(), bg_attrs);
+        pango_layout_set_attributes(layout, attrs);
+        pango_ft2_render_layout(&bitmap, layout, 0, 0);
+        pango_layout_set_attributes(layout, bg_attrs);
 
-	int image_size = rect.width * rect.height * (markup ? 4 : 1);
+	int image_size = rect.width * rect.height * (colored ? 4 : 1);
 	boost::shared_array<unsigned char> pixels(new unsigned char[image_size]);
 
-	if(!markup)
+	if(!colored)
 		memcpy(pixels.get(), bitmap.buffer, image_size);
 	else {
 		memset(pixels.get(), 0x00, image_size);
 
-		PangoLayoutIter* iter = pango_layout_get_iter(layout.get());
+		PangoLayoutIter* iter = pango_layout_get_iter(layout);
 		do {
 			PangoRectangle ink_rect, logical_rect;
 			PangoLayoutRun* run = pango_layout_iter_get_run(iter);
@@ -269,7 +262,15 @@ rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_
 			}
 		} while(pango_layout_iter_next_run(iter));
 	}
-	return rendered_text_ptr(new rendered_text(pixels, rect.width, rect.height, markup, color));
+	return rendered_text_ptr(new rendered_text(pixels, rect.width, rect.height, colored, color));
+}
+
+rendered_text_ptr renderer::render(const std::string& text, int size, const SDL_Color& color, bool markup)
+{
+	::layout layout(size);
+	layout.set_text(text, markup);
+    
+	return render(layout.get(), color, markup);
 }
 
 ft_bitmap_handle::ft_bitmap_handle(int width, int height)

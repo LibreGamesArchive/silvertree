@@ -28,6 +28,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <freetype/ftbitmap.h>
+#include <pango/pangoft2.h>
 
 #include "text.hpp"
 
@@ -70,6 +71,7 @@ class renderer: public text::renderer
 public:
     renderer();
     ~renderer();
+    text::rendered_text_ptr render(PangoLayout* layout, const SDL_Color& color, bool colored);
     text::rendered_text_ptr render(const std::string& text, 
                              int size, 
                              const SDL_Color& color, bool markup = false);
