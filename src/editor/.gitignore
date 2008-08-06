@@ -2,6 +2,8 @@
 /ui_mainwindow.hpp
 /silvertree-editor
 /ui_editpartydialog.hpp
+/ui_derivemapdialog.hpp
+/ui_dialogeditordialog.hpp
 /.deps
 /Makefile
 /*.moc

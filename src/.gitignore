@@ -2,3 +2,4 @@
 /.deps
 /silvertreerpg
 /libsilvertree.a
+*.o

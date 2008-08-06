@@ -59,6 +59,7 @@ conf.CheckBoost("regex", "1.20") or Exit(1)
 conf.Finish()
 namegen_env = env.Clone()
 conf = env.Configure(custom_tests = env["config_checks"])
+conf.CheckBoost("program_options") and \
 conf.CheckGLEW() and \
 conf.CheckSDL(require_version = "1.2.9") and \
 conf.CheckSDL("SDL_image") or Return()
