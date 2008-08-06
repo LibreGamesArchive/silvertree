@@ -15,3 +15,5 @@
 /silvertreeedit
 /silvertreeedit-debug
 *.swp
+*~
+*.o

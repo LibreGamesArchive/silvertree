@@ -5,7 +5,10 @@ def CheckBoostLib(context, boost_lib, require_version = None):
     backup = env.Clone().Dictionary()
     env.AppendUnique(CPPPATH = [env["BOOSTDIR"]], LIBPATH = [env["BOOSTLIBS"]])
 
-    boost_headers = { "regex" : "regex/config.hpp" }
+    boost_headers = {
+        "regex" : "regex/config.hpp",
+        "program_options" : "program_options/config.hpp"
+        }
     header_name = boost_headers.get(boost_lib, boost_lib + ".hpp")
     libname = "boost_" + boost_lib + env.get("BOOST_SUFFIX", "")
 

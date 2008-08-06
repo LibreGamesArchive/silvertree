@@ -19,7 +19,7 @@ int preference_screen_width();
 int preference_screen_height();
 unsigned int preference_fullscreen();
 
-const std::string& preference_save_file();
-const std::string& preference_scenario_file();
+const std::string preference_save_file();
+const std::string preference_scenario_file();
 
 #endif
