@@ -13,6 +13,7 @@
 
 using std::string;
 using std::cout;
+using std::cerr;
 using boost::program_options::options_description;
 using boost::program_options::variables_map;
 using boost::program_options::store;
@@ -69,7 +70,12 @@ bool parse_args(int argc, char** argv)
 	options_description all("Allowed options");
 	all.add(generic).add(general).add(graphics);
 
-	store(parse_command_line(argc, argv, all), options);
+	try {
+		store(parse_command_line(argc, argv, all), options);
+	} catch(boost::program_options::error& e) {
+		cerr << "Error in command-line: " << e.what() << std::endl;
+		return false;
+	}
 
 	if(options.count("help")) {
 		cout << all;
