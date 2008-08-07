@@ -14,6 +14,7 @@ bool preference_sliders();
 
 GLenum preference_mipmap_min();
 GLenum preference_mipmap_max();
+bool preference_anisotropy();
 
 int preference_screen_width();
 int preference_screen_height();

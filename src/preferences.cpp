@@ -86,6 +86,7 @@ bool parse_args(int argc, char** argv)
 		("disable-mipmapping", "disable mipmapping.")
 		("texture-filter-min", value<filtering_setting<true> >(), "Texture minification function(n,l,nn,nl,ln,ll).")
 		("texture-filter-mag", value<filtering_setting<false> >(), "Texture magnification function(n,l).")
+		("texture-filter-anisotropic", "Enable anisotropic filtering.");
 	;
 
 	options_description all("Allowed options");
@@ -119,6 +120,10 @@ GLenum preference_mipmap_min() {
 
 GLenum preference_mipmap_max() {
 	return options.count("texture-filter-mag") ? options["texture-filter-mag"].as<filtering_setting<false> >().filter : GL_NEAREST;
+}
+
+bool preference_anisotropy() {
+	return options.count("texture-filter-anisotropic");
 }
 
 bool preference_nocombat()
