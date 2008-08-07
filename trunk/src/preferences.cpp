@@ -18,31 +18,50 @@ using boost::program_options::options_description;
 using boost::program_options::variables_map;
 using boost::program_options::store;
 using boost::program_options::value;
+using boost::program_options::validation_error;
+using boost::program_options::validators::check_first_occurrence;
+using boost::program_options::validators::get_single_string;
 
 namespace {
 
 variables_map options;
 
-GLenum mipmap_min = GL_NEAREST_MIPMAP_LINEAR, mipmap_max = GL_LINEAR;
-
-GLenum mipmap_arg_to_type(const std::string& arg) {
+GLenum mipmap_arg_to_type(const std::string& arg, bool minification) {
 	if(arg == "l") {
 		return GL_LINEAR;
 	} else if(arg == "n") {
 		return GL_NEAREST;
-	} else if(arg == "nn") {
-		return GL_NEAREST_MIPMAP_NEAREST;
-	} else if(arg == "ll") {
-		return GL_LINEAR_MIPMAP_LINEAR;
-	} else if(arg == "ln") {
-		return GL_LINEAR_MIPMAP_NEAREST;
-	} else if(arg == "nl") {
-		return GL_NEAREST_MIPMAP_LINEAR;
 	}
-	std::cerr << "unknown mipmap type \""<<arg<<"\": set to \"n\"\n";
-	return GL_NEAREST;
+	if(minification) {
+		if(arg == "nn") {
+			return GL_NEAREST_MIPMAP_NEAREST;
+		} else if(arg == "ll") {
+			return GL_LINEAR_MIPMAP_LINEAR;
+		} else if(arg == "ln") {
+			return GL_LINEAR_MIPMAP_NEAREST;
+		} else if(arg == "nl") {
+			return GL_NEAREST_MIPMAP_LINEAR;
+		}
+	}
+	throw validation_error("incorrect texture filter setting.");
 }
 
+}
+
+template <bool minification> struct filtering_setting
+{
+	filtering_setting(GLenum setting) : filter(setting) {}
+	GLenum filter;
+};
+
+template <bool minification> void validate(boost::any& v, 
+              const std::vector<std::string>& values,
+              filtering_setting<minification>* target_type, int)
+{
+	check_first_occurrence(v);
+	const string& arg = get_single_string(values);
+
+	v = boost::any(filtering_setting<minification>(mipmap_arg_to_type(arg, minification)));
 }
 
 bool parse_args(int argc, char** argv)
@@ -65,6 +84,8 @@ bool parse_args(int argc, char** argv)
 		("width", value<int>(), "set the screen/window width.")
 		("height", value<int>(), "set the screen/window height.")
 		("disable-mipmapping", "disable mipmapping.")
+		("texture-filter-min", value<filtering_setting<true> >(), "Texture minification function(n,l,nn,nl,ln,ll).")
+		("texture-filter-mag", value<filtering_setting<false> >(), "Texture magnification function(n,l).")
 	;
 
 	options_description all("Allowed options");
@@ -93,11 +114,11 @@ bool preference_mipmapping() {
 }
 
 GLenum preference_mipmap_min() {
-	return GL_NEAREST;
+	return options.count("texture-filter-min") ? options["texture-filter-min"].as<filtering_setting<true> >().filter : GL_NEAREST;
 }
 
 GLenum preference_mipmap_max() {
-	return GL_NEAREST_MIPMAP_NEAREST;
+	return options.count("texture-filter-mag") ? options["texture-filter-mag"].as<filtering_setting<false> >().filter : GL_NEAREST;
 }
 
 bool preference_nocombat()
