@@ -7,12 +7,13 @@
  * [http://downloads.sourceforge.net/scons/scons-0.97.win32.exe?modtime=1179416442&big_mirror=0  SCons].
  * [http://trolltech.com/developer/downloads/qt/windows Qt4](needed by SilverTree editor).
 
-These are provided by [http://files.openomy.com/public/loonycyborg/silvertree_SDK-r1.zip SilverTree SDK]:
+These are provided by [http://files.openomy.com/public/loonycyborg/silvertree_SDK-r2.zip SilverTree SDK]:
 
  * SDL
  * SDL_image
  * SDL_ttf
  * boost regex
+ * boost program_options
 
 = Compiling SilverTree =
 
