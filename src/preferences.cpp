@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include <boost/program_options/options_description.hpp>
@@ -14,6 +15,7 @@
 using std::string;
 using std::cout;
 using std::cerr;
+using std::ifstream;
 using boost::program_options::options_description;
 using boost::program_options::variables_map;
 using boost::program_options::store;
@@ -91,6 +93,8 @@ bool parse_args(int argc, char** argv)
 
 	options_description all("Allowed options");
 	all.add(generic).add(general).add(graphics);
+	options_description config_file_options;
+	config_file_options.add(graphics);
 
 	try {
 		store(parse_command_line(argc, argv, all), options);
@@ -103,6 +107,15 @@ bool parse_args(int argc, char** argv)
 		cout << all;
 		return false;
 	}
+
+	ifstream config_file((sys::get_user_data_dir() + "/config").c_str());
+	try {
+		store(parse_config_file(config_file, config_file_options), options);
+	} catch(boost::program_options::error& e) {
+		cerr << "Error in config file: " << e.what() << std::endl;
+		return false;
+	}
+
 	return true;
 }
 
