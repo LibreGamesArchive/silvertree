@@ -12,6 +12,7 @@
 #include "gamemap.hpp"
 #include "map_avatar.hpp"
 #include "particle_system.hpp"
+#include "preferences.hpp"
 
 namespace graphics {
 
@@ -49,7 +50,7 @@ private:
 class renderer {
 public:
     explicit renderer(const hex::gamemap& gmap, hex::camera& camera) 
-        : map_(gmap), show_grid_(false), camera_(camera)  { }
+        : map_(gmap), show_grid_(false), skippy_(50, preference_maxfps()), camera_(camera)  { }
 
     virtual ~renderer() {}
 
