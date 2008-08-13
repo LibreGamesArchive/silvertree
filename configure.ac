@@ -70,7 +70,7 @@ AC_CHECK_PROG([pkgconfig_available], [pkg-config], [yes], [no])
 AS_IF([test x$want_pango = xno], 
       [have_pango=no],
       [AS_IF([test "x$pkgconfig_available" = xyes],
-        [PKG_CHECK_MODULES(PANGO, pangoft2 >= 1.16.0, [
+        [PKG_CHECK_MODULES(PANGO, pangoft2, [
         CPPFLAGS="$CPPFLAGS $PANGO_CFLAGS"
         AC_DEFINE([USE_PANGO], 1, [Pango backend enabled.])
         LIBS="$PANGO_LIBS $LIBS"
