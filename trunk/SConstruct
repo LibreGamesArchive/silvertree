@@ -12,7 +12,7 @@ from cross_compile import setup_cross_compile
 opts = Options("options.cache")
 opts.AddOptions(
     ("PREFIX", "Install prefix.", "/usr/local"),
-    ("STAGE_PREFIX", "Install stage prefix.", "$PREFIX"),
+    ("DESTDIR", "Directory of staged installation.", "/"),
     ("QT4DIR", "Root directory of Qt's installation.", ""),
     BoolOption("use_frameworked_qt", "Use Qt frameworks on Mac", False),
     ("SDLDIR", "Root directory of SDL's installation.", "/usr/"),
@@ -128,9 +128,12 @@ executables += glob("*.dll")
 datafiles = map(Dir, Split("data images model-sources music"))
 datafiles += ["FreeSans.ttf"] + map(glob, Split("*.dae *.3ds *.3d"))
 
+def prepend_destdir(env, path):
+    return join(env["DESTDIR"], path.lstrip("/"))
+
 data_install_dir = join(env["PREFIX"], "share/silvertree-rpg")
-data_stage_dir = join(env["STAGE_PREFIX"], "share/silvertree-rpg")
-install_executables = Install(join(env["STAGE_PREFIX"], "bin"), executables)
+data_stage_dir = prepend_destdir(env, data_install_dir)
+install_executables = Install(prepend_destdir(env, join(env["PREFIX"], "bin")), executables)
 install_data = Install(data_stage_dir, datafiles)
 if not env["PLATFORM"] == "win32":
     Alias("install", [install_executables, install_data])
