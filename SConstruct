@@ -152,6 +152,11 @@ if HaveNSIS:
     installer = env.Installer(env["INSTALLER_NAME"] + "-" + env["INSTALLER_VERSION"], "installer.nsi.template")
     env.Alias("installer", installer)
 
+env.Command("tags",
+    Glob("src/*.cpp") + Glob("src/*.hpp") + Glob("src/*/*.cpp") + Glob("src/*/*.hpp"),
+    "ctags -o $TARGET $SOURCES"
+    )
+
 setup_build_output([env, editor_env, namegen_env])
 
 SConsignFile("sconsign")
