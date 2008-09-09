@@ -111,7 +111,7 @@ Export("env")
 Export("editor_env")
 if env["HOST"]: build = env["Build"] + "-" + env["HOST"]
 else: build = env["Build"]
-silvertree, editor = SConscript("src/SConscript", build_dir = join("build", build))
+silvertree, editor = SConscript("src/SConscript", build_dir = join("build", build), duplicate = False)
 
 if (not env["HOST"] or env["HOST"] == "mingw32") and env["Build"] == "release":
     ExecutableSuffix = env["PROGSUFFIX"]
