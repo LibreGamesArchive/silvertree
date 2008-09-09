@@ -3,6 +3,7 @@ Import("editor_env")
 Import("lib_silvertree")
 
 if editor_env["HaveQt"]:
+    editor_env.Append(CPPPATH = ".")
     editor_sources = Glob("*.cpp", source = True, strings = True)
     editor_sources.remove("oldmain.cpp")
     editor_uis = Glob("*.ui", source = True)
