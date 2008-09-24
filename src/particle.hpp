@@ -3,20 +3,22 @@
 
 #include <GL/glew.h>
 
+#include "eigen/vector.h"
+
+#include "animation.hpp"
+
 namespace graphics {
 
 class particle {
 public:
 	friend class particle_emitter;
 	void draw();
-	bool dead() const { return ttl_ <= 0; }
+	bool dead() const { return position_anim_.finished(); }
 private:
 	GLfloat size_;
-	GLfloat pos_[3];
-	GLfloat velocity_[3];
-	GLfloat acceleration_[3];
-	GLfloat color_[4];
-	GLfloat color_diff_[4];
+	function_animation<Eigen::Vector3f, quadratic_function<Eigen::Vector3f> > position_anim_;
+	Eigen::Vector4f color_;
+	Eigen::Vector4f color_diff_;
 	int ttl_;
 };
 

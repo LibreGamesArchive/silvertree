@@ -65,7 +65,7 @@ AR = ar
 ARFLAGS = cru
 libsilvertree_a_AR = $(AR) $(ARFLAGS)
 libsilvertree_a_LIBADD =
-am__libsilvertree_a_SOURCES_DIST = base_terrain_fwd.hpp \
+am__libsilvertree_a_SOURCES_DIST = animation.hpp base_terrain_fwd.hpp \
 	base_terrain.hpp battle_character_fwd.hpp battle_character.hpp \
 	battle_character_npc.hpp battle_character_pc.hpp battle.hpp \
 	battle_map_generator.hpp battle_menu_fwd.hpp battle_menu.hpp \
@@ -104,8 +104,8 @@ am__libsilvertree_a_SOURCES_DIST = base_terrain_fwd.hpp \
 	util.hpp variant.hpp widget.hpp wml_command_fwd.hpp \
 	wml_command.hpp wml_node_fwd.hpp wml_node.hpp wml_parser.hpp \
 	wml_utils.hpp wml_writer.hpp world_fwd.hpp world.hpp \
-	tinyxml/tinyxml.h zoom_map_generator.hpp base_terrain.cpp \
-	battle_character.cpp battle_character_npc.cpp \
+	tinyxml/tinyxml.h zoom_map_generator.hpp animation.cpp \
+	base_terrain.cpp battle_character.cpp battle_character_npc.cpp \
 	battle_character_pc.cpp battle.cpp battle_map_generator.cpp \
 	battle_menu.cpp battle_missile.cpp battle_modification.cpp \
 	battle_move.cpp button.cpp camera_controller.cpp camera.cpp \
@@ -136,7 +136,7 @@ am__libsilvertree_a_SOURCES_DIST = base_terrain_fwd.hpp \
 	tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp \
 	zoom_map_generator.cpp pango_text.hpp pango_text.cpp
 @HAVE_PANGO_TRUE@am__objects_1 = pango_text.$(OBJEXT)
-am_libsilvertree_a_OBJECTS = titlescreen.$(OBJEXT) \
+am_libsilvertree_a_OBJECTS = titlescreen.$(OBJEXT) animation.$(OBJEXT) \
 	base_terrain.$(OBJEXT) battle_character.$(OBJEXT) \
 	battle_character_npc.$(OBJEXT) battle_character_pc.$(OBJEXT) \
 	battle.$(OBJEXT) battle_map_generator.$(OBJEXT) \
@@ -355,8 +355,8 @@ silvertreerpg_LDADD = libsilvertree.a
 AM_CPPFLAGS = -DDATADIR=\"$(pkgdatadir)\"
 AM_CXXFLAGS = -Wall -Werror -Wno-sign-compare -Wno-switch -Wno-switch-enum
 SUBDIRS = . editor
-libsilvertree_a_SOURCES = base_terrain_fwd.hpp base_terrain.hpp \
-	battle_character_fwd.hpp battle_character.hpp \
+libsilvertree_a_SOURCES = animation.hpp base_terrain_fwd.hpp \
+	base_terrain.hpp battle_character_fwd.hpp battle_character.hpp \
 	battle_character_npc.hpp battle_character_pc.hpp battle.hpp \
 	battle_map_generator.hpp battle_menu_fwd.hpp battle_menu.hpp \
 	battle_missile.hpp battle_modification.hpp battle_move_fwd.hpp \
@@ -394,8 +394,8 @@ libsilvertree_a_SOURCES = base_terrain_fwd.hpp base_terrain.hpp \
 	util.hpp variant.hpp widget.hpp wml_command_fwd.hpp \
 	wml_command.hpp wml_node_fwd.hpp wml_node.hpp wml_parser.hpp \
 	wml_utils.hpp wml_writer.hpp world_fwd.hpp world.hpp \
-	tinyxml/tinyxml.h zoom_map_generator.hpp base_terrain.cpp \
-	battle_character.cpp battle_character_npc.cpp \
+	tinyxml/tinyxml.h zoom_map_generator.hpp animation.cpp \
+	base_terrain.cpp battle_character.cpp battle_character_npc.cpp \
 	battle_character_pc.cpp battle.cpp battle_map_generator.cpp \
 	battle_menu.cpp battle_missile.cpp battle_modification.cpp \
 	battle_move.cpp button.cpp camera_controller.cpp camera.cpp \
@@ -498,6 +498,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/animation.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/audio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base_terrain.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/battle.Po@am__quote@

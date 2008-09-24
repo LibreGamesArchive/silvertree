@@ -34,6 +34,7 @@
 #include "wml_parser.hpp"
 #include "wml_utils.hpp"
 #include "world.hpp"
+#include "animation.cpp"
 
 #include <cmath>
 #include <iostream>
@@ -430,6 +431,8 @@ bool world::draw() const
         audio_->pump_sound();
     }
 #endif
+
+    graphics::time_source::instance().advance_time();
 
     return drew;
 }
