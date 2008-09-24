@@ -21,6 +21,7 @@ endif
 SUBDIRS=. editor
 
 libsilvertree_a_SOURCES=\
+animation.hpp \
 base_terrain_fwd.hpp \
 base_terrain.hpp \
 battle_character_fwd.hpp \
@@ -154,6 +155,7 @@ world.hpp \
 tinyxml/tinyxml.h \
 zoom_map_generator.hpp \
 \
+animation.cpp \
 base_terrain.cpp \
 battle_character.cpp \
 battle_character_npc.cpp \

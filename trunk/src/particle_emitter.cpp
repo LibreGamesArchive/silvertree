@@ -92,23 +92,28 @@ void particle_emitter::initialize_particle(particle& p) const
 	const GLfloat g = (rand()%1000)/1000.0;
 	const GLfloat h = 1.0 - g;
 	const GLfloat speed = speed_->execute().as_int()/1000.0;
+	Eigen::Vector3f particle_pos;
+	Eigen::Vector3f particle_velocity;
+	Eigen::Vector3f particle_acceleration;
 	for(int n = 0; n != 3; ++n) {
-		p.pos_[n] = pos1_[n]*g + pos2_[n]*h;
+		particle_pos[n] = pos1_[n]*g + pos2_[n]*h;
 		if(pos_diffs_[n]) {
-			p.pos_[n] += pos_diffs_[n]->execute().as_int()/1000.0;
+			particle_pos[n] += pos_diffs_[n]->execute().as_int()/1000.0;
 		}
 
-		p.velocity_[n] = (dir1_[n]*g + dir2_[n]*h)*speed;
+		particle_velocity[n] = (dir1_[n]*g + dir2_[n]*h)*speed;
 		if(velocity_diffs_[n]) {
-			p.velocity_[n] += velocity_diffs_[n]->execute().as_int()/1000.0;
+			particle_velocity[n] += velocity_diffs_[n]->execute().as_int()/45.;
 		}
 
 		if(acceleration_[n]) {
-			p.acceleration_[n] = acceleration_[n]->execute().as_int()/10000.0;
+			particle_acceleration[n] = acceleration_[n]->execute().as_int()/40.;
 		} else {
-			p.acceleration_[n] = 0.0;
+			particle_acceleration[n] = 0.0;
 		}
 	}
+	p.position_anim_ = function_animation<Eigen::Vector3f, quadratic_function<Eigen::Vector3f> >(quadratic_function<Eigen::Vector3f>(particle_acceleration, particle_velocity, particle_pos));
+	p.position_anim_.set_duration((float)p.ttl_/30.);
 
 	for(int n = 0; n != 4; ++n) {
 		if(color_[n]) {

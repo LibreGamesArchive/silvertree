@@ -6,18 +6,17 @@ namespace graphics {
 
 void particle::draw()
 {
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color_);
-    glVertex3f(pos_[0]-size_, pos_[1], pos_[2]);
-    glVertex3f(pos_[0]+size_, pos_[1], pos_[2]);
-    glVertex3f(pos_[0], pos_[1]+size_, pos_[2]);
-    for(int n = 0; n != 3; ++n) {
-        pos_[n] += velocity_[n];
-        velocity_[n] += acceleration_[n];
-    }
-    
-    for(int n = 0; n != 4; ++n) {
-        color_[n] += color_diff_[n];
-    }
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color_.array());
+    Eigen::Vector3f pos = position_anim_.play();
+    pos.x() -= size_;
+    glVertex3fv(pos.array());
+    pos.x() += 2 * size_;
+    glVertex3fv(pos.array());
+    pos.x() -= size_;
+    pos.y() += size_;
+    glVertex3fv(pos.array());
+
+    color_ += color_diff_;
     ttl_--;
 }
 

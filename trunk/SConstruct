@@ -31,6 +31,8 @@ opts.AddOptions(
 )
 
 env = Environment(tools = ["zip", "config_checks"], toolpath = ["scons"], options = opts)
+env.Decider("MD5-timestamp")
+SetOption('implicit_cache', 1)
 env["Build"] = env["Build"].lower()
 if env["PLATFORM"] == "win32":
     env.Tool("mingw")
