@@ -103,11 +103,11 @@ void particle_emitter::initialize_particle(particle& p) const
 
 		particle_velocity[n] = (dir1_[n]*g + dir2_[n]*h)*speed;
 		if(velocity_diffs_[n]) {
-			particle_velocity[n] += velocity_diffs_[n]->execute().as_int()/45.;
+			particle_velocity[n] += velocity_diffs_[n]->execute().as_int()/10.;
 		}
 
 		if(acceleration_[n]) {
-			particle_acceleration[n] = acceleration_[n]->execute().as_int()/40.;
+			particle_acceleration[n] = acceleration_[n]->execute().as_int()/2.5;
 		} else {
 			particle_acceleration[n] = 0.0;
 		}
