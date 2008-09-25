@@ -10,6 +10,10 @@ for dir in ["release", "debug"]:
     if glob(os.path.join("build", dir, "*.cpp")):
         shutil.rmtree(os.path.join("build", dir), True)
 
+Decider("MD5-timestamp")
+SetOption('implicit_cache', 1)
+SConsignFile("build/sconsign.dblite")
+
 sys.path.insert(0, "./scons")
 from build_output import setup_build_output
 from cross_compile import setup_cross_compile
@@ -36,8 +40,6 @@ opts.AddOptions(
 )
 
 env = Environment(tools = ["zip", "config_checks"], toolpath = ["scons"], options = opts)
-env.Decider("MD5-timestamp")
-SetOption('implicit_cache', 1)
 env["Build"] = env["Build"].lower()
 if env["PLATFORM"] == "win32":
     env.Tool("mingw")
@@ -61,7 +63,7 @@ if env["PLATFORM"] == "win32": openal_lib = "openal32"
 else: openal_lib = "openal"
 
 env.Append(LIBPATH = "/usr/X11R6/lib")
-conf = env.Configure(custom_tests = env["config_checks"])
+conf = env.Configure(custom_tests = env["config_checks"], log_file="build/config.log", conf_dir="build/sconf_temp")
 conf.CheckBoost("regex", "1.20") or Exit(1)
 conf.Finish()
 namegen_env = env.Clone()
