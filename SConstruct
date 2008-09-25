@@ -2,9 +2,14 @@
 
 from os.path import join
 from glob import glob
-import sys
+import os, sys, shutil
 
 EnsureSConsVersion(0, 98, 0)
+
+for dir in ["release", "debug"]:
+    if glob(os.path.join("build", dir, "*.cpp")):
+        shutil.rmtree(os.path.join("build", dir), True)
+
 sys.path.insert(0, "./scons")
 from build_output import setup_build_output
 from cross_compile import setup_cross_compile
